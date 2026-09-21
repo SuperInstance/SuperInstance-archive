@@ -1,0 +1,145 @@
+{
+  "expo": {
+    "name": "ActiveLog",
+    "slug": "activelog",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.activelog.app",
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to capture and attach images to your logs.",
+        "NSPhotoLibraryUsageDescription": "This app uses the photo library to select images for your logs.",
+        "NSLocationWhenInUseUsageDescription": "This app uses location data to tag your log entries with location information.",
+        "NSMicrophoneUsageDescription": "This app uses the microphone to record audio logs.",
+        "NSContactsUsageDescription": "This app uses contacts to share logs with friends and family.",
+        "NSCalendarsUsageDescription": "This app uses calendar data to sync with your scheduled events.",
+        "NSRemindersUsageDescription": "This app uses reminders to create follow-up tasks from your logs.",
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "associatedDomains": [
+        "applinks:activelog.app",
+        "applinks:*.activelog.app"
+      ],
+      "config": {
+        "usesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.activelog.app",
+      "versionCode": 1,
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "RECORD_AUDIO",
+        "READ_CONTACTS",
+        "WRITE_CONTACTS",
+        "READ_CALENDAR",
+        "WRITE_CALENDAR",
+        "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED",
+        "WAKE_LOCK"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "activelog.app"
+            },
+            {
+              "scheme": "https",
+              "host": "*.activelog.app"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-camera",
+      "expo-image-picker",
+      "expo-location",
+      "expo-notifications",
+      "expo-secure-store",
+      "expo-auth-session",
+      "expo-updates",
+      "@sentry/react-native/expo",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "newArchEnabled": true
+          },
+          "android": {
+            "newArchEnabled": true
+          }
+        }
+      ],
+      [
+        "react-native-purchases",
+        {
+          "purchasesAreCompletedBy": {
+            "RevenueCat": {
+              "appleApiKey": "appl_key_placeholder",
+              "googleApiKey": "goog_key_placeholder"
+            }
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "activelog-project-id"
+      },
+      "sentryDsn": "https://sentry-dsn-placeholder@sentry.io/project-id",
+      "mixpanelToken": "mixpanel-token-placeholder",
+      "amplitudeApiKey": "amplitude-api-key-placeholder",
+      "branchKey": "branch-key-placeholder",
+      "revenueCatApiKey": "revenuecat-api-key-placeholder"
+    },
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "activelog",
+            "project": "activelog-mobile"
+          }
+        }
+      ]
+    },
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 30000,
+      "url": "https://u.expo.dev/activelog-project-id"
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    }
+  }
+}

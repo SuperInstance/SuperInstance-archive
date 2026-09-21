@@ -1,0 +1,72 @@
+{
+  "c04ae592437e": {
+    "research": {
+      "skill_type": "research",
+      "experience_points": 0.0,
+      "practice_count": 0,
+      "successful_practices": 0,
+      "last_practiced": "2025-10-21T17:15:57.500411",
+      "skill_level": "novice",
+      "learning_rate": 1.0,
+      "plateau_resistance": 1.0,
+      "decay_rate": 0.01,
+      "breakthrough_required": false,
+      "breakthrough_progress": 0.0,
+      "category": "technical",
+      "success_rate": 0.3,
+      "next_level_xp": 20,
+      "progress_to_next_level": 0.0
+    },
+    "analytical_thinking": {
+      "skill_type": "analytical_thinking",
+      "experience_points": 0.0,
+      "practice_count": 0,
+      "successful_practices": 0,
+      "last_practiced": "2025-10-21T17:15:57.500426",
+      "skill_level": "novice",
+      "learning_rate": 1.0,
+      "plateau_resistance": 1.0,
+      "decay_rate": 0.01,
+      "breakthrough_required": false,
+      "breakthrough_progress": 0.0,
+      "category": "cognitive",
+      "success_rate": 0.3,
+      "next_level_xp": 20,
+      "progress_to_next_level": 0.0
+    },
+    "problem_solving": {
+      "skill_type": "problem_solving",
+      "experience_points": 0.0,
+      "practice_count": 0,
+      "successful_practices": 0,
+      "last_practiced": "2025-10-21T17:15:57.500431",
+      "skill_level": "novice",
+      "learning_rate": 1.0,
+      "plateau_resistance": 1.0,
+      "decay_rate": 0.01,
+      "breakthrough_required": false,
+      "breakthrough_progress": 0.0,
+      "category": "cognitive",
+      "success_rate": 0.3,
+      "next_level_xp": 20,
+      "progress_to_next_level": 0.0
+    },
+    "data_analysis": {
+      "skill_type": "data_analysis",
+      "experience_points": 5.478378373493172,
+      "practice_count": 4,
+      "successful_practices": 1,
+      "last_practiced": "2025-10-21T17:15:57.501132",
+      "skill_level": "novice",
+      "learning_rate": 1.0,
+      "plateau_resistance": 1.0,
+      "decay_rate": 0.01,
+      "breakthrough_required": false,
+      "breakthrough_progress": 0.0,
+      "category": "technical",
+      "success_rate": 0.3,
+      "next_level_xp": 20,
+      "progress_to_next_level": 0.27391891867465856
+    }
+  }
+}

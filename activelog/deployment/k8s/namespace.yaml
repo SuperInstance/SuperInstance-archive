@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: activelog
+  labels:
+    name: activelog
+    environment: production
+    version: v1
+    istio-injection: enabled
+spec: {}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: activelog-monitoring
+  labels:
+    name: activelog-monitoring
+    environment: production
+spec: {}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: activelog-logging
+  labels:
+    name: activelog-logging
+    environment: production
+spec: {}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: activelog-system
+  labels:
+    name: activelog-system
+    environment: production
+spec: {}

@@ -1,0 +1,424 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: canary-deployment-config
+  namespace: activelog
+data:
+  config.yaml: |
+    canary_releases:
+      api-gateway:
+        stable:
+          image: "activelog/api-gateway:v1.0.0"
+          replicas: 3
+          service_name: "api-gateway-stable"
+          port: 8000
+          weight: 90
+          version: "v1.0.0"
+        canary:
+          image: "activelog/api-gateway:v1.1.0-rc1"
+          replicas: 1
+          service_name: "api-gateway-canary"
+          port: 8000
+          weight: 10
+          version: "v1.1.0-rc1"
+        
+      auth-service:
+        stable:
+          image: "activelog/auth-service:v1.0.0"
+          replicas: 2
+          service_name: "auth-service-stable"
+          port: 8001
+          weight: 95
+          version: "v1.0.0"
+        canary:
+          image: "activelog/auth-service:v1.1.0-rc1"
+          replicas: 1
+          service_name: "auth-service-canary"
+          port: 8001
+          weight: 5
+          version: "v1.1.0-rc1"
+          
+      graphql-service:
+        stable:
+          image: "activelog/graphql-service:v1.0.0"
+          replicas: 2
+          service_name: "graphql-service-stable"
+          port: 8010
+          weight: 80
+          version: "v1.0.0"
+        canary:
+          image: "activelog/graphql-service:v1.1.0-rc1"
+          replicas: 1
+          service_name: "graphql-service-canary"
+          port: 8010
+          weight: 20
+          version: "v1.1.0-rc1"
+
+    routing_strategies:
+      # Header-based routing
+      header_routing:
+        enabled: true
+        headers:
+          - name: "x-canary"
+            value: "true"
+            route_to: "canary"
+          - name: "x-user-type"
+            value: "beta"
+            route_to: "canary"
+          - name: "x-environment"
+            value: "staging"
+            route_to: "canary"
+      
+      # User-based routing
+      user_routing:
+        enabled: true
+        beta_users:
+          - "user123@activelog.com"
+          - "beta-tester@activelog.com"
+        percentage_rollout:
+          enabled: true
+          percentage: 10
+          hash_key: "user_id"
+      
+      # Geographic routing
+      geo_routing:
+        enabled: false
+        regions:
+          - name: "us-west"
+            canary_percentage: 20
+          - name: "us-east"
+            canary_percentage: 5
+          - name: "eu-west"
+            canary_percentage: 0
+      
+      # Time-based routing
+      time_routing:
+        enabled: false
+        schedule:
+          - start: "02:00"
+            end: "06:00"
+            timezone: "UTC"
+            canary_percentage: 50
+
+    progression:
+      # Automatic progression rules
+      auto_progression:
+        enabled: true
+        stages:
+          - percentage: 5
+            duration: "10m"
+            success_criteria:
+              error_rate_threshold: 0.01
+              latency_p95_threshold: 1000
+              min_requests: 100
+          - percentage: 10
+            duration: "20m"
+            success_criteria:
+              error_rate_threshold: 0.01
+              latency_p95_threshold: 1000
+              min_requests: 500
+          - percentage: 25
+            duration: "30m"
+            success_criteria:
+              error_rate_threshold: 0.005
+              latency_p95_threshold: 800
+              min_requests: 1000
+          - percentage: 50
+            duration: "1h"
+            success_criteria:
+              error_rate_threshold: 0.005
+              latency_p95_threshold: 800
+              min_requests: 2000
+          - percentage: 100
+            duration: "2h"
+            success_criteria:
+              error_rate_threshold: 0.002
+              latency_p95_threshold: 600
+              min_requests: 5000
+
+      # Rollback criteria
+      rollback:
+        auto_rollback: true
+        criteria:
+          error_rate_threshold: 0.05
+          latency_p95_threshold: 5000
+          latency_p99_threshold: 10000
+          success_rate_threshold: 0.95
+          min_requests_for_decision: 50
+        
+        # Manual rollback triggers
+        manual_triggers:
+          - alert: "CanaryHighErrorRate"
+          - alert: "CanaryHighLatency"
+          - alert: "CanaryLowSuccessRate"
+
+    monitoring:
+      metrics:
+        prometheus_endpoint: "http://prometheus:9090"
+        query_interval: "30s"
+        
+        # Key metrics to monitor
+        key_metrics:
+          - name: "error_rate"
+            query: 'rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m])'
+            threshold: 0.01
+            comparison: "less_than"
+          
+          - name: "latency_p95"
+            query: 'histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))'
+            threshold: 1.0
+            comparison: "less_than"
+          
+          - name: "latency_p99"
+            query: 'histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))'
+            threshold: 2.0
+            comparison: "less_than"
+          
+          - name: "request_rate"
+            query: 'rate(http_requests_total[5m])'
+            threshold: 10
+            comparison: "greater_than"
+          
+          - name: "cpu_usage"
+            query: 'rate(container_cpu_usage_seconds_total[5m])'
+            threshold: 0.8
+            comparison: "less_than"
+          
+          - name: "memory_usage"
+            query: 'container_memory_usage_bytes / container_spec_memory_limit_bytes'
+            threshold: 0.9
+            comparison: "less_than"
+
+      alerts:
+        webhook_url: "http://alertmanager:9093/api/v1/alerts"
+        notifications:
+          - type: "slack"
+            webhook: "${SLACK_WEBHOOK_URL}"
+            channel: "#deployments"
+          - type: "email"
+            recipients: ["ops@activelog.com"]
+
+    analysis:
+      # Statistical analysis for canary vs stable
+      statistical_analysis:
+        enabled: true
+        confidence_level: 0.95
+        minimum_sample_size: 100
+        analysis_interval: "5m"
+        
+        tests:
+          - name: "error_rate_comparison"
+            metric: "error_rate"
+            test_type: "mann_whitney_u"
+          - name: "latency_comparison"
+            metric: "latency_p95"
+            test_type: "welch_t_test"
+          - name: "success_rate_comparison"
+            metric: "success_rate"
+            test_type: "chi_square"
+
+      # A/B testing configuration
+      ab_testing:
+        enabled: true
+        test_duration: "24h"
+        sample_size_calculation: "power_analysis"
+        significance_level: 0.05
+        power: 0.8
+        effect_size: 0.1
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: canary-scripts
+  namespace: activelog
+data:
+  canary-deploy.sh: |
+    #!/bin/bash
+    set -e
+    
+    SERVICE_NAME=${1}
+    CANARY_IMAGE=${2}
+    CANARY_PERCENTAGE=${3:-10}
+    
+    if [ -z "$SERVICE_NAME" ] || [ -z "$CANARY_IMAGE" ]; then
+        echo "Usage: $0 <service-name> <canary-image> [percentage]"
+        exit 1
+    fi
+    
+    echo "Starting canary deployment for $SERVICE_NAME with $CANARY_IMAGE at $CANARY_PERCENTAGE%"
+    
+    # Deploy canary version
+    kubectl set image deployment/$SERVICE_NAME-canary $SERVICE_NAME=$CANARY_IMAGE -n activelog
+    
+    # Scale canary deployment
+    STABLE_REPLICAS=$(kubectl get deployment $SERVICE_NAME-stable -o jsonpath='{.spec.replicas}' -n activelog)
+    CANARY_REPLICAS=$(echo "scale=0; $STABLE_REPLICAS * $CANARY_PERCENTAGE / 100" | bc)
+    
+    if [ "$CANARY_REPLICAS" -eq 0 ]; then
+        CANARY_REPLICAS=1
+    fi
+    
+    echo "Scaling canary to $CANARY_REPLICAS replicas"
+    kubectl scale deployment $SERVICE_NAME-canary --replicas=$CANARY_REPLICAS -n activelog
+    
+    # Wait for canary to be ready
+    kubectl rollout status deployment/$SERVICE_NAME-canary -n activelog --timeout=300s
+    
+    # Update traffic weights in Consul
+    STABLE_WEIGHT=$((100 - CANARY_PERCENTAGE))
+    consul kv put "service/$SERVICE_NAME/stable/weight" "$STABLE_WEIGHT"
+    consul kv put "service/$SERVICE_NAME/canary/weight" "$CANARY_PERCENTAGE"
+    
+    echo "Canary deployment started successfully!"
+    echo "Stable: $STABLE_WEIGHT%, Canary: $CANARY_PERCENTAGE%"
+    
+  canary-promote.sh: |
+    #!/bin/bash
+    set -e
+    
+    SERVICE_NAME=${1}
+    
+    if [ -z "$SERVICE_NAME" ]; then
+        echo "Usage: $0 <service-name>"
+        exit 1
+    fi
+    
+    echo "Promoting canary for $SERVICE_NAME to stable"
+    
+    # Get canary image
+    CANARY_IMAGE=$(kubectl get deployment $SERVICE_NAME-canary -o jsonpath='{.spec.template.spec.containers[0].image}' -n activelog)
+    
+    # Update stable deployment with canary image
+    kubectl set image deployment/$SERVICE_NAME-stable $SERVICE_NAME=$CANARY_IMAGE -n activelog
+    
+    # Wait for stable rollout
+    kubectl rollout status deployment/$SERVICE_NAME-stable -n activelog --timeout=600s
+    
+    # Shift all traffic to stable
+    consul kv put "service/$SERVICE_NAME/stable/weight" "100"
+    consul kv put "service/$SERVICE_NAME/canary/weight" "0"
+    
+    # Scale down canary
+    kubectl scale deployment $SERVICE_NAME-canary --replicas=0 -n activelog
+    
+    echo "Canary promoted successfully!"
+    
+  canary-rollback.sh: |
+    #!/bin/bash
+    set -e
+    
+    SERVICE_NAME=${1}
+    REASON=${2:-"manual"}
+    
+    if [ -z "$SERVICE_NAME" ]; then
+        echo "Usage: $0 <service-name> [reason]"
+        exit 1
+    fi
+    
+    echo "Rolling back canary for $SERVICE_NAME (reason: $REASON)"
+    
+    # Shift all traffic back to stable
+    consul kv put "service/$SERVICE_NAME/stable/weight" "100"
+    consul kv put "service/$SERVICE_NAME/canary/weight" "0"
+    
+    # Scale down canary
+    kubectl scale deployment $SERVICE_NAME-canary --replicas=0 -n activelog
+    
+    # Send notification
+    curl -X POST "$SLACK_WEBHOOK_URL" \
+         -H 'Content-type: application/json' \
+         --data "{\"text\":\"🚨 Canary rollback: $SERVICE_NAME (reason: $REASON)\"}"
+    
+    echo "Canary rollback completed!"
+    
+  canary-analyze.sh: |
+    #!/bin/bash
+    set -e
+    
+    SERVICE_NAME=${1}
+    DURATION=${2:-"10m"}
+    
+    if [ -z "$SERVICE_NAME" ]; then
+        echo "Usage: $0 <service-name> [duration]"
+        exit 1
+    fi
+    
+    echo "Analyzing canary performance for $SERVICE_NAME over $DURATION"
+    
+    PROMETHEUS_URL="http://prometheus:9090"
+    
+    # Query metrics for stable and canary
+    get_metric() {
+        local query=$1
+        local service=$2
+        local version=$3
+        
+        curl -s "$PROMETHEUS_URL/api/v1/query" \
+             --data-urlencode "query=$query{service=\"$service\",version=\"$version\"}[$DURATION]" | \
+             jq -r '.data.result[0].value[1] // "0"'
+    }
+    
+    # Error rates
+    STABLE_ERROR_RATE=$(get_metric "rate(http_requests_total{status=~\"5..\"}" "$SERVICE_NAME" "stable")
+    CANARY_ERROR_RATE=$(get_metric "rate(http_requests_total{status=~\"5..\"}" "$SERVICE_NAME" "canary")
+    
+    # Latency
+    STABLE_P95=$(get_metric "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket" "$SERVICE_NAME" "stable")
+    CANARY_P95=$(get_metric "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket" "$SERVICE_NAME" "canary")
+    
+    echo "=== Analysis Results ==="
+    echo "Error Rate - Stable: $STABLE_ERROR_RATE, Canary: $CANARY_ERROR_RATE"
+    echo "P95 Latency - Stable: ${STABLE_P95}s, Canary: ${CANARY_P95}s"
+    
+    # Simple decision logic
+    ERROR_THRESHOLD="0.01"
+    LATENCY_THRESHOLD="2.0"
+    
+    if (( $(echo "$CANARY_ERROR_RATE > $ERROR_THRESHOLD" | bc -l) )); then
+        echo "❌ FAIL: Canary error rate too high"
+        exit 1
+    fi
+    
+    if (( $(echo "$CANARY_P95 > $LATENCY_THRESHOLD" | bc -l) )); then
+        echo "❌ FAIL: Canary latency too high"
+        exit 1
+    fi
+    
+    echo "✅ PASS: Canary metrics within acceptable range"
+    
+  canary-monitor.sh: |
+    #!/bin/bash
+    set -e
+    
+    SERVICE_NAME=${1}
+    
+    if [ -z "$SERVICE_NAME" ]; then
+        echo "Usage: $0 <service-name>"
+        exit 1
+    fi
+    
+    echo "Starting continuous monitoring for $SERVICE_NAME canary"
+    
+    while true; do
+        echo "=== $(date) ==="
+        
+        # Check if canary is running
+        CANARY_REPLICAS=$(kubectl get deployment $SERVICE_NAME-canary -o jsonpath='{.status.readyReplicas}' -n activelog 2>/dev/null || echo "0")
+        
+        if [ "$CANARY_REPLICAS" -eq 0 ]; then
+            echo "No canary deployment running"
+            sleep 60
+            continue
+        fi
+        
+        # Run analysis
+        if ./canary-analyze.sh "$SERVICE_NAME" "5m"; then
+            echo "✅ Canary health check passed"
+        else
+            echo "❌ Canary health check failed - initiating rollback"
+            ./canary-rollback.sh "$SERVICE_NAME" "automated-health-check-failure"
+            break
+        fi
+        
+        sleep 60
+    done

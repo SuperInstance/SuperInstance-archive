@@ -1,0 +1,216 @@
+{
+  "character_id": "test_consolidation",
+  "memories": [
+    {
+      "id": "01d2e8e63a38",
+      "content": "Important learning experience 1 that should be consolidated",
+      "memory_type": "learning",
+      "importance": 7,
+      "timestamp": "2025-10-21T18:52:04.533599",
+      "context": {
+        "session": "session_0"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "topic_0"
+      ],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 1,
+      "last_accessed": "2025-10-21T18:52:04.539353",
+      "decay_rate": 0.04000000000000001,
+      "current_strength": 0.9999999973347222
+    },
+    {
+      "id": "4ce964289f9f",
+      "content": "Important learning experience 2 that should be consolidated",
+      "memory_type": "learning",
+      "importance": 8,
+      "timestamp": "2025-10-21T18:52:04.534093",
+      "context": {
+        "session": "session_0"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "topic_1"
+      ],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 4,
+      "last_accessed": "2025-10-21T18:52:04.539352",
+      "decay_rate": 0.03,
+      "current_strength": 0.9999999981725695
+    },
+    {
+      "id": "8c80295705bc",
+      "content": "Important learning experience 3 that should be consolidated",
+      "memory_type": "learning",
+      "importance": 9,
+      "timestamp": "2025-10-21T18:52:04.534469",
+      "context": {
+        "session": "session_0"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "topic_2"
+      ],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 4,
+      "last_accessed": "2025-10-21T18:52:04.539351",
+      "decay_rate": 0.020000000000000004,
+      "current_strength": 0.99999999886875
+    },
+    {
+      "id": "3031c70d4ec5",
+      "content": "Important learning experience 4 that should be consolidated",
+      "memory_type": "learning",
+      "importance": 7,
+      "timestamp": "2025-10-21T18:52:04.535046",
+      "context": {
+        "session": "session_1"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "topic_0"
+      ],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 4,
+      "last_accessed": "2025-10-21T18:52:04.539353",
+      "decay_rate": 0.04000000000000001,
+      "current_strength": 0.9999999980046296
+    },
+    {
+      "id": "b949733ee5e1",
+      "content": "Important learning experience 5 that should be consolidated",
+      "memory_type": "learning",
+      "importance": 8,
+      "timestamp": "2025-10-21T18:52:04.535406",
+      "context": {
+        "session": "session_1"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "topic_1"
+      ],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 4,
+      "last_accessed": "2025-10-21T18:52:04.539352",
+      "decay_rate": 0.03,
+      "current_strength": 0.9999999986284722
+    },
+    {
+      "id": "3c1aabfea76a",
+      "content": "Important learning experience 6 that should be consolidated",
+      "memory_type": "learning",
+      "importance": 9,
+      "timestamp": "2025-10-21T18:52:04.535966",
+      "context": {
+        "session": "session_1"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "topic_2"
+      ],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 4,
+      "last_accessed": "2025-10-21T18:52:04.539350",
+      "decay_rate": 0.020000000000000004,
+      "current_strength": 0.9999999992152778
+    },
+    {
+      "id": "1bb2c112438e",
+      "content": "Important learning experience 7 that should be consolidated",
+      "memory_type": "learning",
+      "importance": 7,
+      "timestamp": "2025-10-21T18:52:04.536395",
+      "context": {
+        "session": "session_2"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "topic_0"
+      ],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 4,
+      "last_accessed": "2025-10-21T18:52:04.539353",
+      "decay_rate": 0.04000000000000001,
+      "current_strength": 0.9999999986291667
+    },
+    {
+      "id": "d95a1008825c",
+      "content": "Important learning experience 8 that should be consolidated",
+      "memory_type": "learning",
+      "importance": 8,
+      "timestamp": "2025-10-21T18:52:04.537013",
+      "context": {
+        "session": "session_2"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "topic_1"
+      ],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 4,
+      "last_accessed": "2025-10-21T18:52:04.539351",
+      "decay_rate": 0.03,
+      "current_strength": 0.9999999991864583
+    },
+    {
+      "id": "c95cb69fd0cb",
+      "content": "Important learning experience 9 that should be consolidated",
+      "memory_type": "learning",
+      "importance": 9,
+      "timestamp": "2025-10-21T18:52:04.537669",
+      "context": {
+        "session": "session_2"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "topic_2"
+      ],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 4,
+      "last_accessed": "2025-10-21T18:52:04.539350",
+      "decay_rate": 0.020000000000000004,
+      "current_strength": 0.9999999996094907
+    },
+    {
+      "id": "ae748b8a7f67",
+      "content": "Important learning experience 10 that should be consolidated",
+      "memory_type": "learning",
+      "importance": 7,
+      "timestamp": "2025-10-21T18:52:04.538255",
+      "context": {
+        "session": "session_3"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "topic_0"
+      ],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 4,
+      "last_accessed": "2025-10-21T18:52:04.539352",
+      "decay_rate": 0.04000000000000001,
+      "current_strength": 0.9999999994902777
+    }
+  ],
+  "last_saved": "2025-10-21T18:52:04.539960"
+}

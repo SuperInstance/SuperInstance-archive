@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "DMLog Mobile",
+    "slug": "dmlog-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1a1a2e"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.dmlog.mobile",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses camera for miniature AR features and character photos",
+        "NSMicrophoneUsageDescription": "This app uses microphone for voice notes and chat features"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1a1a2e"
+      },
+      "package": "com.dmlog.mobile",
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE",
+        "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-camera",
+      "expo-notifications",
+      "expo-secure-store",
+      "expo-sqlite"
+    ],
+    "notification": {
+      "icon": "./assets/notification-icon.png",
+      "color": "#ffd700"
+    }
+  }
+}

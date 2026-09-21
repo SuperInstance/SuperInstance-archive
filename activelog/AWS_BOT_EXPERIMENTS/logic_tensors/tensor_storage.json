@@ -1,0 +1,207 @@
+{
+  "logic_tensors": {
+    "2318b4ba7b082eb6": {
+      "task_id": "2318b4ba7b082eb6",
+      "task_description": "a simple calculator app with scientific functions",
+      "created_timestamp": "2025-08-30T18:17:08.293595",
+      "tree_structure": [
+        {
+          "component": "Setup project structure",
+          "bash_level": false,
+          "level": 0
+        },
+        {
+          "component": "Install dependencies",
+          "bash_level": false,
+          "level": 0
+        },
+        {
+          "component": "Create main application logic",
+          "bash_level": false,
+          "level": 0
+        },
+        {
+          "component": "Add user interface",
+          "bash_level": false,
+          "level": 0
+        },
+        {
+          "component": "Test application",
+          "bash_level": false,
+          "level": 0
+        },
+        {
+          "component": "Build and package",
+          "bash_level": false,
+          "level": 0
+        }
+      ],
+      "component_count": 6,
+      "max_depth": 0,
+      "meshed_concepts": {},
+      "tensor_version": "1.0"
+    },
+    "ddc382fe1d0d3a07": {
+      "task_id": "ddc382fe1d0d3a07",
+      "task_description": "a task management dashboard with real-time updates",
+      "created_timestamp": "2025-08-30T18:17:34.529048",
+      "tree_structure": [
+        {
+          "component": "Initialize environment",
+          "bash_level": false,
+          "level": 0
+        },
+        {
+          "component": "Plan implementation",
+          "bash_level": false,
+          "level": 0
+        },
+        {
+          "component": "Core implementation",
+          "bash_level": false,
+          "level": 0
+        },
+        {
+          "component": "Testing and validation",
+          "bash_level": false,
+          "level": 0
+        },
+        {
+          "component": "Finalization",
+          "bash_level": false,
+          "level": 0
+        }
+      ],
+      "component_count": 5,
+      "max_depth": 0,
+      "meshed_concepts": {},
+      "tensor_version": "1.0"
+    },
+    "1b367db59a684b29": {
+      "task_id": "1b367db59a684b29",
+      "task_description": "simple calculator",
+      "created_timestamp": "2025-08-30T18:19:13.680761",
+      "tree_structure": [
+        {
+          "component": "Initialize environment",
+          "bash_level": false,
+          "level": 0
+        },
+        {
+          "component": "Plan implementation",
+          "bash_level": false,
+          "level": 0
+        },
+        {
+          "component": "Core implementation",
+          "bash_level": false,
+          "level": 0
+        },
+        {
+          "component": "Testing and validation",
+          "bash_level": false,
+          "level": 0
+        },
+        {
+          "component": "Finalization",
+          "bash_level": false,
+          "level": 0
+        }
+      ],
+      "component_count": 5,
+      "max_depth": 0,
+      "meshed_concepts": {},
+      "tensor_version": "1.0"
+    }
+  },
+  "component_references": {},
+  "task_trees": {
+    "2318b4ba7b082eb6": [
+      {
+        "component": "Setup project structure",
+        "bash_level": false,
+        "level": 0
+      },
+      {
+        "component": "Install dependencies",
+        "bash_level": false,
+        "level": 0
+      },
+      {
+        "component": "Create main application logic",
+        "bash_level": false,
+        "level": 0
+      },
+      {
+        "component": "Add user interface",
+        "bash_level": false,
+        "level": 0
+      },
+      {
+        "component": "Test application",
+        "bash_level": false,
+        "level": 0
+      },
+      {
+        "component": "Build and package",
+        "bash_level": false,
+        "level": 0
+      }
+    ],
+    "ddc382fe1d0d3a07": [
+      {
+        "component": "Initialize environment",
+        "bash_level": false,
+        "level": 0
+      },
+      {
+        "component": "Plan implementation",
+        "bash_level": false,
+        "level": 0
+      },
+      {
+        "component": "Core implementation",
+        "bash_level": false,
+        "level": 0
+      },
+      {
+        "component": "Testing and validation",
+        "bash_level": false,
+        "level": 0
+      },
+      {
+        "component": "Finalization",
+        "bash_level": false,
+        "level": 0
+      }
+    ],
+    "1b367db59a684b29": [
+      {
+        "component": "Initialize environment",
+        "bash_level": false,
+        "level": 0
+      },
+      {
+        "component": "Plan implementation",
+        "bash_level": false,
+        "level": 0
+      },
+      {
+        "component": "Core implementation",
+        "bash_level": false,
+        "level": 0
+      },
+      {
+        "component": "Testing and validation",
+        "bash_level": false,
+        "level": 0
+      },
+      {
+        "component": "Finalization",
+        "bash_level": false,
+        "level": 0
+      }
+    ]
+  },
+  "last_updated": "2025-08-30T18:19:14.284243"
+}

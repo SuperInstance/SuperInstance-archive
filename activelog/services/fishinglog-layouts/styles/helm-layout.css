@@ -1,0 +1,405 @@
+/* Helm Layout Specific Styles */
+
+.helm-layout .layout-container {
+    grid-template-areas: 
+        "chart instruments radar"
+        "status status status";
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 1fr auto;
+}
+
+.helm-layout .chart-main {
+    grid-area: chart;
+}
+
+.helm-layout .instruments-panel {
+    grid-area: instruments;
+    background: var(--marine-panel-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    overflow-y: auto;
+}
+
+.helm-layout .radar-panel {
+    grid-area: radar;
+    background: var(--marine-panel-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+}
+
+.helm-layout .status-bar {
+    grid-area: status;
+}
+
+/* Instruments Panel Specific */
+.instruments-grid {
+    padding: var(--spacing-md);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+}
+
+.instrument {
+    background: var(--instrument-bg);
+    border: 1px solid var(--instrument-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    text-align: center;
+    position: relative;
+}
+
+.instrument-dial {
+    width: 80px;
+    height: 80px;
+    border: 3px solid var(--instrument-dial);
+    border-radius: 50%;
+    position: relative;
+    margin: 0 auto var(--spacing-sm);
+}
+
+.instrument-needle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2px;
+    height: 35px;
+    background: var(--instrument-needle);
+    transform-origin: bottom center;
+    transform: translate(-50%, -100%);
+    border-radius: 1px;
+}
+
+.instrument-value {
+    font-size: var(--font-size-xl);
+    font-weight: bold;
+    color: var(--marine-text);
+    margin-bottom: var(--spacing-xs);
+}
+
+.instrument-label {
+    color: var(--marine-text-secondary);
+    font-size: var(--font-size-small);
+}
+
+.instrument-unit {
+    color: var(--marine-text-secondary);
+    font-size: var(--font-size-small);
+    margin-left: var(--spacing-xs);
+}
+
+/* Engine Status */
+.engine-status {
+    padding: var(--spacing-md);
+}
+
+.engine-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.engine-indicator {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm);
+    background: var(--marine-darker-bg);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-small);
+}
+
+.engine-value {
+    font-weight: bold;
+}
+
+.engine-value.normal {
+    color: var(--marine-success);
+}
+
+.engine-value.warning {
+    color: var(--marine-warning);
+}
+
+.engine-value.danger {
+    color: var(--marine-danger);
+}
+
+/* Autopilot Controls */
+.autopilot-controls {
+    padding: var(--spacing-md);
+    border-top: 1px solid var(--marine-border);
+}
+
+.autopilot-mode {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.mode-btn {
+    flex: 1;
+    padding: var(--spacing-sm);
+    background: var(--marine-darker-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-sm);
+    color: var(--marine-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mode-btn.active {
+    background: var(--marine-accent);
+    border-color: var(--marine-accent);
+    color: white;
+}
+
+.autopilot-setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.setting-controls {
+    display: flex;
+    gap: var(--spacing-xs);
+    align-items: center;
+}
+
+.adjust-btn {
+    width: 30px;
+    height: 30px;
+    background: var(--marine-darker-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-sm);
+    color: var(--marine-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-small);
+}
+
+.adjust-btn:hover {
+    background: var(--marine-accent);
+    border-color: var(--marine-accent);
+}
+
+.setting-value {
+    min-width: 60px;
+    text-align: center;
+    font-weight: bold;
+    color: var(--marine-accent);
+}
+
+/* Radar Display */
+.radar-display {
+    flex: 1;
+    position: relative;
+    background: var(--marine-darker-bg);
+    border-radius: var(--radius-md);
+    margin: var(--spacing-sm);
+    overflow: hidden;
+}
+
+.radar-canvas {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, 
+        rgba(0, 168, 255, 0.1) 0%, 
+        rgba(0, 168, 255, 0.05) 30%, 
+        transparent 70%);
+}
+
+.radar-sweep {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        var(--marine-accent) 0%, 
+        rgba(0, 168, 255, 0.3) 70%, 
+        transparent 100%);
+    transform-origin: left center;
+    animation: radarSweep 3s linear infinite;
+}
+
+@keyframes radarSweep {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.radar-rings {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+}
+
+.radar-ring {
+    position: absolute;
+    border: 1px solid rgba(0, 168, 255, 0.3);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.radar-ring:nth-child(1) {
+    width: 20%;
+    height: 20%;
+}
+
+.radar-ring:nth-child(2) {
+    width: 40%;
+    height: 40%;
+}
+
+.radar-ring:nth-child(3) {
+    width: 60%;
+    height: 60%;
+}
+
+.radar-ring:nth-child(4) {
+    width: 80%;
+    height: 80%;
+}
+
+.radar-ring:nth-child(5) {
+    width: 100%;
+    height: 100%;
+}
+
+/* Radar Targets */
+.radar-target {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: var(--marine-warning);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 8px var(--marine-warning);
+    animation: radarBlip 2s ease-in-out infinite;
+}
+
+.radar-target.large {
+    background: var(--marine-danger);
+    box-shadow: 0 0 12px var(--marine-danger);
+    width: 8px;
+    height: 8px;
+}
+
+@keyframes radarBlip {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Radar Info */
+.radar-info {
+    padding: var(--spacing-sm);
+    background: var(--marine-darker-bg);
+    border-top: 1px solid var(--marine-border);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+    font-size: var(--font-size-small);
+}
+
+.radar-setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.radar-setting label {
+    color: var(--marine-text-secondary);
+}
+
+.radar-setting span {
+    color: var(--marine-text);
+    font-weight: bold;
+}
+
+/* Helm Controls */
+.helm-controls {
+    position: absolute;
+    bottom: var(--spacing-md);
+    right: var(--spacing-md);
+    display: flex;
+    gap: var(--spacing-sm);
+    z-index: 20;
+}
+
+.helm-btn {
+    width: 50px;
+    height: 50px;
+    background: var(--marine-panel-bg);
+    border: 2px solid var(--marine-border);
+    border-radius: 50%;
+    color: var(--marine-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-large);
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+}
+
+.helm-btn:hover {
+    background: var(--marine-accent);
+    border-color: var(--marine-accent);
+    box-shadow: 0 0 15px var(--marine-accent);
+}
+
+.helm-btn.active {
+    background: var(--marine-accent);
+    border-color: var(--marine-accent);
+    box-shadow: 0 0 20px var(--marine-accent);
+}
+
+/* Responsive Design for Helm Layout */
+@media (max-width: 1200px) {
+    .helm-layout .layout-container {
+        grid-template-areas: 
+            "chart chart"
+            "instruments radar"
+            "status status";
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 2fr 1fr auto;
+    }
+    
+    .instruments-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .helm-layout .layout-container {
+        grid-template-areas: 
+            "chart"
+            "instruments"
+            "radar"
+            "status";
+        grid-template-columns: 1fr;
+        grid-template-rows: 2fr 1fr 1fr auto;
+    }
+    
+    .engine-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .autopilot-mode {
+        flex-direction: column;
+    }
+    
+    .radar-info {
+        grid-template-columns: 1fr;
+    }
+}

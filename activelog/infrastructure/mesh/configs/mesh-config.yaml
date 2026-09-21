@@ -1,0 +1,311 @@
+mesh:
+  name: "activelog-mesh"
+  version: "1.0.0"
+  environment: "production"
+  
+  # Global mesh configuration
+  global:
+    datacenter: "activelog-dc1"
+    cluster_name: "activelog-cluster"
+    
+    # Security settings
+    security:
+      tls_enabled: true
+      mtls_mode: "permissive"  # strict, permissive, disabled
+      certificate_authority: "consul-ca"
+      auto_encrypt: true
+      
+    # Observability
+    observability:
+      tracing:
+        enabled: true
+        jaeger_endpoint: "http://jaeger-collector:14268"
+        sampling_rate: 0.1
+      metrics:
+        enabled: true
+        prometheus_endpoint: "http://mesh-metrics:9090"
+        scrape_interval: "15s"
+      logging:
+        enabled: true
+        log_level: "INFO"
+        structured_logging: true
+
+  # Service configuration
+  services:
+    api-gateway:
+      port: 8000
+      protocol: "http"
+      health_check: "/health"
+      deployment_strategies: ["blue-green", "canary"]
+      circuit_breaker:
+        enabled: true
+        failure_threshold: 5
+        timeout: 30s
+        reset_timeout: 60s
+      retry_policy:
+        max_retries: 3
+        base_interval: 1s
+        max_interval: 10s
+      load_balancing:
+        policy: "round_robin"
+        health_check_interval: 10s
+      
+    auth-service:
+      port: 8001
+      protocol: "http"
+      health_check: "/health"
+      deployment_strategies: ["canary"]
+      circuit_breaker:
+        enabled: true
+        failure_threshold: 3
+        timeout: 15s
+        reset_timeout: 30s
+      retry_policy:
+        max_retries: 5
+        base_interval: 0.5s
+        max_interval: 5s
+      load_balancing:
+        policy: "least_request"
+        health_check_interval: 8s
+      
+    graphql-service:
+      port: 8010
+      protocol: "http"
+      health_check: "/health"
+      deployment_strategies: ["canary"]
+      circuit_breaker:
+        enabled: true
+        failure_threshold: 4
+        timeout: 45s
+        reset_timeout: 90s
+      retry_policy:
+        max_retries: 2
+        base_interval: 2s
+        max_interval: 8s
+      load_balancing:
+        policy: "round_robin"
+        health_check_interval: 10s
+
+    mobile-api-service:
+      port: 8011
+      protocol: "http"
+      health_check: "/health"
+      deployment_strategies: ["blue-green"]
+      circuit_breaker:
+        enabled: true
+        failure_threshold: 3
+        timeout: 20s
+        reset_timeout: 40s
+      retry_policy:
+        max_retries: 3
+        base_interval: 1s
+        max_interval: 6s
+      load_balancing:
+        policy: "round_robin"
+        health_check_interval: 10s
+
+    file-processor-service:
+      port: 8003
+      protocol: "http"
+      health_check: "/health"
+      deployment_strategies: ["blue-green"]
+      circuit_breaker:
+        enabled: true
+        failure_threshold: 5
+        timeout: 60s
+        reset_timeout: 120s
+      retry_policy:
+        max_retries: 2
+        base_interval: 3s
+        max_interval: 15s
+      load_balancing:
+        policy: "least_request"
+        health_check_interval: 15s
+
+    ai-orchestrator-service:
+      port: 8004
+      protocol: "http"
+      health_check: "/health"
+      deployment_strategies: ["canary"]
+      circuit_breaker:
+        enabled: true
+        failure_threshold: 2
+        timeout: 120s
+        reset_timeout: 300s
+      retry_policy:
+        max_retries: 1
+        base_interval: 5s
+        max_interval: 30s
+      load_balancing:
+        policy: "least_request"
+        health_check_interval: 20s
+
+  # Traffic management
+  traffic_management:
+    # Global rate limiting
+    rate_limiting:
+      enabled: true
+      requests_per_second: 1000
+      burst_size: 100
+      
+    # Timeout configuration
+    timeouts:
+      connection_timeout: 5s
+      request_timeout: 30s
+      idle_timeout: 60s
+      
+    # Load balancing
+    load_balancing:
+      global_policy: "round_robin"
+      health_check_interval: 10s
+      unhealthy_threshold: 3
+      healthy_threshold: 2
+      
+    # Circuit breaker defaults
+    circuit_breaker:
+      global_enabled: true
+      failure_threshold: 5
+      timeout: 30s
+      reset_timeout: 60s
+      
+    # Retry policy defaults
+    retry_policy:
+      max_retries: 3
+      base_interval: 1s
+      max_interval: 10s
+      retry_on: ["5xx", "gateway-error", "connect-failure", "refused-stream"]
+
+  # Deployment strategies
+  deployment:
+    blue_green:
+      enabled: true
+      health_check_timeout: 30s
+      switch_strategy: "instant"  # instant, gradual
+      rollback_on_failure: true
+      
+    canary:
+      enabled: true
+      initial_percentage: 5
+      increment_percentage: 10
+      promotion_interval: "10m"
+      max_percentage: 50
+      auto_promotion: true
+      rollback_on_failure: true
+      
+      # Success criteria for auto-promotion
+      success_criteria:
+        error_rate_threshold: 0.01
+        latency_p95_threshold: 1000
+        min_requests: 100
+        
+      # Rollback criteria
+      rollback_criteria:
+        error_rate_threshold: 0.05
+        latency_p95_threshold: 5000
+        success_rate_threshold: 0.95
+
+  # Security policies
+  security:
+    # Access control
+    access_control:
+      default_policy: "allow"  # allow, deny
+      enable_rbac: true
+      
+    # Network policies
+    network_policies:
+      - name: "api-gateway-ingress"
+        from: ["internet"]
+        to: ["api-gateway"]
+        ports: [8080]
+        
+      - name: "internal-services"
+        from: ["api-gateway", "graphql-service"]
+        to: ["auth-service", "metadata-service", "file-processor-service"]
+        ports: [8001, 8002, 8003]
+        
+      - name: "ai-services"
+        from: ["api-gateway", "file-processor-service"]
+        to: ["ai-orchestrator-service"]
+        ports: [8004]
+
+  # Monitoring and alerting
+  monitoring:
+    # Health checks
+    health_checks:
+      enabled: true
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      
+    # Metrics collection
+    metrics:
+      enabled: true
+      collection_interval: 15s
+      retention_period: "7d"
+      
+      # Custom metrics
+      custom_metrics:
+        - name: "mesh_request_duration"
+          type: "histogram"
+          help: "Request duration across the mesh"
+          
+        - name: "mesh_request_total"
+          type: "counter"
+          help: "Total requests across the mesh"
+          
+        - name: "mesh_circuit_breaker_state"
+          type: "gauge"
+          help: "Circuit breaker state (0=closed, 1=open, 2=half-open)"
+
+    # Alerting rules
+    alerting:
+      enabled: true
+      rules:
+        - name: "ServiceDown"
+          condition: "up{job=~'.*-service'} == 0"
+          for: "1m"
+          severity: "critical"
+          
+        - name: "HighErrorRate"
+          condition: "rate(http_requests_total{status=~'5..'}[5m]) > 0.05"
+          for: "2m"
+          severity: "warning"
+          
+        - name: "HighLatency"
+          condition: "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2"
+          for: "5m"
+          severity: "warning"
+          
+        - name: "CircuitBreakerOpen"
+          condition: "circuit_breaker_state > 0"
+          for: "0m"
+          severity: "warning"
+
+  # Chaos engineering
+  chaos_engineering:
+    enabled: false  # Enable for testing
+    scenarios:
+      - name: "service_failure"
+        probability: 0.01
+        duration: "1m"
+        
+      - name: "network_delay"
+        probability: 0.05
+        delay: "100ms"
+        duration: "30s"
+        
+      - name: "high_cpu"
+        probability: 0.02
+        cpu_percentage: 80
+        duration: "2m"
+
+  # Feature flags
+  feature_flags:
+    canary_routing: true
+    blue_green_deployment: true
+    circuit_breaker: true
+    rate_limiting: true
+    chaos_engineering: false
+    advanced_routing: true
+    mutual_tls: false  # Enable in production
+    service_mesh_ui: true

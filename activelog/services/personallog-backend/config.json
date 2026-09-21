@@ -1,0 +1,17 @@
+{
+  "service_name": "personallog-backend",
+  "domain": "PersonalLog",
+  "type": "backend",
+  "port": 8000,
+  "environment": "production",
+  "scaling": {
+    "min_instances": 1,
+    "max_instances": 10,
+    "target_cpu": 70
+  },
+  "health_check": {
+    "path": "/health",
+    "interval": 30,
+    "timeout": 5
+  }
+}

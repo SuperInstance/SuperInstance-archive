@@ -1,0 +1,148 @@
+{
+  "timestamp": "2025-08-26T02:17:44.710548",
+  "metrics": {
+    "users_created": 10,
+    "entries_created": 39,
+    "api_calls_made": 60,
+    "ads_served": 0,
+    "insights_generated": 0,
+    "errors_encountered": 1
+  },
+  "users": [
+    {
+      "id": "beta_user_01_72040a18",
+      "name": "Alex Johnson",
+      "email": "alex.johnson@personallog-beta.com",
+      "tier": "free",
+      "created_at": "2025-08-26 02:17:26.378844",
+      "last_active": "2025-08-24 02:17:40.347382",
+      "usage_stats": {
+        "entries_created": 6,
+        "ai_insights_used": 0,
+        "words_written": 236
+      }
+    },
+    {
+      "id": "beta_user_02_07691f83",
+      "name": "Sarah Chen",
+      "email": "sarah.chen@personallog-beta.com",
+      "tier": "free",
+      "created_at": "2025-08-26 02:17:26.378854",
+      "last_active": "2025-08-26 02:17:26.378854",
+      "usage_stats": {
+        "entries_created": 0,
+        "ai_insights_used": 0,
+        "words_written": 0
+      }
+    },
+    {
+      "id": "beta_user_03_a1764e21",
+      "name": "Michael Rodriguez",
+      "email": "michael.rodriguez@personallog-beta.com",
+      "tier": "free",
+      "created_at": "2025-08-26 02:17:26.378858",
+      "last_active": "2025-08-24 02:17:40.980777",
+      "usage_stats": {
+        "entries_created": 3,
+        "ai_insights_used": 0,
+        "words_written": 126
+      }
+    },
+    {
+      "id": "beta_user_04_6ab6f7da",
+      "name": "Emma Williams",
+      "email": "emma.williams@personallog-beta.com",
+      "tier": "free",
+      "created_at": "2025-08-26 02:17:26.378861",
+      "last_active": "2025-08-24 02:17:40.152228",
+      "usage_stats": {
+        "entries_created": 7,
+        "ai_insights_used": 0,
+        "words_written": 292
+      }
+    },
+    {
+      "id": "beta_user_05_ed337730",
+      "name": "David Kumar",
+      "email": "david.kumar@personallog-beta.com",
+      "tier": "free",
+      "created_at": "2025-08-26 02:17:26.378863",
+      "last_active": "2025-08-24 02:17:39.925817",
+      "usage_stats": {
+        "entries_created": 2,
+        "ai_insights_used": 0,
+        "words_written": 77
+      }
+    },
+    {
+      "id": "beta_user_06_acd22010",
+      "name": "Lisa Thompson",
+      "email": "lisa.thompson@personallog-beta.com",
+      "tier": "free",
+      "created_at": "2025-08-26 02:17:26.378866",
+      "last_active": "2025-08-24 02:17:39.716205",
+      "usage_stats": {
+        "entries_created": 7,
+        "ai_insights_used": 0,
+        "words_written": 300
+      }
+    },
+    {
+      "id": "beta_user_07_5edfa613",
+      "name": "James Anderson",
+      "email": "james.anderson@personallog-beta.com",
+      "tier": "free",
+      "created_at": "2025-08-26 02:17:26.378869",
+      "last_active": "2025-08-24 02:17:40.558920",
+      "usage_stats": {
+        "entries_created": 4,
+        "ai_insights_used": 0,
+        "words_written": 165
+      }
+    },
+    {
+      "id": "beta_user_08_b75f0379",
+      "name": "Maria Garcia",
+      "email": "maria.garcia@personallog-beta.com",
+      "tier": "free",
+      "created_at": "2025-08-26 02:17:26.378871",
+      "last_active": "2025-08-24 02:17:39.083064",
+      "usage_stats": {
+        "entries_created": 4,
+        "ai_insights_used": 0,
+        "words_written": 162
+      }
+    },
+    {
+      "id": "beta_user_09_77f884b3",
+      "name": "Robert Lee",
+      "email": "robert.lee@personallog-beta.com",
+      "tier": "free",
+      "created_at": "2025-08-26 02:17:26.378874",
+      "last_active": "2025-08-26 02:17:26.378874",
+      "usage_stats": {
+        "entries_created": 0,
+        "ai_insights_used": 0,
+        "words_written": 0
+      }
+    },
+    {
+      "id": "beta_user_10_3033ce03",
+      "name": "Ashley Davis",
+      "email": "ashley.davis@personallog-beta.com",
+      "tier": "free",
+      "created_at": "2025-08-26 02:17:26.378877",
+      "last_active": "2025-08-25 02:17:35.761841",
+      "usage_stats": {
+        "entries_created": 6,
+        "ai_insights_used": 0,
+        "words_written": 235
+      }
+    }
+  ],
+  "endpoints": {
+    "backend": "http://localhost:8101/api",
+    "frontend": "http://localhost:3001",
+    "ads": "http://localhost:8080"
+  }
+}

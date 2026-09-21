@@ -1,0 +1,603 @@
+# Grafana Configuration for ActiveLog Platform Visualization
+# Comprehensive dashboards and visualization platform
+
+# Grafana Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: activelog-monitoring
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      serviceAccountName: grafana
+      securityContext:
+        runAsUser: 472
+        runAsGroup: 472
+        fsGroup: 472
+      containers:
+      - name: grafana
+        image: grafana/grafana:10.2.0
+        ports:
+        - containerPort: 3000
+          name: grafana
+        env:
+        - name: GF_SECURITY_ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              name: grafana-secrets
+              key: admin-user
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: grafana-secrets
+              key: admin-password
+        - name: GF_INSTALL_PLUGINS
+          value: "grafana-piechart-panel,grafana-worldmap-panel,grafana-clock-panel,grafana-simple-json-datasource,redis-datasource,elasticsearch-datasource"
+        - name: GF_SERVER_ROOT_URL
+          value: "http://grafana.activelog.local"
+        - name: GF_ANALYTICS_REPORTING_ENABLED
+          value: "false"
+        - name: GF_ANALYTICS_CHECK_FOR_UPDATES
+          value: "false"
+        - name: GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH
+          value: "/var/lib/grafana/dashboards/activelog-overview.json"
+        resources:
+          limits:
+            cpu: 2
+            memory: 4Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        volumeMounts:
+        - name: grafana-storage
+          mountPath: /var/lib/grafana
+        - name: grafana-config
+          mountPath: /etc/grafana
+        - name: dashboards-config
+          mountPath: /etc/grafana/provisioning/dashboards
+        - name: datasources-config
+          mountPath: /etc/grafana/provisioning/datasources
+        - name: dashboard-files
+          mountPath: /var/lib/grafana/dashboards
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 60
+          timeoutSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+      volumes:
+      - name: grafana-config
+        configMap:
+          name: grafana-config
+      - name: dashboards-config
+        configMap:
+          name: grafana-dashboards-config
+      - name: datasources-config
+        configMap:
+          name: grafana-datasources-config
+      - name: dashboard-files
+        configMap:
+          name: grafana-dashboard-files
+      - name: grafana-storage
+        persistentVolumeClaim:
+          claimName: grafana-storage
+---
+# Grafana Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: activelog-monitoring
+  labels:
+    app: grafana
+spec:
+  ports:
+  - port: 3000
+    targetPort: 3000
+    name: grafana
+  selector:
+    app: grafana
+  type: ClusterIP
+---
+# Grafana Storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grafana-storage
+  namespace: activelog-monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: fast-ssd
+  resources:
+    requests:
+      storage: 20Gi
+---
+# Grafana Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-config
+  namespace: activelog-monitoring
+data:
+  grafana.ini: |
+    [analytics]
+    check_for_updates = false
+    reporting_enabled = false
+    
+    [security]
+    disable_gravatar = true
+    
+    [snapshots]
+    external_enabled = false
+    
+    [users]
+    allow_sign_up = false
+    auto_assign_org = true
+    auto_assign_org_role = Viewer
+    
+    [auth.anonymous]
+    enabled = false
+    
+    [dashboards]
+    default_home_dashboard_path = /var/lib/grafana/dashboards/activelog-overview.json
+    
+    [alerting]
+    enabled = true
+    execute_alerts = true
+    
+    [unified_alerting]
+    enabled = true
+    
+    [smtp]
+    enabled = true
+    host = smtp.activelog.local:587
+    user = alerts@activelog.com
+    password = 
+    from_address = alerts@activelog.com
+    from_name = ActiveLog Monitoring
+    
+    [log]
+    mode = console file
+    level = info
+    
+    [panels]
+    disable_sanitize_html = false
+    
+    [plugins]
+    allow_loading_unsigned_plugins = redis-datasource,elasticsearch-datasource
+---
+# Grafana Datasources Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources-config
+  namespace: activelog-monitoring
+data:
+  datasources.yml: |
+    apiVersion: 1
+    
+    deleteDatasources:
+      - name: Prometheus
+        orgId: 1
+    
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      access: proxy
+      orgId: 1
+      uid: prometheus
+      url: http://prometheus:9090
+      basicAuth: false
+      isDefault: true
+      version: 1
+      editable: false
+      jsonData:
+        httpMethod: POST
+        timeInterval: 15s
+        queryTimeout: 60s
+        defaultRegion: us-west-2
+    
+    - name: Elasticsearch-Logs
+      type: elasticsearch
+      access: proxy
+      orgId: 1
+      uid: elasticsearch-logs
+      url: http://elasticsearch.activelog-logging:9200
+      database: "activelog-*"
+      basicAuth: false
+      version: 1
+      editable: false
+      jsonData:
+        interval: Daily
+        timeField: '@timestamp'
+        esVersion: 8.0.0
+        maxConcurrentShardRequests: 5
+        logMessageField: message
+        logLevelField: level
+    
+    - name: Redis
+      type: redis-datasource
+      access: proxy
+      orgId: 1
+      uid: redis
+      url: redis://redis.activelog:6379
+      version: 1
+      editable: false
+      jsonData:
+        poolSize: 5
+        timeout: 10
+        pingInterval: 0
+        pipelineWindow: 0
+    
+    - name: PostgreSQL
+      type: postgres
+      access: proxy
+      orgId: 1
+      uid: postgresql
+      url: postgres.activelog:5432
+      database: activelog
+      user: monitoring
+      version: 1
+      editable: false
+      secureJsonData:
+        password: monitoring_password
+      jsonData:
+        sslmode: require
+        maxOpenConns: 0
+        maxIdleConns: 2
+        connMaxLifetime: 14400
+---
+# Grafana Dashboards Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards-config
+  namespace: activelog-monitoring
+data:
+  dashboards.yml: |
+    apiVersion: 1
+    
+    providers:
+    - name: 'ActiveLog Dashboards'
+      orgId: 1
+      folder: 'ActiveLog'
+      type: file
+      disableDeletion: false
+      updateIntervalSeconds: 30
+      allowUiUpdates: true
+      options:
+        path: /var/lib/grafana/dashboards
+---
+# Grafana Dashboard Files
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-files
+  namespace: activelog-monitoring
+data:
+  activelog-overview.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "ActiveLog - Platform Overview",
+        "tags": ["activelog", "overview"],
+        "timezone": "browser",
+        "panels": [
+          {
+            "id": 1,
+            "title": "Service Health Status",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "up",
+                "legendFormat": "{{ job }}"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "steps": [
+                    {"color": "red", "value": 0},
+                    {"color": "green", "value": 1}
+                  ]
+                }
+              }
+            },
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+          },
+          {
+            "id": 2,
+            "title": "Request Rate (RPS)",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "sum(rate(http_requests_total[5m])) by (service)",
+                "legendFormat": "{{ service }}"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+          },
+          {
+            "id": 3,
+            "title": "Error Rate",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) by (service) / sum(rate(http_requests_total[5m])) by (service)",
+                "legendFormat": "{{ service }}"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8}
+          },
+          {
+            "id": 4,
+            "title": "Response Time (95th Percentile)",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service))",
+                "legendFormat": "{{ service }}"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 24, "x": 0, "y": 16}
+          }
+        ],
+        "time": {"from": "now-1h", "to": "now"},
+        "refresh": "30s"
+      }
+    }
+  
+  activelog-ai-services.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "ActiveLog - AI/ML Services",
+        "tags": ["activelog", "ai", "ml"],
+        "panels": [
+          {
+            "id": 1,
+            "title": "AI Model Inference Time",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, sum(rate(ai_inference_duration_seconds_bucket[5m])) by (le, model))",
+                "legendFormat": "{{ model }}"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+          },
+          {
+            "id": 2,
+            "title": "Model Accuracy",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "ai_model_accuracy",
+                "legendFormat": "{{ model }}"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+          },
+          {
+            "id": 3,
+            "title": "GPU Utilization",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "nvidia_gpu_utilization_gpu",
+                "legendFormat": "GPU {{ instance }}"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8}
+          }
+        ],
+        "time": {"from": "now-4h", "to": "now"},
+        "refresh": "30s"
+      }
+    }
+  
+  activelog-gaming.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "ActiveLog - Gaming Platform",
+        "tags": ["activelog", "gaming", "dmlog"],
+        "panels": [
+          {
+            "id": 1,
+            "title": "Active Players",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "game_active_players",
+                "legendFormat": "Active Players"
+              }
+            ],
+            "gridPos": {"h": 6, "w": 6, "x": 0, "y": 0}
+          },
+          {
+            "id": 2,
+            "title": "Game Sessions",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "game_active_sessions",
+                "legendFormat": "Active Sessions"
+              }
+            ],
+            "gridPos": {"h": 6, "w": 6, "x": 6, "y": 0}
+          },
+          {
+            "id": 3,
+            "title": "Session Latency",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, sum(rate(game_session_latency_seconds_bucket[5m])) by (le))",
+                "legendFormat": "95th Percentile"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+          },
+          {
+            "id": 4,
+            "title": "Player Actions per Minute",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "sum(rate(game_player_actions_total[1m])) by (action)",
+                "legendFormat": "{{ action }}"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8}
+          }
+        ],
+        "time": {"from": "now-2h", "to": "now"},
+        "refresh": "15s"
+      }
+    }
+  
+  activelog-infrastructure.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "ActiveLog - Infrastructure",
+        "tags": ["activelog", "infrastructure", "kubernetes"],
+        "panels": [
+          {
+            "id": 1,
+            "title": "CPU Usage by Node",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "100 - (avg by(instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+                "legendFormat": "{{ instance }}"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+          },
+          {
+            "id": 2,
+            "title": "Memory Usage by Node",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+                "legendFormat": "{{ instance }}"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+          },
+          {
+            "id": 3,
+            "title": "Disk Usage by Node",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "(1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100",
+                "legendFormat": "{{ instance }}:{{ mountpoint }}"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8}
+          },
+          {
+            "id": 4,
+            "title": "Network Traffic",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(node_network_receive_bytes_total[5m])",
+                "legendFormat": "{{ instance }} - Receive"
+              },
+              {
+                "expr": "rate(node_network_transmit_bytes_total[5m])",
+                "legendFormat": "{{ instance }} - Transmit"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 24, "x": 0, "y": 16}
+          }
+        ],
+        "time": {"from": "now-1h", "to": "now"},
+        "refresh": "30s"
+      }
+    }
+  
+  activelog-business-metrics.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "ActiveLog - Business Metrics",
+        "tags": ["activelog", "business", "kpi"],
+        "panels": [
+          {
+            "id": 1,
+            "title": "Daily Active Users",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "daily_active_users",
+                "legendFormat": "DAU"
+              }
+            ],
+            "gridPos": {"h": 6, "w": 6, "x": 0, "y": 0}
+          },
+          {
+            "id": 2,
+            "title": "Total API Calls",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "sum(increase(http_requests_total[24h]))",
+                "legendFormat": "Total Calls"
+              }
+            ],
+            "gridPos": {"h": 6, "w": 6, "x": 6, "y": 0}
+          },
+          {
+            "id": 3,
+            "title": "Revenue Metrics",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "business_revenue_total",
+                "legendFormat": "Revenue"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+          },
+          {
+            "id": 4,
+            "title": "User Engagement by Feature",
+            "type": "piechart",
+            "targets": [
+              {
+                "expr": "sum by (feature) (user_feature_usage_total)",
+                "legendFormat": "{{ feature }}"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8}
+          }
+        ],
+        "time": {"from": "now-24h", "to": "now"},
+        "refresh": "5m"
+      }
+    }

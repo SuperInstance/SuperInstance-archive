@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1e293b" />
+    <meta name="description" content="Marine Navigation Layout Manager - Professional yacht and fishing vessel dashboard layouts" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind configuration -->
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              slate: {
+                50: '#f8fafc',
+                100: '#f1f5f9',
+                200: '#e2e8f0',
+                300: '#cbd5e1',
+                400: '#94a3b8',
+                500: '#64748b',
+                600: '#475569',
+                700: '#334155',
+                800: '#1e293b',
+                900: '#0f172a',
+                950: '#020617',
+              }
+            }
+          }
+        }
+      }
+    </script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Custom styles -->
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      
+      body {
+        margin: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #0f172a;
+        color: #ffffff;
+        overflow: hidden;
+      }
+
+      .font-mono {
+        font-family: 'JetBrains Mono', source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+          monospace;
+      }
+
+      /* React Grid Layout Styles */
+      .react-grid-layout {
+        position: relative;
+        height: 100%;
+      }
+
+      .react-grid-item {
+        transition: all 200ms ease;
+        transition-property: left, top;
+        background: transparent;
+      }
+
+      .react-grid-item.cssTransforms {
+        transition-property: transform;
+      }
+
+      .react-grid-item > .react-resizable-handle {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        bottom: 0;
+        right: 0;
+        background: rgba(148, 163, 184, 0.3);
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        cursor: se-resize;
+        border-radius: 0 0 4px 0;
+      }
+
+      .react-grid-item > .react-resizable-handle::after {
+        content: "";
+        position: absolute;
+        right: 3px;
+        bottom: 3px;
+        width: 5px;
+        height: 5px;
+        border-right: 2px solid rgba(148, 163, 184, 0.8);
+        border-bottom: 2px solid rgba(148, 163, 184, 0.8);
+      }
+
+      .react-grid-item > .react-resizable-handle:hover {
+        background: rgba(59, 130, 246, 0.3);
+        border-color: rgba(59, 130, 246, 0.6);
+      }
+
+      .react-grid-item.react-grid-placeholder {
+        background: rgba(59, 130, 246, 0.2);
+        opacity: 0.2;
+        transition-duration: 100ms;
+        z-index: 2;
+        user-select: none;
+        border: 2px dashed rgba(59, 130, 246, 0.6);
+        border-radius: 8px;
+      }
+
+      /* Marine themed scrollbars */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: rgba(15, 23, 42, 0.8);
+        border-radius: 3px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(100, 116, 139, 0.6);
+        border-radius: 3px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(100, 116, 139, 0.8);
+      }
+
+      /* Loading animation */
+      @keyframes pulse-marine {
+        0%, 100% {
+          opacity: 0.4;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      .pulse-marine {
+        animation: pulse-marine 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+
+      /* Emergency mode styles */
+      .emergency-mode {
+        animation: emergency-pulse 2s infinite;
+      }
+
+      @keyframes emergency-pulse {
+        0%, 100% {
+          background-color: rgba(127, 29, 29, 1);
+        }
+        50% {
+          background-color: rgba(153, 27, 27, 1);
+        }
+      }
+
+      /* Marine instrument styles */
+      .instrument-display {
+        background: linear-gradient(145deg, #1e293b, #334155);
+        border: 1px solid rgba(100, 116, 139, 0.3);
+        box-shadow: 
+          0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .instrument-display:hover {
+        border-color: rgba(59, 130, 246, 0.5);
+        box-shadow: 
+          0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+          0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+
+      /* Chart display styles */
+      .chart-overlay {
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+
+      /* Status indicators */
+      .status-online {
+        color: #22c55e;
+        filter: drop-shadow(0 0 2px rgba(34, 197, 94, 0.5));
+      }
+
+      .status-warning {
+        color: #eab308;
+        filter: drop-shadow(0 0 2px rgba(234, 179, 8, 0.5));
+      }
+
+      .status-offline {
+        color: #ef4444;
+        filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.5));
+      }
+
+      /* Marine typography */
+      .marine-heading {
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      }
+
+      .marine-data {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 500;
+        letter-spacing: 0.025em;
+      }
+
+      /* Button styles */
+      .btn-marine {
+        transition: all 0.2s ease-in-out;
+        font-weight: 500;
+        letter-spacing: 0.025em;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      }
+
+      .btn-marine:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-marine:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      }
+
+      /* Loading screen */
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+
+      /* Layout transition animations */
+      .layout-transition {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* Marine color palette CSS variables */
+      :root {
+        --marine-blue: #0ea5e9;
+        --marine-green: #22c55e;
+        --marine-red: #ef4444;
+        --marine-yellow: #eab308;
+        --marine-orange: #f97316;
+        --marine-purple: #a855f7;
+        --marine-cyan: #06b6d4;
+        --marine-indigo: #6366f1;
+        --marine-teal: #14b8a6;
+        --marine-gray: #6b7280;
+      }
+
+      /* Responsive design helpers */
+      @media (max-width: 768px) {
+        .react-grid-item {
+          margin-bottom: 8px;
+        }
+        
+        body {
+          font-size: 14px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .react-grid-item {
+          margin-bottom: 4px;
+        }
+        
+        body {
+          font-size: 12px;
+        }
+      }
+    </style>
+
+    <title>Marine Layout Manager | ActiveLog FishingLog Layouts</title>
+</head>
+<body class="bg-slate-900 text-white">
+    <noscript>
+        <div style="padding: 2rem; text-align: center; background: #1e293b; color: #ffffff;">
+            <h1>JavaScript Required</h1>
+            <p>This marine navigation layout manager requires JavaScript to function properly.</p>
+            <p>Please enable JavaScript in your browser and reload the page.</p>
+        </div>
+    </noscript>
+    
+    <!-- Loading screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="text-center">
+            <div class="text-6xl mb-4 pulse-marine">⚓</div>
+            <div class="text-xl font-semibold mb-2 marine-heading">Marine Layout Manager</div>
+            <div class="text-sm text-slate-400">Loading navigation systems...</div>
+            <div class="mt-4 flex space-x-1 justify-center">
+                <div class="w-2 h-2 bg-blue-400 rounded-full pulse-marine" style="animation-delay: 0ms;"></div>
+                <div class="w-2 h-2 bg-blue-400 rounded-full pulse-marine" style="animation-delay: 200ms;"></div>
+                <div class="w-2 h-2 bg-blue-400 rounded-full pulse-marine" style="animation-delay: 400ms;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main application container -->
+    <div id="root" class="h-screen overflow-hidden"></div>
+
+    <!-- Service Worker Registration -->
+    <script>
+      // Simple service worker for offline functionality
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js')
+            .then(function(registration) {
+              console.log('ServiceWorker registration successful');
+            })
+            .catch(function(err) {
+              console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+      }
+
+      // Hide loading screen when React app loads
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          const loadingScreen = document.getElementById('loading-screen');
+          if (loadingScreen) {
+            loadingScreen.style.transition = 'opacity 0.5s ease-out';
+            loadingScreen.style.opacity = '0';
+            setTimeout(function() {
+              if (loadingScreen.parentNode) {
+                loadingScreen.parentNode.removeChild(loadingScreen);
+              }
+            }, 500);
+          }
+        }, 1500);
+      });
+
+      // Global error handler
+      window.addEventListener('error', function(e) {
+        console.error('Marine Layout Manager Error:', e.error);
+      });
+
+      // Prevent context menu on production
+      if (window.location.hostname !== 'localhost') {
+        document.addEventListener('contextmenu', function(e) {
+          e.preventDefault();
+        });
+      }
+    </script>
+
+    <!-- Environment variables -->
+    <script>
+      window.MARINE_LAYOUT_CONFIG = {
+        version: '1.0.0',
+        buildTime: '2025-01-24T00:00:00Z',
+        features: {
+          socketIO: true,
+          layoutPersistence: true,
+          emergencyMode: true,
+          offlineSupport: true
+        }
+      };
+    </script>
+</body>
+</html>

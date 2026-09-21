@@ -1,0 +1,295 @@
+# AlertManager Configuration
+global:
+  smtp_smarthost: 'localhost:587'
+  smtp_from: 'alerts@activelog.com'
+  smtp_auth_username: 'alerts@activelog.com'
+  smtp_auth_password: 'your-smtp-password'
+  
+  # Slack webhook URL
+  slack_api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+
+# Inhibit rules - suppress certain alerts when others are firing
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'instance']
+
+# Route configuration
+route:
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+  receiver: 'web.hook'
+  routes:
+  
+  # Critical alerts go to multiple channels
+  - match:
+      severity: critical
+    receiver: 'critical-alerts'
+    group_wait: 5s
+    repeat_interval: 5m
+    routes:
+    - match:
+        service: 'graphql'
+      receiver: 'graphql-critical'
+    - match:
+        service: 'mobile-api'
+      receiver: 'mobile-api-critical'
+    - match:
+        service: 'redis'
+      receiver: 'infrastructure-critical'
+
+  # Warning alerts
+  - match:
+      severity: warning
+    receiver: 'warning-alerts'
+    group_wait: 30s
+    repeat_interval: 1h
+
+  # Performance regression alerts
+  - match:
+      type: regression
+    receiver: 'performance-team'
+    group_wait: 15s
+    repeat_interval: 2h
+
+  # Security alerts
+  - match:
+      type: security
+    receiver: 'security-team'
+    group_wait: 5s
+    repeat_interval: 30m
+
+  # Business logic alerts
+  - match:
+      service: business
+    receiver: 'business-team'
+    group_wait: 30s
+    repeat_interval: 1h
+
+# Receivers configuration
+receivers:
+- name: 'web.hook'
+  webhook_configs:
+  - url: 'http://127.0.0.1:5001/'
+
+# Critical alerts - multiple notification channels
+- name: 'critical-alerts'
+  email_configs:
+  - to: 'oncall@activelog.com'
+    subject: '[CRITICAL] ActiveLog Alert - {{ .GroupLabels.alertname }}'
+    body: |
+      {{ range .Alerts }}
+      Alert: {{ .Annotations.summary }}
+      Description: {{ .Annotations.description }}
+      Instance: {{ .Labels.instance }}
+      Severity: {{ .Labels.severity }}
+      {{ end }}
+  slack_configs:
+  - channel: '#alerts-critical'
+    color: 'danger'
+    title: 'Critical Alert: {{ .GroupLabels.alertname }}'
+    text: |
+      {{ range .Alerts }}
+      *Alert:* {{ .Annotations.summary }}
+      *Description:* {{ .Annotations.description }}
+      *Instance:* {{ .Labels.instance }}
+      *Severity:* {{ .Labels.severity }}
+      {{ end }}
+  webhook_configs:
+  - url: 'http://pagerduty-webhook:8080/webhook'
+    send_resolved: true
+
+# GraphQL service critical alerts
+- name: 'graphql-critical'
+  email_configs:
+  - to: 'graphql-team@activelog.com'
+    subject: '[CRITICAL] GraphQL Service Alert'
+    body: |
+      {{ range .Alerts }}
+      GraphQL Service Alert
+      =====================
+      Alert: {{ .Annotations.summary }}
+      Description: {{ .Annotations.description }}
+      Service: {{ .Labels.service }}
+      Instance: {{ .Labels.instance }}
+      Time: {{ .StartsAt }}
+      {{ end }}
+  slack_configs:
+  - channel: '#graphql-alerts'
+    color: 'danger'
+    title: 'GraphQL Critical Alert'
+    text: |
+      {{ range .Alerts }}
+      🚨 *GraphQL Service Critical Alert*
+      *Alert:* {{ .Annotations.summary }}
+      *Description:* {{ .Annotations.description }}
+      *Instance:* {{ .Labels.instance }}
+      {{ end }}
+
+# Mobile API critical alerts
+- name: 'mobile-api-critical'
+  email_configs:
+  - to: 'mobile-team@activelog.com'
+    subject: '[CRITICAL] Mobile API Alert'
+    body: |
+      {{ range .Alerts }}
+      Mobile API Alert
+      ================
+      Alert: {{ .Annotations.summary }}
+      Description: {{ .Annotations.description }}
+      Service: {{ .Labels.service }}
+      Instance: {{ .Labels.instance }}
+      Time: {{ .StartsAt }}
+      {{ end }}
+  slack_configs:
+  - channel: '#mobile-alerts'
+    color: 'danger'
+    title: 'Mobile API Critical Alert'
+    text: |
+      {{ range .Alerts }}
+      📱 *Mobile API Critical Alert*
+      *Alert:* {{ .Annotations.summary }}
+      *Description:* {{ .Annotations.description }}
+      *Instance:* {{ .Labels.instance }}
+      {{ end }}
+
+# Infrastructure critical alerts
+- name: 'infrastructure-critical'
+  email_configs:
+  - to: 'infra-team@activelog.com'
+    subject: '[CRITICAL] Infrastructure Alert'
+    body: |
+      {{ range .Alerts }}
+      Infrastructure Alert
+      ====================
+      Alert: {{ .Annotations.summary }}
+      Description: {{ .Annotations.description }}
+      Service: {{ .Labels.service }}
+      Instance: {{ .Labels.instance }}
+      Time: {{ .StartsAt }}
+      {{ end }}
+  slack_configs:
+  - channel: '#infrastructure-alerts'
+    color: 'danger'
+    title: 'Infrastructure Critical Alert'
+    text: |
+      {{ range .Alerts }}
+      🏗️ *Infrastructure Critical Alert*
+      *Alert:* {{ .Annotations.summary }}
+      *Description:* {{ .Annotations.description }}
+      *Instance:* {{ .Labels.instance }}
+      {{ end }}
+
+# Warning alerts
+- name: 'warning-alerts'
+  email_configs:
+  - to: 'dev-team@activelog.com'
+    subject: '[WARNING] ActiveLog Alert - {{ .GroupLabels.alertname }}'
+    body: |
+      {{ range .Alerts }}
+      Warning Alert
+      =============
+      Alert: {{ .Annotations.summary }}
+      Description: {{ .Annotations.description }}
+      Instance: {{ .Labels.instance }}
+      Severity: {{ .Labels.severity }}
+      {{ end }}
+  slack_configs:
+  - channel: '#alerts-warning'
+    color: 'warning'
+    title: 'Warning Alert: {{ .GroupLabels.alertname }}'
+    text: |
+      {{ range .Alerts }}
+      ⚠️ *Warning Alert*
+      *Alert:* {{ .Annotations.summary }}
+      *Description:* {{ .Annotations.description }}
+      *Instance:* {{ .Labels.instance }}
+      {{ end }}
+
+# Performance team alerts
+- name: 'performance-team'
+  email_configs:
+  - to: 'performance@activelog.com'
+    subject: '[PERFORMANCE] Regression Detected'
+    body: |
+      {{ range .Alerts }}
+      Performance Regression Alert
+      ============================
+      Alert: {{ .Annotations.summary }}
+      Description: {{ .Annotations.description }}
+      Service: {{ .Labels.service }}
+      Instance: {{ .Labels.instance }}
+      Type: {{ .Labels.type }}
+      {{ end }}
+  slack_configs:
+  - channel: '#performance-alerts'
+    color: '#ff9900'
+    title: 'Performance Regression Detected'
+    text: |
+      {{ range .Alerts }}
+      📈 *Performance Regression*
+      *Alert:* {{ .Annotations.summary }}
+      *Description:* {{ .Annotations.description }}
+      *Service:* {{ .Labels.service }}
+      {{ end }}
+
+# Security team alerts
+- name: 'security-team'
+  email_configs:
+  - to: 'security@activelog.com'
+    subject: '[SECURITY] Security Alert Detected'
+    body: |
+      {{ range .Alerts }}
+      Security Alert
+      ==============
+      Alert: {{ .Annotations.summary }}
+      Description: {{ .Annotations.description }}
+      Instance: {{ .Labels.instance }}
+      Type: {{ .Labels.type }}
+      Time: {{ .StartsAt }}
+      {{ end }}
+  slack_configs:
+  - channel: '#security-alerts'
+    color: '#ff0000'
+    title: 'Security Alert Detected'
+    text: |
+      {{ range .Alerts }}
+      🔒 *Security Alert*
+      *Alert:* {{ .Annotations.summary }}
+      *Description:* {{ .Annotations.description }}
+      *Instance:* {{ .Labels.instance }}
+      {{ end }}
+
+# Business team alerts
+- name: 'business-team'
+  email_configs:
+  - to: 'business@activelog.com'
+    subject: '[BUSINESS] Business Logic Alert'
+    body: |
+      {{ range .Alerts }}
+      Business Logic Alert
+      ====================
+      Alert: {{ .Annotations.summary }}
+      Description: {{ .Annotations.description }}
+      Service: {{ .Labels.service }}
+      Time: {{ .StartsAt }}
+      {{ end }}
+  slack_configs:
+  - channel: '#business-alerts'
+    color: '#0066cc'
+    title: 'Business Logic Alert'
+    text: |
+      {{ range .Alerts }}
+      💼 *Business Alert*
+      *Alert:* {{ .Annotations.summary }}
+      *Description:* {{ .Annotations.description }}
+      *Service:* {{ .Labels.service }}
+      {{ end }}
+
+# Templates for custom formatting
+templates:
+- '/etc/alertmanager/templates/*.tmpl'

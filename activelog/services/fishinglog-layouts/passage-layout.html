@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FishingLog - Passage Layout</title>
+    <link rel="stylesheet" href="styles/marine-common.css">
+    <link rel="stylesheet" href="styles/passage-layout.css">
+</head>
+<body class="marine-interface passage-layout">
+    <div class="layout-container">
+        <!-- Main Chart Display - Long Range -->
+        <div class="chart-main" id="chartMain">
+            <div class="chart-header">
+                <h2>Electronic Chart - Passage Planning</h2>
+                <div class="chart-controls">
+                    <button class="btn-chart" id="zoomIn">+</button>
+                    <button class="btn-chart" id="zoomOut">-</button>
+                    <button class="btn-chart" id="centerVessel">📍</button>
+                    <button class="btn-chart" id="routeOverlay">📍</button>
+                    <select id="chartType">
+                        <option value="passage">Passage Chart</option>
+                        <option value="weather" selected>Weather Routing</option>
+                        <option value="currents">Current Analysis</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-display" id="chartCanvas">
+                <div class="vessel-position passage">
+                    <div class="vessel-icon">🚢</div>
+                    <div class="vessel-track"></div>
+                    <div class="planned-route"></div>
+                </div>
+                
+                <!-- Long Range Route -->
+                <div class="passage-overlay">
+                    <!-- Waypoints -->
+                    <div class="waypoint major" style="top: 20%; left: 25%;" data-waypoint="departure">
+                        <div class="waypoint-marker">START</div>
+                        <div class="waypoint-info">Newport Harbor<br>41°29.4'N 71°19.8'W</div>
+                    </div>
+                    <div class="waypoint" style="top: 35%; left: 45%;" data-waypoint="wp1">
+                        <div class="waypoint-marker">WP1</div>
+                        <div class="waypoint-info">Montauk Point<br>41°04.2'N 71°51.4'W</div>
+                    </div>
+                    <div class="waypoint major" style="top: 55%; left: 75%;" data-waypoint="destination">
+                        <div class="waypoint-marker">DEST</div>
+                        <div class="waypoint-info">Block Island<br>41°09.6'N 71°33.1'W</div>
+                    </div>
+                    
+                    <!-- Route Lines -->
+                    <div class="route-segment active" data-segment="current"></div>
+                    <div class="route-segment planned" data-segment="remaining"></div>
+                    
+                    <!-- Weather Systems -->
+                    <div class="weather-systems">
+                        <div class="pressure-system high" style="top: 15%; left: 60%;">
+                            <div class="system-center">H</div>
+                            <div class="system-label">1025mb</div>
+                        </div>
+                        <div class="weather-front cold" style="top: 70%; left: 30%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-info">
+                <span class="coordinates">LAT: 41°24.123'N LON: 71°51.456'W</span>
+                <span class="passage-info">Leg 1/2 • 38.2nm • ETA Block Island: 08:30 • 14h 25m remaining</span>
+            </div>
+        </div>
+
+        <!-- Weather Routing Panel -->
+        <div class="weather-panel" id="weatherPanel">
+            <div class="panel-header">
+                <h3>Weather Routing</h3>
+                <div class="weather-controls">
+                    <button class="btn-small" id="updateWeather">🔄</button>
+                    <button class="btn-small" id="routeOptimize">⚡</button>
+                    <button class="btn-small" id="weatherSettings">⚙️</button>
+                </div>
+            </div>
+            
+            <!-- Current Conditions -->
+            <div class="current-weather">
+                <div class="weather-summary">
+                    <div class="weather-icon">⛅</div>
+                    <div class="weather-desc">Partly Cloudy</div>
+                    <div class="visibility">Vis: 10+ nm</div>
+                </div>
+                
+                <div class="weather-grid">
+                    <div class="weather-item">
+                        <label>Wind:</label>
+                        <span class="wind-data">SW 12-15 kts</span>
+                        <div class="wind-trend">↗️ Increasing</div>
+                    </div>
+                    <div class="weather-item">
+                        <label>Seas:</label>
+                        <span class="sea-data">2-3 ft SW</span>
+                        <div class="sea-period">6 sec period</div>
+                    </div>
+                    <div class="weather-item">
+                        <label>Barometer:</label>
+                        <span class="pressure-data">30.15 in</span>
+                        <div class="pressure-trend">↗️ Rising</div>
+                    </div>
+                    <div class="weather-item">
+                        <label>Temperature:</label>
+                        <span class="temp-data">72°F</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Forecast Timeline -->
+            <div class="weather-forecast">
+                <h4>48-Hour Marine Forecast</h4>
+                <div class="forecast-timeline">
+                    <div class="forecast-period active">
+                        <div class="period-time">Now</div>
+                        <div class="period-icon">⛅</div>
+                        <div class="period-wind">SW 12-15</div>
+                        <div class="period-seas">2-3 ft</div>
+                        <div class="period-weather">Partly Cloudy</div>
+                    </div>
+                    
+                    <div class="forecast-period">
+                        <div class="period-time">+6h</div>
+                        <div class="period-icon">🌤️</div>
+                        <div class="period-wind">SW 15-20</div>
+                        <div class="period-seas">3-4 ft</div>
+                        <div class="period-weather">Mostly Cloudy</div>
+                    </div>
+                    
+                    <div class="forecast-period">
+                        <div class="period-time">+12h</div>
+                        <div class="period-icon">🌧️</div>
+                        <div class="period-wind">W 20-25</div>
+                        <div class="period-seas">4-6 ft</div>
+                        <div class="period-weather">Showers</div>
+                    </div>
+                    
+                    <div class="forecast-period">
+                        <div class="period-time">+18h</div>
+                        <div class="period-icon">⛈️</div>
+                        <div class="period-wind">NW 25-30</div>
+                        <div class="period-seas">6-8 ft</div>
+                        <div class="period-weather">T-Storms</div>
+                    </div>
+                    
+                    <div class="forecast-period">
+                        <div class="period-time">+24h</div>
+                        <div class="period-icon">🌤️</div>
+                        <div class="period-wind">NW 15-20</div>
+                        <div class="period-seas">3-5 ft</div>
+                        <div class="period-weather">Clearing</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weather Alerts -->
+            <div class="weather-alerts">
+                <div class="alert-item warning">
+                    <div class="alert-icon">⚠️</div>
+                    <div class="alert-content">
+                        <div class="alert-title">Gale Warning</div>
+                        <div class="alert-text">Winds W 25-35 kts with gusts to 45 kts expected after 18:00 tonight through 06:00 tomorrow.</div>
+                        <div class="alert-valid">Valid until: Tomorrow 06:00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Route Optimization -->
+            <div class="route-optimization">
+                <h4>Route Recommendations</h4>
+                <div class="route-option recommended">
+                    <div class="option-header">
+                        <span class="option-name">Weather Route</span>
+                        <span class="option-badge">Recommended</span>
+                    </div>
+                    <div class="option-details">
+                        <span>Distance: +8nm • Time: +1h 15m</span>
+                        <span>Avoids worst conditions</span>
+                    </div>
+                </div>
+                <div class="route-option">
+                    <div class="option-header">
+                        <span class="option-name">Direct Route</span>
+                        <span class="option-badge warning">Rough</span>
+                    </div>
+                    <div class="option-details">
+                        <span>Original route • Heavy weather</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Watch Keeping Panel -->
+        <div class="watchkeeping-panel" id="watchkeepingPanel">
+            <div class="panel-header">
+                <h3>Watch Keeping</h3>
+                <div class="watch-controls">
+                    <button class="btn-small" id="startWatch">⏱️ Start</button>
+                    <button class="btn-small" id="logEntry">📝 Log</button>
+                </div>
+            </div>
+            
+            <!-- Current Watch -->
+            <div class="current-watch">
+                <h4>Current Watch</h4>
+                <div class="watch-info">
+                    <div class="watch-officer">
+                        <label>Watch Officer:</label>
+                        <span>Captain Smith</span>
+                    </div>
+                    <div class="watch-time">
+                        <label>Watch Started:</label>
+                        <span>14:00</span>
+                    </div>
+                    <div class="watch-duration">
+                        <label>Duration:</label>
+                        <span class="elapsed-time">2h 23m</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Watch Schedule -->
+            <div class="watch-schedule">
+                <h4>Watch Schedule</h4>
+                <div class="schedule-list">
+                    <div class="watch-period active">
+                        <div class="period-time">14:00 - 18:00</div>
+                        <div class="period-officer">Capt. Smith</div>
+                        <div class="period-status">Active</div>
+                    </div>
+                    <div class="watch-period upcoming">
+                        <div class="period-time">18:00 - 22:00</div>
+                        <div class="period-officer">First Mate</div>
+                        <div class="period-status">Next</div>
+                    </div>
+                    <div class="watch-period">
+                        <div class="period-time">22:00 - 02:00</div>
+                        <div class="period-officer">Capt. Smith</div>
+                        <div class="period-status">Scheduled</div>
+                    </div>
+                    <div class="watch-period">
+                        <div class="period-time">02:00 - 06:00</div>
+                        <div class="period-officer">First Mate</div>
+                        <div class="period-status">Scheduled</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Log Book -->
+            <div class="log-book">
+                <h4>Ship's Log</h4>
+                <div class="log-entries">
+                    <div class="log-entry">
+                        <div class="log-time">16:15</div>
+                        <div class="log-text">Course altered to 095°T to avoid weather system. Wind increasing SW 20kts.</div>
+                        <div class="log-position">41°22.1'N 71°48.5'W</div>
+                    </div>
+                    <div class="log-entry">
+                        <div class="log-time">15:45</div>
+                        <div class="log-text">Departed Newport Harbor. All systems normal. ETA Block Island 08:30 tomorrow.</div>
+                        <div class="log-position">41°28.2'N 71°20.1'W</div>
+                    </div>
+                    <div class="log-entry">
+                        <div class="log-time">15:30</div>
+                        <div class="log-text">Engine started. Pre-departure checks complete. Weather brief received.</div>
+                        <div class="log-position">41°29.4'N 71°19.8'W</div>
+                    </div>
+                </div>
+                
+                <div class="log-entry-form">
+                    <textarea id="newLogEntry" placeholder="Enter log entry..."></textarea>
+                    <button class="btn-primary" id="addLogEntry">Add Entry</button>
+                </div>
+            </div>
+
+            <!-- Watch Checklist -->
+            <div class="watch-checklist">
+                <h4>Watch Checklist</h4>
+                <div class="checklist-items">
+                    <div class="checklist-item completed">
+                        <input type="checkbox" id="check1" checked>
+                        <label for="check1">Position fix recorded</label>
+                    </div>
+                    <div class="checklist-item completed">
+                        <input type="checkbox" id="check2" checked>
+                        <label for="check2">Weather observation</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="check3">
+                        <label for="check3">Engine room check</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="check4">
+                        <label for="check4">Safety equipment check</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="check5">
+                        <label for="check5">Communication check</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Passage Instruments -->
+        <div class="passage-instruments" id="passageInstruments">
+            <div class="instrument-group primary">
+                <div class="instrument course-speed">
+                    <div class="instrument-label">COG / SOG</div>
+                    <div class="course-display">095°T</div>
+                    <div class="speed-display">7.8 kts</div>
+                </div>
+                
+                <div class="instrument vmg">
+                    <div class="instrument-label">VMG</div>
+                    <div class="vmg-display">7.2 kts</div>
+                    <div class="vmg-efficiency">92%</div>
+                </div>
+                
+                <div class="instrument eta">
+                    <div class="instrument-label">ETA</div>
+                    <div class="eta-display">08:30</div>
+                    <div class="eta-date">Tomorrow</div>
+                </div>
+            </div>
+
+            <div class="instrument-group navigation">
+                <div class="instrument xte">
+                    <div class="instrument-label">Cross Track Error</div>
+                    <div class="xte-display">0.15 nm</div>
+                    <div class="xte-direction">Port</div>
+                </div>
+                
+                <div class="instrument distance">
+                    <div class="instrument-label">Distance to Go</div>
+                    <div class="dtg-display">127.3</div>
+                    <div class="dtg-unit">nm</div>
+                </div>
+                
+                <div class="instrument fuel">
+                    <div class="instrument-label">Fuel Range</div>
+                    <div class="fuel-range">285 nm</div>
+                    <div class="fuel-remaining">68%</div>
+                </div>
+            </div>
+
+            <div class="instrument-group environmental">
+                <div class="instrument wind-passage">
+                    <div class="instrument-label">Wind</div>
+                    <div class="wind-display-passage">
+                        <div class="wind-speed-passage">15 kts</div>
+                        <div class="wind-direction-passage">SW</div>
+                    </div>
+                </div>
+                
+                <div class="instrument sea-state">
+                    <div class="instrument-label">Sea State</div>
+                    <div class="sea-height">3 ft</div>
+                    <div class="sea-period">6 sec</div>
+                </div>
+                
+                <div class="instrument barometer">
+                    <div class="instrument-label">Barometer</div>
+                    <div class="pressure-value">30.15</div>
+                    <div class="pressure-trend">Rising</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-label">Passage:</span>
+                <span class="status-value">Newport → Block Island</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Progress:</span>
+                <span class="status-value">35% (45.2nm)</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Watch:</span>
+                <span class="status-value">Capt. Smith (2h 23m)</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Weather:</span>
+                <span class="status-value warning">Gale Warning</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Next WP:</span>
+                <span class="status-value">Block Island - 82.1nm</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Entry Modal -->
+    <div class="modal hidden" id="logModal">
+        <div class="modal-content">
+            <h3>New Log Entry</h3>
+            <form id="logForm">
+                <div class="form-group">
+                    <label for="entryTime">Time:</label>
+                    <input type="time" id="entryTime" value="16:23">
+                </div>
+                <div class="form-group">
+                    <label for="entryType">Entry Type:</label>
+                    <select id="entryType">
+                        <option value="navigation">Navigation</option>
+                        <option value="weather">Weather</option>
+                        <option value="engine">Engine</option>
+                        <option value="safety">Safety</option>
+                        <option value="crew">Crew</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="logText">Log Entry:</label>
+                    <textarea id="logText" required placeholder="Enter detailed log entry..."></textarea>
+                </div>
+                <div class="auto-fill-info">
+                    <h4>Auto-filled Information</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Position:</label>
+                            <span id="autoPosition">41°24.123'N 71°51.456'W</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Course:</label>
+                            <span id="autoCourse">095°T</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Speed:</label>
+                            <span id="autoSpeed">7.8 kts</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Wind:</label>
+                            <span id="autoWind">SW 15 kts</span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-actions">
+                <button class="btn-primary" id="saveLogEntry">Save Entry</button>
+                <button class="btn-secondary" id="cancelLogEntry">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/marine-common.js"></script>
+    <script src="scripts/passage-layout.js"></script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+# Instance Orchestrator Configuration
+# Auto-scaling configuration for ActiveLog infrastructure
+
+# Monitoring Configuration
+monitoring:
+  cpu_threshold: 70.0          # CPU percentage threshold for scaling trigger
+  memory_threshold: 70.0       # Memory percentage threshold for scaling trigger
+  check_interval: 60           # Monitoring check interval in seconds
+  threshold_duration: 300      # Duration thresholds must be exceeded before scaling (seconds)
+  
+# AWS Configuration
+aws:
+  region: "us-west-2"
+  current_instance_type: "t3.micro"
+  target_instance_type: "t3.medium"
+  
+  # EC2 Configuration
+  ec2:
+    ami_id: "ami-0c02fb55956c7d316"    # Amazon Linux 2023 AMI
+    key_name: "personallog_key"
+    security_group_id: "sg-06ffa55bce9e97a7f"
+    # subnet_id: null                    # Will use current instance's subnet
+    
+  # Route53 Configuration
+  route53:
+    hosted_zones:
+      "personallog.ai": "Z030571913A76XOUMOYWT"
+      "fishinglog.ai": "Z02826911OP8QDECKH3ER"
+      "dmlog.ai": "Z00635201R85H6U037R0F"
+
+# Services Configuration
+services:
+  # List of services to monitor and migrate
+  service_names:
+    - "personallog-backend"
+    - "fishinglog"
+    - "dmlog-session-logger"
+  
+  # Port mapping for services
+  service_ports:
+    "personallog-backend": 8000
+    "fishinglog": 8001
+    "dmlog-session-logger": 8002
+  
+  # Service health check configuration
+  health_checks:
+    enabled: true
+    timeout: 10
+    retry_attempts: 3
+    retry_delay: 5
+
+# Scaling Configuration
+scaling:
+  # Safety settings
+  min_time_between_scales: 3600    # Minimum time between scaling events (seconds)
+  max_scale_attempts: 3            # Maximum scaling attempts per day
+  
+  # Migration settings
+  migration_timeout: 1800          # Maximum time for migration (seconds)
+  dns_propagation_wait: 120        # Wait time for DNS propagation (seconds)
+  service_startup_wait: 60         # Wait time for services to start (seconds)
+  
+  # Rollback settings
+  rollback_enabled: true
+  rollback_timeout: 300            # Time before automatic rollback (seconds)
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  file: "/var/log/instance-orchestrator.log"
+  max_file_size: "50MB"
+  backup_count: 5
+  console_output: true
+
+# Dashboard Configuration
+dashboard:
+  port: 8500
+  host: "0.0.0.0"
+  debug: false
+  auto_refresh_interval: 30000     # Milliseconds
+
+# Notification Configuration (future enhancement)
+notifications:
+  enabled: false
+  # email:
+  #   smtp_server: "smtp.amazonaws.com"
+  #   smtp_port: 587
+  #   username: "your-username"
+  #   password: "your-password"
+  #   recipients:
+  #     - "admin@activelog.com"
+  
+  # slack:
+  #   webhook_url: "https://hooks.slack.com/..."
+  #   channel: "#infrastructure"

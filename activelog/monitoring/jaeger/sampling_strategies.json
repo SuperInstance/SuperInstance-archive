@@ -1,0 +1,152 @@
+{
+  "default_strategy": {
+    "type": "adaptive",
+    "max_traces_per_second": 100,
+    "max_idle_traces": 100,
+    "lower_bound_traces_per_second": 2,
+    "upper_bound_traces_per_second": 200
+  },
+  "per_service_strategies": [
+    {
+      "service": "api-gateway",
+      "type": "adaptive",
+      "max_traces_per_second": 50,
+      "operation_strategies": [
+        {
+          "operation": "GET /health",
+          "type": "adaptive",
+          "max_traces_per_second": 2
+        },
+        {
+          "operation": "GET /metrics",
+          "type": "adaptive", 
+          "max_traces_per_second": 1
+        }
+      ]
+    },
+    {
+      "service": "auth-service",
+      "type": "adaptive",
+      "max_traces_per_second": 30
+    },
+    {
+      "service": "metadata-service",
+      "type": "adaptive",
+      "max_traces_per_second": 40
+    },
+    {
+      "service": "file-processor-service",
+      "type": "adaptive",
+      "max_traces_per_second": 25
+    },
+    {
+      "service": "ai-orchestrator-service",
+      "type": "adaptive",
+      "max_traces_per_second": 20,
+      "operation_strategies": [
+        {
+          "operation": "POST /ai/inference",
+          "type": "probabilistic",
+          "param": 0.5
+        }
+      ]
+    },
+    {
+      "service": "notification-service",
+      "type": "adaptive",
+      "max_traces_per_second": 15
+    },
+    {
+      "service": "backup-service",
+      "type": "probabilistic",
+      "param": 0.1
+    },
+    {
+      "service": "collaboration-service",
+      "type": "adaptive",
+      "max_traces_per_second": 35
+    },
+    {
+      "service": "data-export-service",
+      "type": "probabilistic",
+      "param": 0.2
+    },
+    {
+      "service": "document-ai-service",
+      "type": "adaptive",
+      "max_traces_per_second": 20
+    },
+    {
+      "service": "graphql-service",
+      "type": "adaptive",
+      "max_traces_per_second": 60,
+      "operation_strategies": [
+        {
+          "operation": "query IntrospectionQuery",
+          "type": "adaptive",
+          "max_traces_per_second": 1
+        }
+      ]
+    },
+    {
+      "service": "mobile-api-service",
+      "type": "adaptive",
+      "max_traces_per_second": 45
+    },
+    {
+      "service": "ml-pipeline-service",
+      "type": "probabilistic",
+      "param": 0.3
+    },
+    {
+      "service": "smart-folders-service",
+      "type": "adaptive",
+      "max_traces_per_second": 25
+    },
+    {
+      "service": "sync-engine-service",
+      "type": "adaptive",
+      "max_traces_per_second": 40
+    },
+    {
+      "service": "video-pipeline-service",
+      "type": "probabilistic",
+      "param": 0.1
+    },
+    {
+      "service": "video-processor-service",
+      "type": "probabilistic",
+      "param": 0.1
+    },
+    {
+      "service": "workflows-service",
+      "type": "adaptive",
+      "max_traces_per_second": 20
+    },
+    {
+      "service": "analytics-service",
+      "type": "adaptive",
+      "max_traces_per_second": 30
+    },
+    {
+      "service": "batch-import-service",
+      "type": "probabilistic",
+      "param": 0.2
+    },
+    {
+      "service": "cache-service",
+      "type": "adaptive",
+      "max_traces_per_second": 100
+    },
+    {
+      "service": "p2p-sync-service",
+      "type": "adaptive",
+      "max_traces_per_second": 15
+    },
+    {
+      "service": "file-watcher-service",
+      "type": "adaptive",
+      "max_traces_per_second": 20
+    }
+  ]
+}

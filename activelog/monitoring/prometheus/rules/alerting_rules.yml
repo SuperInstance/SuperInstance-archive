@@ -1,0 +1,565 @@
+# ActiveLog Alerting Rules
+groups:
+  - name: activelog.rules
+    rules:
+    # High-level service availability
+    - alert: ServiceDown
+      expr: up == 0
+      for: 1m
+      labels:
+        severity: critical
+        service: "{{ $labels.job }}"
+      annotations:
+        summary: "Service {{ $labels.job }} is down"
+        description: "Service {{ $labels.job }} on instance {{ $labels.instance }} has been down for more than 1 minute."
+
+    # High memory usage
+    - alert: HighMemoryUsage
+      expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High memory usage detected"
+        description: "Memory usage is above 90% on {{ $labels.instance }} for more than 5 minutes."
+
+    # High CPU usage
+    - alert: HighCPUUsage
+      expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High CPU usage detected"
+        description: "CPU usage is above 80% on {{ $labels.instance }} for more than 5 minutes."
+
+    # Disk space running low
+    - alert: DiskSpaceLow
+      expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 10
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Disk space running low"
+        description: "Disk space on {{ $labels.instance }} is below 10%."
+
+    # High disk I/O
+    - alert: HighDiskIO
+      expr: rate(node_disk_io_time_seconds_total[5m]) > 0.8
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High disk I/O detected"
+        description: "Disk I/O is high on {{ $labels.instance }} for more than 10 minutes."
+
+  - name: activelog.graphql
+    rules:
+    # GraphQL service specific alerts
+    - alert: GraphQLHighLatency
+      expr: histogram_quantile(0.95, rate(graphql_request_duration_seconds_bucket[5m])) > 2
+      for: 5m
+      labels:
+        severity: warning
+        service: graphql
+      annotations:
+        summary: "GraphQL high latency detected"
+        description: "95th percentile latency is above 2 seconds for GraphQL service."
+
+    - alert: GraphQLHighErrorRate
+      expr: rate(graphql_errors_total[5m]) / rate(graphql_requests_total[5m]) > 0.05
+      for: 5m
+      labels:
+        severity: critical
+        service: graphql
+      annotations:
+        summary: "GraphQL high error rate"
+        description: "GraphQL error rate is above 5% for more than 5 minutes."
+
+    - alert: GraphQLComplexityTooHigh
+      expr: rate(graphql_query_complexity_exceeded_total[5m]) > 10
+      for: 2m
+      labels:
+        severity: warning
+        service: graphql
+      annotations:
+        summary: "GraphQL query complexity exceeded frequently"
+        description: "GraphQL queries are frequently exceeding complexity limits."
+
+  - name: activelog.mobile-api
+    rules:
+    # Mobile API specific alerts
+    - alert: MobileAPIHighLatency
+      expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="mobile-api"}[5m])) > 1
+      for: 5m
+      labels:
+        severity: warning
+        service: mobile-api
+      annotations:
+        summary: "Mobile API high latency detected"
+        description: "95th percentile latency is above 1 second for Mobile API service."
+
+    - alert: PushNotificationFailureRate
+      expr: rate(push_notifications_failed_total[5m]) / rate(push_notifications_sent_total[5m]) > 0.1
+      for: 5m
+      labels:
+        severity: warning
+        service: mobile-api
+      annotations:
+        summary: "High push notification failure rate"
+        description: "Push notification failure rate is above 10%."
+
+    - alert: SyncOperationBacklog
+      expr: sync_operations_queued > 1000
+      for: 5m
+      labels:
+        severity: warning
+        service: mobile-api
+      annotations:
+        summary: "Large sync operation backlog"
+        description: "Sync operation queue has more than 1000 pending operations."
+
+    - alert: ImageOptimizationSlow
+      expr: histogram_quantile(0.95, rate(image_optimization_duration_seconds_bucket[5m])) > 10
+      for: 5m
+      labels:
+        severity: warning
+        service: mobile-api
+      annotations:
+        summary: "Image optimization is slow"
+        description: "95th percentile image optimization time is above 10 seconds."
+
+  - name: activelog.redis
+    rules:
+    # Redis specific alerts
+    - alert: RedisDown
+      expr: redis_up == 0
+      for: 1m
+      labels:
+        severity: critical
+        service: redis
+      annotations:
+        summary: "Redis instance is down"
+        description: "Redis instance {{ $labels.instance }} is down."
+
+    - alert: RedisHighMemoryUsage
+      expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+      for: 5m
+      labels:
+        severity: warning
+        service: redis
+      annotations:
+        summary: "Redis high memory usage"
+        description: "Redis memory usage is above 90% on {{ $labels.instance }}."
+
+    - alert: RedisHighConnections
+      expr: redis_connected_clients / redis_config_maxclients > 0.8
+      for: 5m
+      labels:
+        severity: warning
+        service: redis
+      annotations:
+        summary: "Redis high connection usage"
+        description: "Redis connection usage is above 80% on {{ $labels.instance }}."
+
+    - alert: RedisSlowQueries
+      expr: increase(redis_slowlog_length[5m]) > 10
+      for: 2m
+      labels:
+        severity: warning
+        service: redis
+      annotations:
+        summary: "Redis slow queries detected"
+        description: "Redis has more than 10 slow queries in the last 5 minutes."
+
+  - name: activelog.containers
+    rules:
+    # Container-specific alerts
+    - alert: ContainerHighCPU
+      expr: rate(container_cpu_usage_seconds_total{name!=""}[5m]) > 0.8
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Container high CPU usage"
+        description: "Container {{ $labels.name }} CPU usage is above 80%."
+
+    - alert: ContainerHighMemory
+      expr: container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes > 0.9
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Container high memory usage"
+        description: "Container {{ $labels.name }} memory usage is above 90% of limit."
+
+    - alert: ContainerRestarting
+      expr: increase(container_restart_count{name!=""}[1h]) > 3
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Container restarting frequently"
+        description: "Container {{ $labels.name }} has restarted more than 3 times in the last hour."
+
+  - name: activelog.business
+    rules:
+    # Business logic alerts
+    - alert: HighUserRegistrationFailure
+      expr: rate(user_registration_failures_total[5m]) / rate(user_registration_attempts_total[5m]) > 0.2
+      for: 5m
+      labels:
+        severity: warning
+        service: business
+      annotations:
+        summary: "High user registration failure rate"
+        description: "User registration failure rate is above 20%."
+
+    - alert: FileUploadFailures
+      expr: rate(file_upload_failures_total[5m]) > 10
+      for: 5m
+      labels:
+        severity: warning
+        service: business
+      annotations:
+        summary: "High file upload failure rate"
+        description: "File upload failures are above 10 per second."
+
+    - alert: VideoProcessingBacklog
+      expr: video_processing_queue_size > 100
+      for: 10m
+      labels:
+        severity: warning
+        service: business
+      annotations:
+        summary: "Video processing backlog"
+        description: "Video processing queue has more than 100 pending jobs."
+
+    - alert: PaymentFailures
+      expr: rate(payment_failures_total[5m]) > 5
+      for: 2m
+      labels:
+        severity: critical
+        service: business
+      annotations:
+        summary: "High payment failure rate"
+        description: "Payment failures are above 5 per second."
+
+  - name: activelog.performance
+    rules:
+    # Performance regression detection
+    - alert: ResponseTimeRegression
+      expr: (
+        histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[30m])) /
+        histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[30m] offset 1d))
+      ) > 1.5
+      for: 10m
+      labels:
+        severity: warning
+        type: regression
+      annotations:
+        summary: "Response time regression detected"
+        description: "95th percentile response time has increased by more than 50% compared to yesterday."
+
+    - alert: ThroughputRegression
+      expr: (
+        rate(http_requests_total[30m]) /
+        rate(http_requests_total[30m] offset 1d)
+      ) < 0.7
+      for: 10m
+      labels:
+        severity: warning
+        type: regression
+      annotations:
+        summary: "Throughput regression detected"
+        description: "Request throughput has decreased by more than 30% compared to yesterday."
+
+    - alert: ErrorRateIncrease
+      expr: (
+        rate(http_requests_total{status=~"5.."}[30m]) /
+        rate(http_requests_total{status=~"5.."}[30m] offset 1d)
+      ) > 2
+      for: 5m
+      labels:
+        severity: critical
+        type: regression
+      annotations:
+        summary: "Error rate increase detected"
+        description: "5xx error rate has doubled compared to yesterday."
+
+  - name: activelog.security
+    rules:
+    # Security-related alerts
+    - alert: HighFailedLoginRate
+      expr: rate(failed_login_attempts_total[5m]) > 50
+      for: 2m
+      labels:
+        severity: warning
+        type: security
+      annotations:
+        summary: "High failed login rate"
+        description: "Failed login attempts are above 50 per second."
+
+    - alert: SuspiciousAPIUsage
+      expr: rate(http_requests_total{status="401"}[5m]) > 100
+      for: 2m
+      labels:
+        severity: warning
+        type: security
+      annotations:
+        summary: "Suspicious API usage detected"
+        description: "High rate of 401 responses may indicate API abuse."
+
+    - alert: UnusualTrafficPattern
+      expr: rate(http_requests_total[5m]) > (avg_over_time(rate(http_requests_total[5m])[7d]) * 5)
+      for: 5m
+      labels:
+        severity: warning
+        type: security
+      annotations:
+        summary: "Unusual traffic pattern detected"
+        description: "Current traffic is 5x higher than the 7-day average."
+
+  - name: activelog.ai-services
+    rules:
+    # AI/ML service specific alerts
+    - alert: AIModelInferenceSlow
+      expr: histogram_quantile(0.95, rate(ai_model_inference_duration_seconds_bucket[5m])) > 30
+      for: 5m
+      labels:
+        severity: warning
+        service: ai-orchestrator
+      annotations:
+        summary: "AI model inference is slow"
+        description: "95th percentile AI model inference time is above 30 seconds."
+
+    - alert: MLPipelineFailureRate
+      expr: rate(ml_pipeline_failures_total[5m]) / rate(ml_pipeline_executions_total[5m]) > 0.1
+      for: 5m
+      labels:
+        severity: warning
+        service: ml-pipeline
+      annotations:
+        summary: "High ML pipeline failure rate"
+        description: "ML pipeline failure rate is above 10%."
+
+    - alert: DocumentProcessingBacklog
+      expr: document_processing_queue_size > 500
+      for: 10m
+      labels:
+        severity: warning
+        service: document-ai
+      annotations:
+        summary: "Document processing backlog"
+        description: "Document processing queue has more than 500 pending documents."
+
+    - alert: VectorSearchLatencyHigh
+      expr: histogram_quantile(0.95, rate(vector_search_duration_seconds_bucket[5m])) > 5
+      for: 5m
+      labels:
+        severity: warning
+        service: document-ai
+      annotations:
+        summary: "Vector search latency is high"
+        description: "95th percentile vector search time is above 5 seconds."
+
+  - name: activelog.data-services
+    rules:
+    # Data processing service alerts
+    - alert: DataExportQueueBacklog
+      expr: data_export_queue_size > 100
+      for: 10m
+      labels:
+        severity: warning
+        service: data-export
+      annotations:
+        summary: "Data export queue backlog"
+        description: "Data export queue has more than 100 pending jobs."
+
+    - alert: BatchImportFailureRate
+      expr: rate(batch_import_failures_total[5m]) / rate(batch_import_attempts_total[5m]) > 0.15
+      for: 5m
+      labels:
+        severity: warning
+        service: batch-import
+      annotations:
+        summary: "High batch import failure rate"
+        description: "Batch import failure rate is above 15%."
+
+    - alert: SyncEngineConflictRate
+      expr: rate(sync_conflicts_total[5m]) > 10
+      for: 5m
+      labels:
+        severity: warning
+        service: sync-engine
+      annotations:
+        summary: "High sync conflict rate"
+        description: "Sync conflicts are occurring at more than 10 per second."
+
+    - alert: P2PSyncConnectionLoss
+      expr: p2p_active_connections < 3
+      for: 5m
+      labels:
+        severity: warning
+        service: p2p-sync
+      annotations:
+        summary: "Low P2P sync connections"
+        description: "P2P sync has fewer than 3 active connections."
+
+  - name: activelog.backup-storage
+    rules:
+    # Backup and storage alerts
+    - alert: BackupFailureRate
+      expr: rate(backup_failures_total[1h]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        service: backup
+      annotations:
+        summary: "Backup failures detected"
+        description: "Backup operations are failing."
+
+    - alert: StorageSpaceLow
+      expr: (storage_used_bytes / storage_total_bytes) > 0.85
+      for: 5m
+      labels:
+        severity: warning
+        service: storage
+      annotations:
+        summary: "Storage space running low"
+        description: "Storage usage is above 85%."
+
+    - alert: FileWatcherMissedEvents
+      expr: rate(file_watcher_missed_events_total[5m]) > 5
+      for: 5m
+      labels:
+        severity: warning
+        service: file-watcher
+      annotations:
+        summary: "File watcher missing events"
+        description: "File watcher is missing more than 5 events per second."
+
+  - name: activelog.collaboration
+    rules:
+    # Collaboration service alerts
+    - alert: WorkspaceCreationFailures
+      expr: rate(workspace_creation_failures_total[5m]) > 2
+      for: 5m
+      labels:
+        severity: warning
+        service: collaboration
+      annotations:
+        summary: "Workspace creation failures"
+        description: "Workspace creation failures are above 2 per second."
+
+    - alert: RealtimeConnectionDrops
+      expr: rate(realtime_connection_drops_total[5m]) > 10
+      for: 5m
+      labels:
+        severity: warning
+        service: collaboration
+      annotations:
+        summary: "High realtime connection drops"
+        description: "Realtime connections are dropping at more than 10 per second."
+
+  - name: activelog.notification
+    rules:
+    # Notification service alerts
+    - alert: EmailDeliveryFailureRate
+      expr: rate(email_delivery_failures_total[5m]) / rate(email_delivery_attempts_total[5m]) > 0.1
+      for: 5m
+      labels:
+        severity: warning
+        service: notification
+      annotations:
+        summary: "High email delivery failure rate"
+        description: "Email delivery failure rate is above 10%."
+
+    - alert: NotificationQueueBacklog
+      expr: notification_queue_size > 1000
+      for: 10m
+      labels:
+        severity: warning
+        service: notification
+      annotations:
+        summary: "Notification queue backlog"
+        description: "Notification queue has more than 1000 pending notifications."
+
+    - alert: WebhookFailureRate
+      expr: rate(webhook_delivery_failures_total[5m]) / rate(webhook_delivery_attempts_total[5m]) > 0.2
+      for: 5m
+      labels:
+        severity: warning
+        service: notification
+      annotations:
+        summary: "High webhook failure rate"
+        description: "Webhook delivery failure rate is above 20%."
+
+  - name: activelog.workflows
+    rules:
+    # Workflow service alerts
+    - alert: WorkflowExecutionFailures
+      expr: rate(workflow_execution_failures_total[5m]) > 5
+      for: 5m
+      labels:
+        severity: warning
+        service: workflows
+      annotations:
+        summary: "Workflow execution failures"
+        description: "Workflow executions are failing at more than 5 per second."
+
+    - alert: WorkflowQueueDepth
+      expr: workflow_queue_depth > 200
+      for: 10m
+      labels:
+        severity: warning
+        service: workflows
+      annotations:
+        summary: "Workflow queue depth high"
+        description: "Workflow queue has more than 200 pending workflows."
+
+  - name: activelog.cache
+    rules:
+    # Cache service alerts
+    - alert: CacheHitRateLow
+      expr: cache_hit_rate < 0.7
+      for: 10m
+      labels:
+        severity: warning
+        service: cache
+      annotations:
+        summary: "Cache hit rate is low"
+        description: "Cache hit rate is below 70%."
+
+    - alert: CacheEvictionRateHigh
+      expr: rate(cache_evictions_total[5m]) > 100
+      for: 5m
+      labels:
+        severity: warning
+        service: cache
+      annotations:
+        summary: "High cache eviction rate"
+        description: "Cache evictions are above 100 per second."
+
+  - name: activelog.smart-folders
+    rules:
+    # Smart folders service alerts
+    - alert: RuleEngineProcessingLag
+      expr: rule_engine_processing_lag_seconds > 300
+      for: 5m
+      labels:
+        severity: warning
+        service: smart-folders
+      annotations:
+        summary: "Rule engine processing lag"
+        description: "Rule engine processing lag is above 5 minutes."
+
+    - alert: FolderSuggestionFailures
+      expr: rate(folder_suggestion_failures_total[5m]) > 10
+      for: 5m
+      labels:
+        severity: warning
+        service: smart-folders
+      annotations:
+        summary: "Folder suggestion failures"
+        description: "Folder suggestion failures are above 10 per second."

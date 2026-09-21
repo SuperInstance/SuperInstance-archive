@@ -1,0 +1,52 @@
+# AI DM Assistant Requirements
+
+# Core framework
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.4.0
+
+# AI and ML
+openai>=1.3.0
+langchain>=0.0.350
+tiktoken>=0.5.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+
+# Data processing
+pandas>=2.1.0
+python-multipart>=0.0.6
+
+# Database
+sqlalchemy>=2.0.0
+alembic>=1.12.0
+sqlite3
+
+# Utilities
+python-dateutil>=2.8.0
+asyncio
+logging
+json
+yaml
+enum34
+typing-extensions>=4.8.0
+
+# Session and state management
+redis>=5.0.0
+websockets>=11.0.0
+
+# Natural language processing
+spacy>=3.7.0
+nltk>=3.8.0
+
+# Scheduling and timing
+apscheduler>=3.10.0
+
+# Configuration management
+python-dotenv>=1.0.0
+pyyaml>=6.0
+
+# Development
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+black>=23.9.0
+flake8>=6.1.0

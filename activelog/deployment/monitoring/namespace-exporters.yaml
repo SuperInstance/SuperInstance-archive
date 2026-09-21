@@ -1,0 +1,493 @@
+# Monitoring Namespace and Infrastructure Exporters
+# Supporting components for comprehensive monitoring
+
+# Create monitoring namespace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: activelog-monitoring
+  labels:
+    name: activelog-monitoring
+    purpose: monitoring-observability
+---
+# Service Account for Prometheus
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus
+  namespace: activelog-monitoring
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prometheus
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - nodes/proxy
+  - services
+  - endpoints
+  - pods
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["/metrics"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: activelog-monitoring
+---
+# Service Account for Grafana
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: grafana
+  namespace: activelog-monitoring
+---
+# Node Exporter DaemonSet
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-exporter
+  namespace: activelog-monitoring
+  labels:
+    app: node-exporter
+spec:
+  selector:
+    matchLabels:
+      app: node-exporter
+  template:
+    metadata:
+      labels:
+        app: node-exporter
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9100"
+    spec:
+      hostNetwork: true
+      hostPID: true
+      containers:
+      - name: node-exporter
+        image: prom/node-exporter:v1.6.1
+        args:
+        - --path.procfs=/host/proc
+        - --path.sysfs=/host/sys
+        - --path.rootfs=/host/root
+        - --collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)
+        - --collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|cgroup|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|mqueue|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|sysfs|tracefs)$$
+        ports:
+        - containerPort: 9100
+          hostPort: 9100
+          name: metrics
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - name: proc
+          mountPath: /host/proc
+          readOnly:  true
+        - name: sys
+          mountPath: /host/sys
+          readOnly: true
+        - name: root
+          mountPath: /host/root
+          mountPropagation: HostToContainer
+          readOnly: true
+      volumes:
+      - name: proc
+        hostPath:
+          path: /proc
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: root
+        hostPath:
+          path: /
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        effect: NoSchedule
+---
+# Postgres Exporter
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-exporter
+  namespace: activelog-monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-exporter
+  template:
+    metadata:
+      labels:
+        app: postgres-exporter
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9187"
+    spec:
+      containers:
+      - name: postgres-exporter
+        image: prometheuscommunity/postgres-exporter:v0.13.2
+        ports:
+        - containerPort: 9187
+          name: metrics
+        env:
+        - name: DATA_SOURCE_NAME
+          valueFrom:
+            secretKeyRef:
+              name: postgres-exporter-secret
+              key: data-source-name
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9187
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-exporter
+  namespace: activelog-monitoring
+spec:
+  ports:
+  - port: 9187
+    targetPort: 9187
+    name: metrics
+  selector:
+    app: postgres-exporter
+---
+# Redis Exporter
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-exporter
+  namespace: activelog-monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-exporter
+  template:
+    metadata:
+      labels:
+        app: redis-exporter
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9121"
+    spec:
+      containers:
+      - name: redis-exporter
+        image: oliver006/redis_exporter:v1.53.0
+        ports:
+        - containerPort: 9121
+          name: metrics
+        env:
+        - name: REDIS_ADDR
+          value: "redis://redis.activelog:6379"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis-secret
+              key: password
+              optional: true
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-exporter
+  namespace: activelog-monitoring
+spec:
+  ports:
+  - port: 9121
+    targetPort: 9121
+    name: metrics
+  selector:
+    app: redis-exporter
+---
+# NGINX Exporter
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-exporter
+  namespace: activelog-monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-exporter
+  template:
+    metadata:
+      labels:
+        app: nginx-exporter
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9113"
+    spec:
+      containers:
+      - name: nginx-exporter
+        image: nginx/nginx-prometheus-exporter:0.11.0
+        ports:
+        - containerPort: 9113
+          name: metrics
+        args:
+        - -nginx.scrape-uri=http://nginx.activelog/nginx_status
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 50m
+            memory: 50Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-exporter
+  namespace: activelog-monitoring
+spec:
+  ports:
+  - port: 9113
+    targetPort: 9113
+    name: metrics
+  selector:
+    app: nginx-exporter
+---
+# Custom Business Metrics Collector
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: custom-metrics-collector
+  namespace: activelog-monitoring
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: custom-metrics-collector
+  template:
+    metadata:
+      labels:
+        app: custom-metrics-collector
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: collector
+        image: activelog/custom-metrics-collector:latest
+        ports:
+        - containerPort: 8080
+          name: metrics
+        - containerPort: 8081
+          name: business-metrics
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: url
+        - name: REDIS_URL
+          value: "redis://redis.activelog:6379"
+        - name: METRICS_INTERVAL
+          value: "30s"
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 200m
+            memory: 256Mi
+        volumeMounts:
+        - name: config
+          mountPath: /etc/collector
+      volumes:
+      - name: config
+        configMap:
+          name: custom-metrics-config
+---
+# Custom Metrics Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-metrics-config
+  namespace: activelog-monitoring
+data:
+  config.yaml: |
+    metrics:
+      # Business KPIs
+      daily_active_users:
+        query: "SELECT COUNT(DISTINCT user_id) FROM user_sessions WHERE created_at >= CURRENT_DATE"
+        interval: 300s
+        help: "Number of daily active users"
+        type: gauge
+      
+      monthly_active_users:
+        query: "SELECT COUNT(DISTINCT user_id) FROM user_sessions WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'"
+        interval: 3600s
+        help: "Number of monthly active users"
+        type: gauge
+      
+      total_revenue:
+        query: "SELECT COALESCE(SUM(amount), 0) FROM payments WHERE created_at >= CURRENT_DATE"
+        interval: 300s
+        help: "Total revenue for today"
+        type: gauge
+      
+      api_requests_by_endpoint:
+        query: "SELECT endpoint, COUNT(*) FROM api_logs WHERE created_at >= NOW() - INTERVAL '5 minutes' GROUP BY endpoint"
+        interval: 60s
+        help: "API requests by endpoint"
+        type: counter
+        labels: ["endpoint"]
+      
+      # Gaming specific metrics
+      active_game_sessions:
+        query: "SELECT COUNT(*) FROM game_sessions WHERE status = 'active'"
+        interval: 30s
+        help: "Number of active gaming sessions"
+        type: gauge
+      
+      total_players_online:
+        query: "SELECT COUNT(DISTINCT player_id) FROM player_status WHERE online = true"
+        interval: 30s
+        help: "Total players currently online"
+        type: gauge
+      
+      # AI/ML metrics
+      ai_model_predictions:
+        query: "SELECT model_name, COUNT(*) FROM ai_predictions WHERE created_at >= NOW() - INTERVAL '5 minutes' GROUP BY model_name"
+        interval: 60s
+        help: "AI model prediction counts"
+        type: counter
+        labels: ["model_name"]
+      
+      ml_training_jobs:
+        query: "SELECT status, COUNT(*) FROM ml_jobs WHERE created_at >= CURRENT_DATE GROUP BY status"
+        interval: 300s
+        help: "ML training job status"
+        type: gauge
+        labels: ["status"]
+      
+      # Data processing metrics
+      sync_queue_size:
+        query: "SELECT queue_name, COUNT(*) FROM sync_queue WHERE status = 'pending' GROUP BY queue_name"
+        interval: 60s
+        help: "Size of sync queues"
+        type: gauge
+        labels: ["queue_name"]
+      
+      file_processing_rate:
+        query: "SELECT COUNT(*) FROM file_processing WHERE created_at >= NOW() - INTERVAL '1 minute'"
+        interval: 60s
+        help: "Files processed per minute"
+        type: counter
+    
+    redis_metrics:
+      # Cache hit rates
+      cache_hit_rate:
+        key: "stats:cache_hits"
+        interval: 30s
+        help: "Cache hit rate percentage"
+        type: gauge
+      
+      active_connections:
+        key: "stats:connections"
+        interval: 30s
+        help: "Active Redis connections"
+        type: gauge
+---
+# Secrets for exporters
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-exporter-secret
+  namespace: activelog-monitoring
+type: Opaque
+stringData:
+  data-source-name: "postgresql://monitoring:monitoring_password@postgres.activelog:5432/activelog?sslmode=require"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: grafana-secrets
+  namespace: activelog-monitoring
+type: Opaque
+stringData:
+  admin-user: "admin"
+  admin-password: "activelog-grafana-admin"
+---
+# Network Policy for monitoring
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: monitoring-network-policy
+  namespace: activelog-monitoring
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow access from activelog namespace
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: activelog
+  # Allow internal monitoring communication
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: activelog-monitoring
+  egress:
+  # Allow DNS resolution
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+  # Allow access to activelog services for scraping
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: activelog
+  # Allow internal communication
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: activelog-monitoring

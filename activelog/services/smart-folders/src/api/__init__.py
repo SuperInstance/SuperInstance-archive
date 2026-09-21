@@ -1,0 +1,1 @@
+"""API package for smart folders service"""

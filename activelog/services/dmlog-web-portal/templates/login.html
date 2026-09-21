@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DMLog Revolutionary - Login</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            background: rgba(52, 73, 94, 0.95);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .tagline {
+            color: #bdc3c7;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            color: #ecf0f1;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #7f8c8d;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #e74c3c;
+            background: rgba(255,255,255,0.15);
+        }
+
+        .form-input::placeholder {
+            color: #95a5a6;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: #ffffff;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .credentials-hint {
+            background: rgba(52, 152, 219, 0.2);
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .credentials-hint h4 {
+            color: #3498db;
+            margin-bottom: 0.5rem;
+        }
+
+        .credential-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.25rem 0;
+        }
+
+        .username { color: #e74c3c; font-weight: bold; }
+        .password { color: #27ae60; font-weight: bold; }
+
+        .flash-messages {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 999;
+        }
+
+        .flash-message {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            color: #ffffff;
+            font-weight: bold;
+            min-width: 250px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .flash-error { background: #e74c3c; }
+        .flash-info { background: #3498db; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .features-preview {
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .features-title {
+            color: #f39c12;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .feature-list {
+            list-style: none;
+            font-size: 0.85rem;
+            color: #bdc3c7;
+        }
+
+        .feature-list li {
+            margin: 0.25rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .feature-list li:before {
+            content: "🎲";
+            position: absolute;
+            left: 0;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="login-container">
+        <div class="logo">🎲 DMLog Revolutionary</div>
+        <div class="tagline">The D&D Beyond Experience, Revolutionized</div>
+        
+        <form method="POST" class="login-form">
+            <div class="form-group">
+                <label for="username" class="form-label">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    class="form-input" 
+                    placeholder="Enter your username"
+                    required
+                    autocomplete="username"
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="form-input" 
+                    placeholder="Enter your password"
+                    required
+                    autocomplete="current-password"
+                >
+            </div>
+            
+            <button type="submit" class="login-btn">Enter the Adventure</button>
+        </form>
+
+        <div class="credentials-hint">
+            <h4>🔐 Demo Credentials</h4>
+            <div class="credential-item">
+                <span>Dungeon Master:</span>
+                <span><span class="username">Max</span> / <span class="password">Snow</span></span>
+            </div>
+            <div class="credential-item">
+                <span>Player:</span>
+                <span><span class="username">Casey</span> / <span class="password">Snow</span></span>
+            </div>
+        </div>
+
+        <div class="features-preview">
+            <div class="features-title">✨ What's Inside</div>
+            <ul class="feature-list">
+                <li>Complete D&D Beyond Clone Interface</li>
+                <li>Voice-Controlled Everything</li>
+                <li>AI-Powered Character Tools</li>
+                <li>Physics-Based Dice Rolling</li>
+                <li>Complete Spell Database</li>
+                <li>Campaign Management Tools</li>
+                <li>Mobile App Instructions</li>
+                <li>Revolutionary Features</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Auto-hide flash messages after 4 seconds
+        setTimeout(() => {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(msg => {
+                msg.style.opacity = '0';
+                msg.style.transform = 'translateX(100%)';
+                setTimeout(() => msg.remove(), 300);
+            });
+        }, 4000);
+
+        // Quick login with keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Alt + M for Max
+            if (e.altKey && e.key === 'm') {
+                document.getElementById('username').value = 'Max';
+                document.getElementById('password').value = 'Snow';
+                e.preventDefault();
+            }
+            // Alt + C for Casey
+            if (e.altKey && e.key === 'c') {
+                document.getElementById('username').value = 'Casey';
+                document.getElementById('password').value = 'Snow';
+                e.preventDefault();
+            }
+        });
+
+        // Focus username field on load
+        window.addEventListener('load', function() {
+            document.getElementById('username').focus();
+        });
+    </script>
+</body>
+</html>

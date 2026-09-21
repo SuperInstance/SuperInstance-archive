@@ -1,0 +1,25 @@
+{
+  "patterns": [
+    {
+      "id": "performance_optimization_pattern",
+      "title": "High-Impact Performance Optimization Pattern",
+      "description": "Analysis of 1 high-impact optimizations",
+      "tags": [
+        "performance",
+        "optimization",
+        "high_impact"
+      ],
+      "type": "optimization",
+      "reusability": 0.9,
+      "educational_value": 0.95
+    }
+  ],
+  "tags": [
+    "high_impact",
+    "performance",
+    "optimization"
+  ],
+  "bot_specializations": [
+    "learning_system"
+  ]
+}

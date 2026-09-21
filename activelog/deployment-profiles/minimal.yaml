@@ -1,0 +1,254 @@
+# Minimal Workload Profile
+# Optimized for development, testing, or resource-constrained environments
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: minimal-profile
+  namespace: activelog
+data:
+  profile_name: "Minimal"
+  workload_type: "minimal"
+  
+  # Minimal resource allocation
+  resource_allocation: |
+    api-gateway:
+      cpu: "500m"
+      memory: "1Gi"
+      priority: 1
+      instances: 1
+      node_affinity: "standard"
+      
+    essential-services:
+      cpu: "500m"
+      memory: "1Gi"
+      priority: 1
+      instances: 1
+      node_affinity: "standard"
+      
+    observability-stack:
+      cpu: "250m"
+      memory: "512Mi"
+      priority: 2
+      instances: 1
+      node_affinity: "standard"
+
+  # Basic performance targets
+  performance_targets: |
+    response_time:
+      basic_endpoints: "1000ms"
+      health_checks: "100ms"
+      
+    availability:
+      uptime_target: "99%"
+      basic_functionality: true
+      
+    resource_usage:
+      max_cpu_total: "2000m"
+      max_memory_total: "4Gi"
+      target_efficiency: 60
+
+  # Minimal scaling (mostly disabled)
+  scaling_rules: |
+    auto_scaling:
+      enabled: false
+      cpu_threshold: 95
+      memory_threshold: 95
+      
+    scaling_policies:
+      min_instances: 1
+      max_instances: 2
+      
+    manual_scaling: true
+
+  # Basic monitoring
+  monitoring: |
+    metrics_collection:
+      interval: 60
+      retention: "7d"
+      
+    essential_metrics:
+      - "system.cpu.usage"
+      - "system.memory.usage"
+      - "service.health.status"
+      
+    alerting:
+      error_threshold: 10
+      notification_channels:
+        - "admin-email"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway-minimal
+  namespace: activelog
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate  # Simpler strategy for minimal deployments
+  selector:
+    matchLabels:
+      app: api-gateway
+      profile: minimal
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+        profile: minimal
+    spec:
+      containers:
+      - name: api-gateway
+        image: activelog/api-gateway:minimal
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+        env:
+        - name: WORKLOAD_PROFILE
+          value: "minimal"
+        - name: MAX_CONNECTIONS
+          value: "100"
+        - name: LOG_LEVEL
+          value: "WARN"
+        - name: FEATURE_FLAGS
+          value: "minimal_mode=true,analytics=false,advanced_auth=false"
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 15
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: essential-services-minimal
+  namespace: activelog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: essential-services
+      profile: minimal
+  template:
+    metadata:
+      labels:
+        app: essential-services
+        profile: minimal
+    spec:
+      containers:
+      - name: essential-services
+        image: activelog/essential-services:minimal
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+        env:
+        - name: WORKLOAD_PROFILE
+          value: "minimal"
+        - name: SERVICES_ENABLED
+          value: "auth,user-mgmt,basic-trading"
+        - name: DATABASE_CONNECTIONS
+          value: "5"
+        - name: CACHE_SIZE
+          value: "128Mi"
+        ports:
+        - containerPort: 8100
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8100
+          initialDelaySeconds: 45
+          periodSeconds: 60
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8100
+          initialDelaySeconds: 15
+          periodSeconds: 30
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway-minimal-service
+  namespace: activelog
+spec:
+  selector:
+    app: api-gateway
+    profile: minimal
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: essential-services-service
+  namespace: activelog
+spec:
+  selector:
+    app: essential-services
+    profile: minimal
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8100
+  type: ClusterIP
+
+---
+# Simple resource quota for minimal environment
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: minimal-quota
+  namespace: activelog
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 4Gi
+    limits.cpu: "2"
+    limits.memory: 4Gi
+    pods: "5"
+    services: "5"
+    persistentvolumeclaims: "2"
+
+---
+# Limit ranges for minimal profile
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: minimal-limits
+  namespace: activelog
+spec:
+  limits:
+  - default:
+      cpu: "500m"
+      memory: "1Gi"
+    defaultRequest:
+      cpu: "250m"
+      memory: "512Mi"
+    type: Container
+  - default:
+      storage: "10Gi"
+    type: PersistentVolumeClaim

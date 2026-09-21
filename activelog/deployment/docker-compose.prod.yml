@@ -1,0 +1,770 @@
+version: '3.8'
+
+networks:
+  activelog-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+  
+  activelog-backend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+  
+  activelog-ai:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/16
+  
+  activelog-data:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.23.0.0/16
+
+volumes:
+  postgres_data:
+  redis_data:
+  elasticsearch_data:
+  prometheus_data:
+  grafana_data:
+  activelog_data:
+
+x-common-variables: &common-variables
+  NODE_ENV: production
+  LOG_LEVEL: info
+  METRICS_PORT: 9090
+  HEALTH_CHECK_PORT: 8080
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-deploy: &default-deploy
+  restart_policy:
+    condition: on-failure
+    delay: 5s
+    max_attempts: 3
+  update_config:
+    parallelism: 1
+    delay: 10s
+    failure_action: rollback
+    monitor: 60s
+  rollback_config:
+    parallelism: 1
+    delay: 0s
+    failure_action: pause
+    monitor: 60s
+
+services:
+  # Load Balancer / Reverse Proxy
+  traefik:
+    image: traefik:v3.0
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=admin@activelog.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--metrics.prometheus=true"
+      - "--tracing.jaeger=true"
+      - "--tracing.jaeger.samplingServerURL=http://jaeger:5778/sampling"
+      - "--tracing.jaeger.localAgentHostPort=jaeger:6832"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
+    networks:
+      - activelog-network
+    deploy:
+      <<: *default-deploy
+      replicas: 2
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Core Infrastructure Services
+  api-gateway:
+    image: activelog/api-gateway:latest
+    environment:
+      <<: *common-variables
+      PORT: 8000
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/activelog
+    ports:
+      - "8000:8000"
+    networks:
+      - activelog-network
+      - activelog-backend
+    depends_on:
+      - postgres
+      - redis
+    deploy:
+      <<: *default-deploy
+      replicas: 3
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api-gateway.rule=Host(`api.activelog.local`)"
+      - "traefik.http.routers.api-gateway.tls.certresolver=letsencrypt"
+      - "traefik.http.services.api-gateway.loadbalancer.server.port=8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  auth:
+    image: activelog/auth:latest
+    environment:
+      <<: *common-variables
+      PORT: 8001
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/activelog
+    ports:
+      - "8001:8001"
+    networks:
+      - activelog-network
+      - activelog-backend
+    depends_on:
+      - postgres
+    deploy:
+      <<: *default-deploy
+      replicas: 2
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth.rule=Host(`auth.activelog.local`)"
+
+  graphql:
+    image: activelog/graphql:latest
+    environment:
+      <<: *common-variables
+      PORT: 8002
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/activelog
+    ports:
+      - "8002:8002"
+    networks:
+      - activelog-network
+      - activelog-backend
+    depends_on:
+      - postgres
+    deploy:
+      <<: *default-deploy
+      replicas: 2
+    logging: *default-logging
+
+  # Data Management Services
+  data-manager:
+    image: activelog/data-manager:latest
+    environment:
+      <<: *common-variables
+      PORT: 8010
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/activelog
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "8010:8010"
+    networks:
+      - activelog-backend
+      - activelog-data
+    depends_on:
+      - postgres
+      - redis
+    deploy:
+      <<: *default-deploy
+      replicas: 2
+    logging: *default-logging
+    volumes:
+      - activelog_data:/app/data
+
+  data-export:
+    image: activelog/data-export:latest
+    environment:
+      <<: *common-variables
+      PORT: 8011
+    ports:
+      - "8011:8011"
+    networks:
+      - activelog-data
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+
+  batch-import:
+    image: activelog/batch-import:latest
+    environment:
+      <<: *common-variables
+      PORT: 8012
+      WORKER_CONCURRENCY: 4
+    ports:
+      - "8012:8012"
+    networks:
+      - activelog-data
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+    volumes:
+      - activelog_data:/app/import
+
+  metadata:
+    image: activelog/metadata:latest
+    environment:
+      <<: *common-variables
+      PORT: 8013
+    ports:
+      - "8013:8013"
+    networks:
+      - activelog-data
+    deploy:
+      <<: *default-deploy
+      replicas: 2
+    logging: *default-logging
+
+  file-processor:
+    image: activelog/file-processor:latest
+    environment:
+      <<: *common-variables
+      PORT: 8014
+      PROCESSING_QUEUE: file_processing
+    ports:
+      - "8014:8014"
+    networks:
+      - activelog-data
+    depends_on:
+      - redis
+    deploy:
+      <<: *default-deploy
+      replicas: 2
+    logging: *default-logging
+
+  # Synchronization Services
+  sync-engine:
+    image: activelog/sync-engine:latest
+    environment:
+      <<: *common-variables
+      PORT: 8020
+      SYNC_INTERVAL: 30
+    ports:
+      - "8020:8020"
+    networks:
+      - activelog-backend
+    deploy:
+      <<: *default-deploy
+      replicas: 3
+    logging: *default-logging
+
+  sync-v2:
+    image: activelog/sync-v2:latest
+    environment:
+      <<: *common-variables
+      PORT: 8021
+      ENABLE_P2P: true
+    ports:
+      - "8021:8021"
+    networks:
+      - activelog-backend
+    deploy:
+      <<: *default-deploy
+      replicas: 3
+    logging: *default-logging
+
+  file-sync:
+    image: activelog/file-sync:latest
+    environment:
+      <<: *common-variables
+      PORT: 8022
+    ports:
+      - "8022:8022"
+    networks:
+      - activelog-backend
+    deploy:
+      <<: *default-deploy
+      replicas: 2
+    logging: *default-logging
+
+  p2p-sync:
+    image: activelog/p2p-sync:latest
+    environment:
+      <<: *common-variables
+      PORT: 8023
+      P2P_PORT: 6000
+    ports:
+      - "8023:8023"
+      - "6000:6000"
+    networks:
+      - activelog-backend
+    deploy:
+      <<: *default-deploy
+      replicas: 2
+    logging: *default-logging
+
+  file-watcher:
+    image: activelog/file-watcher:latest
+    environment:
+      <<: *common-variables
+      PORT: 8024
+    ports:
+      - "8024:8024"
+    networks:
+      - activelog-backend
+    deploy:
+      <<: *default-deploy
+      replicas: 2
+    logging: *default-logging
+    volumes:
+      - activelog_data:/app/watch
+
+  # AI and ML Services
+  ai-orchestrator:
+    image: activelog/ai-orchestrator:latest
+    environment:
+      <<: *common-variables
+      PORT: 8030
+      GPU_ENABLED: true
+      MODEL_CACHE_SIZE: 2048
+    ports:
+      - "8030:8030"
+    networks:
+      - activelog-ai
+    deploy:
+      <<: *default-deploy
+      replicas: 2
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    logging: *default-logging
+
+  ai-tools:
+    image: activelog/ai-tools:latest
+    environment:
+      <<: *common-variables
+      PORT: 8031
+    ports:
+      - "8031:8031"
+    networks:
+      - activelog-ai
+    deploy:
+      <<: *default-deploy
+      replicas: 2
+    logging: *default-logging
+
+  ml-pipeline:
+    image: activelog/ml-pipeline:latest
+    environment:
+      <<: *common-variables
+      PORT: 8032
+      PIPELINE_WORKERS: 4
+    ports:
+      - "8032:8032"
+    networks:
+      - activelog-ai
+    deploy:
+      <<: *default-deploy
+      replicas: 2
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    logging: *default-logging
+
+  predictive:
+    image: activelog/predictive:latest
+    environment:
+      <<: *common-variables
+      PORT: 8033
+    ports:
+      - "8033:8033"
+    networks:
+      - activelog-ai
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+
+  predictive-ai:
+    image: activelog/predictive-ai:latest
+    environment:
+      <<: *common-variables
+      PORT: 8034
+    ports:
+      - "8034:8034"
+    networks:
+      - activelog-ai
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+
+  document-ai:
+    image: activelog/document-ai:latest
+    environment:
+      <<: *common-variables
+      PORT: 8035
+    ports:
+      - "8035:8035"
+    networks:
+      - activelog-ai
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+
+  emotional-ai:
+    image: activelog/emotional-ai:latest
+    environment:
+      <<: *common-variables
+      PORT: 8036
+    ports:
+      - "8036:8036"
+    networks:
+      - activelog-ai
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+
+  education-ai:
+    image: activelog/education-ai:latest
+    environment:
+      <<: *common-variables
+      PORT: 8037
+    ports:
+      - "8037:8037"
+    networks:
+      - activelog-ai
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+
+  cognitive:
+    image: activelog/cognitive:latest
+    environment:
+      <<: *common-variables
+      PORT: 8038
+    ports:
+      - "8038:8038"
+    networks:
+      - activelog-ai
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+
+  social-ai:
+    image: activelog/social-ai:latest
+    environment:
+      <<: *common-variables
+      PORT: 8039
+    ports:
+      - "8039:8039"
+    networks:
+      - activelog-ai
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+
+  # Video and Media Services
+  video-pipeline:
+    image: activelog/video-pipeline:latest
+    environment:
+      <<: *common-variables
+      PORT: 8040
+      FFMPEG_THREADS: 4
+    ports:
+      - "8040:8040"
+    networks:
+      - activelog-backend
+    deploy:
+      <<: *default-deploy
+      replicas: 2
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    logging: *default-logging
+
+  video-processor:
+    image: activelog/video-processor:latest
+    environment:
+      <<: *common-variables
+      PORT: 8041
+    ports:
+      - "8041:8041"
+    networks:
+      - activelog-backend
+    deploy:
+      <<: *default-deploy
+      replicas: 2
+    logging: *default-logging
+
+  creative-suite:
+    image: activelog/creative-suite:latest
+    environment:
+      <<: *common-variables
+      PORT: 8042
+    ports:
+      - "8042:8042"
+    networks:
+      - activelog-backend
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+
+  # Database and Cache
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: activelog
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf
+    networks:
+      - activelog-backend
+      - activelog-data
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-replica:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: activelog
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      PGUSER: postgres
+      POSTGRES_MASTER_SERVICE: postgres
+    volumes:
+      - ./postgresql-replica.conf:/etc/postgresql/postgresql.conf
+    networks:
+      - activelog-backend
+      - activelog-data
+    deploy:
+      <<: *default-deploy
+      replicas: 2
+    depends_on:
+      - postgres
+    logging: *default-logging
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --requirepass password
+    volumes:
+      - redis_data:/data
+    networks:
+      - activelog-backend
+      - activelog-data
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  redis-sentinel:
+    image: redis:7-alpine
+    command: redis-sentinel /etc/redis/sentinel.conf
+    volumes:
+      - ./redis-sentinel.conf:/etc/redis/sentinel.conf
+    networks:
+      - activelog-backend
+      - activelog-data
+    deploy:
+      <<: *default-deploy
+      replicas: 3
+    depends_on:
+      - redis
+    logging: *default-logging
+
+  # Message Queue
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: password
+      RABBITMQ_DEFAULT_VHOST: activelog
+    ports:
+      - "15672:15672"
+    networks:
+      - activelog-backend
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Monitoring and Logging Stack
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - xpack.security.enabled=false
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - activelog-backend
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+    logging: *default-logging
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.8.0
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    networks:
+      - activelog-backend
+    depends_on:
+      - elasticsearch
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.8.0
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - activelog-backend
+    depends_on:
+      - elasticsearch
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+
+  prometheus:
+    image: prom/prometheus:latest
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - activelog-backend
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+    ports:
+      - "3000:3000"
+    networks:
+      - activelog-backend
+    depends_on:
+      - prometheus
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    ports:
+      - "9093:9093"
+    networks:
+      - activelog-backend
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+
+  # Distributed Tracing
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    environment:
+      COLLECTOR_OTLP_ENABLED: true
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+    networks:
+      - activelog-backend
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+    logging: *default-logging
+
+  # Service Mesh (Consul for service discovery)
+  consul:
+    image: consul:latest
+    command: consul agent -dev -client=0.0.0.0 -ui
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+    networks:
+      - activelog-backend
+    deploy:
+      <<: *default-deploy
+      replicas: 3
+    logging: *default-logging

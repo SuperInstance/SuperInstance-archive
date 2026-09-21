@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .fantasy-font { font-family: 'Cinzel', serif; }
+        .gaming-card {
+            background: linear-gradient(135deg, rgba(139, 69, 19, 0.1) 0%, rgba(0, 0, 0, 0.05) 100%);
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .gaming-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 64px rgba(139, 69, 19, 0.2);
+        }
+        .dice-animation {
+            animation: diceRoll 2s ease-in-out infinite;
+        }
+        @keyframes diceRoll {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(90deg); }
+            50% { transform: rotate(180deg); }
+            75% { transform: rotate(270deg); }
+        }
+        .level-bar {
+            background: linear-gradient(90deg, #f59e0b 0%, #eab308 50%, #84cc16 100%);
+            animation: levelGlow 3s ease-in-out infinite alternate;
+        }
+        @keyframes levelGlow {
+            from { box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3); }
+            to { box-shadow: 0 4px 20px rgba(132, 204, 22, 0.5); }
+        }
+        .magic-glow {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+            animation: magicPulse 4s ease-in-out infinite;
+        }
+        @keyframes magicPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.7); }
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #8b5a2b 0%, #5d4e75 50%, #2563eb 100%);
+        }
+        .campaign-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-amber-50 via-orange-50 to-purple-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-amber-900 via-orange-800 to-purple-800 text-white shadow-2xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center">
+                        <i data-lucide="swords" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold fantasy-font">DMLog.ai</h1>
+                        <p class="text-xs text-amber-200">Revolutionary RPG Platform</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-6">
+                    <div class="hidden md:flex items-center space-x-6">
+                        <nav class="flex space-x-4">
+                            <a href="#" class="text-white hover:text-amber-200 transition-colors font-medium">Campaigns</a>
+                            <a href="#" class="text-white hover:text-amber-200 transition-colors font-medium">Characters</a>
+                            <a href="#" class="text-white hover:text-amber-200 transition-colors font-medium">Sessions</a>
+                            <a href="#" class="text-white hover:text-amber-200 transition-colors font-medium">AI Tools</a>
+                        </nav>
+                    </div>
+                    
+                    <button id="dice-roller" class="dice-animation p-2 rounded-lg hover:bg-white/20 transition-colors">
+                        <i data-lucide="dice-6" class="w-6 h-6"></i>
+                    </button>
+                    
+                    <div class="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full cursor-pointer"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="gaming-card rounded-xl p-6 bg-white/80">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Active Campaigns</p>
+                        <p class="text-3xl font-bold text-amber-800 fantasy-font">3</p>
+                    </div>
+                    <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="scroll" class="w-6 h-6 text-amber-700"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-sm">
+                    <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                    <span class="text-gray-600">2 sessions this week</span>
+                </div>
+            </div>
+
+            <div class="gaming-card rounded-xl p-6 bg-white/80">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Characters</p>
+                        <p class="text-3xl font-bold text-purple-800 fantasy-font">12</p>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="user" class="w-6 h-6 text-purple-700"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex justify-between text-sm text-gray-600 mb-1">
+                        <span>Avg Level</span>
+                        <span>7.2</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="level-bar h-2 rounded-full" style="width: 72%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gaming-card rounded-xl p-6 bg-white/80">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">AI Encounters</p>
+                        <p class="text-3xl font-bold text-green-800 fantasy-font">247</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center magic-glow">
+                        <i data-lucide="sparkles" class="w-6 h-6 text-green-700"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-sm">
+                    <div class="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                    <span class="text-gray-600">AI-generated content</span>
+                </div>
+            </div>
+
+            <div class="gaming-card rounded-xl p-6 bg-white/80">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Compute Rewards</p>
+                        <p class="text-3xl font-bold text-blue-800 fantasy-font">1,450</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="coins" class="w-6 h-6 text-blue-700"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-sm">
+                    <div class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
+                    <span class="text-gray-600">+127 this week</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <!-- Active Campaigns -->
+            <div class="lg:col-span-2">
+                <div class="campaign-card rounded-xl p-6 border border-amber-200/30">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-800 fantasy-font flex items-center">
+                            <i data-lucide="map" class="w-6 h-6 mr-3 text-amber-600"></i>
+                            Active Campaigns
+                        </h3>
+                        <button class="px-4 py-2 bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-lg hover:from-amber-700 hover:to-orange-700 transition-all shadow-md">
+                            <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                            New Campaign
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="campaign-item bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-lg border-l-4 border-amber-500 hover:shadow-lg transition-all cursor-pointer">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-bold text-gray-800 fantasy-font">The Dragon's Crown</h4>
+                                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">Active</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-3">Epic quest through the Forgotten Realms with AI-generated storylines</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                    <span class="flex items-center">
+                                        <i data-lucide="users" class="w-4 h-4 mr-1"></i>
+                                        5 players
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i data-lucide="calendar" class="w-4 h-4 mr-1"></i>
+                                        Session 12
+                                    </span>
+                                </div>
+                                <button class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm">
+                                    Join Session
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="campaign-item bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg border-l-4 border-purple-500 hover:shadow-lg transition-all cursor-pointer">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-bold text-gray-800 fantasy-font">Cyberpunk Chronicles</h4>
+                                <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium">Planning</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-3">Future noir campaign with cross-domain tech integration</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                    <span class="flex items-center">
+                                        <i data-lucide="users" class="w-4 h-4 mr-1"></i>
+                                        3 players
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i data-lucide="clock" class="w-4 h-4 mr-1"></i>
+                                        Next: Thu 8PM
+                                    </span>
+                                </div>
+                                <button class="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors text-sm">
+                                    Manage
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="campaign-item bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border-l-4 border-green-500 hover:shadow-lg transition-all cursor-pointer">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-bold text-gray-800 fantasy-font">Maritime Adventures</h4>
+                                <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">Cross-Domain</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-3">Naval campaign enhanced with marine domain expertise</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                    <span class="flex items-center">
+                                        <i data-lucide="users" class="w-4 h-4 mr-1"></i>
+                                        4 players
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i data-lucide="anchor" class="w-4 h-4 mr-1"></i>
+                                        Port level 6
+                                    </span>
+                                </div>
+                                <button class="px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm">
+                                    Set Sail
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tools & Quick Actions -->
+            <div class="space-y-6">
+                <!-- AI Tools Panel -->
+                <div class="campaign-card rounded-xl p-6 border border-purple-200/30">
+                    <h3 class="text-lg font-bold text-gray-800 fantasy-font mb-4 flex items-center">
+                        <i data-lucide="wand-2" class="w-5 h-5 mr-2 text-purple-600"></i>
+                        AI Gaming Tools
+                    </h3>
+                    
+                    <div class="space-y-3">
+                        <button class="w-full p-3 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-lg hover:from-purple-200 hover:to-indigo-200 transition-all text-left">
+                            <div class="flex items-center space-x-3">
+                                <i data-lucide="brain" class="w-5 h-5 text-purple-600"></i>
+                                <div>
+                                    <p class="font-medium text-gray-800">Campaign Generator</p>
+                                    <p class="text-xs text-gray-600">AI-powered storylines</p>
+                                </div>
+                            </div>
+                        </button>
+                        
+                        <button class="w-full p-3 bg-gradient-to-r from-green-100 to-emerald-100 rounded-lg hover:from-green-200 hover:to-emerald-200 transition-all text-left">
+                            <div class="flex items-center space-x-3">
+                                <i data-lucide="users" class="w-5 h-5 text-green-600"></i>
+                                <div>
+                                    <p class="font-medium text-gray-800">NPC Generator</p>
+                                    <p class="text-xs text-gray-600">Dynamic personalities</p>
+                                </div>
+                            </div>
+                        </button>
+                        
+                        <button class="w-full p-3 bg-gradient-to-r from-amber-100 to-orange-100 rounded-lg hover:from-amber-200 hover:to-orange-200 transition-all text-left">
+                            <div class="flex items-center space-x-3">
+                                <i data-lucide="zap" class="w-5 h-5 text-amber-600"></i>
+                                <div>
+                                    <p class="font-medium text-gray-800">Encounter Builder</p>
+                                    <p class="text-xs text-gray-600">Balanced challenges</p>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Character Panel -->
+                <div class="campaign-card rounded-xl p-6 border border-blue-200/30">
+                    <h3 class="text-lg font-bold text-gray-800 fantasy-font mb-4 flex items-center">
+                        <i data-lucide="shield" class="w-5 h-5 mr-2 text-blue-600"></i>
+                        Recent Characters
+                    </h3>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+                            <div class="w-10 h-10 bg-gradient-to-r from-red-400 to-red-600 rounded-full flex items-center justify-center text-white font-bold">
+                                A
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-medium text-gray-800">Ayla the Fierce</p>
+                                <p class="text-xs text-gray-600">Level 8 Barbarian</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-green-600 font-medium">+12% STR</p>
+                                <p class="text-xs text-gray-500">Fitness boost</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+                            <div class="w-10 h-10 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                                Z
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-medium text-gray-800">Zephyr Brightblade</p>
+                                <p class="text-xs text-gray-600">Level 6 Paladin</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-blue-600 font-medium">+8% INT</p>
+                                <p class="text-xs text-gray-500">Business exp</p>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full p-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors text-gray-600 hover:text-gray-800">
+                            <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                            Create Character
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dice Roller -->
+                <div class="campaign-card rounded-xl p-6 border border-green-200/30">
+                    <h3 class="text-lg font-bold text-gray-800 fantasy-font mb-4 flex items-center">
+                        <i data-lucide="dice-6" class="w-5 h-5 mr-2 text-green-600"></i>
+                        Quick Dice Roll
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-3 gap-2">
+                            <button class="dice-btn px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors" data-dice="1d4">d4</button>
+                            <button class="dice-btn px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors" data-dice="1d6">d6</button>
+                            <button class="dice-btn px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors" data-dice="1d8">d8</button>
+                            <button class="dice-btn px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors" data-dice="1d10">d10</button>
+                            <button class="dice-btn px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors" data-dice="1d12">d12</button>
+                            <button class="dice-btn px-3 py-2 bg-blue-100 hover:bg-blue-200 rounded-lg text-sm font-medium transition-colors text-blue-700" data-dice="1d20">d20</button>
+                        </div>
+                        
+                        <div id="dice-result" class="text-center p-4 bg-gray-50 rounded-lg hidden">
+                            <p class="text-2xl font-bold fantasy-font text-gray-800" id="dice-value">0</p>
+                            <p class="text-sm text-gray-600" id="dice-formula">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="campaign-card rounded-xl p-6 border border-gray-200/30">
+            <h3 class="text-lg font-bold text-gray-800 fantasy-font mb-4 flex items-center">
+                <i data-lucide="activity" class="w-5 h-5 mr-2 text-gray-600"></i>
+                Recent Gaming Activity
+            </h3>
+            
+            <div class="space-y-3">
+                <div class="flex items-center space-x-4 p-3 bg-green-50 rounded-lg">
+                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <i data-lucide="swords" class="w-4 h-4 text-green-600"></i>
+                    <p class="flex-1 text-sm text-gray-700">
+                        <strong>Ayla the Fierce</strong> defeated the Ancient Red Dragon in <strong>The Dragon's Crown</strong>
+                    </p>
+                    <span class="text-xs text-gray-500">2 hours ago</span>
+                </div>
+                
+                <div class="flex items-center space-x-4 p-3 bg-blue-50 rounded-lg">
+                    <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <i data-lucide="sparkles" class="w-4 h-4 text-blue-600"></i>
+                    <p class="flex-1 text-sm text-gray-700">
+                        AI generated a new quest: <strong>"The Merchant's Dilemma"</strong> for Cyberpunk Chronicles
+                    </p>
+                    <span class="text-xs text-gray-500">5 hours ago</span>
+                </div>
+                
+                <div class="flex items-center space-x-4 p-3 bg-purple-50 rounded-lg">
+                    <div class="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    <i data-lucide="users" class="w-4 h-4 text-purple-600"></i>
+                    <p class="flex-1 text-sm text-gray-700">
+                        New player <strong>ThunderBolt92</strong> joined Maritime Adventures campaign
+                    </p>
+                    <span class="text-xs text-gray-500">1 day ago</span>
+                </div>
+                
+                <div class="flex items-center space-x-4 p-3 bg-amber-50 rounded-lg">
+                    <div class="w-2 h-2 bg-amber-500 rounded-full"></div>
+                    <i data-lucide="coins" class="w-4 h-4 text-amber-600"></i>
+                    <p class="flex-1 text-sm text-gray-700">
+                        Earned <strong>247 compute rewards</strong> for excellent DM performance this week
+                    </p>
+                    <span class="text-xs text-gray-500">2 days ago</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Configuration
+        const DMLOG_API = '{{ dmlog_api }}';
+        const AI_INSIGHTS_API = '{{ ai_insights_api }}';
+
+        // Dice rolling functionality
+        const diceButtons = document.querySelectorAll('.dice-btn');
+        const diceResult = document.getElementById('dice-result');
+        const diceValue = document.getElementById('dice-value');
+        const diceFormula = document.getElementById('dice-formula');
+
+        diceButtons.forEach(button => {
+            button.addEventListener('click', async () => {
+                const diceFormula_str = button.getAttribute('data-dice');
+                
+                // Show rolling animation
+                button.classList.add('dice-animation');
+                
+                try {
+                    // Call DMLog API for dice rolling
+                    const response = await fetch(`${DMLOG_API}/api/v1/dice/roll`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            formula: diceFormula_str
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        
+                        // Display result
+                        diceValue.textContent = result.total || Math.floor(Math.random() * parseInt(diceFormula_str.slice(-2))) + 1;
+                        diceFormula.textContent = diceFormula_str.toUpperCase();
+                        diceResult.classList.remove('hidden');
+                        
+                        // Add result animation
+                        diceResult.style.animation = 'none';
+                        setTimeout(() => {
+                            diceResult.style.animation = 'magicPulse 1s ease-in-out';
+                        }, 10);
+                    } else {
+                        // Fallback to local random
+                        const sides = parseInt(diceFormula_str.slice(-2)) || 20;
+                        const roll = Math.floor(Math.random() * sides) + 1;
+                        
+                        diceValue.textContent = roll;
+                        diceFormula.textContent = diceFormula_str.toUpperCase();
+                        diceResult.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error('Dice roll error:', error);
+                    
+                    // Fallback to local random
+                    const sides = parseInt(diceFormula_str.slice(-2)) || 20;
+                    const roll = Math.floor(Math.random() * sides) + 1;
+                    
+                    diceValue.textContent = roll;
+                    diceFormula.textContent = diceFormula_str.toUpperCase();
+                    diceResult.classList.remove('hidden');
+                }
+                
+                // Remove animation after delay
+                setTimeout(() => {
+                    button.classList.remove('dice-animation');
+                }, 2000);
+            });
+        });
+
+        // Load gaming data
+        async function loadGamingData() {
+            try {
+                // Load campaigns
+                const campaignsResponse = await fetch(`${DMLOG_API}/api/v1/campaigns`);
+                if (campaignsResponse.ok) {
+                    const campaigns = await campaignsResponse.json();
+                    console.log('Campaigns loaded:', campaigns);
+                }
+
+                // Load characters
+                const charactersResponse = await fetch(`${DMLOG_API}/api/v1/characters`);
+                if (charactersResponse.ok) {
+                    const characters = await charactersResponse.json();
+                    console.log('Characters loaded:', characters);
+                }
+            } catch (error) {
+                console.log('Gaming data will be loaded when backend is available');
+            }
+        }
+
+        // Campaign management
+        function openCampaign(campaignId) {
+            window.location.href = `/campaign/${campaignId}`;
+        }
+
+        function createCharacter() {
+            window.location.href = '/character-builder';
+        }
+
+        function startSession(sessionId) {
+            window.location.href = `/session/${sessionId}`;
+        }
+
+        // AI Tools integration
+        async function generateCampaign() {
+            try {
+                const response = await fetch(`${AI_INSIGHTS_API}/api/generate-campaign`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        theme: 'fantasy',
+                        difficulty: 'medium',
+                        players: 4
+                    })
+                });
+                
+                if (response.ok) {
+                    const campaign = await response.json();
+                    console.log('AI generated campaign:', campaign);
+                    // Update UI with new campaign
+                }
+            } catch (error) {
+                console.log('AI campaign generation will be available when service is ready');
+            }
+        }
+
+        // Cross-domain character enhancement
+        async function enhanceCharacterWithFitnessData(characterId) {
+            try {
+                // This would integrate with fitness API to enhance character stats
+                const response = await fetch(`/api/character/${characterId}/enhance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const enhancement = await response.json();
+                    console.log('Character enhanced:', enhancement);
+                }
+            } catch (error) {
+                console.log('Cross-domain enhancement feature will be available');
+            }
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            loadGamingData();
+            
+            // Add click handlers for campaign cards
+            document.querySelectorAll('.campaign-item').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) {
+                        // Extract campaign info and navigate
+                        console.log('Opening campaign...');
+                    }
+                });
+            });
+            
+            console.log('DMLog.ai Gaming Dashboard loaded successfully');
+        });
+    </script>
+
+    <!-- Universal Accessibility Enhancer -->
+    <script src="/static/accessibility-enhancer.js" onerror="console.log('Accessibility enhancer not available')"></script>
+</body>
+</html>

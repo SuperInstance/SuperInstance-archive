@@ -1,0 +1,219 @@
+version: '3.8'
+
+services:
+  two-factor-auth:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: activelog-2fa
+    ports:
+      - "8091:8091"
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=activelog_auth
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=5
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key}
+      - TOTP_ISSUER=ActiveLog
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - FROM_EMAIL=${FROM_EMAIL:-noreply@activelog.com}
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER}
+    volumes:
+      - ./configs:/app/configs:ro
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - auth_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8091/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: activelog-auth-db
+    environment:
+      - POSTGRES_DB=activelog_auth
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - auth_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: activelog-auth-redis
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - auth_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  auth-dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: activelog-auth-dashboard
+    ports:
+      - "3004:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8091
+    depends_on:
+      - two-factor-auth
+    networks:
+      - auth_network
+    restart: unless-stopped
+
+  backup-service:
+    build:
+      context: ./backup
+      dockerfile: Dockerfile
+    container_name: activelog-auth-backup
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=activelog_auth
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - BACKUP_SCHEDULE=0 2 * * *  # Daily at 2 AM
+      - S3_BUCKET=${AUTH_BACKUP_BUCKET:-activelog-auth-backup}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    volumes:
+      - auth_backups:/app/backups
+    depends_on:
+      - postgres
+    networks:
+      - auth_network
+    restart: unless-stopped
+
+  notification-service:
+    build:
+      context: ./notifications
+      dockerfile: Dockerfile
+    container_name: activelog-auth-notifications
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=activelog_auth
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - FROM_EMAIL=${FROM_EMAIL}
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - auth_network
+    restart: unless-stopped
+
+  session-manager:
+    build:
+      context: ./session-manager
+      dockerfile: Dockerfile
+    container_name: activelog-session-manager
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=6
+      - SESSION_TIMEOUT=3600  # 1 hour
+      - CLEANUP_INTERVAL=300  # 5 minutes
+    depends_on:
+      - redis
+    networks:
+      - auth_network
+    restart: unless-stopped
+
+  device-tracker:
+    build:
+      context: ./device-tracker
+      dockerfile: Dockerfile
+    container_name: activelog-device-tracker
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=activelog_auth
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - GEOIP_DB_PATH=/app/data/GeoLite2-City.mmdb
+    volumes:
+      - ./data:/app/data:ro
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - auth_network
+    restart: unless-stopped
+
+  fraud-detector:
+    build:
+      context: ./fraud-detection
+      dockerfile: Dockerfile
+    container_name: activelog-fraud-detector
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=activelog_auth
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - ML_MODEL_PATH=/app/models
+      - ALERT_THRESHOLD=0.8
+    volumes:
+      - ./models:/app/models:ro
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - auth_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  auth_backups:
+    driver: local
+
+networks:
+  auth_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.23.0.0/16

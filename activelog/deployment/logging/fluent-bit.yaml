@@ -1,0 +1,306 @@
+# Fluent Bit Configuration for Enhanced Log Collection
+# Lightweight log processor and forwarder as alternative to Filebeat
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fluent-bit
+  namespace: activelog-logging
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fluent-bit-read
+rules:
+- apiGroups: [""]
+  resources:
+  - namespaces
+  - pods
+  - nodes
+  - nodes/proxy
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: fluent-bit-read
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: fluent-bit-read
+subjects:
+- kind: ServiceAccount
+  name: fluent-bit
+  namespace: activelog-logging
+---
+# Fluent Bit Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-config
+  namespace: activelog-logging
+  labels:
+    k8s-app: fluent-bit
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Flush         5
+        Log_Level     info
+        Daemon        off
+        Parsers_File  parsers.conf
+        HTTP_Server   On
+        HTTP_Listen   0.0.0.0
+        HTTP_Port     2020
+        Health_Check  On
+    
+    [INPUT]
+        Name              tail
+        Path              /var/log/containers/*.log
+        multiline.parser  docker, cri
+        Tag               kube.*
+        Mem_Buf_Limit     50MB
+        Skip_Long_Lines   On
+        Refresh_Interval  10
+    
+    [INPUT]
+        Name                systemd
+        Tag                 host.*
+        Systemd_Filter      _SYSTEMD_UNIT=kubelet.service
+        Systemd_Filter      _SYSTEMD_UNIT=docker.service
+        Read_From_Tail      On
+    
+    [FILTER]
+        Name                kubernetes
+        Match               kube.*
+        Kube_URL            https://kubernetes.default.svc:443
+        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+        Kube_Tag_Prefix     kube.var.log.containers.
+        Merge_Log           On
+        Merge_Log_Key       log_processed
+        K8S-Logging.Parser  On
+        K8S-Logging.Exclude Off
+        Annotations         Off
+        Labels              On
+    
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_exists kubernetes.labels.app
+        Set                 service_name ${kubernetes.labels.app}
+    
+    [FILTER]
+        Name                grep
+        Match               kube.*
+        Regex               kubernetes.namespace_name activelog
+    
+    # Parse JSON logs
+    [FILTER]
+        Name                parser
+        Match               kube.*
+        Key_Name            log
+        Parser              json
+        Reserve_Data        On
+        Preserve_Key        On
+    
+    # Add performance metrics parsing
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_exists response_time
+        Set                 log_type performance
+    
+    # Add error detection
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_value_matches log ".*ERROR.*|.*FATAL.*|.*Exception.*"
+        Set                 log_level error
+        Set                 alert_required true
+    
+    # Add security event detection
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_value_matches log ".*authentication.*|.*authorization.*|.*security.*|.*breach.*|.*attack.*"
+        Set                 log_type security
+        Set                 alert_level critical
+    
+    [OUTPUT]
+        Name            es
+        Match           kube.*
+        Host            elasticsearch
+        Port            9200
+        HTTP_User       
+        HTTP_Passwd     
+        Logstash_Format On
+        Logstash_Prefix activelog
+        Retry_Limit     False
+        Type            _doc
+        Replace_Dots    On
+        Suppress_Type_Name On
+        
+    [OUTPUT]
+        Name            forward
+        Match           kube.*
+        Host            logstash
+        Port            24224
+        Require_ack_response true
+  
+  parsers.conf: |
+    [PARSER]
+        Name        json
+        Format      json
+        Time_Key    time
+        Time_Format %Y-%m-%dT%H:%M:%S.%L%z
+        Time_Keep   On
+    
+    [PARSER]
+        Name        docker
+        Format      json
+        Time_Key    time
+        Time_Format %Y-%m-%dT%H:%M:%S.%L%z
+        Time_Keep   On
+    
+    [PARSER]
+        Name        activelog-app
+        Format      regex
+        Regex       ^(?<timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)\s+(?<level>\w+)\s+\[(?<service>\w+)\]\s+(?<message>.*)$
+        Time_Key    timestamp
+        Time_Format %Y-%m-%dT%H:%M:%S.%L%z
+    
+    [PARSER]
+        Name        nginx-access
+        Format      regex
+        Regex       ^(?<remote_addr>[^\s]+)\s+-\s+(?<remote_user>[^\s]+)\s+\[(?<time_local>[^\]]+)\]\s+"(?<method>\w+)\s+(?<path>[^\s]+)\s+(?<protocol>[^"]+)"\s+(?<status>\d+)\s+(?<body_bytes_sent>\d+)\s+"(?<http_referer>[^"]+)"\s+"(?<http_user_agent>[^"]+)"
+        Time_Key    time_local
+        Time_Format %d/%b/%Y:%H:%M:%S %z
+    
+    [PARSER]
+        Name        ai-metrics
+        Format      regex
+        Regex       ^.*model=(?<model_name>\w+).*inference_time=(?<inference_time>\d+).*accuracy=(?<accuracy>\d+\.\d+).*batch_size=(?<batch_size>\d+)
+    
+    [PARSER]
+        Name        gaming-events
+        Format      regex
+        Regex       ^.*player_id=(?<player_id>\w+).*session_id=(?<session_id>\w+).*action=(?<action>\w+).*score=(?<score>\d+)
+    
+    [PARSER]
+        Name        data-pipeline
+        Format      regex
+        Regex       ^.*processed_records=(?<processed_records>\d+).*processing_time=(?<processing_time>\d+).*throughput=(?<throughput>\d+\.\d+)
+---
+# Fluent Bit DaemonSet
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluent-bit
+  namespace: activelog-logging
+  labels:
+    k8s-app: fluent-bit-logging
+    version: v1
+    kubernetes.io/cluster-service: "true"
+spec:
+  selector:
+    matchLabels:
+      k8s-app: fluent-bit-logging
+  template:
+    metadata:
+      labels:
+        k8s-app: fluent-bit-logging
+        version: v1
+        kubernetes.io/cluster-service: "true"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "2020"
+        prometheus.io/path: /api/v1/metrics/prometheus
+    spec:
+      serviceAccountName: fluent-bit
+      hostNetwork: false
+      dnsPolicy: ClusterFirst
+      containers:
+      - name: fluent-bit
+        image: fluent/fluent-bit:2.2.0
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 2020
+            name: http-metrics
+        resources:
+          limits:
+            memory: 500Mi
+            cpu: 500m
+          requests:
+            cpu: 50m
+            memory: 100Mi
+        env:
+        - name: FLUENT_ELASTICSEARCH_HOST
+          value: "elasticsearch"
+        - name: FLUENT_ELASTICSEARCH_PORT
+          value: "9200"
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        volumeMounts:
+        - name: varlog
+          mountPath: /var/log
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+        - name: fluent-bit-config
+          mountPath: /fluent-bit/etc/
+        - name: mnt
+          mountPath: /mnt
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 2020
+          initialDelaySeconds: 120
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 2020
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: varlog
+        hostPath:
+          path: /var/log
+      - name: varlibdockercontainers
+        hostPath:
+          path: /var/lib/docker/containers
+      - name: fluent-bit-config
+        configMap:
+          name: fluent-bit-config
+      - name: mnt
+        hostPath:
+          path: /mnt
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - operator: "Exists"
+        effect: "NoExecute"
+      - operator: "Exists"
+        effect: "NoSchedule"
+---
+# Service for Fluent Bit metrics
+apiVersion: v1
+kind: Service
+metadata:
+  name: fluent-bit
+  namespace: activelog-logging
+  labels:
+    k8s-app: fluent-bit-logging
+spec:
+  ports:
+  - port: 2020
+    protocol: TCP
+    name: http-metrics
+    targetPort: http-metrics
+  selector:
+    k8s-app: fluent-bit-logging

@@ -1,0 +1,15 @@
+{
+  "researcher": "consciousness_demo",
+  "start_time": "2025-08-30T10:38:39.128315",
+  "objective": "Build working awareness demo",
+  "starting_simple": "Agent that reports its own state",
+  "demo_goal": "Show safe self-awareness emergence",
+  "iteration": 1,
+  "status": "starting_simple",
+  "notes": [],
+  "working_versions": [],
+  "failures": [],
+  "next_steps": [
+    "Agent that reports its own state"
+  ]
+}

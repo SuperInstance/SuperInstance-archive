@@ -1,0 +1,282 @@
+{
+  "name": "StudyLog.ai",
+  "version": "1.0.0",
+  "title": "StudyLog.ai - Smart Education Tracking",
+  "description": "Education tracking and tutoring tools for students and educators",
+  "favicon": "/assets/studylog/favicon.ico",
+  "domain": "studylog.ai",
+  "devPort": 3005,
+  "theme": "academic",
+  "layout": "study-dashboard",
+  "monetization": {
+    "type": "freemium",
+    "tiers": ["student", "premium", "educator", "institution"],
+    "trialPeriod": "14d"
+  },
+  "features": {
+    "studyPlanning": true,
+    "progressTracking": true,
+    "notesTaking": true,
+    "flashcards": true,
+    "quizGeneration": true,
+    "timeTracking": true,
+    "collaboration": true,
+    "aiTutoring": true,
+    "resourceLibrary": true,
+    "gradeTracking": true,
+    "scheduleManagement": true,
+    "parentPortal": true
+  },
+  "modules": [
+    {
+      "name": "studyPlanner",
+      "component": "StudyPlannerModule",
+      "props": {
+        "enableSmartScheduling": true,
+        "enableDeadlineTracking": true,
+        "enableGoalSetting": true,
+        "enableReminders": true,
+        "enableCalendarSync": true,
+        "planningHorizons": ["daily", "weekly", "monthly", "semester"]
+      }
+    },
+    {
+      "name": "notes",
+      "component": "NoteTakingModule",
+      "props": {
+        "enableMarkdown": true,
+        "enableLaTeX": true,
+        "enableDrawing": true,
+        "enableAudioNotes": true,
+        "enableImageAnnotation": true,
+        "enableCollaboration": true,
+        "enableSync": true
+      }
+    },
+    {
+      "name": "flashcards",
+      "component": "FlashcardModule",
+      "props": {
+        "enableSpacedRepetition": true,
+        "enableImageCards": true,
+        "enableAudioCards": true,
+        "enableSharedDecks": true,
+        "enableProgressTracking": true,
+        "enableDifficultyAdjustment": true
+      }
+    },
+    {
+      "name": "quizzer",
+      "component": "QuizGeneratorModule",
+      "props": {
+        "enableAutoGeneration": true,
+        "enableMultipleChoice": true,
+        "enableFillInBlank": true,
+        "enableTrueFalse": true,
+        "enableEssayQuestions": true,
+        "enableTimedQuizzes": true,
+        "enableInstantFeedback": true
+      }
+    },
+    {
+      "name": "progress",
+      "component": "ProgressTrackingModule",
+      "props": {
+        "enableStreaks": true,
+        "enableBadges": true,
+        "enableAnalytics": true,
+        "enableComparisons": true,
+        "enableGoalProgress": true,
+        "enableWeeklyReports": true
+      }
+    },
+    {
+      "name": "aiTutor",
+      "component": "AITutorModule",
+      "props": {
+        "enableQuestionAnswering": true,
+        "enableExplanations": true,
+        "enableHints": true,
+        "enablePersonalization": true,
+        "enableMultipleLanguages": true,
+        "subjects": ["math", "science", "history", "literature", "languages"]
+      }
+    },
+    {
+      "name": "collaboration",
+      "component": "StudyGroupModule",
+      "props": {
+        "enableGroupCreation": true,
+        "enableSharedNotes": true,
+        "enableGroupQuizzes": true,
+        "enableVideoChat": true,
+        "enableWhiteboard": true,
+        "enableScreenSharing": true
+      }
+    },
+    {
+      "name": "library",
+      "component": "ResourceLibraryModule",
+      "props": {
+        "enableBookmarks": true,
+        "enableTagging": true,
+        "enableSearch": true,
+        "enableSharing": true,
+        "enableCitations": true,
+        "supportedFormats": ["pdf", "docs", "videos", "audio", "links"]
+      }
+    }
+  ],
+  "aiModels": [
+    {
+      "name": "question-generator",
+      "type": "text-generation",
+      "endpoint": "/ai/question-generation",
+      "features": ["quiz-creation", "difficulty-adjustment", "topic-targeting"]
+    },
+    {
+      "name": "concept-explainer",
+      "type": "educational",
+      "endpoint": "/ai/concept-explanation",
+      "features": ["step-by-step", "analogies", "visual-aids"]
+    },
+    {
+      "name": "study-optimizer",
+      "type": "recommendation",
+      "endpoint": "/ai/study-optimization",
+      "features": ["schedule-optimization", "material-recommendation", "difficulty-progression"]
+    },
+    {
+      "name": "essay-grader",
+      "type": "text-analysis",
+      "endpoint": "/ai/essay-grading",
+      "features": ["grammar-check", "content-analysis", "feedback-generation"]
+    },
+    {
+      "name": "learning-analyzer",
+      "type": "analytics",
+      "endpoint": "/ai/learning-analysis",
+      "features": ["strength-identification", "weakness-detection", "improvement-suggestions"]
+    }
+  ],
+  "auth": {
+    "providers": ["email", "google", "microsoft", "school-sso"],
+    "requireEmailVerification": true,
+    "enableTwoFactor": false,
+    "sessionDuration": "24h",
+    "rememberDevice": true,
+    "enableParentalControls": true,
+    "enableClassroomAccounts": true
+  },
+  "dataSync": {
+    "enabled": true,
+    "cloudProvider": "activelog-cloud-edu",
+    "encryption": "student-safe",
+    "conflictResolution": "merge",
+    "syncFrequency": "realtime",
+    "offlineSupport": true,
+    "enableBackup": true,
+    "parentalVisibility": "configurable"
+  },
+  "settings": {
+    "privacy": {
+      "enableCOPPACompliance": true,
+      "enableFERPACompliance": true,
+      "parentalConsent": true,
+      "dataMinimization": true,
+      "enableDataExport": true,
+      "enableDataDeletion": true
+    },
+    "notifications": {
+      "enablePush": true,
+      "enableEmail": true,
+      "enableParentNotifications": true,
+      "enableStudyReminders": true,
+      "enableDeadlineAlerts": true,
+      "enableProgressUpdates": true
+    },
+    "appearance": {
+      "defaultTheme": "light",
+      "enableCustomization": true,
+      "enableAccessibility": true,
+      "enableFocusMode": true,
+      "enableDyslexiaSupport": true
+    },
+    "parental": {
+      "enableTimeControls": true,
+      "enableContentFiltering": true,
+      "enableProgressReports": true,
+      "enableCommunicationMonitoring": false,
+      "enableScreenTimeReports": true
+    }
+  },
+  "customModules": [
+    {
+      "name": "exam-prep",
+      "path": "/modules/studylog/ExamPrep.js"
+    },
+    {
+      "name": "citation-manager",
+      "path": "/modules/studylog/CitationManager.js"
+    },
+    {
+      "name": "grade-calculator",
+      "path": "/modules/studylog/GradeCalculator.js"
+    }
+  ],
+  "integrations": [
+    {
+      "name": "google-classroom",
+      "enabled": true,
+      "assignmentSync": true
+    },
+    {
+      "name": "canvas",
+      "enabled": true,
+      "gradeSync": true
+    },
+    {
+      "name": "blackboard",
+      "enabled": true,
+      "contentAccess": true
+    },
+    {
+      "name": "zoom",
+      "enabled": true,
+      "classRecordings": true
+    },
+    {
+      "name": "microsoft-teams",
+      "enabled": true,
+      "fileSync": true
+    },
+    {
+      "name": "khan-academy",
+      "enabled": true,
+      "progressSync": true
+    },
+    {
+      "name": "coursera",
+      "enabled": true,
+      "certificateTracking": true
+    }
+  ],
+  "analytics": {
+    "provider": "educational",
+    "enableLearningAnalytics": true,
+    "enablePerformanceTracking": true,
+    "enableEngagementTracking": true,
+    "respectCOPPA": true,
+    "respectFERPA": true,
+    "parentalVisibility": true
+  },
+  "accessibility": {
+    "enableScreenReader": true,
+    "enableHighContrast": true,
+    "enableLargeText": true,
+    "enableDyslexiaFont": true,
+    "enableKeyboardNavigation": true,
+    "enableVoiceControl": true,
+    "enableColorBlindSupport": true
+  }
+}

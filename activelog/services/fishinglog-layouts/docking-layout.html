@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FishingLog - Docking Layout</title>
+    <link rel="stylesheet" href="styles/marine-common.css">
+    <link rel="stylesheet" href="styles/docking-layout.css">
+</head>
+<body class="marine-interface docking-layout">
+    <div class="layout-container">
+        <!-- Main Chart Display - Close Quarters -->
+        <div class="chart-main" id="chartMain">
+            <div class="chart-header">
+                <h2>Electronic Chart - Docking Mode</h2>
+                <div class="chart-controls">
+                    <button class="btn-chart" id="zoomIn">+</button>
+                    <button class="btn-chart" id="zoomOut">-</button>
+                    <button class="btn-chart" id="centerVessel">📍</button>
+                    <button class="btn-chart" id="dockingAids">⚓</button>
+                    <select id="chartScale">
+                        <option value="harbor">Harbor Detail</option>
+                        <option value="marina" selected>Marina Detail</option>
+                        <option value="aerial">Aerial View</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-display" id="chartCanvas">
+                <div class="vessel-position docking">
+                    <div class="vessel-icon detailed">
+                        <div class="bow-thruster" id="bowThruster">⬆️</div>
+                        <div class="vessel-outline">🚢</div>
+                        <div class="stern-thruster" id="sternThruster">⬇️</div>
+                    </div>
+                    <div class="vessel-dimensions">
+                        <div class="length-line">45ft</div>
+                        <div class="beam-line">12ft</div>
+                    </div>
+                </div>
+                
+                <!-- Marina Layout -->
+                <div class="marina-overlay">
+                    <div class="dock-structure">
+                        <div class="dock-pier main" data-pier="A">
+                            <div class="slip" data-slip="A1">A1</div>
+                            <div class="slip" data-slip="A2">A2</div>
+                            <div class="slip assigned" data-slip="A3">A3</div>
+                            <div class="slip" data-slip="A4">A4</div>
+                        </div>
+                        <div class="dock-pier" data-pier="B">
+                            <div class="slip" data-slip="B1">B1</div>
+                            <div class="slip occupied" data-slip="B2">B2</div>
+                            <div class="slip" data-slip="B3">B3</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hazards and Aids -->
+                    <div class="navigation-hazards">
+                        <div class="hazard shallow" style="top: 70%; left: 30%;" data-hazard="shoal">⚠️</div>
+                        <div class="aid pile" style="top: 45%; left: 60%;" data-aid="mooring">⚓</div>
+                    </div>
+                    
+                    <!-- Wind/Current Indicators -->
+                    <div class="environmental-indicators">
+                        <div class="wind-arrow docking" style="top: 20%; left: 80%;" data-wind="8,SW">
+                            <div class="wind-vector">🌬️</div>
+                            <div class="wind-info">SW 8kts</div>
+                        </div>
+                        <div class="current-vector" style="top: 60%; left: 20%;" data-current="0.5,E">
+                            <div class="current-arrow">🌊</div>
+                            <div class="current-info">0.5kt E</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-info">
+                <span class="coordinates">LAT: 41°24.123'N LON: 71°51.456'W</span>
+                <span class="docking-info">Slip A3 • Approach: NW • Depth: 8.5ft</span>
+            </div>
+        </div>
+
+        <!-- Camera Feeds Panel -->
+        <div class="cameras-panel" id="camerasPanel">
+            <div class="panel-header">
+                <h3>Camera Views</h3>
+                <div class="camera-controls">
+                    <button class="btn-small" id="fullscreenCamera">⛶</button>
+                    <button class="btn-small" id="recordCamera">🔴</button>
+                    <button class="btn-small" id="cameraSettings">⚙️</button>
+                </div>
+            </div>
+            
+            <div class="camera-grid">
+                <!-- Bow Camera -->
+                <div class="camera-feed active" id="bowCamera">
+                    <div class="camera-header">
+                        <span class="camera-label">Bow Camera</span>
+                        <div class="camera-status">
+                            <span class="status-indicator good">●</span>
+                            <span class="camera-angle">Pan: 0° Tilt: -15°</span>
+                        </div>
+                    </div>
+                    <div class="camera-view">
+                        <div class="camera-overlay">
+                            <div class="distance-marker" style="top: 60%;">50ft</div>
+                            <div class="distance-marker" style="top: 70%;">25ft</div>
+                            <div class="distance-marker" style="top: 80%;">10ft</div>
+                        </div>
+                        <div class="camera-image">
+                            <div class="placeholder-feed">
+                                <div class="dock-structure-view">🏗️ Dock Structure</div>
+                                <div class="distance-info">Distance: 15ft</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stern Camera -->
+                <div class="camera-feed" id="sternCamera">
+                    <div class="camera-header">
+                        <span class="camera-label">Stern Camera</span>
+                        <div class="camera-status">
+                            <span class="status-indicator good">●</span>
+                            <span class="camera-angle">Pan: 180° Tilt: -10°</span>
+                        </div>
+                    </div>
+                    <div class="camera-view">
+                        <div class="camera-image">
+                            <div class="placeholder-feed">
+                                <div class="wake-view">🌊 Clear Stern</div>
+                                <div class="depth-info">Depth: 8.5ft</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Port Side Camera -->
+                <div class="camera-feed" id="portCamera">
+                    <div class="camera-header">
+                        <span class="camera-label">Port Side</span>
+                        <div class="camera-status">
+                            <span class="status-indicator good">●</span>
+                            <span class="camera-angle">Pan: -90° Tilt: -5°</span>
+                        </div>
+                    </div>
+                    <div class="camera-view">
+                        <div class="camera-image">
+                            <div class="placeholder-feed">
+                                <div class="dock-view">🏗️ Dock A3</div>
+                                <div class="clearance-info">Clearance: 3.2ft</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Starboard Side Camera -->
+                <div class="camera-feed" id="starboardCamera">
+                    <div class="camera-header">
+                        <span class="camera-label">Starboard Side</span>
+                        <div class="camera-status">
+                            <span class="status-indicator good">●</span>
+                            <span class="camera-angle">Pan: 90° Tilt: -5°</span>
+                        </div>
+                    </div>
+                    <div class="camera-view">
+                        <div class="camera-image">
+                            <div class="placeholder-feed">
+                                <div class="clear-water">🌊 Clear Water</div>
+                                <div class="traffic-info">No Traffic</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Camera Controls -->
+            <div class="camera-control-panel">
+                <div class="active-camera-controls">
+                    <h4>Bow Camera Controls</h4>
+                    <div class="ptz-controls">
+                        <div class="pan-control">
+                            <label>Pan:</label>
+                            <input type="range" id="panControl" min="-180" max="180" value="0">
+                            <span id="panValue">0°</span>
+                        </div>
+                        <div class="tilt-control">
+                            <label>Tilt:</label>
+                            <input type="range" id="tiltControl" min="-90" max="30" value="-15">
+                            <span id="tiltValue">-15°</span>
+                        </div>
+                        <div class="zoom-control">
+                            <label>Zoom:</label>
+                            <input type="range" id="zoomControl" min="1" max="10" value="1">
+                            <span id="zoomValue">1x</span>
+                        </div>
+                    </div>
+                    <div class="preset-buttons">
+                        <button class="preset-btn" data-preset="approach">Approach</button>
+                        <button class="preset-btn" data-preset="dock">Dock</button>
+                        <button class="preset-btn" data-preset="stern">Stern</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Environmental Conditions Panel -->
+        <div class="environmental-panel" id="environmentalPanel">
+            <div class="panel-header">
+                <h3>Docking Conditions</h3>
+                <button class="btn-small refresh" id="refreshConditions">🔄</button>
+            </div>
+            
+            <!-- Real-time Wind -->
+            <div class="condition-group wind">
+                <h4>Wind Conditions</h4>
+                <div class="wind-display">
+                    <div class="wind-rose-mini">
+                        <div class="wind-arrow-mini" style="transform: rotate(225deg);"></div>
+                        <div class="wind-center">SW</div>
+                    </div>
+                    <div class="wind-data">
+                        <div class="wind-speed">8.2 kts</div>
+                        <div class="wind-gusts">Gusts: 12 kts</div>
+                        <div class="wind-trend">Decreasing</div>
+                    </div>
+                </div>
+                <div class="wind-impact">
+                    <div class="impact-rating moderate">Moderate</div>
+                    <div class="impact-note">Cross wind - use caution</div>
+                </div>
+            </div>
+
+            <!-- Current Information -->
+            <div class="condition-group current">
+                <h4>Current</h4>
+                <div class="current-display">
+                    <div class="current-vector-display">
+                        <div class="current-arrow" style="transform: rotate(90deg);"></div>
+                        <div class="current-direction">E</div>
+                    </div>
+                    <div class="current-data">
+                        <div class="current-speed">0.5 kts</div>
+                        <div class="current-set">Set: 090°</div>
+                        <div class="tide-state">Tide: Slack</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visibility -->
+            <div class="condition-group visibility">
+                <h4>Visibility</h4>
+                <div class="visibility-data">
+                    <div class="visibility-range">10+ nm</div>
+                    <div class="conditions">Clear</div>
+                    <div class="light-level">Daylight</div>
+                </div>
+            </div>
+
+            <!-- Harbor Traffic -->
+            <div class="condition-group traffic">
+                <h4>Harbor Traffic</h4>
+                <div class="traffic-list">
+                    <div class="traffic-item">
+                        <div class="vessel-type">🚤</div>
+                        <div class="vessel-info">
+                            <div class="vessel-name">Sport Fishing</div>
+                            <div class="vessel-activity">Departing Slip B2</div>
+                        </div>
+                        <div class="vessel-distance">150 ft NE</div>
+                    </div>
+                    <div class="traffic-item">
+                        <div class="vessel-type">⛵</div>
+                        <div class="vessel-info">
+                            <div class="vessel-name">Sailboat</div>
+                            <div class="vessel-activity">Anchored</div>
+                        </div>
+                        <div class="vessel-distance">300 ft SW</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Docking Assistance -->
+            <div class="docking-assistance">
+                <h4>Docking Assistant</h4>
+                <div class="assistance-display">
+                    <div class="approach-guidance">
+                        <div class="guidance-item">
+                            <span class="guidance-icon">📍</span>
+                            <span class="guidance-text">Approach from NW</span>
+                        </div>
+                        <div class="guidance-item">
+                            <span class="guidance-icon">🌬️</span>
+                            <span class="guidance-text">Allow for SW wind drift</span>
+                        </div>
+                        <div class="guidance-item">
+                            <span class="guidance-icon">⚓</span>
+                            <span class="guidance-text">Slip A3 ready - 8.5ft depth</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Docking Controls -->
+        <div class="docking-controls" id="dockingControls">
+            <div class="control-group engine">
+                <h4>Engine Control</h4>
+                <div class="engine-display">
+                    <div class="rpm-mini">
+                        <div class="rpm-gauge-mini">
+                            <div class="rpm-needle-mini" style="transform: rotate(45deg);"></div>
+                        </div>
+                        <div class="rpm-value">800 RPM</div>
+                    </div>
+                    <div class="engine-status">
+                        <div class="engine-temp">165°F</div>
+                        <div class="engine-oil">OK</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group thrusters">
+                <h4>Thrusters</h4>
+                <div class="thruster-controls">
+                    <div class="bow-thruster-control">
+                        <label>Bow:</label>
+                        <button class="thruster-btn port" id="bowThrusterPort">◀️</button>
+                        <span class="thruster-power">0%</span>
+                        <button class="thruster-btn starboard" id="bowThrusterStarboard">▶️</button>
+                    </div>
+                    <div class="stern-thruster-control">
+                        <label>Stern:</label>
+                        <button class="thruster-btn port" id="sternThrusterPort">◀️</button>
+                        <span class="thruster-power">0%</span>
+                        <button class="thruster-btn starboard" id="sternThrusterStarboard">▶️</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group distances">
+                <h4>Clearances</h4>
+                <div class="distance-readings">
+                    <div class="distance-item">
+                        <label>Bow:</label>
+                        <span class="distance-value">15.2 ft</span>
+                    </div>
+                    <div class="distance-item">
+                        <label>Port:</label>
+                        <span class="distance-value">3.2 ft</span>
+                    </div>
+                    <div class="distance-item">
+                        <label>Starboard:</label>
+                        <span class="distance-value">8.7 ft</span>
+                    </div>
+                    <div class="distance-item">
+                        <label>Stern:</label>
+                        <span class="distance-value">25+ ft</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions docking" id="quickActions">
+            <button class="action-btn horn" id="hornBtn">📯</button>
+            <button class="action-btn lights" id="navLightsBtn">💡</button>
+            <button class="action-btn radio" id="radioBtn">📻</button>
+            <button class="action-btn emergency" id="emergencyBtn">🚨</button>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-label">Speed:</span>
+                <span class="status-value">1.2 kts</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Heading:</span>
+                <span class="status-value">310°</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Depth:</span>
+                <span class="status-value">8.5 ft</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Distance:</span>
+                <span class="status-value">15.2 ft</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Slip:</span>
+                <span class="status-value">A3</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Wind:</span>
+                <span class="status-value">SW 8 kts</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Docking Alert Modal -->
+    <div class="modal hidden" id="dockingAlert">
+        <div class="modal-content">
+            <h3 id="alertTitle">Proximity Alert</h3>
+            <p id="alertMessage">Obstacle detected - Port side clearance 2.1ft</p>
+            <div class="alert-actions">
+                <button class="btn-primary" id="alertAcknowledge">Acknowledge</button>
+                <button class="btn-secondary" id="stopEngines">Stop Engines</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/marine-common.js"></script>
+    <script src="scripts/docking-layout.js"></script>
+</body>
+</html>

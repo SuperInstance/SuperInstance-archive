@@ -1,0 +1,76 @@
+{
+  "presets": {
+    "classical": {
+      "energy_level": 0.4,
+      "complexity_preference": 0.7,
+      "tempo_preference": 100,
+      "mood": "contemplative",
+      "favorite_instruments": ["piano", "strings", "woodwinds"],
+      "scale": "MAJOR",
+      "chord_progressions": ["I-IV-V-I", "I-vi-IV-V"]
+    },
+    "jazz": {
+      "energy_level": 0.6,
+      "complexity_preference": 0.8,
+      "tempo_preference": 140,
+      "mood": "sophisticated",
+      "favorite_instruments": ["piano", "saxophone", "bass", "drums"],
+      "scale": "BLUES",
+      "chord_progressions": ["ii-V-I", "I-VI-ii-V"]
+    },
+    "ambient": {
+      "energy_level": 0.2,
+      "complexity_preference": 0.3,
+      "tempo_preference": 70,
+      "mood": "mellow",
+      "favorite_instruments": ["synth_pad", "strings"],
+      "scale": "PENTATONIC",
+      "chord_progressions": ["I-IV", "I-v"]
+    },
+    "electronic_dance": {
+      "energy_level": 0.9,
+      "complexity_preference": 0.6,
+      "tempo_preference": 128,
+      "mood": "upbeat",
+      "favorite_instruments": ["synth", "bass", "drums"],
+      "scale": "MINOR",
+      "chord_progressions": ["i-VI-III-VII", "i-v-VI-III"]
+    },
+    "film_score": {
+      "energy_level": 0.7,
+      "complexity_preference": 0.8,
+      "tempo_preference": 110,
+      "mood": "dramatic",
+      "favorite_instruments": ["orchestra", "strings", "brass", "percussion"],
+      "scale": "CHROMATIC",
+      "chord_progressions": ["i-iv-v-i", "I-bII-I"]
+    },
+    "meditation": {
+      "energy_level": 0.1,
+      "complexity_preference": 0.2,
+      "tempo_preference": 60,
+      "mood": "peaceful",
+      "favorite_instruments": ["bells", "flute", "strings"],
+      "scale": "PENTATONIC",
+      "chord_progressions": ["I", "I-IV"]
+    },
+    "rock": {
+      "energy_level": 0.8,
+      "complexity_preference": 0.5,
+      "tempo_preference": 140,
+      "mood": "energetic",
+      "favorite_instruments": ["guitar", "bass", "drums"],
+      "scale": "MINOR",
+      "chord_progressions": ["i-VI-III-VII", "i-iv-v"]
+    },
+    "pop": {
+      "energy_level": 0.7,
+      "complexity_preference": 0.4,
+      "tempo_preference": 120,
+      "mood": "upbeat",
+      "favorite_instruments": ["synth", "piano", "drums"],
+      "scale": "MAJOR",
+      "chord_progressions": ["I-V-vi-IV", "I-IV-V-I"]
+    }
+  }
+}

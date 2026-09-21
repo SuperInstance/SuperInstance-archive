@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DMLog Session Logger</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+        .panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .panel h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px 5px 5px 0;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .session-item, .character-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .dice-result {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .dice-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 10px 0;
+        }
+        .dice-buttons button {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>DMLog Session Logger</h1>
+        <p>Track your RPG sessions, roll dice, and manage characters</p>
+    </div>
+
+    <div class="container">
+        <!-- Session Notes Panel -->
+        <div class="panel">
+            <h2>Session Notes</h2>
+            <input type="text" id="sessionTitle" placeholder="Session title">
+            <textarea id="sessionNotes" rows="4" placeholder="Session notes..."></textarea>
+            <input type="date" id="sessionDate">
+            <button onclick="addSession()">Add Session</button>
+            
+            <div id="sessionsList"></div>
+        </div>
+
+        <!-- Dice Roller Panel -->
+        <div class="panel">
+            <h2>Dice Roller</h2>
+            <input type="text" id="customDice" placeholder="e.g., 2d6, d20, 4d8">
+            <button onclick="rollCustomDice()">Roll Custom</button>
+            
+            <div class="dice-buttons">
+                <button onclick="rollDice('d4')">d4</button>
+                <button onclick="rollDice('d6')">d6</button>
+                <button onclick="rollDice('d8')">d8</button>
+                <button onclick="rollDice('d10')">d10</button>
+                <button onclick="rollDice('d12')">d12</button>
+                <button onclick="rollDice('d20')">d20</button>
+                <button onclick="rollDice('d100')">d100</button>
+            </div>
+            
+            <div id="diceResults"></div>
+        </div>
+
+        <!-- Character Tracker Panel -->
+        <div class="panel">
+            <h2>Character Tracker</h2>
+            <input type="text" id="charName" placeholder="Character name">
+            <input type="text" id="charClass" placeholder="Class">
+            <input type="number" id="charLevel" placeholder="Level" value="1">
+            <input type="number" id="charHp" placeholder="Hit Points">
+            <textarea id="charNotes" rows="2" placeholder="Character notes..."></textarea>
+            <button onclick="addCharacter()">Add Character</button>
+            
+            <div id="charactersList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Set today's date as default
+        document.getElementById('sessionDate').value = new Date().toISOString().split('T')[0];
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSessions();
+            loadCharacters();
+        });
+
+        function addSession() {
+            const title = document.getElementById('sessionTitle').value;
+            const notes = document.getElementById('sessionNotes').value;
+            const date = document.getElementById('sessionDate').value;
+            
+            if (!title && !notes) {
+                alert('Please enter a title or notes');
+                return;
+            }
+            
+            fetch('/sessions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title, notes, date })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('sessionTitle').value = '';
+                document.getElementById('sessionNotes').value = '';
+                loadSessions();
+            });
+        }
+
+        function loadSessions() {
+            fetch('/sessions')
+            .then(response => response.json())
+            .then(sessions => {
+                const list = document.getElementById('sessionsList');
+                list.innerHTML = sessions.map(session => `
+                    <div class="session-item">
+                        <h4>${session.title}</h4>
+                        <p><small>${session.date}</small></p>
+                        <p>${session.notes}</p>
+                    </div>
+                `).join('');
+            });
+        }
+
+        function rollDice(dice) {
+            fetch(`/roll/${dice}`)
+            .then(response => response.json())
+            .then(result => {
+                if (result.error) {
+                    alert(result.error);
+                    return;
+                }
+                
+                const resultsDiv = document.getElementById('diceResults');
+                const rollHtml = `
+                    <div class="dice-result">
+                        <strong>${result.dice}:</strong> 
+                        ${result.rolls.join(' + ')} = <strong>${result.total}</strong>
+                    </div>
+                `;
+                resultsDiv.innerHTML = rollHtml + resultsDiv.innerHTML;
+            });
+        }
+
+        function rollCustomDice() {
+            const dice = document.getElementById('customDice').value;
+            if (!dice) {
+                alert('Please enter dice format (e.g., 2d6, d20)');
+                return;
+            }
+            rollDice(dice);
+            document.getElementById('customDice').value = '';
+        }
+
+        function addCharacter() {
+            const name = document.getElementById('charName').value;
+            const charClass = document.getElementById('charClass').value;
+            const level = parseInt(document.getElementById('charLevel').value) || 1;
+            const hp = parseInt(document.getElementById('charHp').value) || 0;
+            const notes = document.getElementById('charNotes').value;
+            
+            if (!name) {
+                alert('Please enter a character name');
+                return;
+            }
+            
+            fetch('/characters', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, class: charClass, level, hp, notes })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('charName').value = '';
+                document.getElementById('charClass').value = '';
+                document.getElementById('charLevel').value = '1';
+                document.getElementById('charHp').value = '';
+                document.getElementById('charNotes').value = '';
+                loadCharacters();
+            });
+        }
+
+        function loadCharacters() {
+            fetch('/characters')
+            .then(response => response.json())
+            .then(characters => {
+                const list = document.getElementById('charactersList');
+                list.innerHTML = characters.map(char => `
+                    <div class="character-item">
+                        <h4>${char.name}</h4>
+                        <p><strong>Class:</strong> ${char.class} | <strong>Level:</strong> ${char.level} | <strong>HP:</strong> ${char.hp}</p>
+                        ${char.notes ? `<p><em>${char.notes}</em></p>` : ''}
+                    </div>
+                `).join('');
+            });
+        }
+    </script>
+</body>
+</html>

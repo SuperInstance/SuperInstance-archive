@@ -1,0 +1,459 @@
+# Auto Scaling Groups for all ActiveLog Domains
+# Provides elastic scaling from 1 to 10 instances per domain
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Auto Scaling Groups for ActiveLog Domains'
+
+Parameters:
+  ImageId:
+    Type: AWS::EC2::Image::Id
+    Description: AMI ID for instances
+    Default: ami-0c02fb55956c7d316
+  
+  InstanceType:
+    Type: String
+    Description: EC2 instance type
+    Default: t3.small
+  
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: EC2 Key Pair for SSH access
+  
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnet IDs for auto scaling groups
+
+Resources:
+  # Launch Template for all domains
+  DomainLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: activelog-domain-template
+      LaunchTemplateData:
+        ImageId: !Ref ImageId
+        InstanceType: !Ref InstanceType
+        KeyName: !Ref KeyName
+        SecurityGroupIds:
+          - !Ref InstanceSecurityGroup
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            yum update -y
+            yum install -y docker
+            systemctl start docker
+            systemctl enable docker
+            usermod -a -G docker ec2-user
+            
+            # Install Docker Compose
+            curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            chmod +x /usr/local/bin/docker-compose
+            
+            # Setup health check endpoint
+            mkdir -p /opt/health
+            echo "OK" > /opt/health/status
+            python3 -m http.server 80 --directory /opt/health &
+
+  # Security Group for instances
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for ActiveLog domain instances
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for load balancers
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+  # PersonalLog Auto Scaling Group
+  PersonalLogASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: personallog-asg
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DomainLaunchTemplate
+        Version: !GetAtt DomainLaunchTemplate.LatestVersionNumber
+      MinSize: 1
+      MaxSize: 10
+      DesiredCapacity: 1
+      VPCZoneIdentifier: !Ref SubnetIds
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 300
+      Tags:
+        - Key: Domain
+          Value: PersonalLog
+          PropagateAtLaunch: true
+        - Key: Name
+          Value: personallog-instance
+          PropagateAtLaunch: true
+
+  PersonalLogScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref PersonalLogASG
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 70
+
+  # MakerLog Auto Scaling Group
+  MakerLogASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: makerlog-asg
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DomainLaunchTemplate
+        Version: !GetAtt DomainLaunchTemplate.LatestVersionNumber
+      MinSize: 1
+      MaxSize: 10
+      DesiredCapacity: 1
+      VPCZoneIdentifier: !Ref SubnetIds
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 300
+      Tags:
+        - Key: Domain
+          Value: MakerLog
+          PropagateAtLaunch: true
+        - Key: Name
+          Value: makerlog-instance
+          PropagateAtLaunch: true
+
+  MakerLogScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref MakerLogASG
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 70
+
+  # LucidDreamer Auto Scaling Group
+  LucidDreamerASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: luciddreamer-asg
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DomainLaunchTemplate
+        Version: !GetAtt DomainLaunchTemplate.LatestVersionNumber
+      MinSize: 1
+      MaxSize: 10
+      DesiredCapacity: 1
+      VPCZoneIdentifier: !Ref SubnetIds
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 300
+      Tags:
+        - Key: Domain
+          Value: LucidDreamer
+          PropagateAtLaunch: true
+        - Key: Name
+          Value: luciddreamer-instance
+          PropagateAtLaunch: true
+
+  LucidDreamerScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref LucidDreamerASG
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 70
+
+  # BusinessLog Auto Scaling Group
+  BusinessLogASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: businesslog-asg
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DomainLaunchTemplate
+        Version: !GetAtt DomainLaunchTemplate.LatestVersionNumber
+      MinSize: 1
+      MaxSize: 10
+      DesiredCapacity: 1
+      VPCZoneIdentifier: !Ref SubnetIds
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 300
+      Tags:
+        - Key: Domain
+          Value: BusinessLog
+          PropagateAtLaunch: true
+        - Key: Name
+          Value: businesslog-instance
+          PropagateAtLaunch: true
+
+  BusinessLogScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref BusinessLogASG
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 70
+
+  # Capitaine Auto Scaling Group
+  CapitaineASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: capitaine-asg
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DomainLaunchTemplate
+        Version: !GetAtt DomainLaunchTemplate.LatestVersionNumber
+      MinSize: 1
+      MaxSize: 10
+      DesiredCapacity: 1
+      VPCZoneIdentifier: !Ref SubnetIds
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 300
+      Tags:
+        - Key: Domain
+          Value: Capitaine
+          PropagateAtLaunch: true
+        - Key: Name
+          Value: capitaine-instance
+          PropagateAtLaunch: true
+
+  CapitaineScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref CapitaineASG
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 70
+
+  # DeckBoss Auto Scaling Group
+  DeckBossASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: deckboss-asg
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DomainLaunchTemplate
+        Version: !GetAtt DomainLaunchTemplate.LatestVersionNumber
+      MinSize: 1
+      MaxSize: 10
+      DesiredCapacity: 1
+      VPCZoneIdentifier: !Ref SubnetIds
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 300
+      Tags:
+        - Key: Domain
+          Value: DeckBoss
+          PropagateAtLaunch: true
+        - Key: Name
+          Value: deckboss-instance
+          PropagateAtLaunch: true
+
+  DeckBossScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref DeckBossASG
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 70
+
+  # DMLog Auto Scaling Group
+  DMLogASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: dmlog-asg
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DomainLaunchTemplate
+        Version: !GetAtt DomainLaunchTemplate.LatestVersionNumber
+      MinSize: 1
+      MaxSize: 10
+      DesiredCapacity: 1
+      VPCZoneIdentifier: !Ref SubnetIds
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 300
+      Tags:
+        - Key: Domain
+          Value: DMLog
+          PropagateAtLaunch: true
+        - Key: Name
+          Value: dmlog-instance
+          PropagateAtLaunch: true
+
+  DMLogScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref DMLogASG
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 70
+
+  # FishingLog Auto Scaling Group
+  FishingLogASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: fishinglog-asg
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DomainLaunchTemplate
+        Version: !GetAtt DomainLaunchTemplate.LatestVersionNumber
+      MinSize: 1
+      MaxSize: 10
+      DesiredCapacity: 1
+      VPCZoneIdentifier: !Ref SubnetIds
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 300
+      Tags:
+        - Key: Domain
+          Value: FishingLog
+          PropagateAtLaunch: true
+        - Key: Name
+          Value: fishinglog-instance
+          PropagateAtLaunch: true
+
+  FishingLogScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref FishingLogASG
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 70
+
+  # RealLog Auto Scaling Group
+  RealLogASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: reallog-asg
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DomainLaunchTemplate
+        Version: !GetAtt DomainLaunchTemplate.LatestVersionNumber
+      MinSize: 1
+      MaxSize: 10
+      DesiredCapacity: 1
+      VPCZoneIdentifier: !Ref SubnetIds
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 300
+      Tags:
+        - Key: Domain
+          Value: RealLog
+          PropagateAtLaunch: true
+        - Key: Name
+          Value: reallog-instance
+          PropagateAtLaunch: true
+
+  RealLogScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref RealLogASG
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 70
+
+  # PlayerLog Auto Scaling Group
+  PlayerLogASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: playerlog-asg
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DomainLaunchTemplate
+        Version: !GetAtt DomainLaunchTemplate.LatestVersionNumber
+      MinSize: 1
+      MaxSize: 10
+      DesiredCapacity: 1
+      VPCZoneIdentifier: !Ref SubnetIds
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 300
+      Tags:
+        - Key: Domain
+          Value: PlayerLog
+          PropagateAtLaunch: true
+        - Key: Name
+          Value: playerlog-instance
+          PropagateAtLaunch: true
+
+  PlayerLogScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref PlayerLogASG
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 70
+
+  # StudyLog Auto Scaling Group
+  StudyLogASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: studylog-asg
+      LaunchTemplate:
+        LaunchTemplateId: !Ref DomainLaunchTemplate
+        Version: !GetAtt DomainLaunchTemplate.LatestVersionNumber
+      MinSize: 1
+      MaxSize: 10
+      DesiredCapacity: 1
+      VPCZoneIdentifier: !Ref SubnetIds
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 300
+      Tags:
+        - Key: Domain
+          Value: StudyLog
+          PropagateAtLaunch: true
+        - Key: Name
+          Value: studylog-instance
+          PropagateAtLaunch: true
+
+  StudyLogScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref StudyLogASG
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 70
+
+Outputs:
+  LaunchTemplateId:
+    Description: Launch Template ID for all domains
+    Value: !Ref DomainLaunchTemplate
+    
+  AutoScalingGroups:
+    Description: Auto Scaling Groups created
+    Value: !Sub |
+      PersonalLog: ${PersonalLogASG}
+      MakerLog: ${MakerLogASG}
+      LucidDreamer: ${LucidDreamerASG}
+      BusinessLog: ${BusinessLogASG}
+      Capitaine: ${CapitaineASG}
+      DeckBoss: ${DeckBossASG}
+      DMLog: ${DMLogASG}
+      FishingLog: ${FishingLogASG}
+      RealLog: ${RealLogASG}
+      PlayerLog: ${PlayerLogASG}
+      StudyLog: ${StudyLogASG}

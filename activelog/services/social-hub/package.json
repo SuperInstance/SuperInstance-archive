@@ -1,0 +1,62 @@
+{
+  "name": "social-hub",
+  "version": "1.0.0",
+  "description": "ActiveLog Social Media Integration Hub",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0",
+    "express-rate-limit": "^6.8.1",
+    "dotenv": "^16.3.1",
+    "multer": "^1.4.5-lts.1",
+    "sharp": "^0.32.3",
+    "ffmpeg-static": "^5.1.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "node-cron": "^3.0.2",
+    "twitter-api-v2": "^1.15.0",
+    "facebook-nodejs-business-sdk": "^18.0.0",
+    "instagram-basic-display-api": "^1.2.0",
+    "googleapis": "^126.0.1",
+    "tiktok-api": "^1.0.0",
+    "axios": "^1.4.0",
+    "cheerio": "^1.0.0-rc.12",
+    "sentiment": "^5.0.2",
+    "natural": "^6.7.0",
+    "compromise": "^14.10.0",
+    "openai": "^4.0.0",
+    "hashids": "^2.2.10",
+    "jimp": "^0.22.10",
+    "canvas": "^2.11.2",
+    "text-to-image": "^5.2.0",
+    "qrcode": "^1.5.3",
+    "puppeteer": "^21.0.2",
+    "playwright": "^1.36.2",
+    "winston": "^3.10.0",
+    "morgan": "^1.10.0",
+    "express-validator": "^7.0.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.1",
+    "redis": "^4.6.7",
+    "bull": "^4.11.3",
+    "nodemailer": "^6.9.4",
+    "twilio": "^4.14.0",
+    "compression": "^1.7.4",
+    "express-slow-down": "^2.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.6.1",
+    "@types/node": "^20.4.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Director Terminal - Multi-Bot Orchestration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #0c0c0c;
+            color: #00ff00;
+            overflow: hidden;
+        }
+        
+        .terminal-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .terminal-header {
+            background-color: #1e1e1e;
+            padding: 10px;
+            border-bottom: 2px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .terminal-title {
+            color: #00ff00;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ff0000;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-indicator.healthy {
+            background-color: #00ff00;
+        }
+        
+        .status-indicator.warning {
+            background-color: #ffff00;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .terminal-output {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #0c0c0c;
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .terminal-input-container {
+            background-color: #1e1e1e;
+            padding: 15px;
+            border-top: 2px solid #333;
+            display: flex;
+            align-items: center;
+        }
+        
+        .terminal-prompt {
+            color: #00ff00;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .terminal-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .terminal-input::placeholder {
+            color: #666;
+        }
+        
+        .output-line {
+            margin-bottom: 5px;
+        }
+        
+        .output-timestamp {
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .output-command {
+            color: #00ff00;
+            font-weight: bold;
+        }
+        
+        .output-result {
+            color: #ffffff;
+            margin-left: 20px;
+        }
+        
+        .output-error {
+            color: #ff4444;
+        }
+        
+        .output-success {
+            color: #44ff44;
+        }
+        
+        .output-info {
+            color: #4444ff;
+        }
+        
+        .json-output {
+            background-color: #1a1a1a;
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 3px solid #00ff00;
+            border-radius: 3px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .help-output {
+            background-color: #1a1a1a;
+            padding: 15px;
+            margin: 5px 0;
+            border-left: 3px solid #4444ff;
+            border-radius: 3px;
+        }
+        
+        .help-command {
+            color: #00ff00;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .help-description {
+            color: #cccccc;
+            margin-bottom: 10px;
+        }
+        
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background-color: #333;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        
+        .connection-status.connected {
+            background-color: #004400;
+            color: #00ff00;
+        }
+        
+        .connection-status.disconnected {
+            background-color: #440000;
+            color: #ff4444;
+        }
+        
+        .terminal-output::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .terminal-output::-webkit-scrollbar-track {
+            background: #0c0c0c;
+        }
+        
+        .terminal-output::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        
+        .terminal-output::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="terminal-title">Director Terminal - Multi-Bot Orchestration</div>
+            <div class="system-status">
+                <div id="statusIndicator" class="status-indicator"></div>
+                <span id="statusText">System Status: Unknown</span>
+            </div>
+        </div>
+        
+        <div id="terminalOutput" class="terminal-output">
+            <div class="output-line">
+                <span class="output-timestamp">[${new Date().toISOString()}]</span>
+                <span class="output-info">Initializing Director Terminal...</span>
+            </div>
+        </div>
+        
+        <div class="terminal-input-container">
+            <span class="terminal-prompt">director$</span>
+            <input 
+                type="text" 
+                id="terminalInput" 
+                class="terminal-input" 
+                placeholder="Enter command (type 'help' for available commands)"
+                autocomplete="off"
+            >
+        </div>
+    </div>
+    
+    <div id="connectionStatus" class="connection-status disconnected">Disconnected</div>
+
+    <script>
+        class DirectorTerminal {
+            constructor() {
+                this.socket = null;
+                this.output = document.getElementById('terminalOutput');
+                this.input = document.getElementById('terminalInput');
+                this.statusIndicator = document.getElementById('statusIndicator');
+                this.statusText = document.getElementById('statusText');
+                this.connectionStatus = document.getElementById('connectionStatus');
+                this.commandHistory = [];
+                this.historyIndex = -1;
+                
+                this.connect();
+                this.setupEventListeners();
+            }
+            
+            connect() {
+                const wsUrl = `ws://${window.location.host}/ws`;
+                this.socket = new WebSocket(wsUrl);
+                
+                this.socket.onopen = () => {
+                    this.connectionStatus.textContent = 'Connected';
+                    this.connectionStatus.className = 'connection-status connected';
+                    this.addOutput('Connected to Director Terminal', 'success');
+                };
+                
+                this.socket.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    this.handleMessage(data);
+                };
+                
+                this.socket.onclose = () => {
+                    this.connectionStatus.textContent = 'Disconnected';
+                    this.connectionStatus.className = 'connection-status disconnected';
+                    this.addOutput('Connection lost. Attempting to reconnect...', 'error');
+                    
+                    // Attempt to reconnect after 3 seconds
+                    setTimeout(() => this.connect(), 3000);
+                };
+                
+                this.socket.onerror = (error) => {
+                    this.addOutput('WebSocket error: ' + error, 'error');
+                };
+            }
+            
+            setupEventListeners() {
+                this.input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        const command = this.input.value.trim();
+                        if (command) {
+                            this.executeCommand(command);
+                            this.commandHistory.push(command);
+                            this.historyIndex = this.commandHistory.length;
+                            this.input.value = '';
+                        }
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        if (this.historyIndex > 0) {
+                            this.historyIndex--;
+                            this.input.value = this.commandHistory[this.historyIndex];
+                        }
+                    } else if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        if (this.historyIndex < this.commandHistory.length - 1) {
+                            this.historyIndex++;
+                            this.input.value = this.commandHistory[this.historyIndex];
+                        } else {
+                            this.historyIndex = this.commandHistory.length;
+                            this.input.value = '';
+                        }
+                    }
+                });
+                
+                // Auto-focus input
+                this.input.focus();
+                document.addEventListener('click', () => this.input.focus());
+            }
+            
+            executeCommand(command) {
+                // Display command in output
+                this.addOutput(`director$ ${command}`, 'command');
+                
+                // Send command to server
+                if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+                    this.socket.send(JSON.stringify({ command: command }));
+                } else {
+                    this.addOutput('Error: Not connected to server', 'error');
+                }
+            }
+            
+            handleMessage(data) {
+                switch (data.type) {
+                    case 'welcome':
+                        this.addOutput(data.message, 'success');
+                        break;
+                    case 'clear':
+                        this.output.innerHTML = '';
+                        break;
+                    case 'help':
+                        this.displayHelp(data.commands);
+                        break;
+                    case 'status':
+                        this.displayStatus(data.data);
+                        break;
+                    case 'error':
+                        this.addOutput(`Error: ${data.message}`, 'error');
+                        break;
+                    case 'tasks':
+                    case 'bots':
+                    case 'health':
+                    case 'metrics':
+                    case 'task_submitted':
+                    case 'task_executed':
+                    case 'context_added':
+                    case 'knowledge_added':
+                    case 'information_shared':
+                        this.displayJsonResult(data.type, data.data);
+                        break;
+                    default:
+                        this.addOutput(`Unknown response type: ${data.type}`, 'error');
+                        break;
+                }
+                
+                this.scrollToBottom();
+            }
+            
+            addOutput(message, type = 'info') {
+                const timestamp = new Date().toISOString();
+                const line = document.createElement('div');
+                line.className = 'output-line';
+                
+                const timestampSpan = document.createElement('span');
+                timestampSpan.className = 'output-timestamp';
+                timestampSpan.textContent = `[${timestamp}] `;
+                
+                const messageSpan = document.createElement('span');
+                messageSpan.className = `output-${type}`;
+                messageSpan.textContent = message;
+                
+                line.appendChild(timestampSpan);
+                line.appendChild(messageSpan);
+                this.output.appendChild(line);
+            }
+            
+            displayHelp(commands) {
+                const helpDiv = document.createElement('div');
+                helpDiv.className = 'help-output';
+                
+                helpDiv.innerHTML = '<h3 style="color: #00ff00; margin-bottom: 10px;">Available Commands:</h3>';
+                
+                for (const [command, description] of Object.entries(commands)) {
+                    const commandDiv = document.createElement('div');
+                    commandDiv.innerHTML = `
+                        <div class="help-command">${command}</div>
+                        <div class="help-description">${description}</div>
+                    `;
+                    helpDiv.appendChild(commandDiv);
+                }
+                
+                this.output.appendChild(helpDiv);
+            }
+            
+            displayStatus(statusData) {
+                // Update header status indicator
+                if (statusData.status === 'healthy') {
+                    this.statusIndicator.className = 'status-indicator healthy';
+                    this.statusText.textContent = `System Status: Healthy (${Math.round(statusData.uptime || 0)}s uptime)`;
+                } else if (statusData.status === 'offline') {
+                    this.statusIndicator.className = 'status-indicator';
+                    this.statusText.textContent = 'System Status: Offline';
+                } else {
+                    this.statusIndicator.className = 'status-indicator warning';
+                    this.statusText.textContent = `System Status: ${statusData.status}`;
+                }
+                
+                // Display detailed status
+                this.displayJsonResult('status', statusData);
+            }
+            
+            displayJsonResult(type, data) {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'json-output';
+                
+                const title = document.createElement('div');
+                title.style.color = '#00ff00';
+                title.style.fontWeight = 'bold';
+                title.style.marginBottom = '10px';
+                title.textContent = `${type.toUpperCase()} RESULT:`;
+                
+                const jsonContent = document.createElement('div');
+                jsonContent.textContent = JSON.stringify(data, null, 2);
+                
+                resultDiv.appendChild(title);
+                resultDiv.appendChild(jsonContent);
+                this.output.appendChild(resultDiv);
+            }
+            
+            scrollToBottom() {
+                this.output.scrollTop = this.output.scrollHeight;
+            }
+        }
+        
+        // Initialize terminal when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new DirectorTerminal();
+        });
+    </script>
+</body>
+</html>

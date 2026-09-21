@@ -1,0 +1,66 @@
+{
+  "character_id": "12291f96c256",
+  "clusters": [
+    {
+      "id": "90e0e505",
+      "name": "Consciousness Memories",
+      "topic": "consciousness",
+      "memory_ids": [
+        "ff96a25be558"
+      ],
+      "created_at": "2025-10-21T17:01:47.386113",
+      "importance": 9
+    },
+    {
+      "id": "500dffdf",
+      "name": "Hard Problem Memories",
+      "topic": "hard problem",
+      "memory_ids": [
+        "ff96a25be558"
+      ],
+      "created_at": "2025-10-21T17:01:47.386116",
+      "importance": 9
+    },
+    {
+      "id": "0d2466ca",
+      "name": "Philosophy Memories",
+      "topic": "philosophy",
+      "memory_ids": [
+        "ff96a25be558"
+      ],
+      "created_at": "2025-10-21T17:01:47.386119",
+      "importance": 9
+    },
+    {
+      "id": "deeb9591",
+      "name": "Artificial Intelligence Memories",
+      "topic": "artificial intelligence",
+      "memory_ids": [
+        "283d996f8246"
+      ],
+      "created_at": "2025-10-21T17:01:47.386759",
+      "importance": 7
+    },
+    {
+      "id": "2edac655",
+      "name": "Philosophy Of Mind Memories",
+      "topic": "philosophy of mind",
+      "memory_ids": [
+        "283d996f8246"
+      ],
+      "created_at": "2025-10-21T17:01:47.386763",
+      "importance": 7
+    },
+    {
+      "id": "c13d0a2e",
+      "name": "Cognition Memories",
+      "topic": "cognition",
+      "memory_ids": [
+        "283d996f8246"
+      ],
+      "created_at": "2025-10-21T17:01:47.386766",
+      "importance": 7
+    }
+  ],
+  "last_saved": "2025-10-21T17:01:47.387068"
+}

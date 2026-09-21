@@ -1,0 +1,108 @@
+{
+  "character_id": "47e82d273492",
+  "clusters": [
+    {
+      "id": "0f35aae8",
+      "name": "Consciousness Memories",
+      "topic": "consciousness",
+      "memory_ids": [
+        "91014da8edc6"
+      ],
+      "created_at": "2025-10-21T17:02:01.220399",
+      "importance": 9
+    },
+    {
+      "id": "1da7be92",
+      "name": "Hard Problem Memories",
+      "topic": "hard problem",
+      "memory_ids": [
+        "91014da8edc6"
+      ],
+      "created_at": "2025-10-21T17:02:01.220403",
+      "importance": 9
+    },
+    {
+      "id": "b92cd6f7",
+      "name": "Philosophy Memories",
+      "topic": "philosophy",
+      "memory_ids": [
+        "91014da8edc6"
+      ],
+      "created_at": "2025-10-21T17:02:01.220405",
+      "importance": 9
+    },
+    {
+      "id": "c98665f4",
+      "name": "Artificial Intelligence Memories",
+      "topic": "artificial intelligence",
+      "memory_ids": [
+        "ef816b2cf5fb"
+      ],
+      "created_at": "2025-10-21T17:02:01.220709",
+      "importance": 7
+    },
+    {
+      "id": "fe104e63",
+      "name": "Philosophy Of Mind Memories",
+      "topic": "philosophy of mind",
+      "memory_ids": [
+        "ef816b2cf5fb"
+      ],
+      "created_at": "2025-10-21T17:02:01.220712",
+      "importance": 7
+    },
+    {
+      "id": "d018b70c",
+      "name": "Cognition Memories",
+      "topic": "cognition",
+      "memory_ids": [
+        "ef816b2cf5fb"
+      ],
+      "created_at": "2025-10-21T17:02:01.220715",
+      "importance": 7
+    },
+    {
+      "id": "69871431",
+      "name": "Neuroscience Memories",
+      "topic": "neuroscience",
+      "memory_ids": [
+        "94efda3176e5",
+        "574d2d2f36ff"
+      ],
+      "created_at": "2025-10-21T17:02:01.223347",
+      "importance": 7
+    },
+    {
+      "id": "02e1660b",
+      "name": "Memory Memories",
+      "topic": "memory",
+      "memory_ids": [
+        "94efda3176e5",
+        "574d2d2f36ff"
+      ],
+      "created_at": "2025-10-21T17:02:01.223351",
+      "importance": 7
+    },
+    {
+      "id": "976b2ec1",
+      "name": "Interdisciplinary Discussion Memories",
+      "topic": "interdisciplinary discussion",
+      "memory_ids": [
+        "94efda3176e5"
+      ],
+      "created_at": "2025-10-21T17:02:01.223354",
+      "importance": 7
+    },
+    {
+      "id": "e0a8ac71",
+      "name": "Empirical Evidence Memories",
+      "topic": "empirical evidence",
+      "memory_ids": [
+        "574d2d2f36ff"
+      ],
+      "created_at": "2025-10-21T17:02:01.224342",
+      "importance": 6
+    }
+  ],
+  "last_saved": "2025-10-21T17:02:01.224653"
+}

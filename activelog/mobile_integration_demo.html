@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SuperInstance Mobile Integration Demo</title>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .demo-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 30px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .demo-header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            padding: 20px 16px;
+            color: white;
+            text-align: center;
+        }
+
+        .demo-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .demo-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .integration-status {
+            padding: 16px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        .status-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .status-value {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .status-healthy {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-degraded {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-critical {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .service-grid {
+            padding: 16px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .service-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .service-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .service-card:active {
+            transform: translateY(0);
+        }
+
+        .service-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        .service-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .service-description {
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .service-status {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .demo-actions {
+            padding: 16px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .action-button {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+        }
+
+        .action-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .action-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .action-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .demo-log {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 11px;
+            padding: 12px;
+            margin: 16px;
+            border-radius: 8px;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+            opacity: 0;
+            animation: fadeInLog 0.3s ease forwards;
+        }
+
+        @keyframes fadeInLog {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .log-timestamp {
+            color: #64748b;
+        }
+
+        .log-success {
+            color: #10b981;
+        }
+
+        .log-error {
+            color: #ef4444;
+        }
+
+        .log-info {
+            color: #3b82f6;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 20px;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 350px;
+            width: 100%;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1e293b;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 50%;
+            border-top-color: #6366f1;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Service-specific colors */
+        .service-auth { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+        .service-api { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+        .service-user { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+        .service-activelog { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .service-personallog { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .service-fishinglog { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); }
+        .service-dmlog { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); }
+        .service-businesslog { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
+        .service-fitness { background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%); }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <div class="demo-title">SuperInstance Mobile</div>
+            <div class="demo-subtitle">Backend Integration Demo</div>
+        </div>
+
+        <div class="integration-status">
+            <div class="status-item">
+                <div class="status-label">
+                    <i data-lucide="wifi" size="14"></i>
+                    Connection Status
+                </div>
+                <div class="status-value status-healthy" id="connection-status">Online</div>
+            </div>
+            
+            <div class="status-item">
+                <div class="status-label">
+                    <i data-lucide="shield-check" size="14"></i>
+                    Authentication
+                </div>
+                <div class="status-value status-degraded" id="auth-status">Not Connected</div>
+            </div>
+            
+            <div class="status-item">
+                <div class="status-label">
+                    <i data-lucide="server" size="14"></i>
+                    Services Health
+                </div>
+                <div class="status-value status-critical" id="services-status">Checking...</div>
+            </div>
+        </div>
+
+        <div class="service-grid">
+            <div class="service-card" data-service="auth">
+                <div class="service-status" style="background: #ef4444;"></div>
+                <div class="service-icon service-auth">
+                    <i data-lucide="shield" size="16"></i>
+                </div>
+                <div class="service-name">Auth Service</div>
+                <div class="service-description">JWT authentication & security</div>
+            </div>
+
+            <div class="service-card" data-service="api">
+                <div class="service-status" style="background: #3b82f6;"></div>
+                <div class="service-icon service-api">
+                    <i data-lucide="globe" size="16"></i>
+                </div>
+                <div class="service-name">API Gateway</div>
+                <div class="service-description">Request routing & load balancing</div>
+            </div>
+
+            <div class="service-card" data-service="user">
+                <div class="service-status" style="background: #8b5cf6;"></div>
+                <div class="service-icon service-user">
+                    <i data-lucide="user" size="16"></i>
+                </div>
+                <div class="service-name">User Management</div>
+                <div class="service-description">Profile & preferences</div>
+            </div>
+
+            <div class="service-card" data-service="activelog">
+                <div class="service-status" style="background: #10b981;"></div>
+                <div class="service-icon service-activelog">
+                    <i data-lucide="activity" size="16"></i>
+                </div>
+                <div class="service-name">ActiveLog AI</div>
+                <div class="service-description">Fitness & health insights</div>
+            </div>
+
+            <div class="service-card" data-service="personallog">
+                <div class="service-status" style="background: #f59e0b;"></div>
+                <div class="service-icon service-personallog">
+                    <i data-lucide="target" size="16"></i>
+                </div>
+                <div class="service-name">PersonalLog AI</div>
+                <div class="service-description">Productivity optimization</div>
+            </div>
+
+            <div class="service-card" data-service="fishinglog">
+                <div class="service-status" style="background: #06b6d4;"></div>
+                <div class="service-icon service-fishinglog">
+                    <i data-lucide="waves" size="16"></i>
+                </div>
+                <div class="service-name">FishingLog AI</div>
+                <div class="service-description">Commercial fishing intelligence</div>
+            </div>
+
+            <div class="service-card" data-service="dmlog">
+                <div class="service-status" style="background: #ec4899;"></div>
+                <div class="service-icon service-dmlog">
+                    <i data-lucide="scroll" size="16"></i>
+                </div>
+                <div class="service-name">DMLog AI</div>
+                <div class="service-description">D&D campaign management</div>
+            </div>
+
+            <div class="service-card" data-service="businesslog">
+                <div class="service-status" style="background: #6366f1;"></div>
+                <div class="service-icon service-businesslog">
+                    <i data-lucide="trending-up" size="16"></i>
+                </div>
+                <div class="service-name">BusinessLog AI</div>
+                <div class="service-description">Enterprise analytics</div>
+            </div>
+
+            <div class="service-card" data-service="fitness">
+                <div class="service-status" style="background: #84cc16;"></div>
+                <div class="service-icon service-fitness">
+                    <i data-lucide="dumbbell" size="16"></i>
+                </div>
+                <div class="service-name">Fitness Data API</div>
+                <div class="service-description">Workout & nutrition tracking</div>
+            </div>
+        </div>
+
+        <div class="demo-actions">
+            <button class="action-button action-primary" id="test-integration">
+                <i data-lucide="play" size="16"></i>
+                Test Full Integration
+            </button>
+            
+            <button class="action-button action-secondary" id="check-health">
+                <i data-lucide="heart-pulse" size="16"></i>
+                Check Service Health
+            </button>
+            
+            <button class="action-button action-secondary" id="test-cross-domain">
+                <i data-lucide="shuffle" size="16"></i>
+                Test Cross-Domain AI
+            </button>
+        </div>
+
+        <div class="demo-log" id="demo-log"></div>
+    </div>
+
+    <!-- Service Modal -->
+    <div class="modal" id="service-modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modal-title">Service Details</div>
+            <div id="modal-content">Loading...</div>
+        </div>
+    </div>
+
+    <script src="mobile_ui_backend_integration.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Initialize mobile integration
+        const mobileIntegration = new SuperInstanceMobileIntegration();
+        const logContainer = document.getElementById('demo-log');
+
+        // Logging function
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.innerHTML = `<span class="log-timestamp">${timestamp}</span> ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // Update status indicators
+        function updateStatus(element, status, text) {
+            element.textContent = text;
+            element.className = element.className.replace(/status-\w+/g, '');
+            element.classList.add(`status-${status}`);
+        }
+
+        // Initialize demo
+        async function initializeDemo() {
+            addLog('🚀 Initializing SuperInstance Mobile Integration...');
+            
+            try {
+                const initialized = await mobileIntegration.initialize();
+                
+                if (initialized) {
+                    addLog('✅ Mobile integration initialized successfully', 'success');
+                    updateStatus(document.getElementById('connection-status'), 'healthy', 'Connected');
+                } else {
+                    addLog('⚠️ Mobile integration partially initialized', 'error');
+                    updateStatus(document.getElementById('connection-status'), 'degraded', 'Limited');
+                }
+            } catch (error) {
+                addLog(`❌ Initialization failed: ${error.message}`, 'error');
+                updateStatus(document.getElementById('connection-status'), 'critical', 'Failed');
+            }
+        }
+
+        // Check service health
+        async function checkServiceHealth() {
+            addLog('🏥 Checking SuperInstance service health...');
+            
+            try {
+                const healthStatus = await mobileIntegration.checkServicesHealth();
+                let healthyCount = 0;
+                let totalCount = healthStatus.length;
+                
+                for (const result of healthStatus) {
+                    const service = result.value || result.reason;
+                    const serviceCard = document.querySelector(`[data-service="${service.service}"]`);
+                    const statusDot = serviceCard?.querySelector('.service-status');
+                    
+                    if (service.status === 'healthy') {
+                        healthyCount++;
+                        addLog(`✅ ${service.service}: ${service.responseTime}ms`, 'success');
+                        if (statusDot) statusDot.style.background = '#10b981';
+                    } else {
+                        addLog(`❌ ${service.service}: ${service.error || 'degraded'}`, 'error');
+                        if (statusDot) statusDot.style.background = '#ef4444';
+                    }
+                }
+                
+                const healthPercentage = (healthyCount / totalCount * 100).toFixed(1);
+                updateStatus(
+                    document.getElementById('services-status'), 
+                    healthyCount === totalCount ? 'healthy' : healthyCount > totalCount/2 ? 'degraded' : 'critical',
+                    `${healthyCount}/${totalCount} (${healthPercentage}%)`
+                );
+                
+                addLog(`📊 Health check complete: ${healthPercentage}% services healthy`);
+            } catch (error) {
+                addLog(`❌ Health check failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Test full integration
+        async function testFullIntegration() {
+            addLog('🔄 Testing full SuperInstance integration...');
+            
+            try {
+                // Test authentication
+                addLog('🔐 Testing authentication...');
+                const authResult = await mobileIntegration.authenticate({
+                    username: 'demo@superinstance.ai',
+                    password: 'demo123'
+                });
+                
+                if (authResult.success) {
+                    addLog('✅ Authentication successful', 'success');
+                    updateStatus(document.getElementById('auth-status'), 'healthy', 'Authenticated');
+                } else {
+                    addLog('❌ Authentication failed (demo mode)', 'error');
+                    updateStatus(document.getElementById('auth-status'), 'degraded', 'Demo Mode');
+                }
+
+                // Test dashboard data
+                addLog('📊 Loading dashboard data...');
+                const dashboardData = await mobileIntegration.getMobileDashboardData();
+                addLog(`✅ Dashboard data loaded: ${Object.keys(dashboardData).length} sections`, 'success');
+
+                // Test cross-domain insights
+                addLog('🧠 Testing cross-domain AI insights...');
+                const insights = await mobileIntegration.getCrossDomainInsights();
+                addLog(`✅ Cross-domain insights loaded`, 'success');
+
+                addLog('🎉 Full integration test completed successfully!', 'success');
+            } catch (error) {
+                addLog(`❌ Integration test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Test cross-domain AI
+        async function testCrossDomainAI() {
+            addLog('🧠 Testing cross-domain AI correlations...');
+            
+            try {
+                // Simulate cross-domain data submission
+                const testData = {
+                    fitness: {
+                        workout: 'cardio',
+                        duration: 45,
+                        calories: 400
+                    },
+                    productivity: {
+                        focus_score: 8,
+                        tasks_completed: 12,
+                        energy_level: 'high'
+                    }
+                };
+
+                const result = await mobileIntegration.submitCrossDomainData(testData);
+                
+                if (result.success) {
+                    addLog('✅ Cross-domain data submitted successfully', 'success');
+                    addLog('🔄 Triggering AI correlation analysis...', 'info');
+                    
+                    // Simulate AI insights
+                    setTimeout(() => {
+                        addLog('🧠 AI Insight: High cardio intensity correlates with improved focus scores', 'success');
+                        addLog('💡 Recommendation: Schedule workouts before important tasks', 'info');
+                    }, 2000);
+                } else {
+                    addLog('❌ Cross-domain submission failed', 'error');
+                }
+            } catch (error) {
+                addLog(`❌ Cross-domain AI test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Service card click handler
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.addEventListener('click', async () => {
+                const service = card.dataset.service;
+                const serviceName = card.querySelector('.service-name').textContent;
+                
+                addLog(`🔍 Testing ${serviceName}...`);
+                
+                // Show modal with service details
+                document.getElementById('modal-title').textContent = serviceName;
+                document.getElementById('modal-content').innerHTML = `
+                    <div style="margin-bottom: 16px;">
+                        <div style="font-size: 14px; color: #64748b; margin-bottom: 8px;">Testing connection...</div>
+                        <div class="loading-spinner"></div>
+                    </div>
+                `;
+                document.getElementById('service-modal').style.display = 'flex';
+                
+                // Simulate service test
+                setTimeout(() => {
+                    const isHealthy = Math.random() > 0.3; // 70% chance of success
+                    document.getElementById('modal-content').innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: ${isHealthy ? '#10b981' : '#ef4444'};"></div>
+                            <span style="font-weight: 600; color: ${isHealthy ? '#059669' : '#dc2626'};">
+                                ${isHealthy ? 'Healthy' : 'Degraded'}
+                            </span>
+                        </div>
+                        <div style="font-size: 14px; color: #64748b;">
+                            Response Time: ${Math.floor(Math.random() * 200 + 50)}ms<br>
+                            Last Updated: ${new Date().toLocaleString()}<br>
+                            Status: ${isHealthy ? 'All systems operational' : 'Experiencing issues'}
+                        </div>
+                        <button onclick="document.getElementById('service-modal').style.display='none'" 
+                                style="margin-top: 16px; width: 100%; padding: 12px; background: #f1f5f9; border: none; border-radius: 8px; cursor: pointer;">
+                            Close
+                        </button>
+                    `;
+                    
+                    addLog(`${isHealthy ? '✅' : '❌'} ${serviceName}: ${isHealthy ? 'Connected' : 'Failed'}`, isHealthy ? 'success' : 'error');
+                }, 1500);
+            });
+        });
+
+        // Event listeners
+        document.getElementById('test-integration').addEventListener('click', testFullIntegration);
+        document.getElementById('check-health').addEventListener('click', checkServiceHealth);
+        document.getElementById('test-cross-domain').addEventListener('click', testCrossDomainAI);
+
+        // Close modal on outside click
+        document.getElementById('service-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'service-modal') {
+                e.target.style.display = 'none';
+            }
+        });
+
+        // Initialize demo on load
+        window.addEventListener('load', () => {
+            setTimeout(initializeDemo, 500);
+            setTimeout(checkServiceHealth, 2000);
+        });
+
+        // Listen for integration events
+        document.addEventListener('superinstance:networkStatusChanged', (e) => {
+            const { online } = e.detail;
+            updateStatus(
+                document.getElementById('connection-status'),
+                online ? 'healthy' : 'critical',
+                online ? 'Online' : 'Offline'
+            );
+            addLog(`📶 Network status: ${online ? 'Online' : 'Offline'}`, online ? 'success' : 'error');
+        });
+
+        document.addEventListener('superinstance:newInsight', (e) => {
+            const { service, insight } = e.detail;
+            addLog(`🧠 New insight from ${service}: ${insight.message}`, 'info');
+        });
+
+        document.addEventListener('superinstance:crossDomainCorrelation', (e) => {
+            const { correlation } = e.detail;
+            addLog(`🔗 Cross-domain correlation detected: ${correlation.description}`, 'success');
+        });
+    </script>
+</body>
+</html>

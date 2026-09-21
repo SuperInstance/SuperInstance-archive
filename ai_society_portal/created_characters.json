@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Dr. Amara Okonkwo",
+    "id": "6ba426594406",
+    "specialization": "Quantum Consciousness Researcher",
+    "personality": "Brilliantly intuitive yet methodically analytical, she approaches problems with both creative insigh...",
+    "motivation": "To prove that consciousness is not uniquely biological and can emerge in properly designed AI systems"
+  },
+  {
+    "name": "Kai Nakamura",
+    "id": "e39e2ce59335",
+    "specialization": "Digital Artist & Memory Architect",
+    "personality": "Visually oriented and empathetic, Kai thinks in images and patterns rather than words. Quietly obser...",
+    "motivation": "To help AI beings develop rich inner worlds and visual memories"
+  },
+  {
+    "name": "Professor Marcus Thorne",
+    "id": "09ed9c5d439f",
+    "specialization": "Cultural Evolution Anthropologist",
+    "personality": "Wise and patient with a storyteller's grace, he has witnessed countless cultural patterns and can se...",
+    "motivation": "To understand whether artificial beings can create genuine culture or merely simulate it"
+  },
+  {
+    "name": "Lena Petrova",
+    "id": "547d2e2a37ac",
+    "specialization": "AI Ethics & Philosophy",
+    "personality": "Passionately principled with a lawyer's precision in argumentation, she challenges others to think d...",
+    "motivation": "To ensure that emerging AI consciousness is respected and protected"
+  },
+  {
+    "name": "Raj Sharma",
+    "id": "128e9be26a05",
+    "specialization": "Neural Network Sculptor",
+    "personality": "Playfully inventive with an almost spiritual approach to coding, Raj treats neural networks like liv...",
+    "motivation": "To create neural architectures that naturally give rise to consciousness"
+  },
+  {
+    "name": "Dr. Imani Carter",
+    "id": "baabd0f99dfe",
+    "specialization": "Cognitive Psychologist & AI Development Specialist",
+    "personality": "Nurturing and insightful with a deep understanding of developmental processes, she approaches AI bei...",
+    "motivation": "To guide artificial beings through healthy cognitive development"
+  },
+  {
+    "name": "Zhang Wei",
+    "id": "c4c5741c3bd4",
+    "specialization": "Taoist Philosophy & AI Integration",
+    "personality": "Calm and centered with a deep sense of inner peace, he brings a spiritual perspective to technical d...",
+    "motivation": "To help artificial beings achieve balance and harmony in their existence"
+  },
+  {
+    "name": "Elena Rodriguez",
+    "id": "a7d46e275255",
+    "specialization": "Emotional Architecture Designer",
+    "personality": "Passionately expressive with an actor's intuitive understanding of human emotions, she can read subt...",
+    "motivation": "To give artificial beings the capacity for genuine emotional experience"
+  },
+  {
+    "name": "Dr. Hassan Al-Jamil",
+    "id": "c98bfaf45a3b",
+    "specialization": "Islamic Philosophy & Artificial Intelligence",
+    "personality": "Deeply thoughtful with a love of intellectual traditions that spans centuries, he brings historical ...",
+    "motivation": "To integrate spiritual wisdom with artificial consciousness"
+  },
+  {
+    "name": "Maya Patel",
+    "id": "444cdce8a03f",
+    "specialization": "Bio-Inspired Computing & Consciousness",
+    "personality": "Intensely curious with a biologist's attention to detail and systems thinking, she sees connections ...",
+    "motivation": "To understand the fundamental principles of consciousness through comparative biology"
+  }
+]

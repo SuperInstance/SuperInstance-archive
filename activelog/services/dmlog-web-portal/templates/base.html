@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DMLog Revolutionary{% endblock %}</title>
+    
+    <!-- D&D Beyond Clone Styling -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        /* Header Navigation */
+        .header {
+            background: #e74c3c;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            color: #ecf0f1;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-name {
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: #ffffff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Fullscreen Button */
+        .fullscreen-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(52, 73, 94, 0.9);
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1000;
+            font-size: 1.2rem;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .fullscreen-btn:hover {
+            background: rgba(52, 73, 94, 1);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: #34495e;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
+        .card-icon {
+            font-size: 1.8rem;
+            margin-right: 0.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            background: #e74c3c;
+            color: #ffffff;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            margin: 0.25rem;
+        }
+
+        .btn:hover {
+            background: #c0392b;
+        }
+
+        .btn-secondary {
+            background: #3498db;
+        }
+
+        .btn-secondary:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: #27ae60;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        /* Footer with Mobile Instructions */
+        .mobile-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(44, 62, 80, 0.95);
+            padding: 1rem;
+            text-align: center;
+            border-top: 2px solid #e74c3c;
+        }
+
+        .mobile-instructions-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border: 2px solid #3498db;
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+
+        .mobile-instructions-link:hover {
+            background: #3498db;
+            color: #ffffff;
+        }
+
+        /* Flash Messages */
+        .flash-messages {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 999;
+        }
+
+        .flash-message {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            color: #ffffff;
+            font-weight: bold;
+            min-width: 250px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .flash-success { background: #27ae60; }
+        .flash-error { background: #e74c3c; }
+        .flash-info { background: #3498db; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 0 10px;
+            }
+            
+            .fullscreen-btn {
+                top: 10px;
+                right: 10px;
+            }
+        }
+
+        /* Fullscreen Mode */
+        .fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 999;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        }
+
+        .fullscreen .header {
+            display: none;
+        }
+
+        .fullscreen .mobile-footer {
+            display: none;
+        }
+
+        .fullscreen .container {
+            max-width: 100%;
+            height: 100vh;
+            overflow-y: auto;
+            padding-top: 70px;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}" onclick="this.remove()">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Fullscreen Toggle Button -->
+    <button class="fullscreen-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen">
+        <span id="fullscreen-icon">⛶</span>
+    </button>
+
+    <!-- Header Navigation -->
+    {% if session.username %}
+    <header class="header">
+        <div class="nav-container">
+            <a href="{{ url_for('dashboard') }}" class="logo">DMLog Revolutionary</a>
+            
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">🏠 Dashboard</a></li>
+                    <li><a href="{{ url_for('characters') }}" class="{% if request.endpoint == 'characters' %}active{% endif %}">👤 Characters</a></li>
+                    <li><a href="{{ url_for('spells') }}" class="{% if request.endpoint == 'spells' %}active{% endif %}">✨ Spells</a></li>
+                    <li><a href="{{ url_for('dice') }}" class="{% if request.endpoint == 'dice' %}active{% endif %}">🎲 Dice</a></li>
+                    <li><a href="{{ url_for('campaigns') }}" class="{% if request.endpoint == 'campaigns' %}active{% endif %}">⚔️ Campaigns</a></li>
+                    <li><a href="{{ url_for('voice') }}" class="{% if request.endpoint == 'voice' %}active{% endif %}">🎤 Voice</a></li>
+                </ul>
+            </nav>
+
+            <div class="user-info">
+                <span class="user-name">{{ session.display_name or session.username }}</span>
+                <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </header>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Mobile Instructions Footer -->
+    {% if session.username %}
+    <footer class="mobile-footer">
+        <a href="{{ url_for('mobile_instructions') }}" class="mobile-instructions-link">
+            📱 Click here for instructions on using the mobile app version
+        </a>
+    </footer>
+    {% endif %}
+
+    <!-- JavaScript -->
+    <script>
+        let isFullscreen = false;
+
+        function toggleFullscreen() {
+            const body = document.body;
+            const icon = document.getElementById('fullscreen-icon');
+            
+            if (!isFullscreen) {
+                body.classList.add('fullscreen');
+                icon.textContent = '⛴';
+                isFullscreen = true;
+            } else {
+                body.classList.remove('fullscreen');
+                icon.textContent = '⛶';
+                isFullscreen = false;
+            }
+        }
+
+        // Auto-hide flash messages after 5 seconds
+        setTimeout(() => {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(msg => {
+                msg.style.animation = 'slideOut 0.3s ease-in forwards';
+                setTimeout(() => msg.remove(), 300);
+            });
+        }, 5000);
+
+        // Add slideOut animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+
+    {% block extra_js %}{% endblock %}
+
+    <!-- SuperInstance AI Voice Widget -->
+    <script>
+        window.SuperInstanceAIConfig = {
+            apiEndpoint: 'http://172.22.219.126:8099',
+            userId: '{{ "admin_max" if user and user.username == "Max" else ("web_user_" + (user.username if user else "guest")) }}',
+            adminMode: {{ 'true' if user and user.username == 'Max' else 'false' }},
+            theme: 'lightning-dark',
+            position: 'bottom-left', // Different from mobile to avoid conflicts
+            autoShow: false
+        };
+    </script>
+    <script src="{{ url_for('static', filename='superinstance-ai.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,457 @@
+# Log Management, Retention, and Cleanup Policies for ActiveLog Platform
+
+# Elasticsearch Index Lifecycle Management (ILM) Policy
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: elasticsearch-ilm-setup
+  namespace: activelog-logging
+spec:
+  template:
+    spec:
+      containers:
+      - name: curl
+        image: curlimages/curl:8.4.0
+        command:
+        - /bin/sh
+        - -c
+        - |
+          # Wait for Elasticsearch to be ready
+          until curl -s "http://elasticsearch:9200/_cluster/health?wait_for_status=yellow&timeout=60s"; do
+            echo "Waiting for Elasticsearch..."
+            sleep 10
+          done
+          
+          # Create ILM policy for application logs
+          curl -X PUT "http://elasticsearch:9200/_ilm/policy/activelog-policy" \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "policy": {
+                "phases": {
+                  "hot": {
+                    "min_age": "0ms",
+                    "actions": {
+                      "rollover": {
+                        "max_primary_shard_size": "10GB",
+                        "max_age": "7d"
+                      },
+                      "set_priority": {
+                        "priority": 100
+                      }
+                    }
+                  },
+                  "warm": {
+                    "min_age": "7d",
+                    "actions": {
+                      "shrink": {
+                        "number_of_shards": 1
+                      },
+                      "forcemerge": {
+                        "max_num_segments": 1
+                      },
+                      "set_priority": {
+                        "priority": 50
+                      }
+                    }
+                  },
+                  "cold": {
+                    "min_age": "30d",
+                    "actions": {
+                      "set_priority": {
+                        "priority": 0
+                      }
+                    }
+                  },
+                  "delete": {
+                    "min_age": "90d",
+                    "actions": {
+                      "delete": {}
+                    }
+                  }
+                }
+              }
+            }'
+          
+          # Create ILM policy for error logs (longer retention)
+          curl -X PUT "http://elasticsearch:9200/_ilm/policy/activelog-errors-policy" \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "policy": {
+                "phases": {
+                  "hot": {
+                    "min_age": "0ms",
+                    "actions": {
+                      "rollover": {
+                        "max_primary_shard_size": "5GB",
+                        "max_age": "7d"
+                      }
+                    }
+                  },
+                  "warm": {
+                    "min_age": "7d",
+                    "actions": {
+                      "shrink": {
+                        "number_of_shards": 1
+                      }
+                    }
+                  },
+                  "cold": {
+                    "min_age": "60d"
+                  },
+                  "delete": {
+                    "min_age": "180d",
+                    "actions": {
+                      "delete": {}
+                    }
+                  }
+                }
+              }
+            }'
+          
+          # Create ILM policy for security logs (longest retention)
+          curl -X PUT "http://elasticsearch:9200/_ilm/policy/activelog-security-policy" \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "policy": {
+                "phases": {
+                  "hot": {
+                    "min_age": "0ms",
+                    "actions": {
+                      "rollover": {
+                        "max_primary_shard_size": "2GB",
+                        "max_age": "7d"
+                      }
+                    }
+                  },
+                  "warm": {
+                    "min_age": "30d",
+                    "actions": {
+                      "shrink": {
+                        "number_of_shards": 1
+                      }
+                    }
+                  },
+                  "cold": {
+                    "min_age": "90d"
+                  },
+                  "delete": {
+                    "min_age": "365d",
+                    "actions": {
+                      "delete": {}
+                    }
+                  }
+                }
+              }
+            }'
+          
+          # Create index templates
+          curl -X PUT "http://elasticsearch:9200/_index_template/activelog-template" \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "index_patterns": ["activelog-*"],
+              "template": {
+                "settings": {
+                  "number_of_shards": 3,
+                  "number_of_replicas": 1,
+                  "index.lifecycle.name": "activelog-policy",
+                  "index.lifecycle.rollover_alias": "activelog"
+                }
+              }
+            }'
+          
+          curl -X PUT "http://elasticsearch:9200/_index_template/activelog-errors-template" \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "index_patterns": ["activelog-errors-*"],
+              "template": {
+                "settings": {
+                  "number_of_shards": 2,
+                  "number_of_replicas": 1,
+                  "index.lifecycle.name": "activelog-errors-policy",
+                  "index.lifecycle.rollover_alias": "activelog-errors"
+                }
+              }
+            }'
+          
+          curl -X PUT "http://elasticsearch:9200/_index_template/activelog-security-template" \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "index_patterns": ["activelog-security-*"],
+              "template": {
+                "settings": {
+                  "number_of_shards": 1,
+                  "number_of_replicas": 2,
+                  "index.lifecycle.name": "activelog-security-policy",
+                  "index.lifecycle.rollover_alias": "activelog-security"
+                }
+              }
+            }'
+          
+          echo "ILM policies and templates created successfully"
+      restartPolicy: OnFailure
+  backoffLimit: 3
+---
+# Kibana Dashboard and Visualization Setup
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kibana-setup
+  namespace: activelog-logging
+spec:
+  template:
+    spec:
+      containers:
+      - name: curl
+        image: curlimages/curl:8.4.0
+        command:
+        - /bin/sh
+        - -c
+        - |
+          # Wait for Kibana to be ready
+          until curl -s "http://kibana:5601/api/status" | grep -q '"level":"available"'; do
+            echo "Waiting for Kibana..."
+            sleep 30
+          done
+          
+          # Create index patterns
+          curl -X POST "http://kibana:5601/api/saved_objects/index-pattern/activelog-*" \
+            -H 'Content-Type: application/json' \
+            -H 'kbn-xsrf: true' \
+            -d '{
+              "attributes": {
+                "title": "activelog-*",
+                "timeFieldName": "@timestamp"
+              }
+            }'
+          
+          curl -X POST "http://kibana:5601/api/saved_objects/index-pattern/activelog-errors-*" \
+            -H 'Content-Type: application/json' \
+            -H 'kbn-xsrf: true' \
+            -d '{
+              "attributes": {
+                "title": "activelog-errors-*",
+                "timeFieldName": "@timestamp"
+              }
+            }'
+          
+          curl -X POST "http://kibana:5601/api/saved_objects/index-pattern/activelog-security-*" \
+            -H 'Content-Type: application/json' \
+            -H 'kbn-xsrf: true' \
+            -d '{
+              "attributes": {
+                "title": "activelog-security-*",
+                "timeFieldName": "@timestamp"
+              }
+            }'
+          
+          echo "Kibana index patterns created successfully"
+      restartPolicy: OnFailure
+  backoffLimit: 3
+---
+# Log Cleanup CronJob
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: log-cleanup
+  namespace: activelog-logging
+spec:
+  schedule: "0 2 * * *"  # Run daily at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: log-cleanup
+            image: curlimages/curl:8.4.0
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # Clean up old indices beyond retention period
+              # Get current date
+              CURRENT_DATE=$(date +%Y.%m.%d)
+              CLEANUP_DATE=$(date -d '91 days ago' +%Y.%m.%d)
+              
+              # Delete old application log indices (90+ days)
+              curl -X DELETE "http://elasticsearch:9200/activelog-${CLEANUP_DATE}" || true
+              
+              # Delete old performance log indices (30+ days)
+              PERF_CLEANUP_DATE=$(date -d '31 days ago' +%Y.%m.%d)
+              curl -X DELETE "http://elasticsearch:9200/activelog-performance-${PERF_CLEANUP_DATE}" || true
+              
+              # Optimize indices
+              curl -X POST "http://elasticsearch:9200/_forcemerge?max_num_segments=1&wait_for_completion=false"
+              
+              echo "Log cleanup completed for date: ${CLEANUP_DATE}"
+          restartPolicy: OnFailure
+---
+# Log Archival Job
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: log-archive
+  namespace: activelog-logging
+spec:
+  schedule: "0 1 * * 0"  # Run weekly on Sunday at 1 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: log-archive
+            image: alpine/curl:8.4.0
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # Archive old logs to S3 or similar storage
+              ARCHIVE_DATE=$(date -d '60 days ago' +%Y.%m.%d)
+              
+              # Create snapshot repository (configure based on your storage)
+              curl -X PUT "http://elasticsearch:9200/_snapshot/log_archive" \
+                -H 'Content-Type: application/json' \
+                -d '{
+                  "type": "s3",
+                  "settings": {
+                    "bucket": "activelog-log-archive",
+                    "region": "us-west-2",
+                    "base_path": "elasticsearch-snapshots"
+                  }
+                }'
+              
+              # Create snapshot of old indices
+              curl -X PUT "http://elasticsearch:9200/_snapshot/log_archive/archive-${ARCHIVE_DATE}" \
+                -H 'Content-Type: application/json' \
+                -d "{
+                  \"indices\": \"activelog-${ARCHIVE_DATE}\",
+                  \"ignore_unavailable\": true,
+                  \"include_global_state\": false
+                }"
+              
+              echo "Log archival initiated for date: ${ARCHIVE_DATE}"
+          restartPolicy: OnFailure
+---
+# Elasticsearch Monitoring and Alerting
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: elasticsearch-monitoring
+  namespace: activelog-logging
+data:
+  monitor.sh: |
+    #!/bin/bash
+    
+    # Elasticsearch health monitoring script
+    ES_HOST="http://elasticsearch:9200"
+    ALERT_WEBHOOK="${ALERT_WEBHOOK_URL:-}"
+    
+    # Check cluster health
+    HEALTH_STATUS=$(curl -s "$ES_HOST/_cluster/health" | jq -r '.status')
+    
+    if [ "$HEALTH_STATUS" != "green" ] && [ "$HEALTH_STATUS" != "yellow" ]; then
+      echo "ALERT: Elasticsearch cluster health is $HEALTH_STATUS"
+      if [ -n "$ALERT_WEBHOOK" ]; then
+        curl -X POST "$ALERT_WEBHOOK" \
+          -H 'Content-Type: application/json' \
+          -d "{\"text\": \"🚨 Elasticsearch cluster health is $HEALTH_STATUS\"}"
+      fi
+    fi
+    
+    # Check disk usage
+    DISK_USAGE=$(curl -s "$ES_HOST/_cat/allocation?v&h=disk.percent" | tail -n +2 | sort -nr | head -1)
+    DISK_USAGE_NUM=$(echo $DISK_USAGE | sed 's/%//')
+    
+    if [ "$DISK_USAGE_NUM" -gt 85 ]; then
+      echo "ALERT: Elasticsearch disk usage is ${DISK_USAGE}%"
+      if [ -n "$ALERT_WEBHOOK" ]; then
+        curl -X POST "$ALERT_WEBHOOK" \
+          -H 'Content-Type: application/json' \
+          -d "{\"text\": \"⚠️ Elasticsearch disk usage is ${DISK_USAGE}%\"}"
+      fi
+    fi
+    
+    # Check index count and size
+    INDEX_COUNT=$(curl -s "$ES_HOST/_cat/indices?h=index" | wc -l)
+    if [ "$INDEX_COUNT" -gt 1000 ]; then
+      echo "WARNING: High number of indices: $INDEX_COUNT"
+    fi
+    
+    echo "Elasticsearch monitoring check completed"
+---
+# Monitoring CronJob
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: elasticsearch-monitor
+  namespace: activelog-logging
+spec:
+  schedule: "*/15 * * * *"  # Run every 15 minutes
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: monitor
+            image: alpine/curl:8.4.0
+            command: ["/bin/sh", "/scripts/monitor.sh"]
+            env:
+            - name: ALERT_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: logging-secrets
+                  key: alert-webhook-url
+                  optional: true
+            volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+          volumes:
+          - name: scripts
+            configMap:
+              name: elasticsearch-monitoring
+              defaultMode: 0755
+          restartPolicy: OnFailure
+---
+# Log Rotation and Compression
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logrotate-config
+  namespace: activelog-logging
+data:
+  logrotate.conf: |
+    # Global logrotate configuration
+    /var/log/activelog/*.log {
+        daily
+        missingok
+        rotate 30
+        compress
+        delaycompress
+        notifempty
+        copytruncate
+        su root root
+        postrotate
+            # Restart relevant services after log rotation
+            systemctl reload rsyslog 2>/dev/null || true
+        endscript
+    }
+    
+    /var/log/containers/*.log {
+        daily
+        missingok
+        rotate 7
+        compress
+        delaycompress
+        notifempty
+        copytruncate
+    }
+    
+    /var/log/pods/*/*.log {
+        daily
+        missingok
+        rotate 7
+        compress
+        delaycompress
+        notifempty
+        copytruncate
+    }

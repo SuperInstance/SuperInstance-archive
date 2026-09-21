@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  activelog-compute:
+    image: activelog/compute:latest
+    environment:
+      - CLOUD_MODE=true
+      - DEVICE_TIER=cloud
+    ports:
+      - "8000-8010:8000-8010"
+    resources:
+      limits:
+        cpus: '2.0'
+        memory: 4G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  
+  activelog-thin-client:
+    image: activelog/thin-client:latest
+    environment:
+      - CLOUD_ENDPOINT=http://activelog-compute:8000
+      - DEVICE_TIER=thin
+    ports:
+      - "3000:3000"
+    depends_on:
+      - activelog-compute
+    resources:
+      limits:
+        cpus: '0.5'
+        memory: 512M

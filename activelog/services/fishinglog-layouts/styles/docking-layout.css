@@ -1,0 +1,575 @@
+/* Docking Layout Specific Styles */
+
+.docking-layout .layout-container {
+    grid-template-areas: 
+        "chart cameras wind"
+        "status status status";
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 1fr auto;
+}
+
+.docking-layout .chart-main {
+    grid-area: chart;
+}
+
+.docking-layout .camera-panel {
+    grid-area: cameras;
+    background: var(--marine-panel-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+}
+
+.docking-layout .wind-panel {
+    grid-area: wind;
+    background: var(--marine-panel-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.docking-layout .status-bar {
+    grid-area: status;
+}
+
+/* Docking Overlay */
+.docking-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.dock {
+    position: absolute;
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.dock-structure {
+    background: var(--marine-text-secondary);
+    border: 2px solid var(--marine-border);
+    position: relative;
+}
+
+.dock.slip .dock-structure {
+    width: 80px;
+    height: 20px;
+    background: linear-gradient(90deg, var(--marine-text-secondary), var(--marine-panel-bg));
+}
+
+.dock.pier .dock-structure {
+    width: 100px;
+    height: 8px;
+    background: var(--marine-text-secondary);
+}
+
+.dock-info {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-small);
+    text-align: center;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.dock:hover .dock-info {
+    opacity: 1;
+}
+
+/* Approach Lines */
+.approach-lines {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.approach-line {
+    position: absolute;
+    height: 2px;
+    background: var(--bearing-color);
+    box-shadow: 0 0 6px var(--bearing-color);
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.approach-line.recommended {
+    background: var(--marine-success);
+    box-shadow: 0 0 8px var(--marine-success);
+    animation: approachPulse 3s infinite;
+}
+
+@keyframes approachPulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+/* Wind Indicators */
+.wind-indicators {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.wind-arrow {
+    position: absolute;
+    font-size: var(--font-size-xl);
+    color: var(--marine-accent);
+    animation: windSway 4s ease-in-out infinite;
+}
+
+@keyframes windSway {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+/* Range Rings */
+.range-rings {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+}
+
+.range-ring {
+    position: absolute;
+    border: 1px dashed rgba(0, 168, 255, 0.3);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.range-ring[data-range="50"] {
+    width: 20%;
+    height: 20%;
+}
+
+.range-ring[data-range="100"] {
+    width: 40%;
+    height: 40%;
+}
+
+.range-ring[data-range="200"] {
+    width: 80%;
+    height: 80%;
+}
+
+/* Camera Panel */
+.camera-grid {
+    flex: 1;
+    padding: var(--spacing-sm);
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: var(--spacing-sm);
+}
+
+.camera-view {
+    background: var(--marine-darker-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.camera-feed {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #001122, #002244);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--marine-text-secondary);
+    font-size: var(--font-size-small);
+}
+
+.camera-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        linear-gradient(to right, transparent 49%, rgba(0, 168, 255, 0.3) 50%, transparent 51%),
+        linear-gradient(to bottom, transparent 49%, rgba(0, 168, 255, 0.3) 50%, transparent 51%);
+}
+
+.camera-info {
+    position: absolute;
+    top: var(--spacing-xs);
+    left: var(--spacing-xs);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-small);
+}
+
+.camera-controls {
+    padding: var(--spacing-sm);
+    background: var(--marine-darker-bg);
+    border-top: 1px solid var(--marine-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.camera-selector {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.cam-btn {
+    width: 30px;
+    height: 30px;
+    background: var(--marine-panel-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-sm);
+    color: var(--marine-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-small);
+    transition: all 0.2s ease;
+}
+
+.cam-btn.active {
+    background: var(--marine-accent);
+    border-color: var(--marine-accent);
+    color: white;
+}
+
+.cam-btn:hover:not(.active) {
+    background: var(--marine-border);
+}
+
+.camera-zoom {
+    display: flex;
+    gap: var(--spacing-xs);
+    align-items: center;
+}
+
+.zoom-btn {
+    width: 25px;
+    height: 25px;
+    background: var(--marine-panel-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-sm);
+    color: var(--marine-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-small);
+}
+
+.zoom-btn:hover {
+    background: var(--marine-accent);
+    border-color: var(--marine-accent);
+}
+
+/* Wind Panel */
+.wind-display {
+    flex: 1;
+    padding: var(--spacing-md);
+}
+
+.wind-compass {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto var(--spacing-lg);
+    position: relative;
+    border: 3px solid var(--marine-border);
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--marine-darker-bg), var(--marine-panel-bg));
+}
+
+.compass-face {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.compass-direction {
+    position: absolute;
+    font-size: var(--font-size-small);
+    font-weight: bold;
+    color: var(--marine-text-secondary);
+}
+
+.compass-direction.n {
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--marine-accent);
+}
+
+.compass-direction.e {
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.compass-direction.s {
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.compass-direction.w {
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.wind-needle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2px;
+    height: 60px;
+    background: var(--marine-danger);
+    transform-origin: bottom center;
+    transform: translate(-50%, -100%) rotate(135deg);
+    border-radius: 1px;
+    box-shadow: 0 0 6px var(--marine-danger);
+}
+
+.wind-needle::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 8px solid var(--marine-danger);
+}
+
+.wind-data {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.wind-speed {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-xs);
+}
+
+.wind-speed .unit {
+    font-size: 1rem;
+    color: var(--marine-text-secondary);
+}
+
+.wind-direction {
+    color: var(--marine-text);
+    font-size: var(--font-size-medium);
+    margin-bottom: var(--spacing-xs);
+}
+
+.wind-trend {
+    color: var(--marine-text-secondary);
+    font-size: var(--font-size-small);
+}
+
+.wind-conditions {
+    background: var(--marine-darker-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+}
+
+.wind-conditions h4 {
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+.condition-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-small);
+}
+
+.condition-row:last-child {
+    margin-bottom: 0;
+}
+
+.condition-row label {
+    color: var(--marine-text-secondary);
+}
+
+.condition-row span {
+    color: var(--marine-text);
+    font-weight: bold;
+}
+
+.condition-row .gusts {
+    color: var(--marine-warning);
+}
+
+.condition-row .seas {
+    color: var(--marine-accent);
+}
+
+/* Docking Tools */
+.docking-tools {
+    position: absolute;
+    top: var(--spacing-md);
+    left: var(--spacing-md);
+    background: var(--marine-panel-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    backdrop-filter: blur(10px);
+    z-index: 20;
+}
+
+.docking-tools .tool-group {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.docking-tools .tool-btn {
+    font-size: var(--font-size-small);
+    white-space: nowrap;
+}
+
+.docking-guidance {
+    padding: var(--spacing-sm);
+    background: var(--marine-darker-bg);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    font-size: var(--font-size-small);
+}
+
+.guidance-direction {
+    color: var(--marine-accent);
+    font-weight: bold;
+    font-size: var(--font-size-medium);
+    margin-bottom: var(--spacing-xs);
+}
+
+.guidance-distance {
+    color: var(--marine-text-secondary);
+}
+
+/* Thruster Controls */
+.thruster-controls {
+    position: absolute;
+    bottom: var(--spacing-md);
+    right: var(--spacing-md);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: var(--spacing-sm);
+    z-index: 20;
+}
+
+.thruster-btn {
+    width: 50px;
+    height: 50px;
+    background: var(--marine-panel-bg);
+    border: 2px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    color: var(--marine-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-large);
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+}
+
+.thruster-btn:hover {
+    background: var(--marine-accent);
+    border-color: var(--marine-accent);
+    box-shadow: 0 0 15px var(--marine-accent);
+}
+
+.thruster-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 0 20px var(--marine-accent);
+}
+
+/* Responsive Design for Docking Layout */
+@media (max-width: 1200px) {
+    .docking-layout .layout-container {
+        grid-template-areas: 
+            "chart chart"
+            "cameras wind"
+            "status status";
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 2fr 1fr auto;
+    }
+    
+    .camera-grid {
+        grid-template-rows: 1fr;
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .docking-layout .layout-container {
+        grid-template-areas: 
+            "chart"
+            "cameras"
+            "wind"
+            "status";
+        grid-template-columns: 1fr;
+        grid-template-rows: 2fr 1fr 1fr auto;
+    }
+    
+    .camera-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+    }
+    
+    .wind-compass {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .docking-tools {
+        position: static;
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .thruster-controls {
+        position: static;
+        margin: 0 auto;
+        width: fit-content;
+    }
+    
+    .thruster-btn {
+        width: 40px;
+        height: 40px;
+    }
+}

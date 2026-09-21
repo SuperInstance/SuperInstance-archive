@@ -1,0 +1,56 @@
+{
+  "aws_lambda": {
+    "endpoint": "https://lambda.us-east-1.amazonaws.com/2015-03-31/functions",
+    "api_key": "YOUR_AWS_KEY",
+    "region": "us-east-1",
+    "capabilities": [
+      "ml_inference",
+      "data_processing",
+      "image_processing",
+      "nlp"
+    ],
+    "cost_per_hour": 1.66e-05,
+    "max_concurrent_tasks": 1000,
+    "latency_ms": 150
+  },
+  "google_cloud_run": {
+    "endpoint": "https://run.googleapis.com/apis/serving.knative.dev/v1",
+    "api_key": "YOUR_GOOGLE_KEY",
+    "region": "us-central1",
+    "capabilities": [
+      "ml_inference",
+      "data_processing",
+      "vision_api",
+      "speech_api"
+    ],
+    "cost_per_hour": 2.4e-05,
+    "max_concurrent_tasks": 200,
+    "latency_ms": 200
+  },
+  "azure_functions": {
+    "endpoint": "https://management.azure.com/subscriptions",
+    "api_key": "YOUR_AZURE_KEY",
+    "region": "eastus",
+    "capabilities": [
+      "ml_inference",
+      "cognitive_services",
+      "data_processing"
+    ],
+    "cost_per_hour": 1.6e-05,
+    "max_concurrent_tasks": 500,
+    "latency_ms": 180
+  },
+  "edge_compute": {
+    "endpoint": "https://edge-compute.activelog.ai/api/v1",
+    "api_key": "EDGE_COMPUTE_KEY",
+    "region": "global",
+    "capabilities": [
+      "lightweight_ml",
+      "data_processing",
+      "caching"
+    ],
+    "cost_per_hour": 1e-05,
+    "max_concurrent_tasks": 50,
+    "latency_ms": 50
+  }
+}

@@ -1,0 +1,411 @@
+# Disaster Recovery - Backup and Restore Procedures
+# Comprehensive backup and restore system for ActiveLog platform
+
+# Database Backup CronJob
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+  namespace: activelog
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: postgres-backup
+            image: postgres:15-alpine
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              
+              BACKUP_DATE=$(date +%Y%m%d_%H%M%S)
+              BACKUP_FILE="activelog_backup_${BACKUP_DATE}.sql"
+              
+              echo "Starting database backup at $(date)"
+              
+              # Create full database backup
+              pg_dump -h postgres -U postgres -d activelog --no-password --verbose \
+                --format=custom \
+                --no-owner \
+                --no-privileges \
+                --exclude-table-data="audit_logs" \
+                --exclude-table-data="session_logs" \
+                > /backup/${BACKUP_FILE}
+              
+              # Compress backup
+              gzip /backup/${BACKUP_FILE}
+              
+              # Verify backup
+              if [ -f "/backup/${BACKUP_FILE}.gz" ]; then
+                echo "Backup completed successfully: ${BACKUP_FILE}.gz"
+                echo "Backup size: $(du -h /backup/${BACKUP_FILE}.gz | cut -f1)"
+              else
+                echo "Backup failed!"
+                exit 1
+              fi
+              
+              # Create backup metadata
+              cat > /backup/${BACKUP_FILE}.meta << EOF
+              {
+                "backup_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+                "database": "activelog",
+                "backup_type": "full",
+                "filename": "${BACKUP_FILE}.gz",
+                "size_bytes": $(stat -c%s /backup/${BACKUP_FILE}.gz),
+                "pg_version": "$(psql -h postgres -U postgres -d activelog -t -c 'SELECT version();' | head -1 | xargs)"
+              }
+              EOF
+              
+              # Upload to S3 (optional)
+              if [ -n "${AWS_S3_BUCKET}" ]; then
+                aws s3 cp /backup/${BACKUP_FILE}.gz s3://${AWS_S3_BUCKET}/database-backups/
+                aws s3 cp /backup/${BACKUP_FILE}.meta s3://${AWS_S3_BUCKET}/database-backups/
+                echo "Backup uploaded to S3"
+              fi
+              
+              # Cleanup old backups (keep last 30 days)
+              find /backup -name "activelog_backup_*.sql.gz" -mtime +30 -delete
+              find /backup -name "*.meta" -mtime +30 -delete
+              
+              echo "Database backup completed at $(date)"
+            env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+            - name: AWS_S3_BUCKET
+              value: "activelog-backups"
+            - name: AWS_DEFAULT_REGION
+              value: "us-west-2"
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backup
+            resources:
+              limits:
+                cpu: 1
+                memory: 2Gi
+              requests:
+                cpu: 500m
+                memory: 1Gi
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: backup-storage
+          restartPolicy: OnFailure
+      backoffLimit: 3
+---
+# Application State Backup
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: application-state-backup
+  namespace: activelog
+spec:
+  schedule: "30 3 * * *"  # Daily at 3:30 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: backup-service-account
+          containers:
+          - name: state-backup
+            image: alpine/k8s:1.24.6
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              
+              BACKUP_DATE=$(date +%Y%m%d_%H%M%S)
+              BACKUP_DIR="/backup/k8s-state-${BACKUP_DATE}"
+              mkdir -p ${BACKUP_DIR}
+              
+              echo "Starting Kubernetes state backup at $(date)"
+              
+              # Backup ConfigMaps
+              kubectl get configmaps -n activelog -o yaml > ${BACKUP_DIR}/configmaps.yaml
+              
+              # Backup Secrets (excluding sensitive data)
+              kubectl get secrets -n activelog -o yaml | \
+                grep -v 'password\|token\|key' > ${BACKUP_DIR}/secrets-metadata.yaml
+              
+              # Backup Services
+              kubectl get services -n activelog -o yaml > ${BACKUP_DIR}/services.yaml
+              
+              # Backup Ingresses
+              kubectl get ingresses -n activelog -o yaml > ${BACKUP_DIR}/ingresses.yaml
+              
+              # Backup PVCs
+              kubectl get pvc -n activelog -o yaml > ${BACKUP_DIR}/pvcs.yaml
+              
+              # Backup Deployments
+              kubectl get deployments -n activelog -o yaml > ${BACKUP_DIR}/deployments.yaml
+              
+              # Backup StatefulSets
+              kubectl get statefulsets -n activelog -o yaml > ${BACKUP_DIR}/statefulsets.yaml
+              
+              # Backup Custom Resources
+              kubectl get rollouts -n activelog -o yaml > ${BACKUP_DIR}/rollouts.yaml || true
+              kubectl get canaries -n activelog -o yaml > ${BACKUP_DIR}/canaries.yaml || true
+              
+              # Create backup manifest
+              cat > ${BACKUP_DIR}/backup-manifest.yaml << EOF
+              apiVersion: v1
+              kind: ConfigMap
+              metadata:
+                name: backup-manifest-${BACKUP_DATE}
+                namespace: activelog
+              data:
+                backup_date: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+                backup_type: "kubernetes-state"
+                namespace: "activelog"
+                files: |
+                  $(find ${BACKUP_DIR} -name "*.yaml" -exec basename {} \; | sort)
+              EOF
+              
+              # Compress backup
+              tar -czf /backup/k8s-state-${BACKUP_DATE}.tar.gz -C /backup k8s-state-${BACKUP_DATE}
+              rm -rf ${BACKUP_DIR}
+              
+              echo "Kubernetes state backup completed: k8s-state-${BACKUP_DATE}.tar.gz"
+              
+              # Cleanup old backups
+              find /backup -name "k8s-state-*.tar.gz" -mtime +14 -delete
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backup
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: backup-storage
+          restartPolicy: OnFailure
+---
+# File System Backup (for persistent volumes)
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: filesystem-backup
+  namespace: activelog
+spec:
+  schedule: "0 1 * * 0"  # Weekly on Sunday at 1 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: filesystem-backup
+            image: restic/restic:0.16.2
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              
+              echo "Starting filesystem backup at $(date)"
+              
+              # Initialize repository if it doesn't exist
+              restic snapshots || restic init
+              
+              # Backup data directories
+              restic backup \
+                /data/postgres \
+                /data/redis \
+                /data/uploads \
+                /data/logs \
+                --tag "filesystem-backup" \
+                --exclude="*.tmp" \
+                --exclude="*.log" \
+                --exclude="cache/*"
+              
+              # Prune old backups (keep last 4 weeks)
+              restic forget \
+                --keep-weekly 4 \
+                --keep-monthly 3 \
+                --prune
+              
+              echo "Filesystem backup completed at $(date)"
+            env:
+            - name: RESTIC_REPOSITORY
+              value: "s3:activelog-backups/filesystem"
+            - name: RESTIC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backup-secrets
+                  key: restic-password
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: backup-secrets
+                  key: aws-access-key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backup-secrets
+                  key: aws-secret-key
+            volumeMounts:
+            - name: postgres-data
+              mountPath: /data/postgres
+              readOnly: true
+            - name: redis-data
+              mountPath: /data/redis
+              readOnly: true
+            - name: upload-storage
+              mountPath: /data/uploads
+              readOnly: true
+            - name: log-storage
+              mountPath: /data/logs
+              readOnly: true
+          volumes:
+          - name: postgres-data
+            persistentVolumeClaim:
+              claimName: postgres-data
+          - name: redis-data
+            persistentVolumeClaim:
+              claimName: redis-data
+          - name: upload-storage
+            persistentVolumeClaim:
+              claimName: upload-storage
+          - name: log-storage
+            persistentVolumeClaim:
+              claimName: log-storage
+          restartPolicy: OnFailure
+---
+# Database Restore Job Template
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-restore-template
+  namespace: activelog
+spec:
+  template:
+    spec:
+      containers:
+      - name: postgres-restore
+        image: postgres:15-alpine
+        command:
+        - /bin/sh
+        - -c
+        - |
+          set -e
+          
+          BACKUP_FILE="${BACKUP_FILE:-latest}"
+          
+          echo "Starting database restore from ${BACKUP_FILE} at $(date)"
+          
+          # Find backup file
+          if [ "${BACKUP_FILE}" = "latest" ]; then
+            BACKUP_FILE=$(ls -t /backup/activelog_backup_*.sql.gz | head -1)
+          else
+            BACKUP_FILE="/backup/${BACKUP_FILE}"
+          fi
+          
+          if [ ! -f "${BACKUP_FILE}" ]; then
+            echo "Backup file not found: ${BACKUP_FILE}"
+            exit 1
+          fi
+          
+          echo "Restoring from: ${BACKUP_FILE}"
+          
+          # Stop application connections (scale down deployments)
+          kubectl scale deployment --replicas=0 -n activelog --all
+          
+          # Wait for connections to close
+          sleep 30
+          
+          # Drop and recreate database
+          psql -h postgres -U postgres -c "DROP DATABASE IF EXISTS activelog;"
+          psql -h postgres -U postgres -c "CREATE DATABASE activelog;"
+          
+          # Restore database
+          gunzip -c ${BACKUP_FILE} | pg_restore -h postgres -U postgres -d activelog --verbose --no-owner --no-privileges
+          
+          # Verify restore
+          RECORD_COUNT=$(psql -h postgres -U postgres -d activelog -t -c "SELECT COUNT(*) FROM users;" | xargs)
+          echo "Restored database with ${RECORD_COUNT} users"
+          
+          # Scale deployments back up
+          kubectl scale deployment --replicas=3 api-gateway -n activelog
+          kubectl scale deployment --replicas=2 auth -n activelog
+          # Add other critical services here
+          
+          echo "Database restore completed at $(date)"
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        - name: BACKUP_FILE
+          value: "latest"  # Override this when creating the job
+        volumeMounts:
+        - name: backup-storage
+          mountPath: /backup
+      volumes:
+      - name: backup-storage
+        persistentVolumeClaim:
+          claimName: backup-storage
+      restartPolicy: Never
+  backoffLimit: 1
+---
+# Backup Storage PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backup-storage
+  namespace: activelog
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: fast-ssd
+  resources:
+    requests:
+      storage: 500Gi
+---
+# Service Account for backup operations
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: backup-service-account
+  namespace: activelog
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: backup-operator
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets", "services", "persistentvolumeclaims", "pods"]
+  verbs: ["get", "list", "create", "update", "delete"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "statefulsets", "daemonsets"]
+  verbs: ["get", "list", "update", "patch"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses"]
+  verbs: ["get", "list"]
+- apiGroups: ["argoproj.io"]
+  resources: ["rollouts"]
+  verbs: ["get", "list"]
+- apiGroups: ["flagger.app"]
+  resources: ["canaries"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: backup-operator-binding
+subjects:
+- kind: ServiceAccount
+  name: backup-service-account
+  namespace: activelog
+roleRef:
+  kind: ClusterRole
+  name: backup-operator
+  apiGroup: rbac.authorization.k8s.io

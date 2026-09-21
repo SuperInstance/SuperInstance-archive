@@ -1,0 +1,151 @@
+{
+  "optimization_analysis": {
+    "original_plan": {
+      "instances": "2x c5.4xlarge (16 vCPU, 32GB RAM each)",
+      "cost_per_hour": "$0.68 each = $1.36/hour total",
+      "duration": "48 hours",
+      "total_cost": "$65.28"
+    },
+    "optimized_plan": {
+      "instances": "4x c5.xlarge (4 vCPU, 8GB RAM each)",
+      "cost_per_hour": "$0.17 each = $0.68/hour total",
+      "duration": "36 hours (parallel optimization)",
+      "total_cost": "$24.48",
+      "savings": "$40.80 (62% reduction)"
+    },
+    "optimization_rationale": [
+      "More instances = better parallelization for hierarchical testing",
+      "4x c5.xlarge cheaper than 2x c5.4xlarge with better task distribution",
+      "Parallel execution reduces duration from 48h to 36h",
+      "Better matches hierarchical architecture we're testing"
+    ]
+  },
+  "experiment_execution": {
+    "phase_1_launch": {
+      "timeline": "Hour 0-2",
+      "action": "Launch 4x c5.xlarge instances with optimized configuration",
+      "aws_command": "aws ec2 run-instances \\\n    --image-id ami-0029f5c55e3fbb8d7 \\\n    --count 4 \\\n    --instance-type c5.xlarge \\\n    --security-group-ids sg-079f48abca9795b2c \\\n    --subnet-id subnet-0496763b3fb523c1b \\\n    --block-device-mappings '[{\"DeviceName\":\"/dev/xvda\",\"Ebs\":{\"VolumeSize\":30,\"VolumeType\":\"gp3\"}}]' \\\n    --user-data file://unified_experiment_userdata.sh \\\n    --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=unified_hierarchical_exp},{Key=Purpose,Value=delegation_fourth_dimension_ml}]'\n            ",
+      "expected_outcome": "4 instances ready for hierarchical testing"
+    },
+    "phase_2_delegation_testing": {
+      "timeline": "Hour 2-14 (12 hours)",
+      "instances": "All 4 instances test different delegation strategies in parallel",
+      "testing_focus": [
+        "Instance 1: Binary delegation (simple yes/no decisions)",
+        "Instance 2: Variable delegation (3, 6, 9, 12 components)",
+        "Instance 3: Task-type specific delegation (optimal per task class)",
+        "Instance 4: ML-predicted dynamic delegation"
+      ],
+      "expected_outcome": "Complete delegation strategy comparison"
+    },
+    "phase_3_fourth_dimension_integration": {
+      "timeline": "Hour 14-26 (12 hours)",
+      "instances": "All instances collaborate on fourth-dimension logic testing",
+      "testing_focus": [
+        "Hierarchical chef bot architecture",
+        "Component merging across task trees",
+        "Cross-neuron tensor influence",
+        "Dynamic loop rate optimization"
+      ],
+      "expected_outcome": "Validated fourth-dimension hierarchical system"
+    },
+    "phase_4_ml_optimization": {
+      "timeline": "Hour 26-32 (6 hours)",
+      "instances": "GPU-optimized ML training on accumulated data",
+      "gpu_upgrade": "Upgrade 1 instance to p3.large for ML acceleration",
+      "additional_cost": "$1.26/hour for 6 hours = $7.56",
+      "testing_focus": [
+        "Loop rate prediction model training",
+        "Task complexity classification",
+        "Optimal delegation parameter learning"
+      ],
+      "expected_outcome": "Trained ML models for production use"
+    },
+    "phase_5_integration_validation": {
+      "timeline": "Hour 32-36 (4 hours)",
+      "instances": "All instances validate complete integrated system",
+      "testing_focus": [
+        "End-to-end hierarchical task processing",
+        "Real-world task decomposition scenarios",
+        "Performance benchmarking",
+        "Functional coder system preparation"
+      ],
+      "expected_outcome": "Complete platform validation + functional system design"
+    }
+  },
+  "functional_system_prep": {
+    "system_objective": "Create working hierarchical task decomposition system useful for human coders",
+    "functional_requirements": {
+      "input_interface": {
+        "description": "Human coder describes a complex coding task in natural language",
+        "examples": [
+          "Build a REST API with authentication and database integration",
+          "Create a React dashboard with real-time data updates",
+          "Implement a machine learning pipeline with A/B testing"
+        ],
+        "interface_type": "Command-line tool + web interface"
+      },
+      "task_decomposition": {
+        "description": "System breaks task into hierarchical components using experiment 1 results",
+        "delegation_strategy": "Use optimal strategy determined by experiment (likely task-type specific)",
+        "hierarchy_levels": "Based on fourth-dimension logic validation",
+        "component_generation": "Automated component creation with estimated times"
+      },
+      "execution_orchestration": {
+        "description": "System coordinates component execution with human oversight",
+        "execution_modes": [
+          "Fully automated: System executes all components",
+          "Guided mode: Human approves each component before execution",
+          "Review mode: System generates plan, human executes manually"
+        ],
+        "progress_tracking": "Real-time component completion status"
+      },
+      "learning_integration": {
+        "description": "System learns from successful task completions",
+        "ml_optimization": "Uses ML models from experiment phase 4",
+        "component_reuse": "Builds library of reusable logic blocks",
+        "continuous_improvement": "Updates delegation strategies based on success rates"
+      }
+    },
+    "technical_architecture": {
+      "local_component": {
+        "description": "CLI tool running on developer's machine",
+        "responsibilities": [
+          "Task input and natural language processing",
+          "Communication with cloud hierarchical system",
+          "Local component execution and monitoring",
+          "Results integration and presentation"
+        ]
+      },
+      "cloud_component": {
+        "description": "Hierarchical task decomposition engine",
+        "instance_type": "1x c5.xlarge for most tasks (scalable)",
+        "responsibilities": [
+          "Complex task analysis and decomposition",
+          "Component generation and optimization",
+          "ML-based delegation strategy selection",
+          "Logic block storage and reuse"
+        ]
+      }
+    },
+    "mvp_features": {
+      "core_functionality": [
+        "Natural language task input",
+        "Hierarchical task decomposition",
+        "Component execution with progress tracking",
+        "Basic learning and component reuse"
+      ],
+      "success_criteria": [
+        "Successfully decompose and execute 80% of common coding tasks",
+        "Reduce task completion time by 30% compared to manual approach",
+        "Generate reusable components that improve over time"
+      ]
+    },
+    "post_experiment_development_plan": {
+      "week_1": "Build MVP CLI tool with basic task decomposition",
+      "week_2": "Implement hierarchical execution engine",
+      "week_3": "Add ML optimization and component reuse",
+      "week_4": "User testing and iteration based on feedback"
+    }
+  }
+}

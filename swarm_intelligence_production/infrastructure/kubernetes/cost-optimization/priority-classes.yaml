@@ -1,0 +1,46 @@
+# Priority Classes for Pod Scheduling
+
+# Critical system priority
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: swarm-system-critical
+value: 1000000000
+globalDefault: false
+description: "Critical system components that must always run"
+---
+# High priority for core services
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: swarm-core-high
+value: 1000000
+globalDefault: false
+description: "High priority for core swarm orchestration services"
+---
+# Normal priority for API services
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: swarm-api-normal
+value: 100000
+globalDefault: true
+description: "Normal priority for API and frontend services"
+---
+# Low priority for batch jobs
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: swarm-batch-low
+value: 1000
+globalDefault: false
+description: "Low priority for batch processing and background jobs"
+---
+# Best effort for non-critical workloads
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: swarm-best-effort
+value: 0
+globalDefault: false
+description: "Best effort for non-critical workloads that can be preempted"

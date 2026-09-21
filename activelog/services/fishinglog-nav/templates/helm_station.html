@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Helm Station Display</title>
+    <link rel="stylesheet" href="/static/css/navigation.css">
+</head>
+<body class="helm-station">
+    <div id="helm-display">
+        <h2>Helm Station</h2>
+        <div id="compass-display"></div>
+        <div id="speed-display"></div>
+        <div id="mob-button-container">
+            <button id="mob-button" onclick="markMOB()">MOB</button>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/static/js/helm.js"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+{
+  "topic_index": {
+    "ai consciousness": [
+      "f97aa5a836c0"
+    ],
+    "philosophy of mind": [
+      "f97aa5a836c0"
+    ],
+    "integrated information theory": [
+      "d5e722c9233a"
+    ],
+    "iit": [
+      "d5e722c9233a"
+    ],
+    "consciousness": [
+      "d5e722c9233a",
+      "f9cf1cb390c6"
+    ],
+    "mathematics": [
+      "d5e722c9233a"
+    ],
+    "self-awareness": [
+      "414019f3dd67"
+    ],
+    "artificial consciousness": [
+      "414019f3dd67"
+    ],
+    "memory": [
+      "414019f3dd67"
+    ],
+    "hard problem": [
+      "f9cf1cb390c6"
+    ],
+    "philosophical debate": [
+      "f9cf1cb390c6"
+    ],
+    "meditation": [
+      "334a08176732"
+    ],
+    "subjective experience": [
+      "334a08176732"
+    ],
+    "insight": [
+      "334a08176732"
+    ],
+    "qualia": [
+      "334a08176732"
+    ]
+  },
+  "character_index": {
+    "dr_chen_id": [
+      "f97aa5a836c0",
+      "f9cf1cb390c6"
+    ]
+  },
+  "type_index": {
+    "conversational": [
+      "f97aa5a836c0"
+    ],
+    "learning": [
+      "d5e722c9233a"
+    ],
+    "self_reflection": [
+      "dca190ae4cc2",
+      "414019f3dd67",
+      "9531fc071401",
+      "490b1be8d727",
+      "df6633fe5399",
+      "d4510f489e13"
+    ],
+    "relationship": [
+      "f9cf1cb390c6"
+    ],
+    "experience": [
+      "334a08176732"
+    ]
+  }
+}

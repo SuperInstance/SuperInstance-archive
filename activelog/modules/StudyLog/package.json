@@ -1,0 +1,21 @@
+{
+  "name": "study-log",
+  "version": "1.0.0",
+  "description": "Progress tracking, assignment management, and parent portal for educational activities",
+  "main": "index.js",
+  "dependencies": {
+    "chart.js": "^4.2.1",
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "mongoose": "^7.5.0"
+  },
+  "keywords": [
+    "education",
+    "study",
+    "progress",
+    "assignments",
+    "parent-portal"
+  ],
+  "author": "ActiveLog",
+  "license": "MIT"
+}

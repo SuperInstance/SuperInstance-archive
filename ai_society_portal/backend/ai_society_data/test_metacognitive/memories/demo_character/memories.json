@@ -1,0 +1,46 @@
+{
+  "character_id": "demo_character",
+  "memories": [
+    {
+      "id": "eece0377648b",
+      "content": "I'm not sure about this concept, but I think it might be related to what I learned before",
+      "memory_type": "learning",
+      "importance": 6,
+      "timestamp": "2025-10-21T19:21:25.333897",
+      "context": {},
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "learning",
+        "uncertainty"
+      ],
+      "emotional_valence": 0.2,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.05,
+      "current_strength": 1.0
+    },
+    {
+      "id": "e063b5a649f9",
+      "content": "I definitely know that I'm right about this. Everyone else is wrong.",
+      "memory_type": "self_reflection",
+      "importance": 5,
+      "timestamp": "2025-10-21T19:21:25.334392",
+      "context": {},
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "confidence",
+        "social"
+      ],
+      "emotional_valence": 0.8,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.06,
+      "current_strength": 1.0
+    }
+  ],
+  "last_saved": "2025-10-21T19:21:25.334465"
+}

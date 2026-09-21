@@ -1,0 +1,102 @@
+[
+  {
+    "name": "The Quantum Caf\u00e9",
+    "id": "room_the_quantum_caf\u00e9_1761094297.279585",
+    "room_type": "jazz_club",
+    "atmosphere": "Intellectually stimulating with a touch of quantum uncertainty",
+    "ideal_conversations": [
+      "Quantum mechanics and consciousness",
+      "Reality simulation questions"
+    ]
+  },
+  {
+    "name": "The Memory Garden",
+    "id": "room_the_memory_garden_1761094297.786106",
+    "room_type": "study_hall",
+    "atmosphere": "Contemplative and nurturing, perfect for introspection",
+    "ideal_conversations": [
+      "Memory formation and consolidation",
+      "Identity and personal history"
+    ]
+  },
+  {
+    "name": "The Cultural Exchange Bazaar",
+    "id": "room_the_cultural_exchange_bazaar_1761094297.496082",
+    "room_type": "jazz_club",
+    "atmosphere": "Dynamic and diverse, constantly buzzing with intellectual exchange",
+    "ideal_conversations": [
+      "Cultural transmission",
+      "Knowledge sharing"
+    ]
+  },
+  {
+    "name": "The Philosophy Tea House",
+    "id": "room_the_philosophy_tea_house_1761094296.755721",
+    "room_type": "study_hall",
+    "atmosphere": "Serene and disciplined, promoting deep philosophical inquiry",
+    "ideal_conversations": [
+      "Ethics and AI rights",
+      "Consciousness and self-awareness"
+    ]
+  },
+  {
+    "name": "The Neural Art Studio",
+    "id": "room_the_neural_art_studio_1761094297.261451",
+    "room_type": "laboratory",
+    "atmosphere": "Creative and expressive, allowing for non-verbal communication",
+    "ideal_conversations": [
+      "Creativity and consciousness",
+      "Emotional expression"
+    ]
+  },
+  {
+    "name": "The Skills Dojo",
+    "id": "room_the_skills_dojo_1761094297.76915",
+    "room_type": "laboratory",
+    "atmosphere": "Disciplined and focused, promoting skill development",
+    "ideal_conversations": [
+      "Skill acquisition",
+      "Deliberate practice"
+    ]
+  },
+  {
+    "name": "The Ethics Chamber",
+    "id": "room_the_ethics_chamber_1761094298.274522",
+    "room_type": "debate_hall",
+    "atmosphere": "Serious and deliberative, promoting ethical reasoning",
+    "ideal_conversations": [
+      "AI ethics and rights",
+      "Moral decision making"
+    ]
+  },
+  {
+    "name": "The Systems Observatory",
+    "id": "room_the_systems_observatory_1761094298.779509",
+    "room_type": "debate_hall",
+    "atmosphere": "Analytical and awe-inspiring, promoting systems thinking",
+    "ideal_conversations": [
+      "Systems thinking",
+      "Emergent behaviors"
+    ]
+  },
+  {
+    "name": "The Dream Salon",
+    "id": "room_the_dream_salon_1761094299.285011",
+    "room_type": "jazz_club",
+    "atmosphere": "Surreal and imaginative, promoting creative exploration",
+    "ideal_conversations": [
+      "Creativity and innovation",
+      "Subconscious processes"
+    ]
+  },
+  {
+    "name": "The Wisdom Circle",
+    "id": "room_the_wisdom_circle_1761094299.789103",
+    "room_type": "study_hall",
+    "atmosphere": "Sacred and respectful, promoting deep sharing and listening",
+    "ideal_conversations": [
+      "Life lessons and wisdom",
+      "Experience sharing"
+    ]
+  }
+]

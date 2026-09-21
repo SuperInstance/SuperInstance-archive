@@ -1,0 +1,756 @@
+# NGINX Ingress Controller Configuration for ActiveLog Platform
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nginx-ingress
+  labels:
+    name: nginx-ingress
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-configuration
+  namespace: nginx-ingress
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+data:
+  # Global NGINX configuration
+  map-hash-bucket-size: "128"
+  ssl-protocols: "TLSv1.2 TLSv1.3"
+  ssl-ciphers: "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384"
+  ssl-prefer-server-ciphers: "on"
+  
+  # Connection and performance settings
+  keep-alive: "32"
+  keep-alive-requests: "100"
+  upstream-keepalive-connections: "32"
+  upstream-keepalive-requests: "100"
+  
+  # Body size limits
+  proxy-body-size: "100m"
+  client-max-body-size: "100m"
+  
+  # Timeout settings
+  proxy-connect-timeout: "5"
+  proxy-send-timeout: "60"
+  proxy-read-timeout: "60"
+  
+  # Rate limiting
+  limit-req-status-code: "429"
+  limit-conn-status-code: "429"
+  
+  # Security headers
+  add-headers: "nginx-ingress/custom-headers"
+  
+  # Logging
+  log-format-escape-json: "true"
+  log-format-upstream: >
+    {
+      "time": "$time_iso8601",
+      "remote_addr": "$the_real_ip",
+      "x_forwarded_for": "$proxy_add_x_forwarded_for",
+      "request_id": "$req_id",
+      "remote_user": "$remote_user",
+      "bytes_sent": $bytes_sent,
+      "request_time": $request_time,
+      "status": $status,
+      "vhost": "$host",
+      "request_proto": "$server_protocol",
+      "path": "$uri",
+      "request_query": "$args",
+      "request_length": $request_length,
+      "duration": $request_time,
+      "method": "$request_method",
+      "http_referrer": "$http_referer",
+      "http_user_agent": "$http_user_agent",
+      "upstream_addr": "$upstream_addr",
+      "upstream_response_time": "$upstream_response_time",
+      "upstream_response_length": "$upstream_response_length",
+      "upstream_status": "$upstream_status"
+    }
+  
+  # Enable metrics
+  enable-opentracing: "true"
+  enable-real-ip: "true"
+  forwarded-for-header: "X-Forwarded-For"
+  compute-full-forwarded-for: "true"
+  use-forwarded-headers: "true"
+  
+  # Performance tuning
+  worker-processes: "auto"
+  worker-connections: "16384"
+  max-worker-open-files: "65536"
+  
+  # Cache settings
+  proxy-buffering: "on"
+  proxy-buffer-size: "4k"
+  proxy-buffers: "8 4k"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-headers
+  namespace: nginx-ingress
+data:
+  X-Frame-Options: "DENY"
+  X-Content-Type-Options: "nosniff"
+  X-XSS-Protection: "1; mode=block"
+  Referrer-Policy: "strict-origin-when-cross-origin"
+  Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' wss: https:; media-src 'self'; object-src 'none'; child-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+  Strict-Transport-Security: "max-age=31536000; includeSubDomains; preload"
+  Permissions-Policy: "camera=(), microphone=(), geolocation=()"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-ingress-controller
+  namespace: nginx-ingress
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/component: controller
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ingress-nginx
+      app.kubernetes.io/component: controller
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/component: controller
+      annotations:
+        prometheus.io/port: "10254"
+        prometheus.io/scrape: "true"
+    spec:
+      serviceAccountName: nginx-ingress-serviceaccount
+      containers:
+      - name: nginx-ingress-controller
+        image: k8s.gcr.io/ingress-nginx/controller:v1.8.0
+        args:
+        - /nginx-ingress-controller
+        - --configmap=$(POD_NAMESPACE)/nginx-configuration
+        - --tcp-services-configmap=$(POD_NAMESPACE)/tcp-services
+        - --udp-services-configmap=$(POD_NAMESPACE)/udp-services
+        - --publish-service=$(POD_NAMESPACE)/ingress-nginx
+        - --annotations-prefix=nginx.ingress.kubernetes.io
+        - --enable-ssl-passthrough
+        - --enable-ssl-chain-completion
+        - --default-ssl-certificate=$(POD_NAMESPACE)/activelog-tls
+        - --metrics-address=0.0.0.0
+        - --profiling-address=0.0.0.0
+        - --profiling-port=6060
+        - --health-check-timeout=10
+        - --shutdown-grace-period=30
+        securityContext:
+          allowPrivilegeEscalation: true
+          capabilities:
+            drop:
+            - ALL
+            add:
+            - NET_BIND_SERVICE
+          runAsUser: 101
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: LD_PRELOAD
+          value: /usr/local/lib/libmimalloc.so
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        - name: https
+          containerPort: 443
+          protocol: TCP
+        - name: metrics
+          containerPort: 10254
+          protocol: TCP
+        - name: profiling
+          containerPort: 6060
+          protocol: TCP
+        - name: health
+          containerPort: 10254
+          protocol: TCP
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthz
+            port: 10254
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 10254
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 1
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        volumeMounts:
+        - mountPath: /usr/local/certificates/
+          name: webhook-cert
+          readOnly: true
+      volumes:
+      - name: webhook-cert
+        secret:
+          secretName: webhook-cert
+      nodeSelector:
+        kubernetes.io/os: linux
+      terminationGracePeriodSeconds: 300
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-nginx
+  namespace: nginx-ingress
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/component: controller
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: https
+  selector:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/component: controller
+---
+# ActiveLog Main Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: activelog-ingress
+  namespace: activelog
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Request-ID: $request_id";
+      more_set_headers "X-Real-IP: $remote_addr";
+    
+    # Rate limiting
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    nginx.ingress.kubernetes.io/rate-limit-connections: "10"
+    
+    # CORS configuration
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://activelog.com,https://*.activelog.com"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, DELETE, PATCH"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+    nginx.ingress.kubernetes.io/cors-expose-headers: "Content-Length,Content-Range"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-max-age: "1728000"
+    
+    # Security
+    nginx.ingress.kubernetes.io/server-snippet: |
+      location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+      }
+      
+      # Block common attack patterns
+      location ~* (wp-admin|wp-login|xmlrpc\.php|\.git|\.env|\.htaccess) {
+        deny all;
+        return 404;
+      }
+    
+    # Load balancing
+    nginx.ingress.kubernetes.io/upstream-hash-by: "$remote_addr"
+    nginx.ingress.kubernetes.io/load-balance: "ewma"
+spec:
+  tls:
+  - hosts:
+    - activelog.com
+    - api.activelog.com
+    - app.activelog.com
+    - admin.activelog.com
+    secretName: activelog-tls
+  rules:
+  # Main API Gateway
+  - host: api.activelog.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway
+            port:
+              number: 8000
+  
+  # Authentication Service
+  - host: auth.activelog.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: auth
+            port:
+              number: 8001
+  
+  # GraphQL Service
+  - host: graphql.activelog.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: graphql
+            port:
+              number: 8002
+  
+  # Main Application
+  - host: activelog.com
+    http:
+      paths:
+      - path: /api/
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway
+            port:
+              number: 8000
+      - path: /auth/
+        pathType: Prefix
+        backend:
+          service:
+            name: auth
+            port:
+              number: 8001
+      - path: /graphql
+        pathType: Prefix
+        backend:
+          service:
+            name: graphql
+            port:
+              number: 8002
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway  # Default to API gateway for SPA routing
+            port:
+              number: 8000
+---
+# AI Services Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: activelog-ai-ingress
+  namespace: activelog
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"  # 10 minutes for AI processing
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-body-size: "500m"     # Large payloads for AI
+    
+    # Rate limiting for AI services (lower limits due to processing cost)
+    nginx.ingress.kubernetes.io/rate-limit: "10"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    
+    # Authentication required
+    nginx.ingress.kubernetes.io/auth-url: "https://auth.activelog.com/verify"
+    nginx.ingress.kubernetes.io/auth-signin: "https://auth.activelog.com/login"
+spec:
+  tls:
+  - hosts:
+    - ai.activelog.com
+    secretName: activelog-tls
+  rules:
+  - host: ai.activelog.com
+    http:
+      paths:
+      - path: /orchestrator/
+        pathType: Prefix
+        backend:
+          service:
+            name: ai-orchestrator
+            port:
+              number: 8030
+      - path: /tools/
+        pathType: Prefix
+        backend:
+          service:
+            name: ai-tools
+            port:
+              number: 8031
+      - path: /ml/
+        pathType: Prefix
+        backend:
+          service:
+            name: ml-pipeline
+            port:
+              number: 8032
+      - path: /document/
+        pathType: Prefix
+        backend:
+          service:
+            name: document-ai
+            port:
+              number: 8035
+      - path: /emotional/
+        pathType: Prefix
+        backend:
+          service:
+            name: emotional-ai
+            port:
+              number: 8036
+      - path: /education/
+        pathType: Prefix
+        backend:
+          service:
+            name: education-ai
+            port:
+              number: 8037
+      - path: /cognitive/
+        pathType: Prefix
+        backend:
+          service:
+            name: cognitive
+            port:
+              number: 8038
+      - path: /social/
+        pathType: Prefix
+        backend:
+          service:
+            name: social-ai
+            port:
+              number: 8039
+---
+# Gaming Platform Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: activelog-gaming-ingress
+  namespace: activelog
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/websocket-services: "gaming-platform"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"  # 1 hour for long gaming sessions
+    
+    # Gaming-specific CORS
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://game.activelog.com"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization,Content-Type,X-Game-Session"
+spec:
+  tls:
+  - hosts:
+    - game.activelog.com
+    secretName: activelog-tls
+  rules:
+  - host: game.activelog.com
+    http:
+      paths:
+      - path: /platform/
+        pathType: Prefix
+        backend:
+          service:
+            name: gaming-platform
+            port:
+              number: 8070
+      - path: /dmlog/
+        pathType: Prefix
+        backend:
+          service:
+            name: dmlog-core
+            port:
+              number: 8071
+      - path: /characters/
+        pathType: Prefix
+        backend:
+          service:
+            name: dmlog-characters
+            port:
+              number: 8072
+      - path: /battle/
+        pathType: Prefix
+        backend:
+          service:
+            name: dmlog-battle
+            port:
+              number: 8073
+      - path: /session/
+        pathType: Prefix
+        backend:
+          service:
+            name: dmlog-session
+            port:
+              number: 8074
+---
+# Media Services Ingress (Video/Creative Suite)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: activelog-media-ingress
+  namespace: activelog
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "2g"       # Large video files
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "1800"  # 30 minutes for video processing
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "1800"
+    
+    # Upload optimizations
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    nginx.ingress.kubernetes.io/client-body-buffer-size: "1m"
+    
+    # Rate limiting for uploads
+    nginx.ingress.kubernetes.io/rate-limit: "5"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+spec:
+  tls:
+  - hosts:
+    - media.activelog.com
+    secretName: activelog-tls
+  rules:
+  - host: media.activelog.com
+    http:
+      paths:
+      - path: /video/
+        pathType: Prefix
+        backend:
+          service:
+            name: video-pipeline
+            port:
+              number: 8040
+      - path: /processor/
+        pathType: Prefix
+        backend:
+          service:
+            name: video-processor
+            port:
+              number: 8041
+      - path: /creative/
+        pathType: Prefix
+        backend:
+          service:
+            name: creative-suite
+            port:
+              number: 8042
+---
+# Internal Services Ingress (Admin/Monitoring)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: activelog-admin-ingress
+  namespace: activelog
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    
+    # Admin authentication
+    nginx.ingress.kubernetes.io/auth-type: "basic"
+    nginx.ingress.kubernetes.io/auth-secret: "activelog-admin-auth"
+    nginx.ingress.kubernetes.io/auth-realm: "ActiveLog Admin Area"
+    
+    # IP whitelist for admin access
+    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+spec:
+  tls:
+  - hosts:
+    - admin.activelog.com
+    secretName: activelog-tls
+  rules:
+  - host: admin.activelog.com
+    http:
+      paths:
+      - path: /grafana/
+        pathType: Prefix
+        backend:
+          service:
+            name: grafana
+            port:
+              number: 3000
+      - path: /prometheus/
+        pathType: Prefix
+        backend:
+          service:
+            name: prometheus
+            port:
+              number: 9090
+      - path: /kibana/
+        pathType: Prefix
+        backend:
+          service:
+            name: kibana
+            port:
+              number: 5601
+---
+# TCP Services ConfigMap for non-HTTP services
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tcp-services
+  namespace: nginx-ingress
+data:
+  # PostgreSQL (if needed for external access)
+  # "5432": "activelog/postgres:5432"
+  
+  # Redis (if needed for external access)  
+  # "6379": "activelog/redis:6379"
+  
+  # P2P Sync service
+  "6000": "activelog/p2p-sync:6000"
+---
+# UDP Services ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: udp-services
+  namespace: nginx-ingress
+data:
+  # Add UDP services if needed
+---
+# Service Account for NGINX Ingress
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nginx-ingress-serviceaccount
+  namespace: nginx-ingress
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nginx-ingress-clusterrole
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "endpoints", "nodes", "pods", "secrets", "namespaces"]
+  verbs: ["list", "watch"]
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get"]
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create", "patch"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses/status"]
+  verbs: ["update"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingressclasses"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: nginx-ingress-role
+  namespace: nginx-ingress
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "pods", "secrets", "endpoints"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingressclasses"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["ingress-controller-leader-nginx"]
+  verbs: ["get", "update"]
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["create"]
+- apiGroups: [""]
+  resources: ["endpoints"]
+  verbs: ["create", "get", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: nginx-ingress-role-nisa-binding
+  namespace: nginx-ingress
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: nginx-ingress-role
+subjects:
+- kind: ServiceAccount
+  name: nginx-ingress-serviceaccount
+  namespace: nginx-ingress
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: nginx-ingress-clusterrole-nisa-binding
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: nginx-ingress-clusterrole
+subjects:
+- kind: ServiceAccount
+  name: nginx-ingress-serviceaccount
+  namespace: nginx-ingress

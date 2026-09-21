@@ -1,0 +1,49 @@
+{
+  "name": "activelog-desktop-light",
+  "version": "1.0.0",
+  "description": "Lightweight desktop clients with minimal resource usage and game-friendly performance",
+  "main": "core/main.js",
+  "scripts": {
+    "dev": "npm run dev:electron",
+    "dev:electron": "cd clients/electron && npm run dev",
+    "dev:tauri": "cd clients/tauri && npm run dev",
+    "dev:flutter": "cd clients/flutter && flutter run",
+    "build": "npm run build:all",
+    "build:all": "npm run build:electron && npm run build:tauri && npm run build:flutter",
+    "build:electron": "cd clients/electron && npm run build",
+    "build:tauri": "cd clients/tauri && npm run build",
+    "build:flutter": "cd clients/flutter && flutter build",
+    "test": "jest",
+    "test:performance": "node core/performance/benchmark.js",
+    "optimize": "node core/optimizer/resource-optimizer.js",
+    "profile": "node --prof core/main.js"
+  },
+  "keywords": [
+    "desktop",
+    "lightweight",
+    "gaming",
+    "performance",
+    "minimal",
+    "battery-efficient",
+    "streaming",
+    "modular"
+  ],
+  "author": "ActiveLog Desktop Light Team",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.14.2",
+    "node-fetch": "^2.7.0",
+    "compression": "^1.7.4",
+    "lru-cache": "^7.18.3"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "electron": "^27.0.0",
+    "@tauri-apps/cli": "^1.5.0",
+    "webpack": "^5.88.2",
+    "terser-webpack-plugin": "^5.3.9"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

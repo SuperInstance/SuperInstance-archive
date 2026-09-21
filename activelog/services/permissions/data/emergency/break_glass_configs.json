@@ -1,0 +1,254 @@
+[
+  {
+    "access_id": "bg_0_1756067274",
+    "name": "Security Incident Response",
+    "description": "Emergency access for security incident response team",
+    "resource_patterns": [
+      "security/*",
+      "logs/*",
+      "audit/*"
+    ],
+    "emergency_types": [
+      "security_incident",
+      "data_breach"
+    ],
+    "max_duration_hours": 8,
+    "approval_required": true,
+    "approval_level": "manager",
+    "witness_required": true,
+    "auto_revoke": true,
+    "requires_incident_number": true,
+    "allowed_roles": [
+      "security_analyst",
+      "incident_responder",
+      "security_manager"
+    ],
+    "created_by": "system",
+    "created_at": "2025-08-24T20:27:54.974674+00:00",
+    "is_active": true
+  },
+  {
+    "access_id": "bg_1_1756067274",
+    "name": "System Recovery",
+    "description": "Emergency system recovery access",
+    "resource_patterns": [
+      "system/*",
+      "database/*",
+      "infrastructure/*"
+    ],
+    "emergency_types": [
+      "system_outage",
+      "disaster_recovery"
+    ],
+    "max_duration_hours": 12,
+    "approval_required": true,
+    "approval_level": "senior_manager",
+    "witness_required": false,
+    "auto_revoke": true,
+    "requires_incident_number": true,
+    "allowed_roles": [
+      "system_admin",
+      "devops_engineer",
+      "infrastructure_manager"
+    ],
+    "created_by": "system",
+    "created_at": "2025-08-24T20:27:54.974682+00:00",
+    "is_active": true
+  },
+  {
+    "access_id": "bg_2_1756067274",
+    "name": "Business Critical Operations",
+    "description": "Emergency access for business-critical operations",
+    "resource_patterns": [
+      "production/*",
+      "customer_data/*",
+      "financial/*"
+    ],
+    "emergency_types": [
+      "business_critical",
+      "compliance_issue"
+    ],
+    "max_duration_hours": 6,
+    "approval_required": true,
+    "approval_level": "executive",
+    "witness_required": true,
+    "auto_revoke": true,
+    "requires_incident_number": true,
+    "allowed_roles": [
+      "business_manager",
+      "compliance_officer",
+      "executive"
+    ],
+    "created_by": "system",
+    "created_at": "2025-08-24T20:27:54.974684+00:00",
+    "is_active": true
+  },
+  {
+    "access_id": "bg_0_1756067234",
+    "name": "Security Incident Response",
+    "description": "Emergency access for security incident response team",
+    "resource_patterns": [
+      "security/*",
+      "logs/*",
+      "audit/*"
+    ],
+    "emergency_types": [
+      "security_incident",
+      "data_breach"
+    ],
+    "max_duration_hours": 8,
+    "approval_required": true,
+    "approval_level": "manager",
+    "witness_required": true,
+    "auto_revoke": true,
+    "requires_incident_number": true,
+    "allowed_roles": [
+      "security_analyst",
+      "incident_responder",
+      "security_manager"
+    ],
+    "created_by": "system",
+    "created_at": "2025-08-24T20:27:14.081713+00:00",
+    "is_active": true
+  },
+  {
+    "access_id": "bg_1_1756067234",
+    "name": "System Recovery",
+    "description": "Emergency system recovery access",
+    "resource_patterns": [
+      "system/*",
+      "database/*",
+      "infrastructure/*"
+    ],
+    "emergency_types": [
+      "system_outage",
+      "disaster_recovery"
+    ],
+    "max_duration_hours": 12,
+    "approval_required": true,
+    "approval_level": "senior_manager",
+    "witness_required": false,
+    "auto_revoke": true,
+    "requires_incident_number": true,
+    "allowed_roles": [
+      "system_admin",
+      "devops_engineer",
+      "infrastructure_manager"
+    ],
+    "created_by": "system",
+    "created_at": "2025-08-24T20:27:14.081719+00:00",
+    "is_active": true
+  },
+  {
+    "access_id": "bg_2_1756067234",
+    "name": "Business Critical Operations",
+    "description": "Emergency access for business-critical operations",
+    "resource_patterns": [
+      "production/*",
+      "customer_data/*",
+      "financial/*"
+    ],
+    "emergency_types": [
+      "business_critical",
+      "compliance_issue"
+    ],
+    "max_duration_hours": 6,
+    "approval_required": true,
+    "approval_level": "executive",
+    "witness_required": true,
+    "auto_revoke": true,
+    "requires_incident_number": true,
+    "allowed_roles": [
+      "business_manager",
+      "compliance_officer",
+      "executive"
+    ],
+    "created_by": "system",
+    "created_at": "2025-08-24T20:27:14.081721+00:00",
+    "is_active": true
+  },
+  {
+    "access_id": "bg_0_1756067087",
+    "name": "Security Incident Response",
+    "description": "Emergency access for security incident response team",
+    "resource_patterns": [
+      "security/*",
+      "logs/*",
+      "audit/*"
+    ],
+    "emergency_types": [
+      "security_incident",
+      "data_breach"
+    ],
+    "max_duration_hours": 8,
+    "approval_required": true,
+    "approval_level": "manager",
+    "witness_required": true,
+    "auto_revoke": true,
+    "requires_incident_number": true,
+    "allowed_roles": [
+      "security_analyst",
+      "incident_responder",
+      "security_manager"
+    ],
+    "created_by": "system",
+    "created_at": "2025-08-24T20:24:47.725310+00:00",
+    "is_active": true
+  },
+  {
+    "access_id": "bg_1_1756067087",
+    "name": "System Recovery",
+    "description": "Emergency system recovery access",
+    "resource_patterns": [
+      "system/*",
+      "database/*",
+      "infrastructure/*"
+    ],
+    "emergency_types": [
+      "system_outage",
+      "disaster_recovery"
+    ],
+    "max_duration_hours": 12,
+    "approval_required": true,
+    "approval_level": "senior_manager",
+    "witness_required": false,
+    "auto_revoke": true,
+    "requires_incident_number": true,
+    "allowed_roles": [
+      "system_admin",
+      "devops_engineer",
+      "infrastructure_manager"
+    ],
+    "created_by": "system",
+    "created_at": "2025-08-24T20:24:47.725317+00:00",
+    "is_active": true
+  },
+  {
+    "access_id": "bg_2_1756067087",
+    "name": "Business Critical Operations",
+    "description": "Emergency access for business-critical operations",
+    "resource_patterns": [
+      "production/*",
+      "customer_data/*",
+      "financial/*"
+    ],
+    "emergency_types": [
+      "business_critical",
+      "compliance_issue"
+    ],
+    "max_duration_hours": 6,
+    "approval_required": true,
+    "approval_level": "executive",
+    "witness_required": true,
+    "auto_revoke": true,
+    "requires_incident_number": true,
+    "allowed_roles": [
+      "business_manager",
+      "compliance_officer",
+      "executive"
+    ],
+    "created_by": "system",
+    "created_at": "2025-08-24T20:24:47.725319+00:00",
+    "is_active": true
+  }
+]

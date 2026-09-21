@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to ActiveLog</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #2563eb; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f9f9f9; }
+        .button { display: inline-block; background: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome to ActiveLog!</h1>
+        </div>
+        <div class="content">
+            <h2>Hi {{ user_name }},</h2>
+            <p>Welcome to ActiveLog, your comprehensive file management and AI analysis platform!</p>
+            
+            <p>Your account has been successfully created. Here's what you can do:</p>
+            <ul>
+                <li>Upload and organize your files</li>
+                <li>Get AI-powered insights and analysis</li>
+                <li>Sync across multiple devices</li>
+                <li>Collaborate with team members</li>
+            </ul>
+            
+            <p>Get started by logging into your account:</p>
+            <a href="{{ login_url }}" class="button">Login to ActiveLog</a>
+            
+            <p>If you have any questions, our support team is here to help at <a href="mailto:support@activelog.com">support@activelog.com</a>.</p>
+            
+            <p>Best regards,<br>The ActiveLog Team</p>
+        </div>
+    </div>
+</body>
+</html>

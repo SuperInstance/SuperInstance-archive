@@ -1,0 +1,120 @@
+/* Additional CSS for content pages */
+
+.content-page {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 30px;
+    margin: 20px 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+nav {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+nav a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1.1em;
+}
+
+nav a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+.research-component,
+.reviews-section,
+.enhancements-section,
+.breakthrough-section,
+.implementation-section {
+    line-height: 1.8;
+}
+
+.research-component h2,
+.reviews-section h2,
+.enhancements-section h2,
+.breakthrough-section h2,
+.implementation-section h2 {
+    color: #4a5568;
+    border-bottom: 3px solid #667eea;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.description {
+    font-size: 1.2em;
+    color: #666;
+    font-style: italic;
+    margin-bottom: 25px;
+    padding: 15px;
+    background: rgba(102, 126, 234, 0.1);
+    border-left: 4px solid #667eea;
+    border-radius: 5px;
+}
+
+.breakthrough-formula {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.breakthrough-formula code {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-family: 'Courier New', monospace;
+    font-size: 1.3em;
+    display: inline-block;
+}
+
+.research-component ul,
+.reviews-section ul,
+.enhancements-section ul,
+.breakthrough-section ul,
+.implementation-section ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.research-component li,
+.reviews-section li,
+.enhancements-section li,
+.breakthrough-section li,
+.implementation-section li {
+    padding: 8px 0;
+    padding-left: 25px;
+    position: relative;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.research-component li:before,
+.reviews-section li:before,
+.enhancements-section li:before,
+.breakthrough-section li:before,
+.implementation-section li:before {
+    content: "▶";
+    position: absolute;
+    left: 0;
+    color: #667eea;
+    font-weight: bold;
+}
+
+.research-component h3,
+.reviews-section h3,
+.enhancements-section h3,
+.breakthrough-section h3,
+.implementation-section h3 {
+    color: #667eea;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}

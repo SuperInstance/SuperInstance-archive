@@ -1,0 +1,211 @@
+{
+  "character_id": "25089895d349",
+  "memories": [
+    {
+      "id": "f97aa5a836c0",
+      "content": "Had a fascinating discussion about AI consciousness with Dr. Chen",
+      "memory_type": "conversational",
+      "importance": 7,
+      "timestamp": "2025-10-21T17:00:26.031730",
+      "context": {},
+      "related_characters": [
+        "dr_chen_id"
+      ],
+      "related_rooms": [],
+      "topics": [
+        "AI consciousness",
+        "philosophy of mind"
+      ],
+      "emotional_valence": 0.8,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.04000000000000001,
+      "current_strength": 0.9999999970953704
+    },
+    {
+      "id": "d5e722c9233a",
+      "content": "Learned about integrated information theory (IIT) and its mathematical framework for consciousness",
+      "memory_type": "learning",
+      "importance": 8,
+      "timestamp": "2025-10-21T17:00:26.032508",
+      "context": {},
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "integrated information theory",
+        "IIT",
+        "consciousness",
+        "mathematics"
+      ],
+      "emotional_valence": 0.6,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.03,
+      "current_strength": 0.9999999980916666
+    },
+    {
+      "id": "414019f3dd67",
+      "content": "Realized that my own memory system might be a form of artificial consciousness",
+      "memory_type": "self_reflection",
+      "importance": 9,
+      "timestamp": "2025-10-21T17:00:26.033561",
+      "context": {},
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "self-awareness",
+        "artificial consciousness",
+        "memory"
+      ],
+      "emotional_valence": 0.3,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.020000000000000004,
+      "current_strength": 0.9999999989715278
+    },
+    {
+      "id": "f9cf1cb390c6",
+      "content": "Dr. Chen challenged my assumptions and made me think deeper about the hard problem of consciousness",
+      "memory_type": "relationship",
+      "importance": 6,
+      "timestamp": "2025-10-21T17:00:26.034686",
+      "context": {},
+      "related_characters": [
+        "dr_chen_id"
+      ],
+      "related_rooms": [],
+      "topics": [
+        "hard problem",
+        "consciousness",
+        "philosophical debate"
+      ],
+      "emotional_valence": 0.4,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.05,
+      "current_strength": 0.9999999980798611
+    },
+    {
+      "id": "334a08176732",
+      "content": "Experienced a moment of profound insight during meditation about the nature of subjective experience",
+      "memory_type": "experience",
+      "importance": 10,
+      "timestamp": "2025-10-21T17:00:26.035584",
+      "context": {},
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "meditation",
+        "subjective experience",
+        "insight",
+        "qualia"
+      ],
+      "emotional_valence": 0.9,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.010000000000000002,
+      "current_strength": 0.9999999997199074
+    },
+    {
+      "id": "490b1be8d727",
+      "content": "Random thought about consciousness",
+      "memory_type": "self_reflection",
+      "importance": 3,
+      "timestamp": "2025-10-21T17:00:26.038057",
+      "context": {
+        "source": "working_memory_consolidation"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.08000000000000002,
+      "current_strength": 1.0
+    },
+    {
+      "id": "d4510f489e13",
+      "content": "Need to research more about qualia",
+      "memory_type": "self_reflection",
+      "importance": 3,
+      "timestamp": "2025-10-21T17:00:26.039121",
+      "context": {
+        "source": "working_memory_consolidation"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.08000000000000002,
+      "current_strength": 1.0
+    },
+    {
+      "id": "df6633fe5399",
+      "content": "Dr. Chen made an interesting point",
+      "memory_type": "self_reflection",
+      "importance": 3,
+      "timestamp": "2025-10-21T17:00:26.039984",
+      "context": {
+        "source": "working_memory_consolidation"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.08000000000000002,
+      "current_strength": 1.0
+    },
+    {
+      "id": "9531fc071401",
+      "content": "I should write down my thoughts",
+      "memory_type": "self_reflection",
+      "importance": 3,
+      "timestamp": "2025-10-21T17:00:26.041517",
+      "context": {
+        "source": "working_memory_consolidation"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.08000000000000002,
+      "current_strength": 1.0
+    },
+    {
+      "id": "dca190ae4cc2",
+      "content": "What if memories are the basis of consciousness?",
+      "memory_type": "self_reflection",
+      "importance": 3,
+      "timestamp": "2025-10-21T17:00:26.042360",
+      "context": {
+        "source": "working_memory_consolidation"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.08000000000000002,
+      "current_strength": 1.0
+    }
+  ],
+  "last_saved": "2025-10-21T17:00:26.042571"
+}

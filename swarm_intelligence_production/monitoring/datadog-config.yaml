@@ -1,0 +1,359 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datadog-config
+  namespace: swarm-intelligence
+data:
+  datadog.yaml: |
+    # DataDog Agent Configuration for Swarm Intelligence Platform
+
+    ## API Key (should be provided via secret)
+    api_key: ${DD_API_KEY}
+
+    ## Site (use datadoghq.com for US, datadoghq.eu for EU)
+    site: datadoghq.com
+
+    ## Hostname
+    hostname: swarm-intelligence-cluster
+
+    ## Tags
+    tags:
+      - env:production
+      - platform:swarm-intelligence
+      - cloud:aws
+      - region:us-east-1
+
+    ## Logging
+    log_level: info
+    logs_enabled: true
+    logs_config:
+      container_collect_all: true
+      processing_rules:
+        - type: exclude_at_match
+          name: exclude_healthcheck
+          pattern: /health
+
+    ## APM (Application Performance Monitoring)
+    apm_config:
+      enabled: true
+      apm_non_local_traffic: true
+      analyzed_spans:
+        swarm-api|http.request: 1.0
+        swarm-core|agent.process: 0.1  # Sample 10% to reduce load
+
+    ## Process Monitoring
+    process_config:
+      enabled: true
+      container_collection: true
+
+    ## Live Processes
+    process_config:
+      enabled: "true"
+
+    ## Network Performance Monitoring
+    network_config:
+      enabled: true
+
+    ## Kubernetes Integration
+    kubernetes_kubelet_host: ${DD_KUBERNETES_KUBELET_HOST}
+    kubernetes_http_kubelet_port: 10255
+    kubernetes_https_kubelet_port: 10250
+    kubelet_tls_verify: false
+
+    ## Kubernetes State Metrics
+    kubernetes_state_metrics_url: http://kube-state-metrics.kube-system.svc.cluster.local:8080/metrics
+
+    ## Cluster Checks
+    cluster_checks:
+      enabled: true
+
+    ## Orchestrator Explorer
+    orchestrator_explorer:
+      enabled: true
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: datadog-agent
+  namespace: swarm-intelligence
+spec:
+  selector:
+    matchLabels:
+      app: datadog-agent
+  template:
+    metadata:
+      labels:
+        app: datadog-agent
+      annotations:
+        ad.datadoghq.com/agent.check_names: '["prometheus"]'
+        ad.datadoghq.com/agent.init_configs: '[{}]'
+        ad.datadoghq.com/agent.instances: |
+          [
+            {
+              "prometheus_url": "http://%%host%%:9090/metrics",
+              "namespace": "swarm",
+              "metrics": ["swarm_*"]
+            }
+          ]
+    spec:
+      serviceAccountName: datadog-agent
+      containers:
+      - name: agent
+        image: gcr.io/datadoghq/agent:latest
+        env:
+        - name: DD_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: datadog-secret
+              key: api-key
+        - name: DD_SITE
+          value: "datadoghq.com"
+        - name: DD_KUBERNETES_KUBELET_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: DD_CLUSTER_NAME
+          value: "swarm-production-eks"
+        - name: DD_DOGSTATSD_NON_LOCAL_TRAFFIC
+          value: "true"
+        - name: DD_COLLECT_KUBERNETES_EVENTS
+          value: "true"
+        - name: DD_LEADER_ELECTION
+          value: "true"
+        - name: DD_APM_ENABLED
+          value: "true"
+        - name: DD_LOGS_ENABLED
+          value: "true"
+        - name: DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL
+          value: "true"
+        - name: DD_PROCESS_AGENT_ENABLED
+          value: "true"
+        - name: DD_SYSTEM_PROBE_ENABLED
+          value: "true"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        volumeMounts:
+        - name: dockersocket
+          mountPath: /var/run/docker.sock
+        - name: procdir
+          mountPath: /host/proc
+          readOnly: true
+        - name: cgroups
+          mountPath: /host/sys/fs/cgroup
+          readOnly: true
+        - name: config
+          mountPath: /etc/datadog-agent
+        securityContext:
+          capabilities:
+            add: ["SYS_ADMIN", "SYS_RESOURCE", "SYS_PTRACE", "NET_ADMIN", "NET_BROADCAST", "NET_RAW", "IPC_LOCK"]
+      volumes:
+      - name: dockersocket
+        hostPath:
+          path: /var/run/docker.sock
+      - name: procdir
+        hostPath:
+          path: /proc
+      - name: cgroups
+        hostPath:
+          path: /sys/fs/cgroup
+      - name: config
+        configMap:
+          name: datadog-config
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: datadog-agent
+  namespace: swarm-intelligence
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: datadog-agent
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - nodes/metrics
+  - nodes/spec
+  - nodes/proxy
+  - nodes/stats
+  - endpoints
+  - services
+  - events
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources:
+  - configmaps
+  verbs: ["get", "list", "watch", "create", "update"]
+- apiGroups: ["apps"]
+  resources:
+  - deployments
+  - replicasets
+  - daemonsets
+  - statefulsets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["batch"]
+  resources:
+  - jobs
+  - cronjobs
+  verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["/metrics"]
+  verbs: ["get"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: datadog-agent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: datadog-agent
+subjects:
+- kind: ServiceAccount
+  name: datadog-agent
+  namespace: swarm-intelligence
+
+---
+# Custom Metrics for Swarm Intelligence
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datadog-custom-metrics
+  namespace: swarm-intelligence
+data:
+  conf.yaml: |
+    init_config:
+
+    instances:
+      # Swarm Core Metrics
+      - prometheus_url: http://swarm-core:9090/metrics
+        namespace: swarm_core
+        metrics:
+          - swarm_agents_total
+          - swarm_fps
+          - swarm_processing_duration_seconds
+          - swarm_tasks_completed_total
+          - swarm_active_swarms_total
+          - swarm_pheromone_updates_total
+          - swarm_voting_rounds_total
+        type_overrides:
+          swarm_processing_duration_seconds: histogram
+        tags:
+          - component:swarm-core
+          - service:swarm-intelligence
+
+      # API Metrics
+      - prometheus_url: http://swarm-api:8080/metrics
+        namespace: swarm_api
+        metrics:
+          - http_requests_total
+          - http_request_duration_seconds
+          - websocket_connections_active
+        type_overrides:
+          http_request_duration_seconds: histogram
+        tags:
+          - component:api
+          - service:swarm-intelligence
+
+---
+# Synthetic Monitoring Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datadog-synthetics
+  namespace: swarm-intelligence
+data:
+  synthetics.json: |
+    {
+      "tests": [
+        {
+          "name": "API Health Check",
+          "type": "api",
+          "config": {
+            "request": {
+              "method": "GET",
+              "url": "https://api.swarm-intelligence.example.com/health"
+            },
+            "assertions": [
+              {
+                "type": "statusCode",
+                "operator": "is",
+                "target": 200
+              },
+              {
+                "type": "responseTime",
+                "operator": "lessThan",
+                "target": 200
+              }
+            ]
+          },
+          "locations": ["aws:us-east-1", "aws:us-west-2", "aws:eu-west-1"],
+          "options": {
+            "tick_every": 60,
+            "min_failure_duration": 0,
+            "min_location_failed": 1
+          }
+        },
+        {
+          "name": "Create Swarm E2E Test",
+          "type": "api",
+          "config": {
+            "request": {
+              "method": "POST",
+              "url": "https://api.swarm-intelligence.example.com/api/swarms",
+              "body": "{\"name\":\"test-swarm\",\"agent_count\":1000}",
+              "headers": {
+                "Content-Type": "application/json"
+              }
+            },
+            "assertions": [
+              {
+                "type": "statusCode",
+                "operator": "is",
+                "target": 201
+              },
+              {
+                "type": "body",
+                "operator": "contains",
+                "target": "swarm_id"
+              }
+            ]
+          },
+          "locations": ["aws:us-east-1"],
+          "options": {
+            "tick_every": 300
+          }
+        },
+        {
+          "name": "WebSocket Connection Test",
+          "type": "browser",
+          "config": {
+            "request": {
+              "url": "https://swarm-intelligence.example.com"
+            },
+            "assertions": [
+              {
+                "type": "elementPresent",
+                "operator": "is",
+                "target": ".swarm-canvas"
+              }
+            ]
+          },
+          "locations": ["aws:us-east-1"],
+          "options": {
+            "tick_every": 300,
+            "device_ids": ["laptop_large"]
+          }
+        }
+      ]
+    }

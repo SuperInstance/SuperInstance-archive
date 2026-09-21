@@ -1,0 +1,326 @@
+# Prometheus Configuration
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'activelog'
+    environment: 'development'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - "rules/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Node exporter (system metrics)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 30s
+
+  # Redis metrics
+  - job_name: 'redis-exporter'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 30s
+
+  # Container metrics
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+    scrape_interval: 30s
+
+  # Blackbox exporter (endpoint monitoring)
+  - job_name: 'blackbox'
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+        - blackbox-exporter:9115
+
+  # Core Services
+  - job_name: 'api-gateway'
+    static_configs:
+      - targets: ['host.docker.internal:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'auth-service'
+    static_configs:
+      - targets: ['host.docker.internal:8001']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'metadata-service'
+    static_configs:
+      - targets: ['host.docker.internal:8002']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'file-processor-service'
+    static_configs:
+      - targets: ['host.docker.internal:8003']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'ai-orchestrator-service'
+    static_configs:
+      - targets: ['host.docker.internal:8004']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'notification-service'
+    static_configs:
+      - targets: ['host.docker.internal:8005']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'backup-service'
+    static_configs:
+      - targets: ['host.docker.internal:8006']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'collaboration-service'
+    static_configs:
+      - targets: ['host.docker.internal:8007']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'data-export-service'
+    static_configs:
+      - targets: ['host.docker.internal:8008']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'document-ai-service'
+    static_configs:
+      - targets: ['host.docker.internal:8009']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'graphql-service'
+    static_configs:
+      - targets: ['host.docker.internal:8010']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'mobile-api-service'
+    static_configs:
+      - targets: ['host.docker.internal:8011']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'ml-pipeline-service'
+    static_configs:
+      - targets: ['host.docker.internal:8012']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'smart-folders-service'
+    static_configs:
+      - targets: ['host.docker.internal:8013']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'sync-engine-service'
+    static_configs:
+      - targets: ['host.docker.internal:8014']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'video-pipeline-service'
+    static_configs:
+      - targets: ['host.docker.internal:8015']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'video-processor-service'
+    static_configs:
+      - targets: ['host.docker.internal:8016']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'workflows-service'
+    static_configs:
+      - targets: ['host.docker.internal:8017']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'analytics-service'
+    static_configs:
+      - targets: ['host.docker.internal:8018']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'batch-import-service'
+    static_configs:
+      - targets: ['host.docker.internal:8019']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'cache-service'
+    static_configs:
+      - targets: ['host.docker.internal:8020']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'p2p-sync-service'
+    static_configs:
+      - targets: ['host.docker.internal:8021']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'file-watcher-service'
+    static_configs:
+      - targets: ['host.docker.internal:8022']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  # Database metrics
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    scrape_interval: 30s
+
+  # Frontend application
+  - job_name: 'frontend'
+    static_configs:
+      - targets: ['host.docker.internal:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  # Jaeger metrics
+  - job_name: 'jaeger'
+    static_configs:
+      - targets: ['jaeger-all-in-one:14269']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Loki metrics
+  - job_name: 'loki'
+    static_configs:
+      - targets: ['loki:3100']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Tempo metrics
+  - job_name: 'tempo'
+    static_configs:
+      - targets: ['tempo:3200']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # OpenTelemetry Collector metrics
+  - job_name: 'otel-collector'
+    static_configs:
+      - targets: ['otel-collector:8888']
+    scrape_interval: 30s
+
+  # Blackbox probes for service health
+  - job_name: 'blackbox-http'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+        - http://host.docker.internal:8000/health  # API Gateway
+        - http://host.docker.internal:8001/health  # Auth Service
+        - http://host.docker.internal:8002/health  # Metadata Service
+        - http://host.docker.internal:8003/health  # File Processor
+        - http://host.docker.internal:8004/health  # AI Orchestrator
+        - http://host.docker.internal:8005/health  # Notification Service
+        - http://host.docker.internal:8006/health  # Backup Service
+        - http://host.docker.internal:8007/health  # Collaboration Service
+        - http://host.docker.internal:8008/health  # Data Export Service
+        - http://host.docker.internal:8009/health  # Document AI Service
+        - http://host.docker.internal:8010/health  # GraphQL Service
+        - http://host.docker.internal:8011/health  # Mobile API Service
+        - http://host.docker.internal:8012/health  # ML Pipeline Service
+        - http://host.docker.internal:8013/health  # Smart Folders Service
+        - http://host.docker.internal:8014/health  # Sync Engine Service
+        - http://host.docker.internal:8015/health  # Video Pipeline Service
+        - http://host.docker.internal:8016/health  # Video Processor Service
+        - http://host.docker.internal:8017/health  # Workflows Service
+        - http://host.docker.internal:8018/health  # Analytics Service
+        - http://host.docker.internal:8019/health  # Batch Import Service
+        - http://host.docker.internal:8020/health  # Cache Service
+        - http://host.docker.internal:8021/health  # P2P Sync Service
+        - http://host.docker.internal:8022/health  # File Watcher Service
+        - http://host.docker.internal:3000/health  # Frontend
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+
+  # GraphQL endpoint monitoring
+  - job_name: 'blackbox-graphql'
+    metrics_path: /probe
+    params:
+      module: [graphql_check]
+    static_configs:
+      - targets:
+        - http://host.docker.internal:8010/graphql
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+
+# Service discovery for dynamic environments
+  # Consul service discovery (if used)
+  # - job_name: 'consul-services'
+  #   consul_sd_configs:
+  #     - server: 'consul:8500'
+  #   relabel_configs:
+  #     - source_labels: [__meta_consul_tags]
+  #       regex: .*,activelog,.*
+  #       action: keep
+
+# Remote write (for long-term storage)
+# remote_write:
+#   - url: "http://cortex:9009/api/prom/push"
+#     queue_config:
+#       max_samples_per_send: 1000
+#       max_shards: 200
+#       capacity: 2500

@@ -1,0 +1,256 @@
+version: '3.8'
+
+services:
+  audit-logger:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: activelog-audit-logger
+    ports:
+      - "8088:8088"
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=activelog_audit
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=3
+      - ELASTICSEARCH_HOSTS=elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME}
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD}
+      - JAEGER_AGENT_HOST=jaeger
+      - JAEGER_AGENT_PORT=6831
+      - GEOIP_DB_PATH=/app/data/GeoLite2-City.mmdb
+    volumes:
+      - ./configs:/app/configs:ro
+      - ./data:/app/data:ro
+      - audit_logs:/var/log/audit
+    depends_on:
+      - postgres
+      - redis
+      - elasticsearch
+      - jaeger
+    networks:
+      - audit_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8088/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: activelog-audit-db
+    environment:
+      - POSTGRES_DB=activelog_audit
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - audit_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: activelog-audit-redis
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - audit_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: activelog-audit-elasticsearch
+    environment:
+      - node.name=audit-elasticsearch
+      - cluster.name=activelog-audit
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - audit_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: activelog-audit-kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_NAME=kibana
+      - SERVER_HOST=0.0.0.0
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - audit_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5601/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: activelog-audit-jaeger
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+      - "6831:6831/udp"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - audit_network
+    restart: unless-stopped
+
+  audit-dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: activelog-audit-dashboard
+    ports:
+      - "3002:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8088
+      - REACT_APP_ELASTICSEARCH_URL=http://localhost:9200
+      - REACT_APP_KIBANA_URL=http://localhost:5601
+    depends_on:
+      - audit-logger
+    networks:
+      - audit_network
+    restart: unless-stopped
+
+  compliance-reporter:
+    build:
+      context: ./compliance
+      dockerfile: Dockerfile
+    container_name: activelog-compliance-reporter
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=activelog_audit
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - SCHEDULE_DAILY_REPORTS=true
+      - SCHEDULE_WEEKLY_REPORTS=true
+      - SCHEDULE_MONTHLY_REPORTS=true
+      - EMAIL_SMTP_HOST=${EMAIL_SMTP_HOST}
+      - EMAIL_USERNAME=${EMAIL_USERNAME}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - EMAIL_FROM=${EMAIL_FROM}
+      - COMPLIANCE_RECIPIENTS=${COMPLIANCE_RECIPIENTS:-compliance@activelog.com}
+    volumes:
+      - ./templates:/app/templates:ro
+      - compliance_reports:/app/reports
+    depends_on:
+      - postgres
+      - audit-logger
+    networks:
+      - audit_network
+    restart: unless-stopped
+
+  log-shipper:
+    image: filebeat:8.11.0
+    container_name: activelog-log-shipper
+    user: root
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - audit_logs:/var/log/audit:ro
+    command: filebeat -e -strict.perms=false
+    depends_on:
+      - elasticsearch
+    networks:
+      - audit_network
+    restart: unless-stopped
+
+  geoip-updater:
+    build:
+      context: ./geoip-updater
+      dockerfile: Dockerfile
+    container_name: activelog-geoip-updater
+    environment:
+      - GEOIP_LICENSE_KEY=${GEOIP_LICENSE_KEY}
+      - UPDATE_SCHEDULE=0 2 * * 1  # Weekly on Monday at 2 AM
+    volumes:
+      - ./data:/app/data
+    networks:
+      - audit_network
+    restart: unless-stopped
+
+  audit-archiver:
+    build:
+      context: ./archiver
+      dockerfile: Dockerfile
+    container_name: activelog-audit-archiver
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=activelog_audit
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - S3_BUCKET=${AUDIT_ARCHIVE_BUCKET:-activelog-audit-archive}
+      - ARCHIVE_OLDER_THAN_DAYS=365
+    volumes:
+      - audit_archive:/app/archive
+    depends_on:
+      - postgres
+    networks:
+      - audit_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  elasticsearch_data:
+    driver: local
+  audit_logs:
+    driver: local
+  compliance_reports:
+    driver: local
+  audit_archive:
+    driver: local
+
+networks:
+  audit_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16

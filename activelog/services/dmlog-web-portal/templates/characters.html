@@ -1,0 +1,382 @@
+{% extends "base.html" %}
+
+{% block title %}Characters - DMLog Revolutionary{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-icon">👤</span>
+            <h1 class="card-title">Character Management</h1>
+        </div>
+        <p style="color: #bdc3c7; font-size: 1.1rem;">
+            Manage your D&D characters with full D&D Beyond compatibility and revolutionary features.
+        </p>
+    </div>
+
+    {% if character %}
+    <!-- Featured Character -->
+    <div class="card" style="border: 2px solid #e74c3c;">
+        <div class="card-header">
+            <span class="card-icon">⭐</span>
+            <h2 class="card-title" style="color: #e74c3c;">Featured Character</h2>
+        </div>
+        
+        <!-- Character Header -->
+        <div style="display: flex; align-items: center; margin-bottom: 2rem;">
+            <div style="background: #e74c3c; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin-right: 1.5rem;">
+                {{ character.name[:2] }}
+            </div>
+            <div style="flex: 1;">
+                <h2 style="color: #ffffff; margin-bottom: 0.5rem; font-size: 2rem;">{{ character.name }}</h2>
+                <p style="color: #bdc3c7; font-size: 1.2rem; margin-bottom: 0.25rem;">
+                    Level {{ character.level }} {{ character.race }} {{ character.class_name }}
+                </p>
+                {% if character.background %}
+                <p style="color: #95a5a6; font-size: 1rem;">{{ character.background }}</p>
+                {% endif %}
+            </div>
+            <div style="text-align: right;">
+                <button class="btn" onclick="alert('Character editing coming soon!')">Edit Character</button>
+            </div>
+        </div>
+
+        <!-- Core Stats -->
+        <div style="margin-bottom: 2rem;">
+            <h3 style="color: #ffffff; margin-bottom: 1rem;">Combat Statistics</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                <div style="text-align: center; background: rgba(231, 76, 60, 0.1); padding: 1.5rem; border-radius: 10px; border: 2px solid #e74c3c;">
+                    <div style="color: #e74c3c; font-size: 2.5rem; font-weight: bold;">{{ character.hit_points or 45 }}</div>
+                    <div style="color: #ffffff; font-weight: bold; margin-top: 0.5rem;">Hit Points</div>
+                </div>
+                <div style="text-align: center; background: rgba(52, 152, 219, 0.1); padding: 1.5rem; border-radius: 10px; border: 2px solid #3498db;">
+                    <div style="color: #3498db; font-size: 2.5rem; font-weight: bold;">{{ character.armor_class or 18 }}</div>
+                    <div style="color: #ffffff; font-weight: bold; margin-top: 0.5rem;">Armor Class</div>
+                </div>
+                <div style="text-align: center; background: rgba(241, 196, 15, 0.1); padding: 1.5rem; border-radius: 10px; border: 2px solid #f1c40f;">
+                    <div style="color: #f1c40f; font-size: 2.5rem; font-weight: bold;">{{ character.level }}</div>
+                    <div style="color: #ffffff; font-weight: bold; margin-top: 0.5rem;">Character Level</div>
+                </div>
+                <div style="text-align: center; background: rgba(46, 204, 113, 0.1); padding: 1.5rem; border-radius: 10px; border: 2px solid #2ecc71;">
+                    <div style="color: #2ecc71; font-size: 2.5rem; font-weight: bold;">+3</div>
+                    <div style="color: #ffffff; font-weight: bold; margin-top: 0.5rem;">Proficiency</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ability Scores -->
+        <div style="margin-bottom: 2rem;">
+            <h3 style="color: #ffffff; margin-bottom: 1rem;">Ability Scores</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem;">
+                {% for stat, value in character.stats.items() %}
+                {% set modifier = ((value - 10) // 2) %}
+                <div style="background: rgba(52, 73, 94, 0.5); padding: 1rem; border-radius: 10px; text-align: center;">
+                    <div style="color: #95a5a6; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; margin-bottom: 0.5rem;">
+                        {{ stat[:3] }}
+                    </div>
+                    <div style="color: #ffffff; font-size: 1.8rem; font-weight: bold; margin-bottom: 0.25rem;">
+                        {{ value }}
+                    </div>
+                    <div style="color: #bdc3c7; font-size: 0.9rem;">
+                        {% if modifier >= 0 %}+{{ modifier }}{% else %}{{ modifier }}{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Equipment -->
+        {% if character.equipment %}
+        <div style="margin-bottom: 2rem;">
+            <h3 style="color: #ffffff; margin-bottom: 1rem;">Equipment</h3>
+            <div style="display: grid; gap: 1rem;">
+                {% for item in character.equipment %}
+                <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; display: flex; align-items: center;">
+                    <div style="background: #f39c12; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                        {% if item.type == 'weapon' %}⚔️{% else %}🛡️{% endif %}
+                    </div>
+                    <div style="flex: 1;">
+                        <h4 style="color: #ffffff; margin: 0 0 0.25rem 0;">{{ item.name }}</h4>
+                        <p style="color: #95a5a6; margin: 0; font-size: 0.9rem; text-transform: capitalize;">
+                            {{ item.type }}
+                            {% if item.damage %} • Damage: {{ item.damage }}{% endif %}
+                            {% if item.ac %} • AC: +{{ item.ac }}{% endif %}
+                        </p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Character Actions -->
+        <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2rem;">
+            <button class="btn" onclick="rollInitiative()">Roll Initiative</button>
+            <button class="btn btn-secondary" onclick="rollSavingThrow()">Saving Throw</button>
+            <button class="btn" style="background: #27ae60;" onclick="rollSkillCheck()">Skill Check</button>
+            <button class="btn" style="background: #9b59b6;" onclick="castSpell()">Cast Spell</button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Character Creation -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-icon">➕</span>
+            <h2 class="card-title">Create New Character</h2>
+        </div>
+        <p style="color: #bdc3c7; margin-bottom: 1.5rem;">
+            Start your next adventure with a brand new D&D 5e character. Choose from all official races and classes.
+        </p>
+        
+        <!-- Quick Character Creator -->
+        <div style="background: rgba(52, 152, 219, 0.1); padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem;">
+            <h4 style="color: #3498db; margin-bottom: 1rem;">🚀 Quick Character Generator</h4>
+            <div class="grid grid-2">
+                <div>
+                    <label style="color: #ffffff; display: block; margin-bottom: 0.5rem;">Character Name:</label>
+                    <input type="text" id="characterName" placeholder="Enter character name" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #7f8c8d; background: rgba(255,255,255,0.1); color: #ffffff;">
+                </div>
+                <div>
+                    <label style="color: #ffffff; display: block; margin-bottom: 0.5rem;">Class:</label>
+                    <select id="characterClass" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #7f8c8d; background: rgba(255,255,255,0.1); color: #ffffff;">
+                        <option>Fighter</option>
+                        <option>Wizard</option>
+                        <option>Rogue</option>
+                        <option>Cleric</option>
+                        <option>Ranger</option>
+                        <option>Barbarian</option>
+                        <option>Bard</option>
+                        <option>Druid</option>
+                        <option>Monk</option>
+                        <option>Paladin</option>
+                        <option>Sorcerer</option>
+                        <option>Warlock</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-top: 1rem;">
+                <button class="btn" onclick="createQuickCharacter()">Generate Random Character</button>
+                <button class="btn btn-secondary" onclick="openAdvancedCreator()">Advanced Creator</button>
+            </div>
+        </div>
+
+        <!-- Popular Race/Class Combinations -->
+        <div>
+            <h4 style="color: #ffffff; margin-bottom: 1rem;">Popular Combinations</h4>
+            <div class="grid grid-3">
+                <button class="btn" style="background: #e67e22; text-align: center; padding: 1rem;" onclick="createPreset('Human', 'Fighter')">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">⚔️</div>
+                    <div>Human Fighter</div>
+                </button>
+                <button class="btn" style="background: #3498db; text-align: center; padding: 1rem;" onclick="createPreset('High Elf', 'Wizard')">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔮</div>
+                    <div>Elf Wizard</div>
+                </button>
+                <button class="btn" style="background: #9b59b6; text-align: center; padding: 1rem;" onclick="createPreset('Halfling', 'Rogue')">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🗡️</div>
+                    <div>Halfling Rogue</div>
+                </button>
+                <button class="btn" style="background: #f39c12; text-align: center; padding: 1rem;" onclick="createPreset('Dwarf', 'Cleric')">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">⚡</div>
+                    <div>Dwarf Cleric</div>
+                </button>
+                <button class="btn" style="background: #27ae60; text-align: center; padding: 1rem;" onclick="createPreset('Wood Elf', 'Ranger')">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🏹</div>
+                    <div>Elf Ranger</div>
+                </button>
+                <button class="btn" style="background: #e74c3c; text-align: center; padding: 1rem;" onclick="createPreset('Half-Orc', 'Barbarian')">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">💪</div>
+                    <div>Half-Orc Barbarian</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Character Tools -->
+    <div class="grid grid-2">
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">🛠️</span>
+                <h2 class="card-title">Character Tools</h2>
+            </div>
+            <div class="grid grid-2" style="gap: 1rem;">
+                <button class="btn" onclick="openStatRoller()">
+                    <div>🎲</div>
+                    <div>Stat Roller</div>
+                </button>
+                <button class="btn btn-secondary" onclick="openSpellLookup()">
+                    <div>✨</div>
+                    <div>Spell Lookup</div>
+                </button>
+                <button class="btn" style="background: #27ae60;" onclick="openEquipmentLibrary()">
+                    <div>⚔️</div>
+                    <div>Equipment</div>
+                </button>
+                <button class="btn" style="background: #f39c12;" onclick="openRaceGuide()">
+                    <div>👥</div>
+                    <div>Race Guide</div>
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">📊</span>
+                <h2 class="card-title">Character Statistics</h2>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                <div style="text-align: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                    <div style="color: #3498db; font-size: 2rem; font-weight: bold;">1</div>
+                    <div style="color: #bdc3c7; font-size: 0.9rem;">Characters Created</div>
+                </div>
+                <div style="text-align: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                    <div style="color: #27ae60; font-size: 2rem; font-weight: bold;">5</div>
+                    <div style="color: #bdc3c7; font-size: 0.9rem;">Average Level</div>
+                </div>
+                <div style="text-align: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                    <div style="color: #e74c3c; font-size: 2rem; font-weight: bold;">12</div>
+                    <div style="color: #bdc3c7; font-size: 0.9rem;">Sessions Played</div>
+                </div>
+                <div style="text-align: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                    <div style="color: #f39c12; font-size: 2rem; font-weight: bold;">Fighter</div>
+                    <div style="color: #bdc3c7; font-size: 0.9rem;">Favorite Class</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function rollInitiative() {
+        // Roll d20 + dex modifier
+        const dexModifier = {{ ((character.stats.dexterity - 10) // 2) if character and character.stats else 0 }};
+        rollDiceWithModifier(20, dexModifier, 'Initiative');
+    }
+    
+    function rollSavingThrow() {
+        const saves = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
+        const randomSave = saves[Math.floor(Math.random() * saves.length)];
+        const modifier = Math.floor(Math.random() * 6) - 1; // -1 to +4
+        rollDiceWithModifier(20, modifier, `${randomSave} Save`);
+    }
+    
+    function rollSkillCheck() {
+        const skills = ['Athletics', 'Acrobatics', 'Stealth', 'Investigation', 'Perception', 'Insight'];
+        const randomSkill = skills[Math.floor(Math.random() * skills.length)];
+        const modifier = Math.floor(Math.random() * 8) + 2; // +2 to +9
+        rollDiceWithModifier(20, modifier, `${randomSkill} Check`);
+    }
+    
+    function castSpell() {
+        const spells = [
+            {name: 'Fireball', damage: '8d6'},
+            {name: 'Magic Missile', damage: '3d4+3'},
+            {name: 'Cure Wounds', damage: '1d8+3'},
+            {name: 'Lightning Bolt', damage: '8d6'}
+        ];
+        const spell = spells[Math.floor(Math.random() * spells.length)];
+        
+        if (spell.damage.includes('d6')) {
+            const diceCount = parseInt(spell.damage.split('d')[0]);
+            rollMultipleDice(6, diceCount, `${spell.name} Damage`);
+        } else if (spell.damage.includes('d4')) {
+            rollDiceWithModifier(4, 3, `${spell.name} Damage`, 3);
+        } else if (spell.damage.includes('d8')) {
+            rollDiceWithModifier(8, 3, `${spell.name} Healing`);
+        }
+    }
+    
+    async function rollDiceWithModifier(sides, modifier, label, count = 1) {
+        try {
+            const response = await fetch(`/api/roll-dice?sides=${sides}&count=${count}`);
+            const data = await response.json();
+            
+            if (data.results) {
+                const total = data.total + modifier;
+                const modifierText = modifier >= 0 ? `+${modifier}` : `${modifier}`;
+                
+                alert(`${label}: ${data.results.join(', ')} ${modifierText} = ${total}`);
+            }
+        } catch (error) {
+            console.error('Dice roll error:', error);
+        }
+    }
+    
+    async function rollMultipleDice(sides, count, label) {
+        try {
+            const response = await fetch(`/api/roll-dice?sides=${sides}&count=${count}`);
+            const data = await response.json();
+            
+            if (data.results) {
+                alert(`${label}: ${data.results.join(' + ')} = ${data.total}`);
+            }
+        } catch (error) {
+            console.error('Dice roll error:', error);
+        }
+    }
+    
+    function createQuickCharacter() {
+        const name = document.getElementById('characterName').value || 'Random Hero';
+        const characterClass = document.getElementById('characterClass').value;
+        
+        alert(`Creating ${name} the ${characterClass}! This will connect to the character creation system.`);
+    }
+    
+    function createPreset(race, characterClass) {
+        alert(`Creating a ${race} ${characterClass}! This will use optimized stat arrays and equipment.`);
+    }
+    
+    function openAdvancedCreator() {
+        alert('Advanced Character Creator opening soon! This will include full customization options.');
+    }
+    
+    function openStatRoller() {
+        window.open('{{ url_for("dice") }}', '_blank');
+    }
+    
+    function openSpellLookup() {
+        window.open('{{ url_for("spells") }}', '_blank');
+    }
+    
+    function openEquipmentLibrary() {
+        alert('Equipment library coming soon! Browse weapons, armor, and magical items.');
+    }
+    
+    function openRaceGuide() {
+        alert('Race guide coming soon! Learn about all D&D 5e player races and their abilities.');
+    }
+</script>
+
+<style>
+    .container {
+        padding-bottom: 80px;
+    }
+    
+    input, select {
+        background: rgba(255,255,255,0.1) !important;
+        color: #ffffff !important;
+        border: 1px solid #7f8c8d !important;
+    }
+    
+    input::placeholder {
+        color: #95a5a6 !important;
+    }
+    
+    select option {
+        background: #2c3e50;
+        color: #ffffff;
+    }
+    
+    @media (max-width: 768px) {
+        .grid-2, .grid-3 {
+            grid-template-columns: 1fr;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+        }
+    }
+</style>
+{% endblock %}

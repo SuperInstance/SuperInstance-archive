@@ -1,0 +1,180 @@
+{
+  "knowledge": [
+    {
+      "id": "d1add7c2a415",
+      "content": "E=mc\u00b2: Energy and mass are interchangeable",
+      "knowledge_type": "fact",
+      "importance": 9,
+      "origin_character_id": "82b11eb1e0ec",
+      "discovered_at": "2025-10-21T17:10:13.841662",
+      "transmission_chain": [
+        {
+          "from_character": "82b11eb1e0ec",
+          "to_character": "b221f050744d",
+          "method": "direct_teaching",
+          "success": false,
+          "timestamp": "2025-10-21T17:10:13.843198"
+        },
+        {
+          "from_character": "82b11eb1e0ec",
+          "to_character": "70e6fd88ecdf",
+          "method": "social",
+          "success": true,
+          "timestamp": "2025-10-21T17:10:13.844443"
+        },
+        {
+          "from_character": "82b11eb1e0ec",
+          "to_character": "f4819bcf3e38",
+          "method": "social",
+          "success": true,
+          "timestamp": "2025-10-21T17:10:13.844450"
+        },
+        {
+          "from_character": "82b11eb1e0ec",
+          "to_character": "da354fa12096",
+          "method": "social",
+          "success": true,
+          "timestamp": "2025-10-21T17:10:13.844452"
+        },
+        {
+          "from_character": "f4819bcf3e38",
+          "to_character": "da354fa12096",
+          "method": "direct_teaching",
+          "success": true,
+          "timestamp": "2025-10-21T17:10:13.846846"
+        },
+        {
+          "from_character": "82b11eb1e0ec",
+          "to_character": "da354fa12096",
+          "method": "direct_teaching",
+          "success": true,
+          "timestamp": "2025-10-21T17:10:13.847576"
+        }
+      ],
+      "topics": [
+        "physics",
+        "relativity",
+        "energy"
+      ],
+      "context": {
+        "discovery_method": "theoretical_work",
+        "field": "physics"
+      },
+      "emotional_valence": 0.0,
+      "transmission_difficulty": 0.39,
+      "retention_rate": 0.78,
+      "adaptability": 0.3,
+      "times_used": 0,
+      "last_used": null,
+      "successful_transmissions": 5
+    },
+    {
+      "id": "b66c738b498c",
+      "content": "Laboratory safety protocols for radioactive materials",
+      "knowledge_type": "skill",
+      "importance": 8,
+      "origin_character_id": "b221f050744d",
+      "discovered_at": "2025-10-21T17:10:13.842098",
+      "transmission_chain": [
+        {
+          "from_character": "b221f050744d",
+          "to_character": "da354fa12096",
+          "method": "direct_teaching",
+          "success": false,
+          "timestamp": "2025-10-21T17:10:13.845716"
+        }
+      ],
+      "topics": [
+        "chemistry",
+        "safety",
+        "radioactivity"
+      ],
+      "context": {
+        "discovery_method": "practical_experience",
+        "field": "chemistry"
+      },
+      "emotional_valence": 0.0,
+      "transmission_difficulty": 0.95,
+      "retention_rate": 0.95,
+      "adaptability": 0.4,
+      "times_used": 0,
+      "last_used": null,
+      "successful_transmissions": 0
+    },
+    {
+      "id": "568f96b4ee8c",
+      "content": "The unexamined life is not worth living",
+      "knowledge_type": "insight",
+      "importance": 10,
+      "origin_character_id": "70e6fd88ecdf",
+      "discovered_at": "2025-10-21T17:10:13.842775",
+      "transmission_chain": [
+        {
+          "from_character": "70e6fd88ecdf",
+          "to_character": "82b11eb1e0ec",
+          "method": "social",
+          "success": true,
+          "timestamp": "2025-10-21T17:10:13.844456"
+        },
+        {
+          "from_character": "82b11eb1e0ec",
+          "to_character": "b221f050744d",
+          "method": "direct_teaching",
+          "success": false,
+          "timestamp": "2025-10-21T17:10:13.845215"
+        },
+        {
+          "from_character": "70e6fd88ecdf",
+          "to_character": "f4819bcf3e38",
+          "method": "direct_teaching",
+          "success": false,
+          "timestamp": "2025-10-21T17:10:13.846297"
+        }
+      ],
+      "topics": [
+        "philosophy",
+        "ethics",
+        "self-knowledge"
+      ],
+      "context": {
+        "discovery_method": "dialogue",
+        "field": "philosophy"
+      },
+      "emotional_valence": 0.0,
+      "transmission_difficulty": 0.7999999999999999,
+      "retention_rate": 0.8999999999999999,
+      "adaptability": 0.7,
+      "times_used": 1,
+      "last_used": "2025-10-21T17:10:13.843608",
+      "successful_transmissions": 1
+    },
+    {
+      "id": "236f760b0669",
+      "content": "Adapted version: E=mc\u00b2: Energy and mass are interchangeable",
+      "knowledge_type": "fact",
+      "importance": 9,
+      "origin_character_id": "da354fa12096",
+      "discovered_at": "2025-10-21T17:10:13.847585",
+      "transmission_chain": [],
+      "topics": [
+        "physics",
+        "relativity",
+        "energy"
+      ],
+      "context": {
+        "discovery_method": "theoretical_work",
+        "field": "physics",
+        "variant_of": "d1add7c2a415",
+        "adapter": "da354fa12096"
+      },
+      "emotional_valence": 0.0,
+      "transmission_difficulty": 0.35100000000000003,
+      "retention_rate": 0.8580000000000001,
+      "adaptability": 0.36,
+      "times_used": 0,
+      "last_used": null,
+      "successful_transmissions": 0
+    }
+  ],
+  "last_saved": "2025-10-21T17:10:13.847723"
+}

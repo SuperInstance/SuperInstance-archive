@@ -1,0 +1,94 @@
+# KEDA ScaledObject for Kafka-based autoscaling
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: swarm-core-kafka-scaler
+  namespace: swarm-intelligence
+spec:
+  scaleTargetRef:
+    name: swarm-core
+  pollingInterval: 30
+  cooldownPeriod: 300
+  minReplicaCount: 10
+  maxReplicaCount: 1000
+  triggers:
+  - type: kafka
+    metadata:
+      bootstrapServers: kafka-0.kafka-headless:9092,kafka-1.kafka-headless:9092,kafka-2.kafka-headless:9092
+      consumerGroup: swarm-orchestrator
+      topic: swarm-tasks
+      lagThreshold: "1000"
+      offsetResetPolicy: latest
+---
+# KEDA ScaledObject for Redis queue-based scaling
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: swarm-api-redis-scaler
+  namespace: swarm-intelligence
+spec:
+  scaleTargetRef:
+    name: swarm-api
+  pollingInterval: 15
+  cooldownPeriod: 120
+  minReplicaCount: 20
+  maxReplicaCount: 500
+  triggers:
+  - type: redis
+    metadata:
+      address: redis-service:6379
+      listName: api-requests
+      listLength: "50"
+---
+# KEDA ScaledObject for Prometheus metrics-based scaling
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: swarm-core-metrics-scaler
+  namespace: swarm-intelligence
+spec:
+  scaleTargetRef:
+    name: swarm-core
+  pollingInterval: 30
+  cooldownPeriod: 300
+  minReplicaCount: 10
+  maxReplicaCount: 1000
+  triggers:
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus:9090
+      metricName: swarm_agents_per_pod
+      query: avg(swarm_agents_total / count(up{job="swarm-core"}))
+      threshold: "100000"
+---
+# KEDA CronScaledObject for predictive scaling
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: swarm-core-schedule-scaler
+  namespace: swarm-intelligence
+spec:
+  scaleTargetRef:
+    name: swarm-core
+  triggers:
+  # Scale up during business hours
+  - type: cron
+    metadata:
+      timezone: America/New_York
+      start: 0 8 * * 1-5
+      end: 0 18 * * 1-5
+      desiredReplicas: "100"
+  # Scale down during off-hours
+  - type: cron
+    metadata:
+      timezone: America/New_York
+      start: 0 18 * * 1-5
+      end: 0 8 * * 1-5
+      desiredReplicas: "20"
+  # Minimal during weekends
+  - type: cron
+    metadata:
+      timezone: America/New_York
+      start: 0 0 * * 0,6
+      end: 0 23 * * 0,6
+      desiredReplicas: "10"

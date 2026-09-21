@@ -1,0 +1,66 @@
+Architecture diagrams generated at 2025-08-23 23:36:08
+
+Available diagrams:
+  - high_level_architecture
+  - microservices_architecture
+  - data_architecture
+  - security_architecture
+  - deployment_architecture
+  - integration_architecture
+  - ascii_overview
+
+================================================================================
+
+╭─────────────────────────────────────────────────────────────────────────────╮
+│                    ActiveLog Technologies Platform                          │
+│                          System Architecture                               │
+╰─────────────────────────────────────────────────────────────────────────────╯
+
+┌─ Client Layer ─────────────────────────────────────────────────────────────┐
+│  [Web App]  [Mobile Apps]  [API Clients]  [Third-party Integrations]     │
+└────────────────────────┬───────────────────────────────────────────────────┘
+                         │
+┌─ Edge & Gateway ───────▼───────────────────────────────────────────────────┐
+│  [CloudFront CDN] → [WAF] → [Load Balancer] → [Kong API Gateway]          │
+└────────────────────────┬───────────────────────────────────────────────────┘
+                         │
+┌─ Microservices Mesh ───▼───────────────────────────────────────────────────┐
+│  ┌─ Core Services ────┐  ┌─ AI/ML Services ──┐  ┌─ Infrastructure ────┐    │
+│  │ • Auth Service     │  │ • NLP Engine       │  │ • Logging Service   │    │
+│  │ • User Management  │  │ • Speech Processing│  │ • Metrics Collector │    │
+│  │ • AI Receptionist  │  │ • Sentiment Analysis│ │ • Health Checker    │    │
+│  │ • Phone System     │  │ • Predictive AI    │  │ • Config Management │    │
+│  │ • Appointments     │  │ • Recommendation   │  │ • Backup Service    │    │
+│  │ • Document AI      │  │ • Model Management │  │ • Security Scanner  │    │
+│  │ • Analytics        │  │                    │  │                     │    │
+│  │ • Notifications    │  │                    │  │                     │    │
+│  │ • File Processing  │  │                    │  │                     │    │
+│  │ • Integration Hub  │  │                    │  │                     │    │
+│  │ • Billing Service  │  │                    │  │                     │    │
+│  │ • Admin Portal     │  │                    │  │                     │    │
+│  └────────────────────┘  └────────────────────┘  └─────────────────────┘    │
+└────────────────────────┬───────────────────────────────────────────────────┘
+                         │
+┌─ Data Layer ───────────▼───────────────────────────────────────────────────┐
+│  [PostgreSQL]  [Redis Cache]  [Elasticsearch]  [S3 Storage]              │
+│       │             │              │               │                       │
+│   User Data    Session Cache   Search Index    File Storage               │
+│  Conversations    API Cache     Log Analysis    Documents                  │
+│   AI Training    Real-time      Metrics        Backups                     │
+│                   Data                                                     │
+└────────────────────────────────────────────────────────────────────────────┘
+
+┌─ External Services ────────────────────────────────────────────────────────┐
+│  [Twilio VoIP]  [Stripe Billing]  [AWS AI/ML]  [Partner APIs]            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+Key Metrics:
+• 47 Microservices          • 99.97% Uptime
+• 1.2M Requests/Day         • <200ms P95 Response Time  
+• 127 Database Tables       • 94.2% Cache Hit Rate
+• 2.4TB Production Data     • 87.3% Code Coverage
+
+Security: SOC 2 Type II | GDPR | HIPAA Ready | PCI DSS Level 1
+Infrastructure: AWS Multi-AZ | Kubernetes | Auto-scaling | Blue-green Deployment
+
+================================================================================

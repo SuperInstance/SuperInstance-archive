@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marine Navigation System</title>
+    <link rel="stylesheet" href="/static/css/navigation.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div id="nav-container">
+        <div id="chart-display">
+            <canvas id="chart-canvas" width="1920" height="1080"></canvas>
+        </div>
+        <div id="control-panel">
+            <div class="panel-section">
+                <h3>Position</h3>
+                <div id="position-display">
+                    <span id="lat-display">00°00.000'N</span>
+                    <span id="lon-display">000°00.000'W</span>
+                </div>
+            </div>
+            <div class="panel-section">
+                <h3>AIS Targets</h3>
+                <div id="ais-list"></div>
+            </div>
+            <div class="panel-section">
+                <h3>Radar</h3>
+                <div id="radar-controls">
+                    <button onclick="setRadarRange(6)">6nm</button>
+                    <button onclick="setRadarRange(12)">12nm</button>
+                    <button onclick="setRadarRange(24)">24nm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/static/js/navigation.js"></script>
+</body>
+</html>

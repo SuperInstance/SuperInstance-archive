@@ -1,0 +1,83 @@
+{
+  "5ad0c93c96be": [
+    {
+      "id": "2fb80d96-451d-49e3-b0e4-1ee6562b0b20",
+      "character_id": "5ad0c93c96be",
+      "skill_type": "analytical_thinking",
+      "badge_type": "milestone",
+      "badge_name": "Novice Analytical_Thinking",
+      "description": "Reached beginner level in analytical_thinking",
+      "earned_at": "2025-10-21T17:15:31.532820",
+      "requirements_met": {
+        "level": "beginner",
+        "xp": 26.83697133233659
+      }
+    },
+    {
+      "id": "6f05841c-002d-45b0-9186-fe91e912a3ae",
+      "character_id": "5ad0c93c96be",
+      "skill_type": "analytical_thinking",
+      "badge_type": "streak",
+      "badge_name": "Practitioner Analytical_Thinking",
+      "description": "Practiced analytical_thinking 5+ times in the last week",
+      "earned_at": "2025-10-21T17:15:31.532842",
+      "requirements_met": {
+        "recent_sessions": 5
+      }
+    }
+  ],
+  "cfe72db199b6": [],
+  "502957c8cab3": [
+    {
+      "id": "ec6f71c4-349d-4ca4-bf68-08534a9e5c48",
+      "character_id": "502957c8cab3",
+      "skill_type": "programming",
+      "badge_type": "milestone",
+      "badge_name": "Novice Programming",
+      "description": "Reached beginner level in programming",
+      "earned_at": "2025-10-21T17:15:31.533054",
+      "requirements_met": {
+        "level": "beginner",
+        "xp": 25.225778517675728
+      }
+    },
+    {
+      "id": "364d647f-87ff-406f-b5b1-029648c3bee8",
+      "character_id": "502957c8cab3",
+      "skill_type": "programming",
+      "badge_type": "streak",
+      "badge_name": "Practitioner Programming",
+      "description": "Practiced programming 5+ times in the last week",
+      "earned_at": "2025-10-21T17:15:31.533148",
+      "requirements_met": {
+        "recent_sessions": 5
+      }
+    },
+    {
+      "id": "a37de6d6-b52c-464e-b673-357d75973d4f",
+      "character_id": "502957c8cab3",
+      "skill_type": "programming",
+      "badge_type": "milestone",
+      "badge_name": "Competent Programming",
+      "description": "Reached competent level in programming",
+      "earned_at": "2025-10-21T17:15:31.533188",
+      "requirements_met": {
+        "level": "competent",
+        "xp": 51.6029439192871
+      }
+    },
+    {
+      "id": "522ac474-886a-49c6-b180-a88ef4924ac7",
+      "character_id": "502957c8cab3",
+      "skill_type": "programming",
+      "badge_type": "milestone",
+      "badge_name": "Proficient Programming",
+      "description": "Reached proficient level in programming",
+      "earned_at": "2025-10-21T17:15:31.533577",
+      "requirements_met": {
+        "level": "proficient",
+        "xp": 109.69703583956483
+      }
+    }
+  ]
+}

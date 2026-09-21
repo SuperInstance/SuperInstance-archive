@@ -1,0 +1,1 @@
+const EventEmitter = require("events"); module.exports = class VesselRecognition extends EventEmitter { constructor(options = {}) { super(); this.options = { confidenceThreshold: 0.75, ...options }; } async analyzeFrame(frameData) { return { vessels: [], timestamp: Date.now() }; } };

@@ -1,0 +1,235 @@
+# ActiveLog Main App - App Store Metadata
+# Comprehensive logging and productivity application
+
+app_info:
+  name: "ActiveLog"
+  bundle_id: "com.activelog.app"
+  category: "Productivity"
+  content_rating: "4+"
+  
+  # Version information
+  version: "1.0.0"
+  build_number: "1"
+  minimum_os_version:
+    ios: "15.0"
+    android: "7.0"
+  
+  # Pricing
+  pricing_model: "freemium"
+  base_price: "free"
+  in_app_purchases: true
+
+# App Store descriptions
+descriptions:
+  short_description: "Professional activity logging and productivity tracking with powerful analytics and team collaboration."
+  
+  full_description: |
+    ActiveLog is the ultimate productivity companion for professionals, teams, and organizations who want to track, analyze, and optimize their daily activities with precision and insight.
+
+    🚀 POWERFUL ACTIVITY TRACKING
+    • Log any activity with customizable templates
+    • Time tracking with automatic reminders
+    • Location-based logging with GPS integration
+    • Voice memo recording and transcription
+    • Photo and document attachments
+    • QR code scanning for quick logging
+
+    📊 ADVANCED ANALYTICS
+    • Beautiful visualizations and charts
+    • Productivity trends and patterns
+    • Goal setting and progress tracking
+    • Custom reports and exports
+    • Performance insights and recommendations
+    • Time allocation analysis
+
+    👥 TEAM COLLABORATION
+    • Share logs with team members
+    • Real-time collaboration features
+    • Team analytics and dashboards
+    • Project tracking and management
+    • Role-based access control
+    • Integration with popular workflow tools
+
+    🔧 POWERFUL INTEGRATIONS
+    • Calendar sync (Google, Outlook, Apple)
+    • Task management tools (Asana, Trello, Notion)
+    • Communication platforms (Slack, Teams)
+    • File storage services (Drive, Dropbox, OneDrive)
+    • Time tracking tools (Toggl, RescueTime)
+    • CRM systems (Salesforce, HubSpot)
+
+    ⚡ SMART FEATURES
+    • AI-powered activity suggestions
+    • Automatic categorization and tagging
+    • Smart reminders and notifications
+    • Offline mode with sync
+    • Dark mode support
+    • Cross-platform synchronization
+
+    🛡️ PRIVACY & SECURITY
+    • End-to-end encryption
+    • GDPR and CCPA compliant
+    • Biometric authentication
+    • Local data storage options
+    • Zero-knowledge architecture
+    • SOC 2 Type II certified
+
+    💎 PREMIUM FEATURES
+    • Unlimited log entries
+    • Advanced analytics and reporting
+    • Team collaboration tools
+    • Priority customer support
+    • Custom integrations
+    • White-label options
+
+    Perfect for:
+    • Consultants and freelancers
+    • Project managers and team leads
+    • Sales professionals
+    • Healthcare workers
+    • Researchers and analysts
+    • Students and educators
+    • Remote workers
+    • Anyone who wants to optimize their productivity
+
+    Start your productivity journey today with ActiveLog!
+
+  whats_new: |
+    🎉 Welcome to ActiveLog 1.0!
+
+    ✨ Brand new features:
+    • Beautiful Material Design 3 interface
+    • Voice recording with AI transcription
+    • Smart activity suggestions
+    • Real-time team collaboration
+    • Advanced analytics dashboard
+    • Cross-platform synchronization
+
+    🚀 Performance improvements:
+    • 50% faster app startup
+    • Optimized battery usage
+    • Improved offline capabilities
+    • Enhanced data synchronization
+
+    🛡️ Security enhancements:
+    • Biometric authentication
+    • End-to-end encryption
+    • Enhanced privacy controls
+
+    We're excited to help you transform your productivity!
+
+# Keywords for app store search
+keywords:
+  primary: ["productivity", "logging", "tracking", "analytics", "time management"]
+  secondary: ["team collaboration", "project management", "activity tracker", "work log", "professional tools"]
+  long_tail: ["daily activity logging", "productivity analytics", "team performance tracking", "professional activity tracker"]
+
+# App Store Connect metadata
+app_store_connect:
+  developer_name: "ActiveLog Technologies"
+  support_url: "https://activelog.com/support"
+  marketing_url: "https://activelog.com"
+  privacy_policy_url: "https://activelog.com/privacy"
+  copyright: "© 2024 ActiveLog Technologies. All rights reserved."
+  
+  # Localization
+  locales:
+    - language: "en-US"
+      territory: "US"
+    - language: "es-ES" 
+      territory: "ES"
+    - language: "fr-FR"
+      territory: "FR"
+    - language: "de-DE"
+      territory: "DE"
+    - language: "ja-JP"
+      territory: "JP"
+    - language: "ko-KR"
+      territory: "KR"
+    - language: "zh-CN"
+      territory: "CN"
+
+# Google Play Store specific
+google_play:
+  developer_name: "ActiveLog Technologies"
+  contact_email: "support@activelog.com"
+  contact_phone: "+1-555-ACTIVELOG"
+  website: "https://activelog.com"
+  privacy_policy: "https://activelog.com/privacy"
+  
+  # Content rating questionnaire answers
+  content_rating:
+    violence: "none"
+    blood: "none"
+    sexual_content: "none"
+    profanity: "none"
+    drugs_alcohol: "none"
+    gambling: "none"
+    horror: "none"
+    
+# Screenshots configuration
+screenshots:
+  required_sizes:
+    ios:
+      - "6.7_inch_display"  # iPhone 14 Pro Max
+      - "6.1_inch_display"  # iPhone 14 Pro
+      - "5.5_inch_display"  # iPhone 8 Plus
+      - "12.9_inch_display" # iPad Pro 12.9"
+      - "11_inch_display"   # iPad Pro 11"
+    android:
+      - "phone_portrait"
+      - "phone_landscape" 
+      - "7_inch_tablet"
+      - "10_inch_tablet"
+  
+  scenes:
+    - name: "onboarding"
+      title: "Welcome to ActiveLog"
+      description: "Beautiful, intuitive interface for professional activity tracking"
+      
+    - name: "activity_logging"
+      title: "Log Any Activity"
+      description: "Quick and easy activity logging with voice, photo, and location support"
+      
+    - name: "analytics_dashboard"
+      title: "Powerful Analytics"
+      description: "Gain insights into your productivity with beautiful charts and reports"
+      
+    - name: "team_collaboration"
+      title: "Team Collaboration"
+      description: "Share logs and collaborate with your team in real-time"
+      
+    - name: "integrations"
+      title: "Seamless Integrations"
+      description: "Connect with your favorite tools and platforms"
+
+# App review guidelines compliance
+compliance:
+  data_collection:
+    personal_info: true
+    usage_analytics: true
+    crash_reports: true
+    user_content: true
+    
+  permissions_required:
+    camera: "Photo attachments and QR code scanning"
+    microphone: "Voice memo recording"
+    location: "Location-based activity logging"
+    photos: "Image attachments for logs"
+    calendar: "Calendar integration and sync"
+    contacts: "Team member sharing"
+    
+  age_rating:
+    ios: "4+"
+    android: "Everyone"
+    
+# Marketing assets
+marketing:
+  app_icon_variants:
+    - "standard"
+    - "dark_mode"
+    - "holiday_themed"
+  
+  promotional_text: "Transform your productivity with intelligent activity logging and powerful analytics."
+  
+  feature_graphic_text: "Professional Activity Tracking • Team Collaboration • Advanced Analytics"

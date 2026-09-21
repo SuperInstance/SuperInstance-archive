@@ -1,0 +1,493 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traffic-routing-rules
+  namespace: activelog
+data:
+  envoy-routing.yaml: |
+    # Dynamic routing configuration for Envoy
+    route_config:
+      name: activelog_routes
+      virtual_hosts:
+      - name: api_routes
+        domains: ["*"]
+        routes:
+        
+        # Header-based routing for canary testing
+        - match:
+            prefix: "/api/"
+            headers:
+            - name: "x-canary"
+              exact_match: "true"
+          route:
+            cluster: api-gateway-canary-cluster
+            timeout: 30s
+          decorator:
+            operation: canary_api_request
+        
+        # User-based routing for beta users
+        - match:
+            prefix: "/api/"
+            headers:
+            - name: "x-user-type"
+              exact_match: "beta"
+          route:
+            cluster: api-gateway-canary-cluster
+            timeout: 30s
+          decorator:
+            operation: beta_user_request
+        
+        # Geographic routing
+        - match:
+            prefix: "/api/"
+            headers:
+            - name: "x-region"
+              exact_match: "us-west"
+          route:
+            weighted_clusters:
+              clusters:
+              - name: api-gateway-stable-cluster
+                weight: 80
+              - name: api-gateway-canary-cluster
+                weight: 20
+            timeout: 30s
+          decorator:
+            operation: geo_us_west_request
+        
+        # Feature flag routing
+        - match:
+            prefix: "/api/v2/"
+            headers:
+            - name: "x-feature-flag"
+              exact_match: "new-ui"
+          route:
+            cluster: api-gateway-canary-cluster
+            timeout: 30s
+          decorator:
+            operation: feature_flag_request
+        
+        # A/B testing routing based on session
+        - match:
+            prefix: "/api/"
+            headers:
+            - name: "x-ab-test"
+              safe_regex_match:
+                google_re2: {}
+                regex: ".*[13579]$"  # Route odd session IDs to canary
+          route:
+            cluster: api-gateway-canary-cluster
+            timeout: 30s
+          decorator:
+            operation: ab_test_variant_a
+        
+        # Version-specific routing
+        - match:
+            prefix: "/api/v1/"
+          route:
+            cluster: api-gateway-stable-cluster
+            timeout: 30s
+          decorator:
+            operation: api_v1_request
+        
+        - match:
+            prefix: "/api/v2/"
+          route:
+            cluster: api-gateway-canary-cluster
+            timeout: 30s
+          decorator:
+            operation: api_v2_request
+        
+        # GraphQL routing with complexity-based routing
+        - match:
+            prefix: "/graphql"
+            headers:
+            - name: "content-type"
+              exact_match: "application/json"
+          route:
+            # Route complex queries to more powerful instances
+            weighted_clusters:
+              clusters:
+              - name: graphql-service-stable-cluster
+                weight: 70
+                request_headers_to_add:
+                - header:
+                    key: "x-routing-tier"
+                    value: "standard"
+                  append: false
+              - name: graphql-service-canary-cluster
+                weight: 30
+                request_headers_to_add:
+                - header:
+                    key: "x-routing-tier"
+                    value: "canary"
+                  append: false
+            timeout: 60s
+          decorator:
+            operation: graphql_request
+        
+        # Mobile API routing with device-based routing
+        - match:
+            prefix: "/mobile/"
+            headers:
+            - name: "user-agent"
+              safe_regex_match:
+                google_re2: {}
+                regex: ".*iOS.*"
+          route:
+            cluster: mobile-api-stable-cluster
+            timeout: 20s
+            request_headers_to_add:
+            - header:
+                key: "x-device-type"
+                value: "ios"
+              append: false
+          decorator:
+            operation: mobile_ios_request
+        
+        - match:
+            prefix: "/mobile/"
+            headers:
+            - name: "user-agent"
+              safe_regex_match:
+                google_re2: {}
+                regex: ".*Android.*"
+          route:
+            cluster: mobile-api-stable-cluster
+            timeout: 20s
+            request_headers_to_add:
+            - header:
+                key: "x-device-type"
+                value: "android"
+              append: false
+          decorator:
+            operation: mobile_android_request
+        
+        # Auth service routing with security level
+        - match:
+            prefix: "/auth/admin"
+          route:
+            cluster: auth-service-stable-cluster
+            timeout: 15s
+            request_headers_to_add:
+            - header:
+                key: "x-auth-level"
+                value: "admin"
+              append: false
+          decorator:
+            operation: admin_auth_request
+        
+        - match:
+            prefix: "/auth/"
+          route:
+            weighted_clusters:
+              clusters:
+              - name: auth-service-stable-cluster
+                weight: 95
+              - name: auth-service-canary-cluster
+                weight: 5
+            timeout: 15s
+          decorator:
+            operation: standard_auth_request
+        
+        # File operations routing based on file size
+        - match:
+            prefix: "/files/upload"
+            headers:
+            - name: "content-length"
+              safe_regex_match:
+                google_re2: {}
+                regex: "^[0-9]{1,8}$"  # Files < 100MB
+          route:
+            cluster: file-processor-standard-cluster
+            timeout: 120s
+          decorator:
+            operation: small_file_upload
+        
+        - match:
+            prefix: "/files/upload"
+          route:
+            cluster: file-processor-large-cluster
+            timeout: 600s
+          decorator:
+            operation: large_file_upload
+        
+        # AI service routing based on model complexity
+        - match:
+            prefix: "/ai/simple"
+          route:
+            cluster: ai-orchestrator-light-cluster
+            timeout: 60s
+          decorator:
+            operation: simple_ai_request
+        
+        - match:
+            prefix: "/ai/complex"
+          route:
+            cluster: ai-orchestrator-heavy-cluster
+            timeout: 300s
+          decorator:
+            operation: complex_ai_request
+        
+        # Default routing with traffic splitting
+        - match:
+            prefix: "/"
+          route:
+            weighted_clusters:
+              clusters:
+              - name: api-gateway-stable-cluster
+                weight: 90
+              - name: api-gateway-canary-cluster
+                weight: 10
+            timeout: 30s
+          decorator:
+            operation: default_request
+
+  consul-routing.hcl: |
+    # Consul Connect routing configuration
+    Kind = "service-router"
+    Name = "api-gateway"
+    Routes = [
+      {
+        Match {
+          HTTP {
+            Header = [
+              {
+                Name = "x-canary"
+                Exact = "true"
+              }
+            ]
+          }
+        }
+        Destination {
+          Service = "api-gateway"
+          ServiceSubset = "canary"
+        }
+      },
+      {
+        Match {
+          HTTP {
+            Header = [
+              {
+                Name = "x-user-type"
+                Exact = "beta"
+              }
+            ]
+          }
+        }
+        Destination {
+          Service = "api-gateway"
+          ServiceSubset = "canary"
+        }
+      },
+      {
+        Match {
+          HTTP {
+            PathPrefix = "/api/v2/"
+          }
+        }
+        Destination {
+          Service = "api-gateway"
+          ServiceSubset = "canary"
+        }
+      },
+      {
+        Match {
+          HTTP {
+            PathPrefix = "/api/v1/"
+          }
+        }
+        Destination {
+          Service = "api-gateway"
+          ServiceSubset = "stable"
+        }
+      }
+    ]
+    
+    # Service splitter for weighted traffic distribution
+    Kind = "service-splitter"
+    Name = "api-gateway"
+    Splits = [
+      {
+        Weight = 90
+        Service = "api-gateway"
+        ServiceSubset = "stable"
+      },
+      {
+        Weight = 10
+        Service = "api-gateway"
+        ServiceSubset = "canary"
+      }
+    ]
+    
+    # Service resolver for subset definitions
+    Kind = "service-resolver"
+    Name = "api-gateway"
+    DefaultSubset = "stable"
+    Subsets = {
+      "stable" = {
+        Filter = "Service.Meta.version == stable"
+      }
+      "canary" = {
+        Filter = "Service.Meta.version == canary"
+      }
+      "blue" = {
+        Filter = "Service.Meta.deployment == blue"
+      }
+      "green" = {
+        Filter = "Service.Meta.deployment == green"
+      }
+    }
+    
+    # Load balancer configuration
+    LoadBalancer = {
+      Policy = "round_robin"
+      HashPolicies = [
+        {
+          Field = "header"
+          FieldValue = "x-session-id"
+          CookieConfig = {
+            TTL = "1h"
+          }
+        }
+      ]
+    }
+
+  fault-injection.yaml: |
+    # Fault injection rules for chaos engineering
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: fault-injection-config
+    data:
+      config.yaml: |
+        fault_injection:
+          # Delay injection
+          delay:
+            percentage: 0.1  # 0.1% of requests
+            fixed_delay: 5s
+            targets:
+              - service: "api-gateway"
+                paths: ["/api/slow-test"]
+              - service: "auth-service"
+                paths: ["/auth/login"]
+                percentage: 0.05
+          
+          # Abort injection
+          abort:
+            percentage: 0.05  # 0.05% of requests
+            http_status: 503
+            targets:
+              - service: "file-processor"
+                paths: ["/files/upload"]
+              - service: "ai-orchestrator"
+                paths: ["/ai/inference"]
+                percentage: 0.02
+          
+          # Rate limiting simulation
+          rate_limit:
+            requests_per_minute: 1000
+            targets:
+              - service: "api-gateway"
+                burst_size: 100
+              - service: "graphql-service"
+                requests_per_minute: 500
+                burst_size: 50
+
+  advanced-routing.yaml: |
+    # Advanced routing patterns
+    routing_patterns:
+      
+      # Circuit breaker routing
+      circuit_breaker_routing:
+        enabled: true
+        fallback_service: "api-gateway-fallback"
+        thresholds:
+          error_rate: 0.5
+          min_requests: 20
+          failure_percentage: 50
+      
+      # Retry routing with exponential backoff
+      retry_routing:
+        max_retries: 3
+        base_interval: 1s
+        max_interval: 10s
+        retry_on:
+          - "5xx"
+          - "gateway-error"
+          - "connect-failure"
+          - "refused-stream"
+      
+      # Timeout routing based on endpoint
+      timeout_routing:
+        rules:
+          - path_prefix: "/ai/"
+            timeout: 300s
+          - path_prefix: "/files/upload"
+            timeout: 120s
+          - path_prefix: "/graphql"
+            timeout: 60s
+          - path_prefix: "/auth/"
+            timeout: 15s
+          - default: 30s
+      
+      # Priority routing for different user tiers
+      priority_routing:
+        enabled: true
+        rules:
+          - headers:
+              x-user-tier: "premium"
+            priority: "high"
+            cluster: "premium-cluster"
+          - headers:
+              x-user-tier: "enterprise"
+            priority: "highest"
+            cluster: "enterprise-cluster"
+          - default:
+            priority: "normal"
+            cluster: "standard-cluster"
+      
+      # Content-based routing
+      content_routing:
+        rules:
+          - content_type: "application/json"
+            size_limit: "10MB"
+            cluster: "json-processor-cluster"
+          - content_type: "multipart/form-data"
+            cluster: "file-upload-cluster"
+          - content_type: "application/graphql"
+            cluster: "graphql-cluster"
+      
+      # Time-based routing
+      time_routing:
+        enabled: true
+        rules:
+          - time_range:
+              start: "02:00"
+              end: "06:00"
+              timezone: "UTC"
+            cluster: "maintenance-cluster"
+          - time_range:
+              start: "09:00"
+              end: "17:00"
+              timezone: "EST"
+            load_balancing: "peak_hours"
+            cluster: "high-capacity-cluster"
+      
+      # Gradual traffic shifting
+      gradual_shifting:
+        enabled: true
+        strategy: "linear"  # linear, exponential, custom
+        duration: "2h"
+        steps:
+          - percentage: 10
+            duration: "15m"
+          - percentage: 25
+            duration: "15m"
+          - percentage: 50
+            duration: "30m"
+          - percentage: 75
+            duration: "30m"
+          - percentage: 100
+            duration: "30m"
+        rollback_on_error: true
+        error_threshold: 0.05

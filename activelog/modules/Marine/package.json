@@ -1,0 +1,23 @@
+{
+  "name": "marine",
+  "version": "1.0.0",
+  "description": "OpenCPN integration, AIS tracking, and weather routing for marine navigation",
+  "main": "index.js",
+  "dependencies": {
+    "serialport": "^10.5.0",
+    "net": "^1.0.2",
+    "node-fetch": "^3.3.0",
+    "grib2-simple": "^1.0.2",
+    "ais-stream": "^2.1.0"
+  },
+  "keywords": [
+    "marine",
+    "navigation",
+    "opencpn",
+    "ais",
+    "weather",
+    "routing"
+  ],
+  "author": "ActiveLog",
+  "license": "MIT"
+}

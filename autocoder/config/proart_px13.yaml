@@ -1,0 +1,135 @@
+# AutoCoder Configuration for ProArt PX13
+# Optimized for RTX 4050 (6GB VRAM)
+
+hardware:
+  name: "ASUS ProArt PX13 HN7306WU"
+  gpu:
+    model: "RTX 4050"
+    vram_mb: 6141
+    max_temp_celsius: 80
+    power_limit_watts: 60
+  cpu:
+    model: "Ryzen AI 9 HX 370"
+    cores: 12
+    threads: 24
+  ram_gb: 32
+  is_laptop: true
+
+# Power management for laptop
+power:
+  battery_mode:
+    prefer_cloud: true
+    max_gpu_time_seconds: 10
+    disable_cpu_inference: true
+
+  plugged_mode:
+    prefer_local: true
+    allow_cpu_inference: true
+    gpu_power_limit: 60
+
+# Model providers
+providers:
+  ollama:
+    enabled: true
+    base_url: "http://localhost:11434"
+    models:
+      primary:
+        name: "qwen2.5-coder:7b-instruct-q4_K_M"
+        vram_mb: 4500
+        context_window: 32768
+        quality_score: 9
+        use_for:
+          - trivial
+          - simple
+          - moderate_fast
+
+      fallback:
+        name: "qwen2.5-coder:3b"
+        vram_mb: 2500
+        context_window: 32768
+        quality_score: 7
+        use_for:
+          - formatting
+          - quick_questions
+
+  claude:
+    enabled: true
+    models:
+      primary:
+        name: "claude-sonnet-4-5-20250929"
+        cost_input_per_1m: 3.00
+        cost_output_per_1m: 15.00
+        quality_score: 10
+        use_for:
+          - complex
+          - architecture
+          - security
+
+      fast:
+        name: "claude-3-5-haiku-20250219"
+        cost_input_per_1m: 0.80
+        cost_output_per_1m: 4.00
+        quality_score: 8
+        use_for:
+          - moderate_battery
+          - simple_fast
+
+# Task routing configuration
+routing:
+  strategy: "hybrid"  # classifier + power-aware
+
+  rules:
+    trivial:
+      description: "Format, comments, docstrings"
+      max_tokens: 500
+      primary_model: "ollama.primary"
+      fallback_model: "claude.fast"
+
+    simple:
+      description: "Basic functions, small bug fixes"
+      max_tokens: 2000
+      primary_model: "ollama.primary"
+      fallback_model: "claude.fast"
+
+    moderate:
+      description: "Features, tests, single-file refactor"
+      max_tokens: 10000
+      battery_model: "claude.fast"
+      plugged_model: "ollama.primary"
+      fallback_model: "claude.primary"
+
+    complex:
+      description: "Multi-file, architecture, security"
+      max_tokens: 50000
+      primary_model: "claude.primary"
+      no_fallback: true
+
+# Budget management
+budget:
+  daily_limit: 5.00
+  monthly_limit: 150.00
+  warning_threshold: 0.80
+  emergency_action: "use_local_only"
+
+# Thermal management
+thermal:
+  enabled: true
+  max_continuous_minutes: 30
+  cooldown_seconds: 60
+  throttle_temp: 80
+  emergency_shutdown_temp: 90
+
+# Caching configuration
+cache:
+  enabled: true
+  semantic_cache: true
+  exact_cache: true
+  max_size_gb: 10
+  ttl_seconds: 3600
+
+# Logging
+logging:
+  level: "INFO"
+  save_conversations: true
+  conversations_dir: "./logs"
+  max_log_size_mb: 100

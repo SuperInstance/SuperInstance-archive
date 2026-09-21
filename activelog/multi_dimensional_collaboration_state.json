@@ -1,0 +1,132 @@
+{
+  "active_collaborations": {
+    "collab_1756265250": {
+      "collaboration_id": "collab_1756265250",
+      "mode": "pipeline",
+      "task": "Deploy complete ActiveLog fitness domain with cross-domain analytics integration",
+      "participants": [
+        "infrastructure",
+        "services",
+        "domains"
+      ],
+      "started_at": "2025-08-26T19:27:30.288755",
+      "phases": [
+        {
+          "phase": "pipeline_design",
+          "duration": "5 minutes",
+          "activities": [
+            "stage_definition",
+            "handoff_protocols"
+          ],
+          "participants": "all",
+          "coordination": "design_session"
+        },
+        {
+          "phase": "sequential_processing",
+          "duration": "variable",
+          "activities": [
+            "stage_execution",
+            "value_addition",
+            "quality_gates"
+          ],
+          "participants": "staged",
+          "coordination": "handoff_points"
+        },
+        {
+          "phase": "final_assembly",
+          "duration": "5 minutes",
+          "activities": [
+            "final_integration",
+            "quality_validation"
+          ],
+          "participants": "all",
+          "coordination": "collaborative_review"
+        }
+      ],
+      "coordination_mechanisms": [
+        "handoff_validation",
+        "quality_gates",
+        "stage_completion_signals"
+      ],
+      "success_criteria": [
+        "task_completion",
+        "quality_standards_met",
+        "no_critical_issues",
+        "value_added_at_each_stage",
+        "smooth_handoffs"
+      ]
+    }
+  },
+  "collaboration_patterns": {
+    "parallel": {
+      "description": "Independent parallel work with coordination points",
+      "use_cases": [
+        "large_feature_development",
+        "multi_service_deployment"
+      ],
+      "coordination_frequency": "milestone_based",
+      "communication_overhead": "low",
+      "efficiency_multiplier": 2.8
+    },
+    "pipeline": {
+      "description": "Value-added sequential processing chain",
+      "use_cases": [
+        "data_transformation",
+        "progressive_enhancement"
+      ],
+      "coordination_frequency": "handoff_points",
+      "communication_overhead": "medium",
+      "efficiency_multiplier": 2.2
+    },
+    "swarm": {
+      "description": "Collective intelligence on complex problems",
+      "use_cases": [
+        "architecture_design",
+        "problem_solving"
+      ],
+      "coordination_frequency": "continuous",
+      "communication_overhead": "high",
+      "efficiency_multiplier": 3.5
+    },
+    "mesh": {
+      "description": "Dynamic peer-to-peer expertise sharing",
+      "use_cases": [
+        "cross_functional_tasks",
+        "knowledge_synthesis"
+      ],
+      "coordination_frequency": "as_needed",
+      "communication_overhead": "variable",
+      "efficiency_multiplier": 2.6
+    },
+    "hierarchical": {
+      "description": "Temporary specialized leadership structures",
+      "use_cases": [
+        "crisis_management",
+        "complex_coordination"
+      ],
+      "coordination_frequency": "directive_based",
+      "communication_overhead": "medium",
+      "efficiency_multiplier": 2.4
+    },
+    "competitive": {
+      "description": "Parallel solutions with best-option selection",
+      "use_cases": [
+        "algorithm_optimization",
+        "design_alternatives"
+      ],
+      "coordination_frequency": "evaluation_points",
+      "communication_overhead": "low",
+      "efficiency_multiplier": 2.1
+    },
+    "symbiotic": {
+      "description": "Mutually dependent specialized collaboration",
+      "use_cases": [
+        "integrated_systems",
+        "cross_domain_features"
+      ],
+      "coordination_frequency": "continuous",
+      "communication_overhead": "medium",
+      "efficiency_multiplier": 3.2
+    }
+  }
+}

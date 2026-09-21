@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FishingLog - Helm Layout</title>
+    <link rel="stylesheet" href="styles/marine-common.css">
+    <link rel="stylesheet" href="styles/helm-layout.css">
+</head>
+<body class="marine-interface helm-layout">
+    <div class="layout-container">
+        <!-- Main Chart Display -->
+        <div class="chart-main" id="chartMain">
+            <div class="chart-header">
+                <h2>Electronic Chart - Helm Control</h2>
+                <div class="chart-controls">
+                    <button class="btn-chart" id="zoomIn">+</button>
+                    <button class="btn-chart" id="zoomOut">-</button>
+                    <button class="btn-chart" id="centerVessel">📍</button>
+                    <select id="chartType">
+                        <option value="nautical">Nautical Chart</option>
+                        <option value="satellite">Satellite</option>
+                        <option value="hybrid">Hybrid</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-display" id="chartCanvas">
+                <div class="vessel-position">
+                    <div class="vessel-icon">🚢</div>
+                    <div class="course-line"></div>
+                </div>
+                <div class="chart-overlay">
+                    <div class="depth-contours"></div>
+                    <div class="navigation-aids"></div>
+                    <div class="hazards"></div>
+                </div>
+            </div>
+            <div class="chart-info">
+                <span class="coordinates">LAT: 41°24.123'N LON: 71°51.456'W</span>
+                <span class="chart-datum">WGS84 - Scale 1:25000</span>
+            </div>
+        </div>
+
+        <!-- Instrument Cluster -->
+        <div class="instruments-panel" id="instrumentsPanel">
+            <div class="panel-header">
+                <h3>Navigation Instruments</h3>
+                <button class="panel-toggle" id="toggleInstruments">⚙️</button>
+            </div>
+            
+            <!-- Primary Navigation -->
+            <div class="instrument-group primary-nav">
+                <div class="instrument compass">
+                    <div class="instrument-label">COMPASS</div>
+                    <div class="compass-rose">
+                        <div class="compass-needle" style="transform: rotate(285deg);"></div>
+                        <div class="compass-heading">285°</div>
+                    </div>
+                </div>
+                
+                <div class="instrument speed">
+                    <div class="instrument-label">SPEED</div>
+                    <div class="speed-display">
+                        <div class="speed-value">8.2</div>
+                        <div class="speed-unit">kts</div>
+                    </div>
+                    <div class="speed-trend">↗️</div>
+                </div>
+                
+                <div class="instrument depth">
+                    <div class="instrument-label">DEPTH</div>
+                    <div class="depth-display">
+                        <div class="depth-value">24.6</div>
+                        <div class="depth-unit">ft</div>
+                    </div>
+                    <div class="depth-alarm" id="depthAlarm">🔔</div>
+                </div>
+            </div>
+
+            <!-- Engine & Systems -->
+            <div class="instrument-group engine-systems">
+                <div class="instrument engine-rpm">
+                    <div class="instrument-label">ENGINE RPM</div>
+                    <div class="rpm-gauge">
+                        <div class="rpm-needle" style="transform: rotate(120deg);"></div>
+                        <div class="rpm-value">2100</div>
+                    </div>
+                </div>
+                
+                <div class="instrument fuel">
+                    <div class="instrument-label">FUEL</div>
+                    <div class="fuel-gauge">
+                        <div class="fuel-bar" style="width: 75%;"></div>
+                        <div class="fuel-value">75%</div>
+                    </div>
+                    <div class="fuel-range">Range: 180nm</div>
+                </div>
+                
+                <div class="instrument battery">
+                    <div class="instrument-label">BATTERY</div>
+                    <div class="battery-voltage">12.8V</div>
+                    <div class="battery-status charging">🔋</div>
+                </div>
+            </div>
+
+            <!-- Environmental -->
+            <div class="instrument-group environmental">
+                <div class="instrument wind">
+                    <div class="instrument-label">WIND</div>
+                    <div class="wind-rose">
+                        <div class="wind-arrow" style="transform: rotate(45deg);"></div>
+                        <div class="wind-speed">12 kts</div>
+                        <div class="wind-direction">NE</div>
+                    </div>
+                </div>
+                
+                <div class="instrument water-temp">
+                    <div class="instrument-label">WATER TEMP</div>
+                    <div class="temp-value">68°F</div>
+                </div>
+                
+                <div class="instrument time">
+                    <div class="instrument-label">TIME</div>
+                    <div class="time-display">
+                        <div class="local-time">14:23:45</div>
+                        <div class="utc-time">UTC 18:23:45</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Radar Display -->
+        <div class="radar-panel" id="radarPanel">
+            <div class="panel-header">
+                <h3>Radar Display</h3>
+                <div class="radar-controls">
+                    <select id="radarRange">
+                        <option value="0.5">0.5nm</option>
+                        <option value="1">1nm</option>
+                        <option value="2" selected>2nm</option>
+                        <option value="4">4nm</option>
+                        <option value="8">8nm</option>
+                        <option value="16">16nm</option>
+                    </select>
+                    <button class="btn-radar" id="radarGain">GAIN</button>
+                    <button class="btn-radar" id="radarClutter">CLUTTER</button>
+                </div>
+            </div>
+            
+            <div class="radar-screen">
+                <div class="radar-sweep" id="radarSweep"></div>
+                <div class="radar-rings">
+                    <div class="range-ring" data-range="0.5"></div>
+                    <div class="range-ring" data-range="1.0"></div>
+                    <div class="range-ring" data-range="1.5"></div>
+                    <div class="range-ring" data-range="2.0"></div>
+                </div>
+                <div class="radar-targets">
+                    <div class="target" style="top: 30%; left: 70%;" data-target="vessel">🚢</div>
+                    <div class="target" style="top: 45%; left: 40%;" data-target="buoy">⚓</div>
+                </div>
+                <div class="radar-center">
+                    <div class="own-ship">⊕</div>
+                </div>
+            </div>
+            
+            <div class="radar-info">
+                <div class="radar-status">
+                    <span class="status-indicator active">TX</span>
+                    <span class="range-display">2.0 NM</span>
+                    <span class="bearing-mode">REL</span>
+                </div>
+                <div class="target-info" id="targetInfo">
+                    Target: CPA 0.3nm in 8min
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions" id="quickActions">
+            <button class="action-btn emergency" id="emergencyBtn">🚨 EMERGENCY</button>
+            <button class="action-btn autopilot" id="autopilotBtn">🎯 AUTOPILOT</button>
+            <button class="action-btn anchor" id="anchorBtn">⚓ ANCHOR</button>
+            <button class="action-btn lights" id="lightsBtn">💡 LIGHTS</button>
+            <button class="action-btn horn" id="hornBtn">📯 HORN</button>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-label">GPS:</span>
+                <span class="status-value good">FIXED</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">AIS:</span>
+                <span class="status-value good">TX/RX</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">VHF:</span>
+                <span class="status-value">CH 16</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Weather:</span>
+                <span class="status-value">Fair</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Tide:</span>
+                <span class="status-value">Rising +2.1ft</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div class="modal hidden" id="alertModal">
+        <div class="modal-content">
+            <h3 id="alertTitle">Navigation Alert</h3>
+            <p id="alertMessage">Shallow water ahead - depth 8.2ft</p>
+            <div class="modal-actions">
+                <button class="btn-primary" id="alertAcknowledge">Acknowledge</button>
+                <button class="btn-secondary" id="alertDismiss">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/marine-common.js"></script>
+    <script src="scripts/helm-layout.js"></script>
+</body>
+</html>

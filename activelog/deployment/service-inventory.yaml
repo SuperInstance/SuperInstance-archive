@@ -1,0 +1,536 @@
+# ActiveLog Services Inventory
+# Complete list of all 67+ microservices in the platform
+
+services:
+  # Core Infrastructure Services
+  - name: api-gateway
+    type: gateway
+    port: 8000
+    replicas: 3
+    resources:
+      cpu: 500m
+      memory: 512Mi
+    
+  - name: auth
+    type: authentication
+    port: 8001
+    replicas: 2
+    resources:
+      cpu: 200m
+      memory: 256Mi
+    
+  - name: graphql
+    type: api
+    port: 8002
+    replicas: 2
+    resources:
+      cpu: 300m
+      memory: 512Mi
+
+  # Data Management Services
+  - name: data-manager
+    type: data
+    port: 8010
+    replicas: 2
+    resources:
+      cpu: 400m
+      memory: 1Gi
+    
+  - name: data-export
+    type: data
+    port: 8011
+    replicas: 1
+    resources:
+      cpu: 300m
+      memory: 512Mi
+    
+  - name: batch-import
+    type: data
+    port: 8012
+    replicas: 1
+    resources:
+      cpu: 400m
+      memory: 1Gi
+    
+  - name: metadata
+    type: data
+    port: 8013
+    replicas: 2
+    resources:
+      cpu: 200m
+      memory: 256Mi
+    
+  - name: file-processor
+    type: processing
+    port: 8014
+    replicas: 2
+    resources:
+      cpu: 600m
+      memory: 1Gi
+
+  # Synchronization Services
+  - name: sync-engine
+    type: sync
+    port: 8020
+    replicas: 3
+    resources:
+      cpu: 400m
+      memory: 512Mi
+    
+  - name: sync-v2
+    type: sync
+    port: 8021
+    replicas: 3
+    resources:
+      cpu: 500m
+      memory: 768Mi
+    
+  - name: file-sync
+    type: sync
+    port: 8022
+    replicas: 2
+    resources:
+      cpu: 300m
+      memory: 512Mi
+    
+  - name: p2p-sync
+    type: sync
+    port: 8023
+    replicas: 2
+    resources:
+      cpu: 400m
+      memory: 512Mi
+    
+  - name: file-watcher
+    type: monitoring
+    port: 8024
+    replicas: 2
+    resources:
+      cpu: 200m
+      memory: 256Mi
+
+  # AI and ML Services
+  - name: ai-orchestrator
+    type: ai
+    port: 8030
+    replicas: 2
+    resources:
+      cpu: 1000m
+      memory: 2Gi
+      gpu: 1
+    
+  - name: ai-tools
+    type: ai
+    port: 8031
+    replicas: 2
+    resources:
+      cpu: 800m
+      memory: 1Gi
+    
+  - name: ml-pipeline
+    type: ml
+    port: 8032
+    replicas: 2
+    resources:
+      cpu: 1000m
+      memory: 2Gi
+      gpu: 1
+    
+  - name: predictive
+    type: ml
+    port: 8033
+    replicas: 1
+    resources:
+      cpu: 800m
+      memory: 1Gi
+    
+  - name: predictive-ai
+    type: ml
+    port: 8034
+    replicas: 1
+    resources:
+      cpu: 800m
+      memory: 1Gi
+    
+  - name: document-ai
+    type: ai
+    port: 8035
+    replicas: 1
+    resources:
+      cpu: 600m
+      memory: 1Gi
+    
+  - name: emotional-ai
+    type: ai
+    port: 8036
+    replicas: 1
+    resources:
+      cpu: 400m
+      memory: 768Mi
+    
+  - name: education-ai
+    type: ai
+    port: 8037
+    replicas: 1
+    resources:
+      cpu: 400m
+      memory: 768Mi
+    
+  - name: cognitive
+    type: ai
+    port: 8038
+    replicas: 1
+    resources:
+      cpu: 600m
+      memory: 1Gi
+    
+  - name: social-ai
+    type: ai
+    port: 8039
+    replicas: 1
+    resources:
+      cpu: 400m
+      memory: 512Mi
+
+  # Video and Media Services
+  - name: video-pipeline
+    type: media
+    port: 8040
+    replicas: 2
+    resources:
+      cpu: 1200m
+      memory: 2Gi
+      gpu: 1
+    
+  - name: video-processor
+    type: media
+    port: 8041
+    replicas: 2
+    resources:
+      cpu: 1000m
+      memory: 1Gi
+    
+  - name: creative-suite
+    type: media
+    port: 8042
+    replicas: 1
+    resources:
+      cpu: 800m
+      memory: 1Gi
+
+  # Quantum and Advanced Computing
+  - name: quantum-ready
+    type: quantum
+    port: 8050
+    replicas: 1
+    resources:
+      cpu: 400m
+      memory: 512Mi
+    
+  - name: quantum-reality
+    type: quantum
+    port: 8051
+    replicas: 1
+    resources:
+      cpu: 400m
+      memory: 512Mi
+    
+  - name: simulation
+    type: computing
+    port: 8052
+    replicas: 1
+    resources:
+      cpu: 800m
+      memory: 1Gi
+
+  # Collaboration and Communication
+  - name: collaboration
+    type: collaboration
+    port: 8060
+    replicas: 2
+    resources:
+      cpu: 300m
+      memory: 512Mi
+    
+  - name: notification
+    type: communication
+    port: 8061
+    replicas: 2
+    resources:
+      cpu: 200m
+      memory: 256Mi
+    
+  - name: notifications
+    type: communication
+    port: 8062
+    replicas: 2
+    resources:
+      cpu: 200m
+      memory: 256Mi
+    
+  - name: universal-translator
+    type: communication
+    port: 8063
+    replicas: 1
+    resources:
+      cpu: 400m
+      memory: 768Mi
+
+  # Gaming and Entertainment
+  - name: gaming-platform
+    type: gaming
+    port: 8070
+    replicas: 2
+    resources:
+      cpu: 600m
+      memory: 1Gi
+    
+  - name: dmlog-core
+    type: gaming
+    port: 8071
+    replicas: 1
+    resources:
+      cpu: 300m
+      memory: 512Mi
+    
+  - name: dmlog-characters
+    type: gaming
+    port: 8072
+    replicas: 1
+    resources:
+      cpu: 200m
+      memory: 256Mi
+    
+  - name: dmlog-battle
+    type: gaming
+    port: 8073
+    replicas: 1
+    resources:
+      cpu: 300m
+      memory: 512Mi
+    
+  - name: dmlog-session
+    type: gaming
+    port: 8074
+    replicas: 1
+    resources:
+      cpu: 200m
+      memory: 256Mi
+    
+  - name: dmlog-world
+    type: gaming
+    port: 8075
+    replicas: 1
+    resources:
+      cpu: 300m
+      memory: 512Mi
+    
+  - name: dmlog-marketplace
+    type: gaming
+    port: 8076
+    replicas: 1
+    resources:
+      cpu: 200m
+      memory: 256Mi
+    
+  - name: dmlog-ai-dm
+    type: gaming
+    port: 8077
+    replicas: 1
+    resources:
+      cpu: 400m
+      memory: 768Mi
+    
+  - name: dmlog-player
+    type: gaming
+    port: 8078
+    replicas: 1
+    resources:
+      cpu: 200m
+      memory: 256Mi
+    
+  - name: dmlog-templates
+    type: gaming
+    port: 8079
+    replicas: 1
+    resources:
+      cpu: 100m
+      memory: 128Mi
+    
+  - name: dmlog-converter
+    type: gaming
+    port: 8080
+    replicas: 1
+    resources:
+      cpu: 200m
+      memory: 256Mi
+
+  # Infrastructure and Support Services
+  - name: cache
+    type: infrastructure
+    port: 8090
+    replicas: 3
+    resources:
+      cpu: 200m
+      memory: 512Mi
+    
+  - name: backup
+    type: infrastructure
+    port: 8091
+    replicas: 1
+    resources:
+      cpu: 300m
+      memory: 512Mi
+    
+  - name: analytics
+    type: analytics
+    port: 8092
+    replicas: 2
+    resources:
+      cpu: 400m
+      memory: 768Mi
+    
+  - name: workflows
+    type: orchestration
+    port: 8093
+    replicas: 2
+    resources:
+      cpu: 300m
+      memory: 512Mi
+    
+  - name: smart-folders
+    type: organization
+    port: 8094
+    replicas: 1
+    resources:
+      cpu: 200m
+      memory: 256Mi
+    
+  - name: time-machine
+    type: versioning
+    port: 8095
+    replicas: 1
+    resources:
+      cpu: 300m
+      memory: 512Mi
+    
+  - name: memory-preservation
+    type: storage
+    port: 8096
+    replicas: 1
+    resources:
+      cpu: 200m
+      memory: 256Mi
+
+  # Specialized Industry Services
+  - name: manufacturing
+    type: industry
+    port: 8100
+    replicas: 1
+    resources:
+      cpu: 400m
+      memory: 512Mi
+    
+  - name: biological
+    type: industry
+    port: 8101
+    replicas: 1
+    resources:
+      cpu: 400m
+      memory: 512Mi
+    
+  - name: marine-advanced
+    type: industry
+    port: 8102
+    replicas: 1
+    resources:
+      cpu: 400m
+      memory: 512Mi
+    
+  - name: health-integration
+    type: industry
+    port: 8103
+    replicas: 1
+    resources:
+      cpu: 300m
+      memory: 512Mi
+
+  # AR/VR and Extended Reality
+  - name: ar-layer
+    type: xr
+    port: 8110
+    replicas: 1
+    resources:
+      cpu: 600m
+      memory: 1Gi
+    
+  - name: multiverse
+    type: xr
+    port: 8111
+    replicas: 1
+    resources:
+      cpu: 800m
+      memory: 1Gi
+
+  # Security and Blockchain
+  - name: security-advanced
+    type: security
+    port: 8120
+    replicas: 2
+    resources:
+      cpu: 300m
+      memory: 512Mi
+    
+  - name: blockchain
+    type: blockchain
+    port: 8121
+    replicas: 1
+    resources:
+      cpu: 400m
+      memory: 768Mi
+    
+  - name: activeledger
+    type: blockchain
+    port: 8122
+    replicas: 1
+    resources:
+      cpu: 400m
+      memory: 768Mi
+
+  # Integration and Mobile
+  - name: integration-hub
+    type: integration
+    port: 8130
+    replicas: 2
+    resources:
+      cpu: 300m
+      memory: 512Mi
+    
+  - name: mobile-api
+    type: api
+    port: 8131
+    replicas: 2
+    resources:
+      cpu: 400m
+      memory: 512Mi
+
+  # Environmental and Context Services
+  - name: ambient
+    type: contextual
+    port: 8140
+    replicas: 1
+    resources:
+      cpu: 200m
+      memory: 256Mi
+    
+  - name: ads
+    type: advertising
+    port: 8141
+    replicas: 1
+    resources:
+      cpu: 200m
+      memory: 256Mi
+
+# Total: 67 microservices
+# Port range: 8000-8150
+# Resource requirements vary by service type and complexity

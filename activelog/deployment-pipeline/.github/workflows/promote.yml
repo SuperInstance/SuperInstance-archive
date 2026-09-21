@@ -1,0 +1,307 @@
+name: DMLog Environment Promotion
+
+on:
+  workflow_dispatch:
+    inputs:
+      from_environment:
+        description: 'Source environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      to_environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      version:
+        description: 'Version to promote (leave empty for latest from source)'
+        required: false
+        type: string
+      services:
+        description: 'Services to promote (comma-separated, or "all")'
+        required: false
+        default: 'all'
+        type: string
+      skip_tests:
+        description: 'Skip integration tests'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  validate-promotion:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.parse.outputs.services }}
+      source_version: ${{ steps.version.outputs.version }}
+      valid_promotion: ${{ steps.validate.outputs.valid }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate promotion path
+        id: validate
+        run: |
+          FROM="${{ github.event.inputs.from_environment }}"
+          TO="${{ github.event.inputs.to_environment }}"
+          
+          # Prevent invalid promotion paths
+          if [ "$FROM" = "$TO" ]; then
+            echo "valid=false" >> $GITHUB_OUTPUT
+            echo "❌ Cannot promote from $FROM to $TO (same environment)"
+            exit 1
+          fi
+          
+          # Only allow staging -> production for security
+          if [ "$TO" = "production" ] && [ "$FROM" != "staging" ]; then
+            echo "valid=false" >> $GITHUB_OUTPUT
+            echo "❌ Production deployments must come from staging"
+            exit 1
+          fi
+          
+          echo "valid=true" >> $GITHUB_OUTPUT
+          echo "✅ Valid promotion: $FROM -> $TO"
+
+      - name: Parse services
+        id: parse
+        run: |
+          if [ "${{ github.event.inputs.services }}" = "all" ]; then
+            echo "services=[\"dmlog-gamedev\",\"dmlog-integration\",\"frontend-dmlog-final\",\"data-orchestrator\"]" >> $GITHUB_OUTPUT
+          else
+            services=$(echo "${{ github.event.inputs.services }}" | jq -Rc 'split(",") | map(gsub(" ";""))')
+            echo "services=$services" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Determine source version
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+            echo "Using specified version: $VERSION"
+          else
+            # Get the currently deployed version from source environment
+            FROM_ENV="${{ github.event.inputs.from_environment }}"
+            VERSION=$(kubectl get deployment dmlog-integration -n $FROM_ENV -o jsonpath='{.spec.template.spec.containers[0].image}' | cut -d':' -f2)
+            echo "Using current $FROM_ENV version: $VERSION"
+          fi
+          
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Setup Kubernetes
+        uses: azure/setup-kubectl@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
+      - name: Verify source deployment
+        run: |
+          FROM_ENV="${{ github.event.inputs.from_environment }}"
+          aws eks update-kubeconfig --region us-west-2 --name dmlog-$FROM_ENV
+          
+          SERVICES='${{ steps.parse.outputs.services }}'
+          echo "$SERVICES" | jq -r '.[]' | while read service; do
+            if kubectl get deployment $service -n $FROM_ENV >/dev/null 2>&1; then
+              echo "✅ $service is deployed in $FROM_ENV"
+            else
+              echo "❌ $service not found in $FROM_ENV"
+              exit 1
+            fi
+          done
+
+  promote-to-staging:
+    needs: validate-promotion
+    runs-on: ubuntu-latest
+    if: |
+      needs.validate-promotion.outputs.valid_promotion == 'true' && 
+      github.event.inputs.to_environment == 'staging'
+    environment: staging
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Kubernetes
+        uses: azure/setup-kubectl@v3
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region us-west-2 --name dmlog-staging
+
+      - name: Create backup
+        run: |
+          cd kubernetes
+          ./scripts/create-backup.sh staging promotion
+
+      - name: Deploy promoted services
+        run: |
+          cd kubernetes
+          SERVICES='${{ needs.validate-promotion.outputs.services }}'
+          VERSION='${{ needs.validate-promotion.outputs.source_version }}'
+          
+          echo "$SERVICES" | jq -r '.[]' | while read service; do
+            echo "Promoting $service version $VERSION to staging"
+            ./scripts/deploy-service.sh staging $service $VERSION
+          done
+
+      - name: Run integration tests
+        if: github.event.inputs.skip_tests != 'true'
+        run: |
+          cd scripts
+          ./run-integration-tests.sh staging --promotion-verification
+
+      - name: Update promotion tracking
+        run: |
+          cd scripts
+          ./track-promotion.sh '${{ github.event.inputs.from_environment }}' staging '${{ needs.validate-promotion.outputs.source_version }}'
+
+  promote-to-production:
+    needs: validate-promotion
+    runs-on: ubuntu-latest
+    if: |
+      needs.validate-promotion.outputs.valid_promotion == 'true' && 
+      github.event.inputs.to_environment == 'production'
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Kubernetes
+        uses: azure/setup-kubectl@v3
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region us-west-2 --name dmlog-production
+
+      - name: Production promotion notice
+        run: |
+          echo "🚀 PRODUCTION PROMOTION INITIATED"
+          echo "From: ${{ github.event.inputs.from_environment }}"
+          echo "To: production"
+          echo "Version: ${{ needs.validate-promotion.outputs.source_version }}"
+          echo "Services: ${{ github.event.inputs.services }}"
+
+      - name: Verify staging tests
+        if: github.event.inputs.skip_tests != 'true'
+        run: |
+          # Verify that staging tests passed for this version
+          cd scripts
+          ./verify-staging-tests.sh '${{ needs.validate-promotion.outputs.source_version }}'
+
+      - name: Create production backup
+        run: |
+          cd kubernetes
+          ./scripts/create-backup.sh production promotion
+
+      - name: Canary deployment
+        run: |
+          cd kubernetes
+          SERVICES='${{ needs.validate-promotion.outputs.services }}'
+          VERSION='${{ needs.validate-promotion.outputs.source_version }}'
+          
+          echo "$SERVICES" | jq -r '.[]' | while read service; do
+            echo "Starting canary deployment for $service"
+            ./scripts/canary-deploy.sh production $service $VERSION
+          done
+
+      - name: Monitor canary metrics
+        run: |
+          cd scripts
+          ./monitor-canary.sh production 300 # Monitor for 5 minutes
+
+      - name: Blue-green promotion
+        run: |
+          cd kubernetes
+          SERVICES='${{ needs.validate-promotion.outputs.services }}'
+          VERSION='${{ needs.validate-promotion.outputs.source_version }}'
+          
+          echo "$SERVICES" | jq -r '.[]' | while read service; do
+            echo "Blue-green promotion for $service"
+            ./scripts/blue-green-promote.sh production $service $VERSION
+          done
+
+      - name: Production smoke tests
+        run: |
+          cd scripts
+          ./run-smoke-tests.sh production --promotion-verification
+
+      - name: Complete traffic switch
+        run: |
+          cd kubernetes
+          ./scripts/complete-promotion.sh production
+
+      - name: Update monitoring and alerting
+        run: |
+          cd scripts
+          ./update-monitoring.sh production promotion '${{ needs.validate-promotion.outputs.source_version }}'
+
+      - name: Update promotion tracking
+        run: |
+          cd scripts
+          ./track-promotion.sh '${{ github.event.inputs.from_environment }}' production '${{ needs.validate-promotion.outputs.source_version }}'
+
+  notification:
+    needs: [validate-promotion, promote-to-staging, promote-to-production]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Promotion notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          message: |
+            🔄 Environment Promotion ${{ contains(needs.*.result, 'failure') && 'FAILED' || 'COMPLETED' }}
+            
+            From: ${{ github.event.inputs.from_environment }}
+            To: ${{ github.event.inputs.to_environment }}
+            Version: ${{ needs.validate-promotion.outputs.source_version }}
+            Services: ${{ github.event.inputs.services }}
+            Initiated by: ${{ github.actor }}
+            
+            ${{ github.event.inputs.to_environment == 'production' && '🎉 Production deployment successful!' || '' }}
+
+      - name: Update deployment dashboard
+        run: |
+          curl -X POST '${{ secrets.DEPLOYMENT_WEBHOOK_URL }}' \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "event": "promotion",
+              "from": "${{ github.event.inputs.from_environment }}",
+              "to": "${{ github.event.inputs.to_environment }}",
+              "version": "${{ needs.validate-promotion.outputs.source_version }}",
+              "status": "${{ contains(needs.*.result, 'failure') && 'failed' || 'success' }}",
+              "actor": "${{ github.actor }}"
+            }'

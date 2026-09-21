@@ -1,0 +1,30 @@
+{
+  "character_id": "7c1acdf47952",
+  "memories": [
+    {
+      "id": "cee82acb837d",
+      "content": "Discovered new knowledge: Laboratory safety protocols for radioactive materials",
+      "memory_type": "learning",
+      "importance": 8,
+      "timestamp": "2025-10-21T17:09:36.631241",
+      "context": {
+        "source": "knowledge_discovery",
+        "knowledge_id": "b907beb3649f"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "chemistry",
+        "safety",
+        "radioactivity"
+      ],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.03,
+      "current_strength": 1.0
+    }
+  ],
+  "last_saved": "2025-10-21T17:09:36.631299"
+}

@@ -1,0 +1,363 @@
+{
+  "template": {
+    "id": "elf-wizard-template",
+    "name": "Elf Wizard Template", 
+    "description": "A scholarly spellcaster with keen intellect and magical heritage. Excellent for players who enjoy strategic thinking and versatile magic.",
+    "level": 1,
+    "recommendedFor": ["Players who enjoy magic", "Strategic thinkers", "Support role players"]
+  },
+  "character": {
+    "name": "[Character Name]",
+    "race": "High Elf",
+    "class": "Wizard",
+    "subclass": "School of Evocation",
+    "level": 1,
+    "background": "Sage",
+    "alignment": "Lawful Neutral"
+  },
+  "abilityScores": {
+    "strength": 8,
+    "dexterity": 14,
+    "constitution": 13,
+    "intelligence": 16,
+    "wisdom": 12,
+    "charisma": 10,
+    "method": "Point Buy",
+    "racialBonuses": {
+      "dexterity": "+1 (High Elf)",
+      "intelligence": "+2 (High Elf)"
+    }
+  },
+  "hitPoints": {
+    "maximum": 7,
+    "current": 7,
+    "hitDie": "1d6",
+    "calculation": "6 (base) + 1 (Con modifier)"
+  },
+  "armorClass": {
+    "total": 12,
+    "calculation": "10 + 2 (Dex modifier)"
+  },
+  "proficiencies": {
+    "armor": [],
+    "weapons": ["Daggers", "Darts", "Slings", "Quarterstaffs", "Light crossbows", "Longswords", "Shortbows", "Shortswords"],
+    "tools": [],
+    "savingThrows": ["Intelligence", "Wisdom"],
+    "skills": ["Arcana", "Investigation"]
+  },
+  "languages": ["Common", "Elvish", "Draconic"],
+  "equipment": {
+    "weapons": [
+      {
+        "name": "Quarterstaff",
+        "type": "Simple Melee",
+        "damage": "1d6 bludgeoning",
+        "properties": ["Versatile (1d8)"],
+        "equipped": true
+      },
+      {
+        "name": "Light Crossbow",
+        "type": "Simple Ranged",
+        "damage": "1d8 piercing",
+        "properties": ["Ammunition (80/320)", "Loading", "Two-handed"],
+        "equipped": false
+      },
+      {
+        "name": "Dagger",
+        "type": "Simple Melee",
+        "damage": "1d4 piercing",
+        "properties": ["Finesse", "Light", "Thrown (20/60)"],
+        "quantity": 2
+      }
+    ],
+    "armor": [],
+    "gear": [
+      "Spellbook",
+      "Scholar's pack",
+      "Bottle of black ink",
+      "Quill",
+      "Small knife",
+      "Letter from dead colleague",
+      "Set of common clothes",
+      "Belt pouch",
+      "Component pouch"
+    ],
+    "currency": {
+      "cp": 0,
+      "sp": 0,
+      "gp": 10,
+      "ep": 0,
+      "pp": 0
+    }
+  },
+  "features": {
+    "racial": [
+      {
+        "name": "Darkvision",
+        "description": "You can see in dim light within 60 feet as if it were bright light, and in darkness as if it were dim light."
+      },
+      {
+        "name": "Fey Ancestry",
+        "description": "You have advantage on saving throws against being charmed, and magic can't put you to sleep."
+      },
+      {
+        "name": "Trance",
+        "description": "You don't need to sleep and can't be forced to sleep. You meditate deeply for 4 hours and gain the same benefit as 8 hours of sleep."
+      },
+      {
+        "name": "Keen Senses",
+        "description": "You have proficiency in the Perception skill."
+      },
+      {
+        "name": "Elf Weapon Training",
+        "description": "You have proficiency with longswords, shortbows, longbows, and shortbows."
+      },
+      {
+        "name": "Cantrip",
+        "description": "You know one cantrip of your choice from the wizard spell list (Prestidigitation recommended)."
+      },
+      {
+        "name": "Extra Language",
+        "description": "You can speak, read, and write one extra language of your choice."
+      }
+    ],
+    "class": [
+      {
+        "name": "Spellcasting",
+        "description": "You can cast wizard spells using Intelligence as your spellcasting ability.",
+        "spellSaveDC": "13 (8 + 2 prof + 3 Int)",
+        "spellAttackBonus": "+5 (2 prof + 3 Int)"
+      },
+      {
+        "name": "Ritual Casting",
+        "description": "You can cast wizard spells as rituals if they have the ritual tag and are in your spellbook."
+      },
+      {
+        "name": "Spellbook",
+        "description": "Contains 6 1st-level spells of your choice. You add spells as you level up and can copy spells you find."
+      }
+    ],
+    "background": [
+      {
+        "name": "Researcher",
+        "description": "When you attempt to learn information, you know where and from whom you can obtain it, usually from a library, university, or sage."
+      }
+    ]
+  },
+  "spells": {
+    "casterLevel": 1,
+    "spellcastingAbility": "Intelligence",
+    "spellSaveDC": 13,
+    "spellAttackBonus": 5,
+    "spellSlots": {
+      "1": 2,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0
+    },
+    "knownCantrips": [
+      {
+        "name": "Mage Hand",
+        "level": 0,
+        "school": "Transmutation",
+        "castingTime": "1 action",
+        "range": "30 feet",
+        "components": "V, S",
+        "duration": "1 minute",
+        "description": "Create a spectral floating hand that can manipulate objects."
+      },
+      {
+        "name": "Minor Illusion",
+        "level": 0,
+        "school": "Illusion", 
+        "castingTime": "1 action",
+        "range": "30 feet",
+        "components": "S, M",
+        "duration": "1 minute",
+        "description": "Create a sound or image of an object for 1 minute."
+      },
+      {
+        "name": "Prestidigitation",
+        "level": 0,
+        "school": "Transmutation",
+        "castingTime": "1 action",
+        "range": "10 feet", 
+        "components": "V, S",
+        "duration": "Up to 1 hour",
+        "description": "Perform a minor magical trick (racial cantrip)."
+      }
+    ],
+    "knownSpells": [
+      {
+        "name": "Magic Missile",
+        "level": 1,
+        "school": "Evocation",
+        "castingTime": "1 action",
+        "range": "120 feet",
+        "components": "V, S",
+        "duration": "Instantaneous",
+        "description": "Create 3 darts of magical force, each dealing 1d4+1 force damage."
+      },
+      {
+        "name": "Shield",
+        "level": 1,
+        "school": "Abjuration",
+        "castingTime": "1 reaction",
+        "range": "Self",
+        "components": "V, S",
+        "duration": "1 round",
+        "description": "Gain +5 AC and immunity to Magic Missile until start of your next turn."
+      },
+      {
+        "name": "Detect Magic",
+        "level": 1,
+        "school": "Divination",
+        "castingTime": "1 action",
+        "range": "Self",
+        "components": "V, S",
+        "duration": "10 minutes",
+        "ritual": true,
+        "description": "Sense magical auras within 30 feet."
+      },
+      {
+        "name": "Comprehend Languages",
+        "level": 1,
+        "school": "Divination",
+        "castingTime": "1 action",
+        "range": "Self",
+        "components": "V, S, M",
+        "duration": "1 hour",
+        "ritual": true,
+        "description": "Understand any spoken language or read any written text."
+      },
+      {
+        "name": "Identify",
+        "level": 1,
+        "school": "Divination", 
+        "castingTime": "1 minute",
+        "range": "Touch",
+        "components": "V, S, M",
+        "duration": "Instantaneous",
+        "ritual": true,
+        "description": "Learn the properties of a magical item or spell affecting a creature."
+      },
+      {
+        "name": "Sleep",
+        "level": 1,
+        "school": "Enchantment",
+        "castingTime": "1 action", 
+        "range": "90 feet",
+        "components": "V, S, M",
+        "duration": "1 minute",
+        "description": "Put creatures to sleep in a 20-foot radius (5d8 hit points worth)."
+      }
+    ]
+  },
+  "personality": {
+    "traits": [
+      "I am horribly, horribly awkward in social situations.",
+      "I speak without really thinking through my words, invariably insulting others."
+    ],
+    "ideals": [
+      "Knowledge: The path to power and self-improvement is through knowledge."
+    ],
+    "bonds": [
+      "The workshop where I learned my trade is the most important place in the world to me."
+    ],
+    "flaws": [
+      "I overlook obvious solutions in favor of complicated ones."
+    ]
+  },
+  "backstory": {
+    "summary": "A studious elf who spent years in academic research before taking up adventuring. Seeks to expand knowledge and discover lost magical secrets.",
+    "keyEvents": [
+      "Spent decades studying in a magical academy",
+      "Mentored by a respected wizard who disappeared mysteriously",
+      "Discovered a fragment of an ancient spellbook",
+      "Left academic life to seek practical magical knowledge",
+      "Joined an adventuring party to explore dangerous ruins"
+    ],
+    "connections": [
+      "Former mentor (missing, potential quest hook)",
+      "Fellow researchers at magical institutions",
+      "Library contacts across the realm",
+      "Other elves from the same community"
+    ]
+  },
+  "levelProgression": {
+    "level2": {
+      "features": ["Choose Arcane Tradition (Evocation recommended)"],
+      "spells": ["Gain 2 new 1st-level spells", "Learn 1 new cantrip"],
+      "hitPoints": "+1d6+1",
+      "notes": "Evocation Savant: Copy evocation spells for half cost and time"
+    },
+    "level3": {
+      "features": ["2nd-level spells", "If Evocation: Sculpt Spells"],
+      "spells": ["Gain 2nd-level spell slots", "Learn 2 new spells of any level you can cast"],
+      "hitPoints": "+1d6+1",
+      "recommendations": "Web, Misty Step, or Scorching Ray for 2nd-level spells"
+    },
+    "level4": {
+      "features": ["Ability Score Improvement", "New cantrip"],
+      "spells": ["Learn 2 new spells"],
+      "hitPoints": "+1d6+1",
+      "recommendations": "Increase Intelligence to 18 or take Fey Touched feat"
+    }
+  },
+  "tactics": {
+    "combat": [
+      "Stay at maximum range and use cantrips for minor threats",
+      "Use Shield reaction to avoid attacks when possible",
+      "Magic Missile for guaranteed damage against low-HP enemies",
+      "Sleep spell can end encounters against weak groups",
+      "Position carefully and use cover"
+    ],
+    "exploration": [
+      "Cast ritual spells freely (Detect Magic, Identify, Comprehend Languages)",
+      "Use Investigation skill to understand magical phenomena",
+      "Arcana knowledge helps identify magical threats and opportunities"
+    ],
+    "social": [
+      "Research background provides access to information",
+      "May be socially awkward but intellectually valuable to the party",
+      "Can identify magical items and provide scholarly knowledge"
+    ]
+  },
+  "alternativeBuilds": {
+    "warWizard": {
+      "subclass": "School of War Magic",
+      "focus": "Combat survivability and battlefield control",
+      "tactics": "More defensive, better saving throws"
+    },
+    "diviner": {
+      "subclass": "School of Divination", 
+      "focus": "Portent ability and information gathering",
+      "tactics": "Manipulate dice rolls, excellent utility"
+    },
+    "enchanter": {
+      "subclass": "School of Enchantment",
+      "focus": "Mind control and social manipulation",
+      "tactics": "Control enemies, split enchantment effects"
+    }
+  },
+  "customization": {
+    "nameOptions": [
+      "Alaric Moonwhisper", "Seraphina Starweaver", "Thalion Spellsong",
+      "Lyralei Nightbreeze", "Silvyr Dawnlight", "Celeste Arcanum"
+    ],
+    "backgroundAlternatives": [
+      "Hermit", "Noble", "Acolyte", "Guild Artisan (Scribe)"
+    ],
+    "personalityOptions": {
+      "curiousScholar": "Endlessly fascinated by magical phenomena",
+      "arrogantIntellectual": "Believes intelligence trumps all other qualities",
+      "anxiousBookworm": "More comfortable with books than people",
+      "ambitiousResearcher": "Driven to make groundbreaking magical discoveries"
+    }
+  }
+}

@@ -1,0 +1,90 @@
+
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>ActiveLog Integration Hub</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }
+                .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+                .status { display: inline-block; padding: 2px 8px; border-radius: 3px; color: white; }
+                .status.healthy { background: green; }
+                .status.unhealthy { background: red; }
+                .status.unknown { background: gray; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+                .metric { display: inline-block; margin: 10px; padding: 10px; background: #f9f9f9; border-radius: 5px; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>ActiveLog Integration Hub</h1>
+                <p>Central management for all 70+ services</p>
+            </div>
+            
+            <div class="section">
+                <h2>System Overview</h2>
+                <div id="overview-metrics"></div>
+            </div>
+            
+            <div class="section">
+                <h2>Service Status</h2>
+                <div id="service-status"></div>
+            </div>
+            
+            <div class="section">
+                <h2>Health Monitoring</h2>
+                <div id="health-status"></div>
+            </div>
+            
+            <div class="section">
+                <h2>Integration Tests</h2>
+                <div id="test-status"></div>
+            </div>
+            
+            <script>
+                async function loadDashboard() {
+                    try {
+                        // Load overview
+                        const statusResponse = await fetch('/api/status');
+                        const status = await statusResponse.json();
+                        document.getElementById('overview-metrics').innerHTML = `
+                            <div class="metric">Services: ${status.total_services}</div>
+                            <div class="metric">Healthy: ${status.healthy_services}</div>
+                            <div class="metric">Tests Passed: ${status.tests_passed || 0}</div>
+                            <div class="metric">Dependencies: ${status.total_dependencies || 0}</div>
+                        `;
+                        
+                        // Load services
+                        const servicesResponse = await fetch('/api/services');
+                        const services = await servicesResponse.json();
+                        let serviceTable = '<table><tr><th>Service</th><th>Status</th><th>Port</th><th>Type</th></tr>';
+                        for (const [name, service] of Object.entries(services)) {
+                            const statusClass = service.status === 'healthy' ? 'healthy' : 
+                                              service.status === 'unhealthy' ? 'unhealthy' : 'unknown';
+                            serviceTable += `
+                                <tr>
+                                    <td>${name}</td>
+                                    <td><span class="status ${statusClass}">${service.status}</span></td>
+                                    <td>${service.port || 'N/A'}</td>
+                                    <td>${service.service_type}</td>
+                                </tr>
+                            `;
+                        }
+                        serviceTable += '</table>';
+                        document.getElementById('service-status').innerHTML = serviceTable;
+                        
+                    } catch (error) {
+                        console.error('Failed to load dashboard:', error);
+                    }
+                }
+                
+                // Load dashboard on page load
+                loadDashboard();
+                
+                // Refresh every 30 seconds
+                setInterval(loadDashboard, 30000);
+            </script>
+        </body>
+        </html>
+        

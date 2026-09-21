@@ -1,0 +1,35 @@
+# Service Mesh Infrastructure Requirements
+
+# Core Dependencies
+consul==1.1.0
+requests>=2.28.0
+aiohttp>=3.8.0
+aiohttp-cors>=0.7.0
+asyncio
+
+# Data Processing and Storage
+numpy>=1.21.0
+pandas>=1.3.0
+sqlite3
+
+# Visualization and Graphing  
+matplotlib>=3.5.0
+plotly>=5.0.0
+networkx>=2.6.0
+
+# System Monitoring
+psutil>=5.8.0
+docker>=6.0.0
+
+# Date/Time Handling
+python-dateutil>=2.8.0
+
+# Networking and HTTP
+urllib3>=1.26.0
+
+# Optional: Enhanced Features
+# For production deployments, consider adding:
+# prometheus_client>=0.12.0  # Metrics export to Prometheus  
+# jaeger-client>=4.8.0      # Jaeger tracing integration
+# redis>=4.0.0              # Redis for distributed caching
+# pyyaml>=6.0               # YAML configuration support

@@ -1,0 +1,139 @@
+{
+  "storage_config": {
+    "total_limit_gb": 30.0,
+    "emergency_cleanup_threshold": 0.95,
+    "warning_threshold": 0.85,
+    "service_allocations": {
+      "dmlog-core": 4.0,
+      "dmlog-backend": 2.0,
+      "dmlog-beta-portal": 3.0,
+      "ai-insights": 2.5,
+      "bot-ecosystem": 3.5,
+      "bot-orchestrator": 2.0,
+      "ml-platform": 5.0,
+      "adaptive-cv-training": 2.0,
+      "analytics-platform": 1.5,
+      "backup-dr": 2.5,
+      "data-manager": 1.0,
+      "misc": 1.0
+    }
+  },
+  "cleanup_policies": {
+    "log_retention_days": {
+      "critical_services": 30,
+      "important_services": 14,
+      "standard_services": 7,
+      "development_services": 3
+    },
+    "temp_file_retention_hours": {
+      "critical_services": 24,
+      "important_services": 6,
+      "standard_services": 2,
+      "development_services": 0.5
+    },
+    "cache_retention_hours": {
+      "critical_services": 72,
+      "important_services": 24,
+      "standard_services": 8,
+      "development_services": 2
+    },
+    "ml_model_retention_days": {
+      "critical_services": 90,
+      "important_services": 60,
+      "standard_services": 30,
+      "development_services": 7
+    }
+  },
+  "service_classifications": {
+    "critical_services": [
+      "dmlog-core",
+      "backup-dr",
+      "data-lifecycle-manager"
+    ],
+    "important_services": [
+      "ai-insights",
+      "bot-ecosystem",
+      "ml-platform",
+      "analytics-platform",
+      "dmlog-backend",
+      "dmlog-beta-portal"
+    ],
+    "standard_services": [
+      "adaptive-cv-training",
+      "bot-orchestrator",
+      "notifications",
+      "api-gateway"
+    ],
+    "development_services": [
+      "dev-sandbox",
+      "game-dev-mode",
+      "dev-productivity"
+    ]
+  },
+  "ml_config": {
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "epochs": 50,
+    "model_save_interval_hours": 6,
+    "feedback_processing_interval_minutes": 5,
+    "continuous_learning_enabled": true,
+    "reinforcement_learning_enabled": true
+  },
+  "monitoring_config": {
+    "resource_monitoring_interval_seconds": 60,
+    "storage_analytics_interval_minutes": 15,
+    "performance_alert_thresholds": {
+      "cpu_percent": 90,
+      "memory_percent": 85,
+      "disk_io_mb_per_second": 1000
+    },
+    "dashboard_refresh_seconds": 30
+  },
+  "integration_config": {
+    "service_discovery_interval_minutes": 60,
+    "cross_service_deduplication_enabled": true,
+    "building_bots_network_optimization": true,
+    "parallel_cleanup_max_workers": 5,
+    "service_health_check_interval_minutes": 10
+  },
+  "api_config": {
+    "port": 8490,
+    "host": "0.0.0.0",
+    "debug": false,
+    "cors_enabled": true,
+    "rate_limiting_enabled": true,
+    "max_requests_per_minute": 100
+  },
+  "logging_config": {
+    "level": "INFO",
+    "file": "data_lifecycle_manager.log",
+    "max_file_size_mb": 50,
+    "backup_count": 5,
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  },
+  "backup_config": {
+    "backup_enabled": true,
+    "backup_interval_hours": 24,
+    "backup_retention_days": 30,
+    "backup_directory": "backups",
+    "compress_backups": true
+  },
+  "security_config": {
+    "encryption_enabled": false,
+    "access_logging_enabled": true,
+    "sensitive_file_patterns": [
+      "*.key",
+      "*.pem",
+      "*.env",
+      "*password*",
+      "*secret*"
+    ],
+    "secure_deletion_enabled": true
+  },
+  "experimental_features": {
+    "quantum_ready_optimization": false,
+    "advanced_prediction_models": true,
+    "cross_domain_learning": true,
+    "autonomous_optimization": false
+  }
+}

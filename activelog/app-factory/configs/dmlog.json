@@ -1,0 +1,263 @@
+{
+  "name": "DMLog.ai",
+  "version": "1.0.0",
+  "title": "DMLog.ai - Tabletop RPG Management",
+  "description": "Comprehensive tabletop RPG management tools for dungeon masters and players",
+  "favicon": "/assets/dmlog/favicon.ico",
+  "domain": "dmlog.ai",
+  "devPort": 3010,
+  "theme": "fantasy",
+  "layout": "rpg-dashboard",
+  "monetization": {
+    "type": "freemium",
+    "tiers": ["adventurer", "dungeon-master", "legend"],
+    "trialPeriod": "14d"
+  },
+  "features": {
+    "campaignManagement": true,
+    "characterCreation": true,
+    "worldBuilding": true,
+    "sessionPlanning": true,
+    "combatTracker": true,
+    "npcGenerator": true,
+    "mapMaking": true,
+    "lootGeneration": true,
+    "playerCollaboration": true,
+    "diceRolling": true,
+    "rulesetSupport": true,
+    "storyTracking": true
+  },
+  "modules": [
+    {
+      "name": "campaign",
+      "component": "CampaignManagerModule",
+      "props": {
+        "enableMultipleCampaigns": true,
+        "enableSessionNotes": true,
+        "enableTimelineTracking": true,
+        "enablePlotPointManagement": true,
+        "enablePlayerInvitations": true,
+        "enableProgressTracking": true
+      }
+    },
+    {
+      "name": "characters",
+      "component": "CharacterManagerModule",
+      "props": {
+        "enableCharacterSheets": true,
+        "enableStatTracking": true,
+        "enableLevelProgression": true,
+        "enableInventoryManagement": true,
+        "enableBackstoryTracking": true,
+        "supportedSystems": ["dnd5e", "pathfinder", "dnd35", "savage-worlds", "fate"]
+      }
+    },
+    {
+      "name": "worldbuilding",
+      "component": "WorldBuildingModule",
+      "props": {
+        "enableLocationManagement": true,
+        "enableNPCDatabase": true,
+        "enableOrganizationTracking": true,
+        "enableHistoryTimeline": true,
+        "enableRelationshipMapping": true,
+        "enableCultureCreation": true
+      }
+    },
+    {
+      "name": "combat",
+      "component": "CombatTrackerModule",
+      "props": {
+        "enableInitiativeTracking": true,
+        "enableHealthTracking": true,
+        "enableConditionTracking": true,
+        "enableSpellSlotTracking": true,
+        "enableGridCombat": true,
+        "enableMapIntegration": true
+      }
+    },
+    {
+      "name": "generator",
+      "component": "ContentGeneratorModule",
+      "props": {
+        "enableNPCGeneration": true,
+        "enableLootGeneration": true,
+        "enableEncounterGeneration": true,
+        "enableNameGeneration": true,
+        "enableQuestGeneration": true,
+        "enableDungeonGeneration": true
+      }
+    },
+    {
+      "name": "maps",
+      "component": "MapMakingModule",
+      "props": {
+        "enableGridMaps": true,
+        "enableHexMaps": true,
+        "enableWorldMaps": true,
+        "enableTokenSupport": true,
+        "enableLayerManagement": true,
+        "enableFogOfWar": true,
+        "enableDynamicLighting": true
+      }
+    },
+    {
+      "name": "dice",
+      "component": "DiceRollerModule",
+      "props": {
+        "enableCustomDice": true,
+        "enableAdvantageDisadvantage": true,
+        "enableExplodingDice": true,
+        "enableRollHistory": true,
+        "enablePrivateRolls": true,
+        "enableMacros": true
+      }
+    },
+    {
+      "name": "collaboration",
+      "component": "PlayerCollaborationModule",
+      "props": {
+        "enableSharedNotes": true,
+        "enableCharacterSharing": true,
+        "enableVoiceChat": true,
+        "enableTextChat": true,
+        "enableScreenSharing": true,
+        "enableHandouts": true
+      }
+    }
+  ],
+  "aiModels": [
+    {
+      "name": "story-generator",
+      "type": "text-generation",
+      "endpoint": "/ai/story-generation",
+      "features": ["plot-hooks", "character-motivations", "world-events"]
+    },
+    {
+      "name": "npc-creator",
+      "type": "character-generation",
+      "endpoint": "/ai/npc-creation",
+      "features": ["personality-traits", "backstories", "dialogue-generation"]
+    },
+    {
+      "name": "encounter-builder",
+      "type": "game-design",
+      "endpoint": "/ai/encounter-building",
+      "features": ["balance-calculation", "tactical-design", "environment-suggestions"]
+    },
+    {
+      "name": "lore-assistant",
+      "type": "worldbuilding",
+      "endpoint": "/ai/lore-assistance",
+      "features": ["consistency-checking", "culture-development", "history-generation"]
+    }
+  ],
+  "auth": {
+    "providers": ["email", "google", "discord", "roll20"],
+    "requireEmailVerification": false,
+    "enableTwoFactor": false,
+    "sessionDuration": "30d",
+    "rememberDevice": true,
+    "enableGuestAccess": true
+  },
+  "dataSync": {
+    "enabled": true,
+    "cloudProvider": "activelog-cloud",
+    "encryption": "standard",
+    "conflictResolution": "merge",
+    "syncFrequency": "realtime",
+    "offlineSupport": true,
+    "enableSharing": true
+  },
+  "settings": {
+    "privacy": {
+      "enableCampaignPrivacy": true,
+      "enableCharacterPrivacy": true,
+      "enableDataExport": true,
+      "enableDataDeletion": true,
+      "showDataUsage": true
+    },
+    "notifications": {
+      "enablePush": true,
+      "enableEmail": false,
+      "enableDiscord": true,
+      "enableSessionReminders": true,
+      "enablePlayerUpdates": true,
+      "enableCampaignNews": true
+    },
+    "appearance": {
+      "defaultTheme": "fantasy-dark",
+      "enableCustomization": true,
+      "enableCampaignThemes": true,
+      "enableAnimations": true
+    },
+    "gameplay": {
+      "defaultRuleset": "dnd5e",
+      "enableHouseRules": true,
+      "enableCustomRules": true,
+      "enableRuleVariants": true
+    }
+  },
+  "customModules": [
+    {
+      "name": "spell-manager",
+      "path": "/modules/dmlog/SpellManager.js"
+    },
+    {
+      "name": "treasure-tracker",
+      "path": "/modules/dmlog/TreasureTracker.js"
+    },
+    {
+      "name": "calendar-system",
+      "path": "/modules/dmlog/CalendarSystem.js"
+    }
+  ],
+  "integrations": [
+    {
+      "name": "roll20",
+      "enabled": true,
+      "characterImport": true
+    },
+    {
+      "name": "dndbeyond",
+      "enabled": true,
+      "characterSync": true
+    },
+    {
+      "name": "foundry-vtt",
+      "enabled": true,
+      "moduleExport": true
+    },
+    {
+      "name": "discord",
+      "enabled": true,
+      "botIntegration": true
+    },
+    {
+      "name": "kobold-fight-club",
+      "enabled": true,
+      "encounterImport": true
+    },
+    {
+      "name": "donjon",
+      "enabled": true,
+      "generatorImport": true
+    }
+  ],
+  "analytics": {
+    "provider": "gaming-focused",
+    "enableUsageTracking": true,
+    "enableSessionMetrics": true,
+    "enableCampaignAnalytics": true,
+    "respectDoNotTrack": true,
+    "enableAnonymousStats": true
+  },
+  "community": {
+    "enablePublicCampaigns": true,
+    "enableCampaignSharing": true,
+    "enableResourceSharing": true,
+    "enableCommunityVoting": true,
+    "enableMarketplace": false,
+    "moderationTools": true
+  }
+}

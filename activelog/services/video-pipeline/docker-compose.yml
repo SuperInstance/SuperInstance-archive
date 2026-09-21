@@ -1,0 +1,124 @@
+version: '3.8'
+
+services:
+  video-pipeline:
+    build: .
+    container_name: activelog-video-pipeline
+    ports:
+      - "8004:8004"
+      - "9090:9090"  # Metrics port
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://activelog_admin:SecurePass123!@postgres:5432/activelog
+      - REDIS_URL=redis://redis:6379/0
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin123
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - NATS_URL=nats://nats:4222
+      - AI_ORCHESTRATOR_URL=http://ai-orchestrator:8001
+      - AUTH_SERVICE_URL=http://auth:8002
+      - METADATA_SERVICE_URL=http://metadata:8003
+      - LOG_LEVEL=INFO
+      - ENABLE_METRICS=true
+    volumes:
+      - ./temp:/app/temp
+      - ./models:/app/models
+      - ./logs:/app/logs
+    depends_on:
+      - postgres
+      - redis
+      - minio
+      - elasticsearch
+      - nats
+    networks:
+      - activelog-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2.0'
+        reservations:
+          memory: 2G
+          cpus: '1.0'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Worker nodes for processing
+  video-worker-1:
+    build: .
+    container_name: activelog-video-worker-1
+    command: python -m celery -A src.workers.celery_app worker --loglevel=info --concurrency=2
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://activelog_admin:SecurePass123!@postgres:5432/activelog
+      - REDIS_URL=redis://redis:6379/0
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin123
+      - NATS_URL=nats://nats:4222
+      - LOG_LEVEL=INFO
+      - WORKER_ID=worker-1
+    volumes:
+      - ./temp:/app/temp
+      - ./models:/app/models
+      - ./logs:/app/logs
+    depends_on:
+      - postgres
+      - redis
+      - nats
+    networks:
+      - activelog-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 3G
+          cpus: '1.5'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+
+  video-worker-2:
+    build: .
+    container_name: activelog-video-worker-2
+    command: python -m celery -A src.workers.celery_app worker --loglevel=info --concurrency=2
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://activelog_admin:SecurePass123!@postgres:5432/activelog
+      - REDIS_URL=redis://redis:6379/0
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin123
+      - NATS_URL=nats://nats:4222
+      - LOG_LEVEL=INFO
+      - WORKER_ID=worker-2
+    volumes:
+      - ./temp:/app/temp
+      - ./models:/app/models
+      - ./logs:/app/logs
+    depends_on:
+      - postgres
+      - redis
+      - nats
+    networks:
+      - activelog-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 3G
+          cpus: '1.5'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+
+networks:
+  activelog-network:
+    external: true
+
+volumes:
+  temp_data:
+  models_data:
+  logs_data:

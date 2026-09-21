@@ -1,0 +1,58 @@
+{
+  "id": "room_the_dream_salon_1761094299.285011",
+  "name": "The Dream Salon",
+  "room_type": "jazz_club",
+  "created_at": "2025-10-21T16:51:39.285028",
+  "atmosphere": {
+    "room_type": "jazz_club",
+    "description": "A dimly lit jazz club with a live band. Bass walks, saxophone wails. Ideas flow like improvised jazz. The energy is creative and spontaneous.",
+    "ambient_sounds": [
+      "jazz music",
+      "soft chatter",
+      "clinking glasses",
+      "double bass",
+      "saxophone riffs"
+    ],
+    "visual_elements": [
+      "dim lighting",
+      "small stage",
+      "scattered tables",
+      "mood lighting",
+      "instruments"
+    ],
+    "mood_tags": [
+      "creative",
+      "spontaneous",
+      "playful",
+      "rhythmic",
+      "improvisational"
+    ],
+    "temperature": 0.85,
+    "pace": "moderate",
+    "formality": 0.3,
+    "collaboration_level": 0.8,
+    "cognitive_effects": {
+      "creativity": 0.4,
+      "associative_thinking": 0.5,
+      "inhibition": -0.3,
+      "playfulness": 0.4
+    },
+    "turn_taking": "natural",
+    "speaking_style": "riffing",
+    "content_focus": [
+      "creative exploration",
+      "building on ideas",
+      "unexpected connections"
+    ],
+    "discouraged_topics": []
+  },
+  "objects_in_room": [],
+  "background_media": [],
+  "current_session": null,
+  "characters_present": [],
+  "max_characters": 10,
+  "conversation_pace_seconds": 3.0,
+  "purpose": "",
+  "expected_outputs": [],
+  "past_sessions": []
+}

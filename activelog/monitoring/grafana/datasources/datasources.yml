@@ -1,0 +1,43 @@
+# Grafana Datasource Configuration
+apiVersion: 1
+
+datasources:
+  # Prometheus
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+
+  # Loki for logs
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    editable: true
+
+  # Jaeger for distributed tracing
+  - name: Jaeger
+    type: jaeger
+    access: proxy
+    url: http://jaeger-all-in-one:16686
+    editable: true
+
+  # Tempo for distributed tracing (alternative)
+  - name: Tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    editable: true
+    jsonData:
+      httpMethod: GET
+      serviceMap:
+        datasourceUid: 'prometheus'
+
+  # Redis datasource
+  - name: Redis
+    type: redis-datasource
+    access: proxy
+    url: redis://host.docker.internal:6379
+    editable: true

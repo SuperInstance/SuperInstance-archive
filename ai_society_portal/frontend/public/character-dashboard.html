@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Character Evolution Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .character-selector {
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+            min-width: 200px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .character-selector:hover {
+            border-color: #667eea;
+        }
+
+        .refresh-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .auto-refresh-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #4a5568;
+            font-size: 14px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: #cbd5e0;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: #667eea;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(24px);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+
+        .status-indicator.online {
+            background: #48bb78;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.offline {
+            background: #f56565;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .stat-title {
+            color: #718096;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-change.positive {
+            color: #38a169;
+        }
+
+        .stat-change.negative {
+            color: #e53e3e;
+        }
+
+        .stat-change.neutral {
+            color: #718096;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .chart-container.tall {
+            height: 400px;
+        }
+
+        .timeline-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+
+        .timeline-item {
+            border-left: 3px solid #e2e8f0;
+            padding-left: 20px;
+            position: relative;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+        }
+
+        .timeline-item:hover {
+            border-color: #667eea;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -8px;
+            top: 6px;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #667eea;
+        }
+
+        .timeline-content {
+            margin-left: 10px;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+
+        .timeline-description {
+            color: #718096;
+            font-size: 0.875rem;
+            margin-bottom: 4px;
+        }
+
+        .timeline-time {
+            color: #a0aec0;
+            font-size: 0.75rem;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: #718096;
+        }
+
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #feb2b2;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #a0aec0;
+            padding: 40px;
+            font-style: italic;
+        }
+
+        .memory-types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .memory-type-card {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .memory-type-card:hover {
+            background: #edf2f7;
+            transform: translateY(-1px);
+        }
+
+        .memory-type-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .memory-type-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 4px;
+        }
+
+        .memory-type-count {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .skill-progress {
+            margin-top: 15px;
+        }
+
+        .skill-item {
+            margin-bottom: 15px;
+        }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .skill-name {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.875rem;
+        }
+
+        .skill-level {
+            font-size: 0.75rem;
+            color: #718096;
+        }
+
+        .skill-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .skill-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #9f7aea);
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 10px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .character-selector {
+                width: 100%;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .overview-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Color palette for different metrics */
+        .metric-memory { background: #9f7aea; }
+        .metric-skills { background: #4299e1; }
+        .metric-relationships { background: #48bb78; }
+        .metric-knowledge { background: #ed8936; }
+        .metric-culture { background: #e53e3e; }
+        .metric-evolution { background: #38b2ac; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <header>
+            <div class="header-content">
+                <div>
+                    <h1>AI Character Evolution Dashboard</h1>
+                    <div class="subtitle">
+                        Track character development, memory formation, and cultural transmission
+                        <span id="connection-status" class="status-indicator offline"></span>
+                    </div>
+                </div>
+                <div class="controls">
+                    <select id="character-selector" class="character-selector">
+                        <option value="">Select a character...</option>
+                    </select>
+                    <button id="refresh-btn" class="refresh-btn">Refresh Data</button>
+                    <div class="auto-refresh-toggle">
+                        <span>Auto-refresh</span>
+                        <div id="auto-refresh-toggle" class="toggle-switch">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main id="dashboard-content">
+            <div class="loading">
+                <div>Loading dashboard...</div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        class CharacterDashboard {
+            constructor() {
+                this.apiBase = 'http://localhost:8003';
+                this.selectedCharacter = null;
+                this.characters = [];
+                this.autoRefresh = false;
+                this.refreshInterval = null;
+                this.charts = {};
+
+                this.init();
+            }
+
+            async init() {
+                try {
+                    await this.loadCharacters();
+                    this.setupEventListeners();
+                    this.checkConnectionStatus();
+
+                    // Select first character if available
+                    if (this.characters.length > 0) {
+                        this.selectCharacter(this.characters[0].id);
+                    } else {
+                        this.showNoCharactersMessage();
+                    }
+                } catch (error) {
+                    console.error('Dashboard initialization error:', error);
+                    this.showErrorMessage('Failed to initialize dashboard. Please check if the backend server is running.');
+                }
+            }
+
+            setupEventListeners() {
+                const characterSelector = document.getElementById('character-selector');
+                const refreshBtn = document.getElementById('refresh-btn');
+                const autoRefreshToggle = document.getElementById('auto-refresh-toggle');
+
+                characterSelector.addEventListener('change', (e) => {
+                    if (e.target.value) {
+                        this.selectCharacter(e.target.value);
+                    }
+                });
+
+                refreshBtn.addEventListener('click', () => {
+                    this.refreshData();
+                });
+
+                autoRefreshToggle.addEventListener('click', () => {
+                    this.toggleAutoRefresh();
+                });
+            }
+
+            async loadCharacters() {
+                try {
+                    const response = await fetch(`${this.apiBase}/characters`);
+                    if (!response.ok) throw new Error('Failed to fetch characters');
+
+                    const data = await response.json();
+                    this.characters = data.characters || [];
+
+                    const selector = document.getElementById('character-selector');
+                    selector.innerHTML = '<option value="">Select a character...</option>';
+
+                    this.characters.forEach(char => {
+                        const option = document.createElement('option');
+                        option.value = char.id;
+                        option.textContent = `${char.name} (${char.specialization})`;
+                        selector.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error('Error loading characters:', error);
+                    throw error;
+                }
+            }
+
+            async selectCharacter(characterId) {
+                this.selectedCharacter = this.characters.find(c => c.id === characterId);
+                if (!this.selectedCharacter) return;
+
+                document.getElementById('character-selector').value = characterId;
+
+                try {
+                    await this.loadCharacterData();
+                    this.renderDashboard();
+                } catch (error) {
+                    console.error('Error loading character data:', error);
+                    this.showErrorMessage(`Failed to load data for ${this.selectedCharacter.name}`);
+                }
+            }
+
+            async loadCharacterData() {
+                const characterId = this.selectedCharacter.id;
+
+                try {
+                    // Load comprehensive analytics data
+                    const analyticsResponse = await fetch(`${this.apiBase}/characters/${characterId}/analytics`);
+                    if (!analyticsResponse.ok) throw new Error('Failed to fetch analytics data');
+
+                    const analytics = await analyticsResponse.json();
+
+                    // Extract all data from analytics response
+                    this.characterData = {
+                        personality: analytics.personality || {},
+                        relationships: analytics.relationships || {},
+                        current_mood: analytics.current_mood || {}
+                    };
+
+                    this.memoryStats = analytics.memory_analytics || { stats: {} };
+                    this.skillsData = analytics.skills || { skills: [] };
+                    this.recentMemories = analytics.memory_analytics?.recent_memories || [];
+                    this.knowledgeData = analytics.knowledge_analytics?.recent_discoveries || [];
+
+                    // Additional analytics data for enhanced dashboard
+                    this.culturalImpact = analytics.cultural_impact || {};
+                    this.evolutionMetrics = analytics.evolution_metrics || {};
+                    this.developmentTimeline = analytics.development_timeline || [];
+                    this.characterInfo = analytics.character_info || {};
+
+                } catch (error) {
+                    console.error('Error loading analytics data, falling back to individual endpoints:', error);
+
+                    // Fallback to individual endpoints if analytics fails
+                    await this.loadCharacterDataLegacy();
+                }
+            }
+
+            async loadCharacterDataLegacy() {
+                const characterId = this.selectedCharacter.id;
+
+                // Load character details
+                const characterResponse = await fetch(`${this.apiBase}/characters/${characterId}`);
+                if (!characterResponse.ok) throw new Error('Failed to fetch character details');
+                this.characterData = await characterResponse.json();
+
+                // Load memory statistics
+                try {
+                    const memoryStatsResponse = await fetch(`${this.apiBase}/characters/${characterId}/memories/stats`);
+                    if (memoryStatsResponse.ok) {
+                        this.memoryStats = await memoryStatsResponse.json();
+                    } else {
+                        this.memoryStats = { stats: {} };
+                    }
+                } catch (error) {
+                    console.warn('Memory stats not available:', error);
+                    this.memoryStats = { stats: {} };
+                }
+
+                // Load skills
+                try {
+                    const skillsResponse = await fetch(`${this.apiBase}/characters/${characterId}/skills`);
+                    if (skillsResponse.ok) {
+                        this.skillsData = await skillsResponse.json();
+                    } else {
+                        this.skillsData = { skills: [] };
+                    }
+                } catch (error) {
+                    console.warn('Skills data not available:', error);
+                    this.skillsData = { skills: [] };
+                }
+
+                // Load recent memories
+                try {
+                    const memoriesResponse = await fetch(`${this.apiBase}/characters/${characterId}/memories?limit=10&sort_by=recent`);
+                    if (memoriesResponse.ok) {
+                        const memoriesData = await memoriesResponse.json();
+                        this.recentMemories = memoriesData.memories || [];
+                    } else {
+                        this.recentMemories = [];
+                    }
+                } catch (error) {
+                    console.warn('Recent memories not available:', error);
+                    this.recentMemories = [];
+                }
+
+                // Load knowledge
+                try {
+                    const knowledgeResponse = await fetch(`${this.apiBase}/characters/${characterId}/knowledge`);
+                    if (knowledgeResponse.ok) {
+                        const knowledgeData = await knowledgeResponse.json();
+                        this.knowledgeData = knowledgeData.knowledge || [];
+                    } else {
+                        this.knowledgeData = [];
+                    }
+                } catch (error) {
+                    console.warn('Knowledge data not available:', error);
+                    this.knowledgeData = [];
+                }
+
+                // Set default values for enhanced analytics
+                this.culturalImpact = {};
+                this.evolutionMetrics = {};
+                this.developmentTimeline = [];
+                this.characterInfo = {};
+            }
+
+            renderDashboard() {
+                const dashboardContent = document.getElementById('dashboard-content');
+
+                const html = `
+                    <div class="overview-grid">
+                        ${this.renderStatCards()}
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Memory Timeline</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="memory-timeline-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Skill Progression</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="skills-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Personality Evolution</h3>
+                        </div>
+                        <div class="chart-container tall">
+                            <canvas id="personality-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="timeline-container">
+                        <h3 style="margin-bottom: 20px; color: #2d3748;">Recent Development Timeline</h3>
+                        ${this.renderTimeline()}
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Memory Types Distribution</h3>
+                            </div>
+                            ${this.renderMemoryTypes()}
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Top Skills</h3>
+                            </div>
+                            ${this.renderTopSkills()}
+                        </div>
+                    </div>
+                `;
+
+                dashboardContent.innerHTML = html;
+
+                // Initialize charts after DOM is updated
+                setTimeout(() => {
+                    this.initializeCharts();
+                }, 100);
+            }
+
+            renderStatCards() {
+                const stats = this.calculateOverviewStats();
+
+                return `
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Total Memories</span>
+                            <div class="stat-icon metric-memory">🧠</div>
+                        </div>
+                        <div class="stat-value">${stats.totalMemories}</div>
+                        <div class="stat-change ${stats.memoryTrend >= 0 ? 'positive' : 'negative'}">
+                            <span>${stats.memoryTrend >= 0 ? '↑' : '↓'}</span>
+                            <span>${Math.abs(stats.memoryTrend)}% from last session</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Skills Developed</span>
+                            <div class="stat-icon metric-skills">⚡</div>
+                        </div>
+                        <div class="stat-value">${stats.totalSkills}</div>
+                        <div class="stat-change positive">
+                            <span>↑</span>
+                            <span>${stats.newSkills} new this week</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Knowledge Items</span>
+                            <div class="stat-icon metric-knowledge">📚</div>
+                        </div>
+                        <div class="stat-value">${stats.totalKnowledge}</div>
+                        <div class="stat-change neutral">
+                            <span>→</span>
+                            <span>Steady growth</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Relationships</span>
+                            <div class="stat-icon metric-relationships">🤝</div>
+                        </div>
+                        <div class="stat-value">${stats.totalRelationships}</div>
+                        <div class="stat-change positive">
+                            <span>↑</span>
+                            <span>Growing network</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Cultural Impact</span>
+                            <div class="stat-icon metric-culture">🎨</div>
+                        </div>
+                        <div class="stat-value">${stats.culturalImpact}</div>
+                        <div class="stat-change ${stats.culturalTrend >= 0 ? 'positive' : 'neutral'}">
+                            <span>${stats.culturalTrend >= 0 ? '↑' : '→'}</span>
+                            <span>${stats.culturalTrend >= 0 ? 'Increasing' : 'Stable'}</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Evolution Score</span>
+                            <div class="stat-icon metric-evolution">🔄</div>
+                        </div>
+                        <div class="stat-value">${stats.evolutionScore}</div>
+                        <div class="stat-change positive">
+                            <span>↑</span>
+                            <span>Active development</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            calculateOverviewStats() {
+                const stats = this.memoryStats.stats || {};
+                const totalMemories = stats.total_memories || 0;
+                const totalSkills = this.skillsData.skills ? this.skillsData.skills.length : 0;
+                const totalKnowledge = this.knowledgeData.length;
+                const totalRelationships = Object.keys(this.characterData.relationships || {}).length;
+
+                // Use enhanced analytics if available
+                if (this.evolutionMetrics && this.evolutionMetrics.evolution_score !== undefined) {
+                    return {
+                        totalMemories: this.evolutionMetrics.memory_growth || totalMemories,
+                        totalSkills: this.evolutionMetrics.skill_development || totalSkills,
+                        totalKnowledge: this.evolutionMetrics.knowledge_acquisition || totalKnowledge,
+                        totalRelationships: this.evolutionMetrics.social_connections || totalRelationships,
+                        culturalImpact: this.evolutionMetrics.cultural_influence || Math.max(0, totalKnowledge - 2),
+                        evolutionScore: this.evolutionMetrics.evolution_score,
+                        memoryTrend: this.calculateTrend('memory'),
+                        newSkills: this.calculateTrend('skills'),
+                        culturalTrend: this.calculateTrend('cultural'),
+                        developmentRate: this.evolutionMetrics.development_rate || 'emerging'
+                    };
+                }
+
+                // Fallback to original calculation
+                const evolutionScore = Math.min(100, Math.round(
+                    (totalMemories * 2) +
+                    (totalSkills * 10) +
+                    (totalKnowledge * 3) +
+                    (totalRelationships * 5)
+                ));
+
+                return {
+                    totalMemories,
+                    totalSkills,
+                    totalKnowledge,
+                    totalRelationships,
+                    culturalImpact: Math.max(0, totalKnowledge - 2),
+                    evolutionScore,
+                    memoryTrend: 12, // Placeholder - would calculate from historical data
+                    newSkills: Math.max(0, totalSkills - 2), // Placeholder
+                    culturalTrend: 5 // Placeholder
+                };
+            }
+
+            calculateTrend(metricType) {
+                // In a real implementation, this would compare current data with historical data
+                // For now, return reasonable placeholder values
+                const trends = {
+                    memory: Math.floor(Math.random() * 20) - 5, // -5 to 15
+                    skills: Math.floor(Math.random() * 3), // 0 to 2
+                    cultural: Math.floor(Math.random() * 10) // 0 to 9
+                };
+                return trends[metricType] || 0;
+            }
+
+            renderMemoryTypes() {
+                const stats = this.memoryStats.stats || {};
+                const memoryTypes = [
+                    { type: 'conversational', icon: '💬', name: 'Conversational' },
+                    { type: 'learning', icon: '📖', name: 'Learning' },
+                    { type: 'experience', icon: '⭐', name: 'Experience' },
+                    { type: 'relationship', icon: '❤️', name: 'Relationship' },
+                    { type: 'self_reflection', icon: '🤔', name: 'Reflection' },
+                    { type: 'emotional', icon: '😊', name: 'Emotional' }
+                ];
+
+                return `
+                    <div class="memory-types-grid">
+                        ${memoryTypes.map(memType => `
+                            <div class="memory-type-card">
+                                <div class="memory-type-icon">${memType.icon}</div>
+                                <div class="memory-type-name">${memType.name}</div>
+                                <div class="memory-type-count">${stats.memories_by_type?.[memType.type] || 0}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            renderTopSkills() {
+                const skills = this.skillsData.skills || [];
+                const topSkills = skills.slice(0, 5);
+
+                if (topSkills.length === 0) {
+                    return '<div class="no-data">No skills developed yet</div>';
+                }
+
+                return `
+                    <div class="skill-progress">
+                        ${topSkills.map(skill => `
+                            <div class="skill-item">
+                                <div class="skill-header">
+                                    <span class="skill-name">${skill.skill_type}</span>
+                                    <span class="skill-level">${skill.skill_level}</span>
+                                </div>
+                                <div class="skill-bar">
+                                    <div class="skill-progress-fill" style="width: ${this.getSkillPercentage(skill.skill_level)}%"></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            getSkillPercentage(skillLevel) {
+                const levels = {
+                    'novice': 20,
+                    'beginner': 35,
+                    'intermediate': 50,
+                    'advanced': 70,
+                    'expert': 85,
+                    'master': 100
+                };
+                return levels[skillLevel] || 0;
+            }
+
+            renderTimeline() {
+                // Use enhanced development timeline if available
+                const timelineEvents = this.developmentTimeline && this.developmentTimeline.length > 0
+                    ? this.developmentTimeline
+                    : this.recentMemories.slice(0, 5);
+
+                if (timelineEvents.length === 0) {
+                    return '<div class="no-data">No recent activity to display</div>';
+                }
+
+                return timelineEvents.map(event => {
+                    // Handle both enhanced timeline format and legacy memory format
+                    const title = event.title || event.content || 'Activity';
+                    const type = event.type || event.memory_type || 'experience';
+                    const timestamp = event.timestamp || event.created_at || 'Unknown time';
+                    const importance = event.importance || 5;
+                    const relatedChars = event.related_characters || [];
+
+                    return `
+                        <div class="timeline-item">
+                            <div class="timeline-dot" style="border-color: ${this.getTimelineColor(type, importance)}"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">${this.getMemoryTypeLabel(type)}</div>
+                                <div class="timeline-description">${title.substring(0, 100)}${title.length > 100 ? '...' : ''}</div>
+                                ${relatedChars.length > 0 ? `<div class="timeline-description" style="font-style: italic; color: #718096;">With: ${relatedChars.length} other(s)</div>` : ''}
+                                <div class="timeline-time">${this.formatDate(timestamp)}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            getTimelineColor(type, importance) {
+                const colors = {
+                    'conversational': '#4299e1',
+                    'learning': '#48bb78',
+                    'experience': '#ed8936',
+                    'relationship': '#e53e3e',
+                    'self_reflection': '#9f7aea',
+                    'emotional': '#f687b3'
+                };
+
+                // Use importance to adjust opacity
+                const baseColor = colors[type] || '#718096';
+                const opacity = 0.5 + (importance / 10) * 0.5;
+                return baseColor + Math.floor(opacity * 255).toString(16);
+            }
+
+            getMemoryTypeLabel(memoryType) {
+                const labels = {
+                    'conversational': '💬 Conversation',
+                    'learning': '📖 Learning',
+                    'experience': '⭐ Experience',
+                    'relationship': '❤️ Relationship',
+                    'self_reflection': '🤔 Self-Reflection',
+                    'emotional': '😊 Emotional Experience'
+                };
+                return labels[memoryType] || memoryType;
+            }
+
+            formatDate(timestamp) {
+                if (!timestamp) return 'Unknown time';
+
+                const date = new Date(timestamp);
+                const now = new Date();
+                const diffHours = Math.floor((now - date) / (1000 * 60 * 60));
+
+                if (diffHours < 1) return 'Just now';
+                if (diffHours < 24) return `${diffHours} hours ago`;
+                if (diffHours < 48) return 'Yesterday';
+                return date.toLocaleDateString();
+            }
+
+            initializeCharts() {
+                this.destroyCharts();
+
+                this.initializeMemoryTimeline();
+                this.initializeSkillsChart();
+                this.initializePersonalityChart();
+            }
+
+            destroyCharts() {
+                Object.values(this.charts).forEach(chart => {
+                    if (chart) chart.destroy();
+                });
+                this.charts = {};
+            }
+
+            initializeMemoryTimeline() {
+                const ctx = document.getElementById('memory-timeline-chart');
+                if (!ctx) return;
+
+                // Process memory data for timeline
+                const timelineData = this.processMemoryTimelineData();
+
+                this.charts.memoryTimeline = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: timelineData.labels,
+                        datasets: [{
+                            label: 'Memories Created',
+                            data: timelineData.data,
+                            borderColor: '#9f7aea',
+                            backgroundColor: 'rgba(159, 122, 234, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            processMemoryTimelineData() {
+                // This would normally process actual timestamp data
+                // For now, generate sample data based on recent memories
+                const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                const data = days.map(() => Math.floor(Math.random() * 5) + 1);
+
+                return {
+                    labels: days,
+                    data: data
+                };
+            }
+
+            initializeSkillsChart() {
+                const ctx = document.getElementById('skills-chart');
+                if (!ctx) return;
+
+                const skills = this.skillsData.skills || [];
+                const skillData = skills.map(skill => ({
+                    label: skill.skill_type.replace('_', ' '),
+                    value: this.getSkillPercentage(skill.skill_level)
+                }));
+
+                this.charts.skills = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: skillData.map(s => s.label),
+                        datasets: [{
+                            data: skillData.map(s => s.value),
+                            backgroundColor: [
+                                '#4299e1',
+                                '#48bb78',
+                                '#ed8936',
+                                '#9f7aea',
+                                '#e53e3e',
+                                '#38b2ac'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    boxWidth: 12,
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            initializePersonalityChart() {
+                const ctx = document.getElementById('personality-chart');
+                if (!ctx) return;
+
+                const personality = this.characterData.personality || {};
+
+                this.charts.personality = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: Object.keys(personality).map(key => key.replace('_', ' ')),
+                        datasets: [{
+                            label: 'Current Personality',
+                            data: Object.values(personality),
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            pointBackgroundColor: '#667eea',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#667eea'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 1,
+                                ticks: {
+                                    stepSize: 0.2
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            toggleAutoRefresh() {
+                this.autoRefresh = !this.autoRefresh;
+                const toggle = document.getElementById('auto-refresh-toggle');
+
+                if (this.autoRefresh) {
+                    toggle.classList.add('active');
+                    this.refreshInterval = setInterval(() => {
+                        this.refreshData();
+                    }, 30000); // Refresh every 30 seconds
+                } else {
+                    toggle.classList.remove('active');
+                    if (this.refreshInterval) {
+                        clearInterval(this.refreshInterval);
+                        this.refreshInterval = null;
+                    }
+                }
+            }
+
+            async refreshData() {
+                if (!this.selectedCharacter) return;
+
+                const refreshBtn = document.getElementById('refresh-btn');
+                const originalText = refreshBtn.textContent;
+                refreshBtn.textContent = 'Refreshing...';
+                refreshBtn.disabled = true;
+
+                try {
+                    await this.loadCharacterData();
+                    this.renderDashboard();
+                    this.checkConnectionStatus();
+                } catch (error) {
+                    console.error('Error refreshing data:', error);
+                    this.showErrorMessage('Failed to refresh data');
+                } finally {
+                    refreshBtn.textContent = originalText;
+                    refreshBtn.disabled = false;
+                }
+            }
+
+            async checkConnectionStatus() {
+                try {
+                    const response = await fetch(`${this.apiBase}/`);
+                    const statusIndicator = document.getElementById('connection-status');
+
+                    if (response.ok) {
+                        statusIndicator.classList.remove('offline');
+                        statusIndicator.classList.add('online');
+                    } else {
+                        throw new Error('Server not responding');
+                    }
+                } catch (error) {
+                    const statusIndicator = document.getElementById('connection-status');
+                    statusIndicator.classList.remove('online');
+                    statusIndicator.classList.add('offline');
+                }
+            }
+
+            showNoCharactersMessage() {
+                const dashboardContent = document.getElementById('dashboard-content');
+                dashboardContent.innerHTML = `
+                    <div class="chart-card">
+                        <div style="text-align: center; padding: 60px 20px;">
+                            <h3 style="color: #4a5568; margin-bottom: 15px;">No Characters Available</h3>
+                            <p style="color: #718096; margin-bottom: 20px;">
+                                Create some AI characters first to see their evolution data here.
+                            </p>
+                            <button onclick="window.location.href='/'" class="refresh-btn">
+                                Go to Main Portal
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showErrorMessage(message) {
+                const dashboardContent = document.getElementById('dashboard-content');
+                dashboardContent.innerHTML = `
+                    <div class="error-message">
+                        <strong>Error:</strong> ${message}
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize dashboard when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new CharacterDashboard();
+        });
+    </script>
+</body>
+</html>

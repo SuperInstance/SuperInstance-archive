@@ -1,0 +1,341 @@
+version: '3.8'
+
+services:
+  # Consul Server
+  consul-server:
+    image: consul:1.17.0
+    container_name: activelog-consul-server
+    command: >
+      consul agent
+      -server
+      -bootstrap-expect=1
+      -datacenter=activelog-dc1
+      -data-dir=/consul/data
+      -bind=0.0.0.0
+      -client=0.0.0.0
+      -retry-join=consul-server
+      -ui-config-file=/consul/config/ui.json
+      -config-file=/consul/config/server.json
+      -log-level=INFO
+    ports:
+      - "8500:8500"   # HTTP API
+      - "8501:8501"   # HTTPS API
+      - "8600:8600"   # DNS
+      - "8300:8300"   # Server RPC
+      - "8301:8301"   # Serf LAN
+      - "8302:8302"   # Serf WAN
+      - "8502:8502"   # gRPC
+    volumes:
+      - ./consul/consul-server.json:/consul/config/server.json:ro
+      - ./consul/ui.json:/consul/config/ui.json:ro
+      - consul_data:/consul/data
+      - consul_logs:/consul/logs
+    environment:
+      - CONSUL_BIND_INTERFACE=eth0
+      - CONSUL_CLIENT_INTERFACE=eth0
+    networks:
+      - mesh
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "consul", "members"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  # Envoy Proxy (Edge Gateway)
+  envoy-gateway:
+    image: envoyproxy/envoy:v1.28.0
+    container_name: activelog-envoy-gateway
+    ports:
+      - "8080:8080"   # Main proxy port
+      - "9901:9901"   # Admin interface
+    volumes:
+      - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
+      - ./envoy/bootstrap.yaml:/etc/envoy/bootstrap.yaml:ro
+    command: ["envoy", "-c", "/etc/envoy/envoy.yaml", "--service-cluster", "activelog-gateway"]
+    networks:
+      - mesh
+    depends_on:
+      - consul-server
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9901/ready"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  # Consul Connect Sidecar for API Gateway
+  consul-connect-api-gateway:
+    image: consul:1.17.0
+    container_name: consul-connect-api-gateway
+    command: >
+      consul connect proxy
+      -sidecar-for api-gateway
+      -bind 0.0.0.0:20000
+      -admin-bind 0.0.0.0:19000
+      -log-level INFO
+    ports:
+      - "19000:19000"  # Admin
+      - "20000:20000"  # Proxy
+    networks:
+      - mesh
+    depends_on:
+      - consul-server
+    restart: unless-stopped
+
+  # Service Mesh Controller
+  mesh-controller:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile.controller
+    container_name: activelog-mesh-controller
+    volumes:
+      - ./configs:/app/configs:ro
+      - ./scripts:/app/scripts:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - CONSUL_HTTP_ADDR=http://consul-server:8500
+      - ENVOY_ADMIN_ADDR=http://envoy-gateway:9901
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - MESH_CONFIG_PATH=/app/configs
+    networks:
+      - mesh
+    depends_on:
+      - consul-server
+      - envoy-gateway
+    restart: unless-stopped
+
+  # Traffic Management Service
+  traffic-manager:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile.traffic-manager
+    container_name: activelog-traffic-manager
+    ports:
+      - "8090:8090"   # Management API
+    volumes:
+      - ./routing:/app/routing:ro
+      - ./deployments:/app/deployments:ro
+    environment:
+      - CONSUL_HTTP_ADDR=http://consul-server:8500
+      - PROMETHEUS_URL=http://prometheus:9090
+      - GRAFANA_URL=http://grafana:3000
+    networks:
+      - mesh
+    depends_on:
+      - consul-server
+    restart: unless-stopped
+
+  # Blue-Green Deployment Manager
+  deployment-manager:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile.deployment-manager
+    container_name: activelog-deployment-manager
+    ports:
+      - "8091:8091"   # Management API
+    volumes:
+      - ./deployments:/app/deployments:ro
+      - ./scripts:/app/scripts:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - CONSUL_HTTP_ADDR=http://consul-server:8500
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - PROMETHEUS_URL=http://prometheus:9090
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
+    networks:
+      - mesh
+    depends_on:
+      - consul-server
+      - traffic-manager
+    restart: unless-stopped
+
+  # Canary Release Controller
+  canary-controller:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile.canary-controller
+    container_name: activelog-canary-controller
+    ports:
+      - "8092:8092"   # Management API
+    volumes:
+      - ./deployments:/app/deployments:ro
+      - ./scripts:/app/scripts:ro
+    environment:
+      - CONSUL_HTTP_ADDR=http://consul-server:8500
+      - PROMETHEUS_URL=http://prometheus:9090
+      - GRAFANA_URL=http://grafana:3000
+      - ALERTMANAGER_URL=http://alertmanager:9093
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
+    networks:
+      - mesh
+    depends_on:
+      - consul-server
+      - traffic-manager
+    restart: unless-stopped
+
+  # Circuit Breaker Manager
+  circuit-breaker-manager:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile.circuit-breaker
+    container_name: activelog-circuit-breaker-manager
+    ports:
+      - "8093:8093"   # Management API
+    volumes:
+      - ./configs:/app/configs:ro
+    environment:
+      - CONSUL_HTTP_ADDR=http://consul-server:8500
+      - ENVOY_ADMIN_ADDR=http://envoy-gateway:9901
+      - PROMETHEUS_URL=http://prometheus:9090
+    networks:
+      - mesh
+    depends_on:
+      - consul-server
+      - envoy-gateway
+    restart: unless-stopped
+
+  # Service Discovery Health Checker
+  health-checker:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile.health-checker
+    container_name: activelog-health-checker
+    volumes:
+      - ./configs:/app/configs:ro
+    environment:
+      - CONSUL_HTTP_ADDR=http://consul-server:8500
+      - CHECK_INTERVAL=30s
+      - PROMETHEUS_URL=http://prometheus:9090
+    networks:
+      - mesh
+    depends_on:
+      - consul-server
+    restart: unless-stopped
+
+  # Mesh Metrics Collector
+  mesh-metrics:
+    image: prom/prometheus:v2.47.2
+    container_name: activelog-mesh-metrics
+    ports:
+      - "9095:9090"   # Prometheus for mesh metrics
+    volumes:
+      - ./configs/prometheus-mesh.yml:/etc/prometheus/prometheus.yml:ro
+      - mesh_metrics_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=7d'
+      - '--web.enable-lifecycle'
+    networks:
+      - mesh
+    restart: unless-stopped
+
+  # Jaeger for Distributed Tracing
+  jaeger-collector:
+    image: jaegertracing/jaeger-collector:1.50
+    container_name: activelog-jaeger-collector
+    ports:
+      - "14269:14269"  # Admin port
+      - "14268:14268"  # HTTP
+      - "14250:14250"  # gRPC
+    environment:
+      - SPAN_STORAGE_TYPE=elasticsearch
+      - ES_SERVER_URLS=http://elasticsearch:9200
+      - ES_NUM_SHARDS=1
+      - ES_NUM_REPLICAS=0
+    networks:
+      - mesh
+    restart: unless-stopped
+
+  jaeger-query:
+    image: jaegertracing/jaeger-query:1.50
+    container_name: activelog-jaeger-query
+    ports:
+      - "16687:16686"  # Jaeger UI for mesh
+    environment:
+      - SPAN_STORAGE_TYPE=elasticsearch
+      - ES_SERVER_URLS=http://elasticsearch:9200
+      - JAEGER_AGENT_HOST=jaeger-collector
+    networks:
+      - mesh
+    depends_on:
+      - jaeger-collector
+    restart: unless-stopped
+
+  # Mesh Configuration API
+  mesh-config-api:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile.config-api
+    container_name: activelog-mesh-config-api
+    ports:
+      - "8094:8094"   # Configuration API
+    volumes:
+      - ./configs:/app/configs
+      - ./routing:/app/routing
+      - ./deployments:/app/deployments
+    environment:
+      - CONSUL_HTTP_ADDR=http://consul-server:8500
+      - CONFIG_PATH=/app/configs
+    networks:
+      - mesh
+    depends_on:
+      - consul-server
+    restart: unless-stopped
+
+  # Load Testing Agent
+  load-test-agent:
+    image: loadimpact/k6:latest
+    container_name: activelog-load-test-agent
+    volumes:
+      - ./scripts/load-tests:/scripts:ro
+      - load_test_results:/results
+    environment:
+      - TARGET_URL=http://envoy-gateway:8080
+      - CONSUL_HTTP_ADDR=http://consul-server:8500
+    networks:
+      - mesh
+    restart: "no"  # Run on demand
+
+  # Chaos Engineering Agent
+  chaos-agent:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile.chaos-agent
+    container_name: activelog-chaos-agent
+    volumes:
+      - ./configs/chaos.yaml:/app/chaos.yaml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - CONSUL_HTTP_ADDR=http://consul-server:8500
+      - CHAOS_CONFIG=/app/chaos.yaml
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    networks:
+      - mesh
+    depends_on:
+      - consul-server
+    restart: unless-stopped
+
+volumes:
+  consul_data:
+  consul_logs:
+  mesh_metrics_data:
+  load_test_results:
+
+networks:
+  mesh:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
+    driver_opts:
+      com.docker.network.bridge.name: activelog-mesh
+
+# External network connection to main application network
+  activelog_default:
+    external: true

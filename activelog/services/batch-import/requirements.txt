@@ -1,0 +1,62 @@
+# ActiveLog Batch Import Service Dependencies
+
+# Web Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Async support
+asyncio-mqtt==0.16.1
+aiofiles==23.2.1
+
+# Configuration and validation
+pydantic[email]==2.5.0
+python-dotenv==1.0.0
+
+# File monitoring
+watchdog==3.0.0
+
+# Object Storage
+minio==7.2.0
+
+# Database connectivity
+psycopg2-binary==2.9.7
+
+# Image processing
+Pillow==10.1.0
+
+# Video processing (for thumbnails)
+ffmpeg-python==0.2.0
+
+# Audio metadata
+mutagen==1.47.0
+
+# Document processing
+PyPDF2==3.0.1
+python-docx==1.1.0
+openpyxl==3.1.2
+
+# File type detection
+python-magic==0.4.27
+filetype==1.2.0
+
+# HTTP requests
+requests==2.31.0
+
+# Logging
+structlog==23.2.0
+
+# Date handling
+python-dateutil==2.8.2
+
+# Security
+cryptography==41.0.7
+
+# Development tools
+pytest==7.4.3
+pytest-asyncio==0.21.1
+
+# Optional OCR support
+# pytesseract==0.3.10  # Uncomment if OCR is needed
+
+# Optional language detection
+# langdetect==1.0.9   # Uncomment if language detection is needed

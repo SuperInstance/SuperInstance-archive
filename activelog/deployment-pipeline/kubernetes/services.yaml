@@ -1,0 +1,143 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dmlog-integration
+  namespace: dmlog-staging
+  labels:
+    app: dmlog-integration
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8203
+      targetPort: 8203
+      protocol: TCP
+      name: http
+  selector:
+    app: dmlog-integration
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dmlog-integration
+  namespace: dmlog-production
+  labels:
+    app: dmlog-integration
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8203
+      targetPort: 8203
+      protocol: TCP
+      name: http
+  selector:
+    app: dmlog-integration
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-orchestrator
+  namespace: dmlog-staging
+  labels:
+    app: data-orchestrator
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8204
+      targetPort: 8204
+      protocol: TCP
+      name: http
+    - port: 9204
+      targetPort: 9204
+      protocol: TCP
+      name: metrics
+  selector:
+    app: data-orchestrator
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-orchestrator
+  namespace: dmlog-production
+  labels:
+    app: data-orchestrator
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8204
+      targetPort: 8204
+      protocol: TCP
+      name: http
+    - port: 9204
+      targetPort: 9204
+      protocol: TCP
+      name: metrics
+  selector:
+    app: data-orchestrator
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-dmlog-final
+  namespace: dmlog-staging
+  labels:
+    app: frontend-dmlog-final
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  selector:
+    app: frontend-dmlog-final
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-dmlog-final
+  namespace: dmlog-production
+  labels:
+    app: frontend-dmlog-final
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  selector:
+    app: frontend-dmlog-final
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dmlog-gamedev
+  namespace: dmlog-staging
+  labels:
+    app: dmlog-gamedev
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8200
+      targetPort: 8200
+      protocol: TCP
+      name: http
+  selector:
+    app: dmlog-gamedev
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dmlog-gamedev
+  namespace: dmlog-production
+  labels:
+    app: dmlog-gamedev
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8200
+      targetPort: 8200
+      protocol: TCP
+      name: http
+  selector:
+    app: dmlog-gamedev

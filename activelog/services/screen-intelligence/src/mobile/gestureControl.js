@@ -1,0 +1,1 @@
+const EventEmitter = require("events"); module.exports = class GestureControl extends EventEmitter { constructor(options = {}) { super(); this.options = { sensitivity: 0.8, ...options }; } processGesture(data, clientId) { this.emit("gesture-processed", { data, clientId }); } };

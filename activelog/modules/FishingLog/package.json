@@ -1,0 +1,20 @@
+{
+  "name": "fishing-log",
+  "version": "1.0.0",
+  "description": "NMEA data integration, fish counting CV, and Coast Guard compliance for fishing activities",
+  "main": "index.js",
+  "dependencies": {
+    "nmea-simple": "^1.1.0",
+    "opencv4nodejs": "^5.6.0",
+    "node-fetch": "^3.3.0"
+  },
+  "keywords": [
+    "fishing",
+    "nmea",
+    "computer-vision",
+    "coast-guard",
+    "compliance"
+  ],
+  "author": "ActiveLog",
+  "license": "MIT"
+}

@@ -1,0 +1,322 @@
+{
+  "vestige_researcher": {
+    "bot_name": "vestige_researcher",
+    "specialization": "Death-rebirth optimization in hierarchical systems",
+    "phases": {
+      "delegation": {
+        "binary": {
+          "efficiency": 0.841874332176839,
+          "components": 2
+        },
+        "variable": {
+          "efficiency": 0.7908611221246656,
+          "components": 6
+        },
+        "task_specific": {
+          "efficiency": 0.853515923727029,
+          "components": 6
+        },
+        "ml_dynamic": {
+          "efficiency": 0.9273761551854083,
+          "components": 10
+        }
+      },
+      "fourth_dimension": {
+        "chef_bot_effectiveness": 0.8791420269483755,
+        "component_merging_success": 0.8078047762628714,
+        "hierarchy_depth_optimal": 4,
+        "cross_tree_optimization": 0.8374635153518991
+      },
+      "ml_optimization": {
+        "prediction_accuracy": 0.8876590201796771,
+        "loop_rate_optimization": 1.5683080257362219,
+        "training_efficiency": 0.9205700692177066
+      },
+      "integration": {
+        "end_to_end_success": 0.9360544976505918,
+        "cost_reduction_achieved": 0.4013950988541201,
+        "scalability_factor": 7.07572413120135
+      }
+    }
+  },
+  "holographic_researcher": {
+    "bot_name": "holographic_researcher",
+    "specialization": "Fault-tolerant hierarchical task logic",
+    "phases": {
+      "delegation": {
+        "binary": {
+          "efficiency": 0.7402399452516754,
+          "components": 2
+        },
+        "variable": {
+          "efficiency": 0.8119735161668429,
+          "components": 11
+        },
+        "task_specific": {
+          "efficiency": 0.8639375902294091,
+          "components": 7
+        },
+        "ml_dynamic": {
+          "efficiency": 0.9371555162691052,
+          "components": 7
+        }
+      },
+      "fourth_dimension": {
+        "chef_bot_effectiveness": 0.8663070282327603,
+        "component_merging_success": 0.8295307010467761,
+        "hierarchy_depth_optimal": 4,
+        "cross_tree_optimization": 0.7508546409974605
+      },
+      "ml_optimization": {
+        "prediction_accuracy": 0.8825164495957253,
+        "loop_rate_optimization": 1.3464379214293236,
+        "training_efficiency": 0.9365574156812864
+      },
+      "integration": {
+        "end_to_end_success": 0.906813002763562,
+        "cost_reduction_achieved": 0.5635484820691226,
+        "scalability_factor": 7.069769571471779
+      }
+    }
+  },
+  "firefly_researcher": {
+    "bot_name": "firefly_researcher",
+    "specialization": "Democratic coordination in task hierarchies",
+    "phases": {
+      "delegation": {
+        "binary": {
+          "efficiency": 0.7516624779384751,
+          "components": 2
+        },
+        "variable": {
+          "efficiency": 0.8019632891590364,
+          "components": 8
+        },
+        "task_specific": {
+          "efficiency": 0.9347094779939643,
+          "components": 6
+        },
+        "ml_dynamic": {
+          "efficiency": 0.9599474714175191,
+          "components": 7
+        }
+      },
+      "fourth_dimension": {
+        "chef_bot_effectiveness": 0.8980404137068742,
+        "component_merging_success": 0.8559046731884458,
+        "hierarchy_depth_optimal": 5,
+        "cross_tree_optimization": 0.7998127020626482
+      },
+      "ml_optimization": {
+        "prediction_accuracy": 0.9214978044075206,
+        "loop_rate_optimization": 1.5367889491017488,
+        "training_efficiency": 0.9559853030468266
+      },
+      "integration": {
+        "end_to_end_success": 0.947472701992286,
+        "cost_reduction_achieved": 0.4603628262732976,
+        "scalability_factor": 8.792623356120924
+      }
+    }
+  },
+  "spatial_researcher": {
+    "bot_name": "spatial_researcher",
+    "specialization": "Semantic organization of task components",
+    "phases": {
+      "delegation": {
+        "binary": {
+          "efficiency": 0.797574066706661,
+          "components": 2
+        },
+        "variable": {
+          "efficiency": 0.7727960544164124,
+          "components": 10
+        },
+        "task_specific": {
+          "efficiency": 0.9100773202780136,
+          "components": 4
+        },
+        "ml_dynamic": {
+          "efficiency": 0.9115409321456477,
+          "components": 10
+        }
+      },
+      "fourth_dimension": {
+        "chef_bot_effectiveness": 0.826384275721491,
+        "component_merging_success": 0.7862008668962457,
+        "hierarchy_depth_optimal": 4,
+        "cross_tree_optimization": 0.7713429418797936
+      },
+      "ml_optimization": {
+        "prediction_accuracy": 0.9181639805304488,
+        "loop_rate_optimization": 1.4842356776064458,
+        "training_efficiency": 0.9302808435410003
+      },
+      "integration": {
+        "end_to_end_success": 0.9309038419370069,
+        "cost_reduction_achieved": 0.39370284750144985,
+        "scalability_factor": 6.845895306774653
+      }
+    }
+  },
+  "consciousness_researcher": {
+    "bot_name": "consciousness_researcher",
+    "specialization": "Self-aware hierarchical task systems",
+    "phases": {
+      "delegation": {
+        "binary": {
+          "efficiency": 0.7817798639443017,
+          "components": 3
+        },
+        "variable": {
+          "efficiency": 0.7827365429346903,
+          "components": 9
+        },
+        "task_specific": {
+          "efficiency": 0.8736141165048087,
+          "components": 4
+        },
+        "ml_dynamic": {
+          "efficiency": 0.9174048495649334,
+          "components": 9
+        }
+      },
+      "fourth_dimension": {
+        "chef_bot_effectiveness": 0.8488545629227556,
+        "component_merging_success": 0.8444824840319648,
+        "hierarchy_depth_optimal": 5,
+        "cross_tree_optimization": 0.7652971912533276
+      },
+      "ml_optimization": {
+        "prediction_accuracy": 0.9354442781800608,
+        "loop_rate_optimization": 1.3786943045079902,
+        "training_efficiency": 0.9186230825318641
+      },
+      "integration": {
+        "end_to_end_success": 0.9067231291360002,
+        "cost_reduction_achieved": 0.38868558052602903,
+        "scalability_factor": 10.35697105540469
+      }
+    }
+  },
+  "economics_researcher": {
+    "bot_name": "economics_researcher",
+    "specialization": "ROI-optimized hierarchical task allocation",
+    "phases": {
+      "delegation": {
+        "binary": {
+          "efficiency": 0.7474925207590092,
+          "components": 3
+        },
+        "variable": {
+          "efficiency": 0.7159857132701294,
+          "components": 6
+        },
+        "task_specific": {
+          "efficiency": 0.8889343014112798,
+          "components": 4
+        },
+        "ml_dynamic": {
+          "efficiency": 0.8877642992009028,
+          "components": 6
+        }
+      },
+      "fourth_dimension": {
+        "chef_bot_effectiveness": 0.873335348759947,
+        "component_merging_success": 0.7899779030853165,
+        "hierarchy_depth_optimal": 6,
+        "cross_tree_optimization": 0.7889371912168195
+      },
+      "ml_optimization": {
+        "prediction_accuracy": 0.904844966701869,
+        "loop_rate_optimization": 1.4574927646956106,
+        "training_efficiency": 0.910371954532727
+      },
+      "integration": {
+        "end_to_end_success": 0.9455835158995082,
+        "cost_reduction_achieved": 0.5113699407480169,
+        "scalability_factor": 7.621243073477365
+      }
+    }
+  },
+  "integration_researcher": {
+    "bot_name": "integration_researcher",
+    "specialization": "Unified hierarchical framework synthesis",
+    "phases": {
+      "delegation": {
+        "binary": {
+          "efficiency": 0.7803555034665095,
+          "components": 2
+        },
+        "variable": {
+          "efficiency": 0.7922108471429958,
+          "components": 11
+        },
+        "task_specific": {
+          "efficiency": 0.8986222191266483,
+          "components": 8
+        },
+        "ml_dynamic": {
+          "efficiency": 0.9441425702932391,
+          "components": 9
+        }
+      },
+      "fourth_dimension": {
+        "chef_bot_effectiveness": 0.8509985128772117,
+        "component_merging_success": 0.8716834495988689,
+        "hierarchy_depth_optimal": 5,
+        "cross_tree_optimization": 0.7799150279863335
+      },
+      "ml_optimization": {
+        "prediction_accuracy": 0.9300089282030394,
+        "loop_rate_optimization": 1.679400860578331,
+        "training_efficiency": 0.941551154526247
+      },
+      "integration": {
+        "end_to_end_success": 0.9484783999156643,
+        "cost_reduction_achieved": 0.5136112120568647,
+        "scalability_factor": 6.673327026211612
+      }
+    }
+  },
+  "professor_enhanced": {
+    "bot_name": "professor_enhanced",
+    "specialization": "Comprehensive hierarchical system oversight",
+    "phases": {
+      "delegation": {
+        "binary": {
+          "efficiency": 0.7886768155445155,
+          "components": 4
+        },
+        "variable": {
+          "efficiency": 0.7098481445340923,
+          "components": 11
+        },
+        "task_specific": {
+          "efficiency": 0.900168328000695,
+          "components": 7
+        },
+        "ml_dynamic": {
+          "efficiency": 0.881871168325532,
+          "components": 7
+        }
+      },
+      "fourth_dimension": {
+        "chef_bot_effectiveness": 0.8599730514742221,
+        "component_merging_success": 0.8578261982027644,
+        "hierarchy_depth_optimal": 5,
+        "cross_tree_optimization": 0.842626455729577
+      },
+      "ml_optimization": {
+        "prediction_accuracy": 0.939525941279127,
+        "loop_rate_optimization": 1.6500836247672725,
+        "training_efficiency": 0.9337204136694821
+      },
+      "integration": {
+        "end_to_end_success": 0.907085355139488,
+        "cost_reduction_achieved": 0.5506253404300173,
+        "scalability_factor": 11.604750432078177
+      }
+    }
+  }
+}

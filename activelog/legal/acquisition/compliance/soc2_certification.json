@@ -1,0 +1,192 @@
+{
+  "certification_details": {
+    "certification_type": "SOC 2 Type II",
+    "issuing_authority": "BDO USA, LLP",
+    "company_name": "ActiveLog Technologies, Inc.",
+    "certificate_number": "SOC2-2024-AL-1147",
+    "issue_date": "2024-08-15",
+    "effective_period": {
+      "start_date": "2023-08-01",
+      "end_date": "2024-07-31"
+    },
+    "next_audit_due": "2025-08-31",
+    "audit_status": "Passed without exceptions",
+    "trust_services_criteria": {
+      "security": "No exceptions noted",
+      "availability": "No exceptions noted", 
+      "processing_integrity": "No exceptions noted",
+      "confidentiality": "No exceptions noted",
+      "privacy": "No exceptions noted"
+    }
+  },
+  "audit_scope": {
+    "systems_covered": [
+      "ActiveLog AI Platform",
+      "Customer Portal",
+      "Admin Dashboard",
+      "API Gateway",
+      "Data Processing Pipeline",
+      "Backup and Recovery Systems"
+    ],
+    "services_in_scope": [
+      "AI-powered business automation",
+      "Customer data processing",
+      "Document management",
+      "Communication services",
+      "Analytics and reporting"
+    ],
+    "locations_covered": [
+      "Primary Data Center (AWS us-west-2)",
+      "Secondary Data Center (AWS us-east-1)",
+      "Corporate Offices (San Francisco, CA)"
+    ],
+    "personnel_covered": {
+      "total_employees_assessed": 67,
+      "security_trained": 67,
+      "background_checked": 65,
+      "privileged_access_users": 12
+    }
+  },
+  "control_objectives_tested": {
+    "cc1_control_environment": {
+      "status": "Effective",
+      "findings": 0,
+      "description": "Entity maintains policies and procedures to achieve control objectives"
+    },
+    "cc2_communication_information": {
+      "status": "Effective", 
+      "findings": 0,
+      "description": "Internal and external communication supports functioning of controls"
+    },
+    "cc3_risk_assessment": {
+      "status": "Effective",
+      "findings": 0,
+      "description": "Entity identifies, analyzes and responds to risks"
+    },
+    "cc4_monitoring_activities": {
+      "status": "Effective",
+      "findings": 0,
+      "description": "Entity monitors system and evaluates control deficiencies"
+    },
+    "cc5_control_activities": {
+      "status": "Effective",
+      "findings": 0,
+      "description": "Entity implements control activities through policies and procedures"
+    },
+    "cc6_logical_physical_access": {
+      "status": "Effective",
+      "findings": 0,
+      "description": "Entity restricts logical and physical access"
+    },
+    "cc7_system_operations": {
+      "status": "Effective", 
+      "findings": 0,
+      "description": "Entity ensures system processing is complete, valid and authorized"
+    },
+    "cc8_change_management": {
+      "status": "Effective",
+      "findings": 0,
+      "description": "Entity manages system changes in a controlled manner"
+    }
+  },
+  "security_controls": {
+    "access_controls": {
+      "multi_factor_authentication": "Required for all users",
+      "privileged_access_management": "Implemented with regular review",
+      "user_access_reviews": "Quarterly reviews conducted",
+      "terminated_user_access": "Removed within 24 hours"
+    },
+    "data_protection": {
+      "encryption_at_rest": "AES-256 encryption implemented",
+      "encryption_in_transit": "TLS 1.3 for all communications",
+      "data_backup": "Daily automated backups with offsite storage",
+      "data_retention": "Policy compliant retention schedules"
+    },
+    "network_security": {
+      "firewall_configuration": "Properly configured and monitored",
+      "intrusion_detection": "24/7 monitoring implemented",
+      "vulnerability_management": "Regular scans and remediation",
+      "network_segmentation": "Proper segmentation implemented"
+    },
+    "incident_response": {
+      "incident_response_plan": "Documented and tested annually",
+      "security_incident_logging": "All incidents properly logged",
+      "breach_notification": "Procedures meet regulatory requirements",
+      "forensic_capabilities": "Third-party forensic services contracted"
+    }
+  },
+  "availability_controls": {
+    "system_uptime": {
+      "target_uptime": "99.9%",
+      "achieved_uptime": "99.97%",
+      "planned_maintenance": "Monthly maintenance windows",
+      "unplanned_downtime": "2.8 hours total for audit period"
+    },
+    "backup_recovery": {
+      "backup_frequency": "Daily automated backups",
+      "recovery_testing": "Monthly recovery tests performed",
+      "rto_target": "4 hours",
+      "rpo_target": "1 hour",
+      "disaster_recovery_plan": "Tested semi-annually"
+    },
+    "capacity_management": {
+      "performance_monitoring": "Real-time monitoring implemented",
+      "capacity_planning": "Quarterly capacity reviews",
+      "scalability_testing": "Annual load testing performed",
+      "resource_utilization": "Average 67% CPU, 72% memory"
+    }
+  },
+  "processing_integrity": {
+    "data_processing_controls": {
+      "input_validation": "Comprehensive validation implemented",
+      "processing_accuracy": "Automated accuracy checks",
+      "error_handling": "Proper error logging and notification",
+      "data_completeness": "Batch processing reconciliation"
+    },
+    "system_interfaces": {
+      "api_controls": "Rate limiting and authentication",
+      "data_transfer_integrity": "Checksum validation implemented",
+      "interface_monitoring": "Real-time interface monitoring",
+      "error_correction": "Automated retry mechanisms"
+    }
+  },
+  "confidentiality_privacy": {
+    "data_classification": {
+      "classification_scheme": "Public, Internal, Confidential, Restricted",
+      "labeling_requirements": "Automated data labeling",
+      "handling_procedures": "Role-based access controls",
+      "retention_policies": "Data retention schedules implemented"
+    },
+    "privacy_controls": {
+      "personal_data_inventory": "Complete inventory maintained",
+      "consent_management": "Consent tracking implemented",
+      "data_subject_rights": "GDPR rights management system",
+      "cross_border_transfers": "Standard contractual clauses used"
+    }
+  },
+  "auditor_opinion": {
+    "overall_conclusion": "ActiveLog Technologies' controls were suitably designed and operating effectively throughout the specified period to meet the criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy.",
+    "management_letter_points": 0,
+    "recommendations": [
+      "Continue quarterly access reviews",
+      "Maintain current security training program",
+      "Monitor emerging threats and update controls accordingly"
+    ],
+    "prior_year_findings": "No prior year findings to follow up on",
+    "continuous_improvement": "Management demonstrates commitment to continuous improvement of controls"
+  },
+  "compliance_summary": {
+    "total_controls_tested": 127,
+    "effective_controls": 127,
+    "deficient_controls": 0,
+    "management_responses": "N/A - No deficiencies identified",
+    "audit_evidence": "Sufficient appropriate evidence obtained",
+    "testing_period": "12 months ending July 31, 2024"
+  },
+  "certificate_validity": {
+    "valid_through": "2025-08-15",
+    "renewal_process": "Annual Type II audit required",
+    "continuous_monitoring": "Quarterly management attestations",
+    "interim_testing": "Semi-annual internal assessments"
+  }
+}

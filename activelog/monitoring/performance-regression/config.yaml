@@ -1,0 +1,194 @@
+prometheus:
+  url: "http://prometheus:9090"
+
+alertmanager:
+  url: "http://alertmanager:9093"
+
+metrics:
+  latency_metrics:
+    - "http_request_duration_seconds"
+    - "grpc_server_handling_seconds"
+    - "ai_model_inference_duration_seconds"
+    - "database_query_duration_seconds"
+    - "video_processing_duration_seconds"
+    - "file_upload_duration_seconds"
+    - "sync_operation_duration_seconds"
+    - "backup_duration_seconds"
+    - "export_operation_duration_seconds"
+    - "ml_pipeline_duration_seconds"
+    - "document_processing_duration_seconds"
+    - "cache_operation_duration_seconds"
+    - "notification_delivery_duration_seconds"
+    - "workflow_execution_duration_seconds"
+    - "collaboration_operation_duration_seconds"
+    - "smart_folder_rule_duration_seconds"
+    - "p2p_sync_duration_seconds"
+    - "graphql_request_duration_seconds"
+    - "mobile_api_request_duration_seconds"
+    - "auth_operation_duration_seconds"
+    - "metadata_operation_duration_seconds"
+    - "file_watcher_processing_duration_seconds"
+    - "batch_import_duration_seconds"
+
+  throughput_metrics:
+    - "http_requests_total"
+    - "grpc_server_started_total"
+    - "ai_model_inference_total"
+    - "database_queries_total"
+    - "video_processing_total"
+    - "file_uploads_total"
+    - "sync_operations_total"
+    - "backup_operations_total"
+    - "export_operations_total"
+    - "ml_pipeline_executions_total"
+    - "documents_processed_total"
+    - "cache_operations_total"
+    - "notifications_sent_total"
+    - "workflows_executed_total"
+    - "collaboration_operations_total"
+    - "smart_folder_rules_executed_total"
+    - "p2p_sync_operations_total"
+    - "graphql_requests_total"
+    - "mobile_api_requests_total"
+    - "auth_operations_total"
+    - "metadata_operations_total"
+    - "file_watcher_events_total"
+    - "batch_import_operations_total"
+
+  error_metrics:
+    - "http_requests_total{status=~\"5..\"}"
+    - "grpc_server_started_total{grpc_code!=\"OK\"}"
+    - "ai_model_inference_errors_total"
+    - "database_query_errors_total"
+    - "video_processing_errors_total"
+    - "file_upload_errors_total"
+    - "sync_operation_errors_total"
+    - "backup_failures_total"
+    - "export_operation_errors_total"
+    - "ml_pipeline_failures_total"
+    - "document_processing_errors_total"
+    - "cache_operation_errors_total"
+    - "notification_delivery_errors_total"
+    - "workflow_execution_errors_total"
+    - "collaboration_operation_errors_total"
+    - "smart_folder_rule_errors_total"
+    - "p2p_sync_errors_total"
+    - "graphql_errors_total"
+    - "mobile_api_errors_total"
+    - "auth_operation_errors_total"
+    - "metadata_operation_errors_total"
+    - "file_watcher_errors_total"
+    - "batch_import_errors_total"
+
+thresholds:
+  # Percentage increase in latency that triggers an alert
+  latency_increase_percentage: 50
+  
+  # Percentage decrease in throughput that triggers an alert
+  throughput_decrease_percentage: 30
+  
+  # Multiplier for error rate increase that triggers an alert
+  error_rate_increase_multiplier: 2.0
+  
+  # Statistical significance threshold for trend analysis
+  statistical_significance: 0.05
+  
+  # Minimum data points required for analysis
+  minimum_data_points: 10
+  
+  # Baseline comparison periods
+  baseline_periods:
+    - "1d"   # Compare with same time yesterday
+    - "7d"   # Compare with same time last week
+    - "30d"  # Compare with same time last month
+
+detection:
+  # How often to run detection (in seconds)
+  interval: 300
+  
+  # Time windows for analysis
+  current_window: "1h"
+  baseline_window: "1h"
+  
+  # Services to monitor
+  services:
+    - name: "api-gateway"
+      priority: "critical"
+      custom_thresholds:
+        latency_increase_percentage: 30
+    - name: "auth-service"
+      priority: "critical"
+      custom_thresholds:
+        error_rate_increase_multiplier: 1.5
+    - name: "metadata-service"
+      priority: "high"
+    - name: "file-processor-service"
+      priority: "high"
+    - name: "ai-orchestrator-service"
+      priority: "medium"
+      custom_thresholds:
+        latency_increase_percentage: 100  # AI operations can be more variable
+    - name: "notification-service"
+      priority: "medium"
+    - name: "backup-service"
+      priority: "low"
+    - name: "collaboration-service"
+      priority: "medium"
+    - name: "data-export-service"
+      priority: "low"
+    - name: "document-ai-service"
+      priority: "medium"
+    - name: "graphql-service"
+      priority: "critical"
+    - name: "mobile-api-service"
+      priority: "high"
+    - name: "ml-pipeline-service"
+      priority: "medium"
+    - name: "smart-folders-service"
+      priority: "medium"
+    - name: "sync-engine-service"
+      priority: "high"
+    - name: "video-pipeline-service"
+      priority: "low"
+    - name: "video-processor-service"
+      priority: "low"
+    - name: "workflows-service"
+      priority: "medium"
+    - name: "analytics-service"
+      priority: "medium"
+    - name: "batch-import-service"
+      priority: "low"
+    - name: "cache-service"
+      priority: "high"
+    - name: "p2p-sync-service"
+      priority: "medium"
+    - name: "file-watcher-service"
+      priority: "medium"
+
+alerting:
+  # Channels for different severity levels
+  channels:
+    critical:
+      - webhook: "http://alertmanager:9093/api/v1/alerts"
+      - slack: "#critical-alerts"
+      - email: "ops-critical@activelog.com"
+    high:
+      - webhook: "http://alertmanager:9093/api/v1/alerts"
+      - slack: "#alerts"
+    medium:
+      - webhook: "http://alertmanager:9093/api/v1/alerts"
+    low:
+      - webhook: "http://alertmanager:9093/api/v1/alerts"
+
+  # Rate limiting to prevent alert spam
+  rate_limiting:
+    max_alerts_per_hour: 10
+    max_alerts_per_service_per_hour: 3
+    cooldown_period: 3600  # seconds
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "/var/log/regression-detector.log"
+  max_size: "10MB"
+  backup_count: 5

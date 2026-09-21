@@ -1,0 +1,32 @@
+[
+  {
+    "grant_id": "perm_0307c5d08aae",
+    "user_id": "test_user",
+    "resource_id": "/sensitive/files",
+    "resource_type": "ResourceType.FILE",
+    "permission_level": "PermissionLevel.READ",
+    "granted_by": "api_user",
+    "granted_at": "2025-08-24 20:27:29.273079+00:00",
+    "expires_at": "2025-11-22 20:27:29.273017+00:00",
+    "device_restrictions": [],
+    "conditions": {},
+    "justification": "Testing permission system",
+    "status": "PermissionStatus.ACTIVE",
+    "metadata": {}
+  },
+  {
+    "grant_id": "perm_77df97dbe326",
+    "user_id": "test_user",
+    "resource_id": "/sensitive/files",
+    "resource_type": "ResourceType.FILE",
+    "permission_level": "PermissionLevel.READ",
+    "granted_by": "api_user",
+    "granted_at": "2025-08-24 20:28:05.546488+00:00",
+    "expires_at": "2025-11-22 20:28:05.546477+00:00",
+    "device_restrictions": [],
+    "conditions": {},
+    "justification": "Testing permission system",
+    "status": "PermissionStatus.ACTIVE",
+    "metadata": {}
+  }
+]

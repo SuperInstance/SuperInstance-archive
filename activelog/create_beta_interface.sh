@@ -1,0 +1,111 @@
+#!/bin/bash
+
+# Create a simple HTML interface for beta testing
+cat > ~/activelog/beta_dashboard.html << 'HTML'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ActiveLog Beta Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .service { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
+        .running { background-color: #d4edda; }
+        .stopped { background-color: #f8d7da; }
+        h1 { color: #333; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>🚀 ActiveLog Beta Testing Dashboard</h1>
+    
+    <h2>Available Services</h2>
+    
+    <div class="service running">
+        <h3>📁 File Sync Service</h3>
+        <p>Port: 8000</p>
+        <a href="http://localhost:8000/docs" target="_blank">API Documentation</a> |
+        <a href="http://localhost:8000/health" target="_blank">Health Check</a>
+    </div>
+    
+    <div class="service running">
+        <h3>🤖 AI Orchestrator</h3>
+        <p>Port: 8001</p>
+        <a href="http://localhost:8001/docs" target="_blank">API Documentation</a> |
+        <a href="http://localhost:8001/plugins" target="_blank">Plugins</a>
+    </div>
+    
+    <div class="service running">
+        <h3>🔐 Authentication Service</h3>
+        <p>Port: 8002</p>
+        <a href="http://localhost:8002/docs" target="_blank">API Documentation</a>
+    </div>
+    
+    <div class="service running">
+        <h3>🌐 API Gateway</h3>
+        <p>Port: 8088</p>
+        <a href="http://localhost:8088/health" target="_blank">Health Check</a>
+    </div>
+    
+    <div class="service running">
+        <h3>💾 MinIO Storage</h3>
+        <p>Port: 9001</p>
+        <a href="http://localhost:9001" target="_blank">MinIO Console</a>
+        <p>Login: minioadmin / minioadmin123</p>
+    </div>
+    
+    <div class="service running">
+        <h3>🎨 Frontend Application</h3>
+        <p>Port: 3000</p>
+        <a href="http://localhost:3000" target="_blank">Open Application</a>
+    </div>
+    
+    <h2>Test Credentials</h2>
+    <ul>
+        <li>Email: test@example.com</li>
+        <li>Password: testpass123</li>
+    </ul>
+    
+    <h2>Quick Tests</h2>
+    <ul>
+        <li><a href="http://localhost:8000/docs#/default/upload_file_upload_post" target="_blank">Test File Upload</a></li>
+        <li><a href="http://localhost:8001/plugins" target="_blank">View AI Plugins</a></li>
+        <li><a href="http://localhost:3000" target="_blank">Main Application</a></li>
+    </ul>
+    
+    <script>
+        // Auto-refresh every 30 seconds
+        setTimeout(() => location.reload(), 30000);
+    </script>
+</body>
+</html>
+HTML
+
+echo "Beta dashboard created: ~/activelog/beta_dashboard.html"
+echo "Open in browser: file://$HOME/activelog/beta_dashboard.html"
+
+# Also create a simple Python server to serve it
+cat > ~/activelog/serve_dashboard.py << 'PYTHON'
+#!/usr/bin/env python3
+import http.server
+import socketserver
+import os
+
+os.chdir(os.path.expanduser("~/activelog"))
+PORT = 8090
+
+Handler = http.server.SimpleHTTPRequestHandler
+
+with socketserver.TCPServer(("", PORT), Handler) as httpd:
+    print(f"Beta Dashboard running at: http://localhost:{PORT}/beta_dashboard.html")
+    httpd.serve_forever()
+PYTHON
+
+chmod +x ~/activelog/serve_dashboard.py
+
+# Start the dashboard server
+python3 ~/activelog/serve_dashboard.py &
+echo $! > ~/activelog/pids/dashboard.pid
+
+echo ""
+echo "✅ Beta Dashboard available at: http://localhost:8090/beta_dashboard.html"

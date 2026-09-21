@@ -1,0 +1,256 @@
+name: DMLog Rollback Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to rollback'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      rollback_version:
+        description: 'Version to rollback to (e.g., v1.2.3 or commit SHA)'
+        required: true
+        type: string
+      services:
+        description: 'Services to rollback (comma-separated, or "all")'
+        required: false
+        default: 'all'
+        type: string
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  validate-rollback:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.parse.outputs.services }}
+      valid_version: ${{ steps.validate.outputs.valid }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Parse services input
+        id: parse
+        run: |
+          if [ "${{ github.event.inputs.services }}" = "all" ]; then
+            echo "services=[\"dmlog-gamedev\",\"dmlog-integration\",\"frontend-dmlog-final\",\"data-orchestrator\"]" >> $GITHUB_OUTPUT
+          else
+            # Convert comma-separated to JSON array
+            services=$(echo "${{ github.event.inputs.services }}" | jq -Rc 'split(",") | map(gsub(" ";""))')
+            echo "services=$services" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate rollback version
+        id: validate
+        run: |
+          VERSION="${{ github.event.inputs.rollback_version }}"
+          
+          # Check if it's a commit SHA
+          if [[ $VERSION =~ ^[0-9a-f]{7,40}$ ]]; then
+            if git rev-parse --verify $VERSION >/dev/null 2>&1; then
+              echo "valid=true" >> $GITHUB_OUTPUT
+              echo "Version $VERSION is a valid commit SHA"
+            else
+              echo "valid=false" >> $GITHUB_OUTPUT
+              echo "Invalid commit SHA: $VERSION"
+            fi
+          # Check if it's a semantic version tag
+          elif [[ $VERSION =~ ^v?[0-9]+\.[0-9]+\.[0-9]+.*$ ]]; then
+            if git tag -l | grep -q "^$VERSION$"; then
+              echo "valid=true" >> $GITHUB_OUTPUT
+              echo "Version $VERSION is a valid tag"
+            else
+              echo "valid=false" >> $GITHUB_OUTPUT
+              echo "Tag not found: $VERSION"
+            fi
+          else
+            echo "valid=false" >> $GITHUB_OUTPUT
+            echo "Invalid version format: $VERSION"
+          fi
+
+      - name: Check image availability
+        if: steps.validate.outputs.valid == 'true'
+        run: |
+          SERVICES='${{ steps.parse.outputs.services }}'
+          VERSION="${{ github.event.inputs.rollback_version }}"
+          
+          echo "$SERVICES" | jq -r '.[]' | while read service; do
+            IMAGE_TAG="${{ env.REGISTRY }}/${{ github.repository }}/$service:$VERSION"
+            
+            # Check if image exists in registry
+            if docker manifest inspect $IMAGE_TAG > /dev/null 2>&1; then
+              echo "✓ Image exists: $IMAGE_TAG"
+            else
+              echo "✗ Image not found: $IMAGE_TAG"
+              echo "ERROR=true" >> $GITHUB_ENV
+            fi
+          done
+          
+          if [ "$ERROR" = "true" ]; then
+            echo "Some images are not available for rollback"
+            exit 1
+          fi
+
+  rollback-staging:
+    needs: validate-rollback
+    runs-on: ubuntu-latest
+    if: github.event.inputs.environment == 'staging' && needs.validate-rollback.outputs.valid_version == 'true'
+    environment: staging
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Kubernetes
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region us-west-2 --name dmlog-staging
+
+      - name: Create rollback backup
+        run: |
+          cd kubernetes
+          ./scripts/create-rollback-backup.sh staging
+
+      - name: Execute rollback
+        run: |
+          cd kubernetes
+          SERVICES='${{ needs.validate-rollback.outputs.services }}'
+          VERSION="${{ github.event.inputs.rollback_version }}"
+          
+          echo "$SERVICES" | jq -r '.[]' | while read service; do
+            echo "Rolling back $service to $VERSION"
+            ./scripts/rollback-service.sh staging $service $VERSION
+          done
+
+      - name: Verify rollback
+        run: |
+          cd scripts
+          ./verify-rollback.sh staging '${{ needs.validate-rollback.outputs.services }}' '${{ github.event.inputs.rollback_version }}'
+
+      - name: Run health checks
+        run: |
+          cd scripts
+          ./run-health-checks.sh staging
+
+      - name: Rollback notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          message: |
+            🔄 Staging Rollback ${{ job.status == 'success' && 'Completed' || 'Failed' }}
+            Environment: staging
+            Version: ${{ github.event.inputs.rollback_version }}
+            Services: ${{ github.event.inputs.services }}
+
+  rollback-production:
+    needs: validate-rollback
+    runs-on: ubuntu-latest
+    if: github.event.inputs.environment == 'production' && needs.validate-rollback.outputs.valid_version == 'true'
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Kubernetes
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region us-west-2 --name dmlog-production
+
+      - name: Production rollback confirmation
+        run: |
+          echo "⚠️  PRODUCTION ROLLBACK INITIATED"
+          echo "Environment: production"
+          echo "Version: ${{ github.event.inputs.rollback_version }}"
+          echo "Services: ${{ github.event.inputs.services }}"
+          echo "Initiated by: ${{ github.actor }}"
+
+      - name: Create rollback backup
+        run: |
+          cd kubernetes
+          ./scripts/create-rollback-backup.sh production
+
+      - name: Traffic shift preparation
+        run: |
+          cd kubernetes
+          ./scripts/prepare-traffic-shift.sh production
+
+      - name: Execute blue-green rollback
+        run: |
+          cd kubernetes
+          SERVICES='${{ needs.validate-rollback.outputs.services }}'
+          VERSION="${{ github.event.inputs.rollback_version }}"
+          
+          echo "$SERVICES" | jq -r '.[]' | while read service; do
+            echo "Rolling back $service to $VERSION using blue-green strategy"
+            ./scripts/blue-green-rollback.sh production $service $VERSION
+          done
+
+      - name: Run critical smoke tests
+        run: |
+          cd scripts
+          ./run-smoke-tests.sh production --critical-only
+
+      - name: Complete traffic switch
+        run: |
+          cd kubernetes
+          ./scripts/complete-rollback-switch.sh production
+
+      - name: Comprehensive verification
+        run: |
+          cd scripts
+          ./verify-rollback.sh production '${{ needs.validate-rollback.outputs.services }}' '${{ github.event.inputs.rollback_version }}'
+          ./run-integration-tests.sh production --rollback-verification
+
+      - name: Update monitoring dashboards
+        run: |
+          cd scripts
+          ./update-monitoring.sh production rollback '${{ github.event.inputs.rollback_version }}'
+
+      - name: Production rollback notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#critical-alerts'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          message: |
+            🚨 PRODUCTION ROLLBACK ${{ job.status == 'success' && 'COMPLETED' || 'FAILED' }}
+            Environment: production
+            Version: ${{ github.event.inputs.rollback_version }}
+            Services: ${{ github.event.inputs.services }}
+            Initiated by: ${{ github.actor }}
+            Duration: ${{ steps.duration.outputs.time || 'N/A' }}
+
+      - name: Create incident report
+        if: always()
+        run: |
+          cd scripts
+          ./create-incident-report.sh production rollback '${{ github.event.inputs.rollback_version }}' '${{ job.status }}'

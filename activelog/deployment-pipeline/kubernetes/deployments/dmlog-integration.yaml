@@ -1,0 +1,167 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dmlog-integration
+  namespace: dmlog-staging
+  labels:
+    app: dmlog-integration
+    environment: staging
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dmlog-integration
+  template:
+    metadata:
+      labels:
+        app: dmlog-integration
+        environment: staging
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8203"
+        prometheus.io/path: "/metrics"
+    spec:
+      imagePullSecrets:
+        - name: registry-secret
+      containers:
+        - name: dmlog-integration
+          image: ghcr.io/dmlog/dmlog-integration:latest
+          ports:
+            - containerPort: 8203
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "8203"
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: dmlog-config
+                  key: NODE_ENV
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: dmlog-config
+                  key: LOG_LEVEL
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dmlog-database
+                  key: DATABASE_URL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dmlog-redis
+                  key: REDIS_URL
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: dmlog-jwt
+                  key: JWT_SECRET
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8203
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8203
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dmlog-integration
+  namespace: dmlog-production
+  labels:
+    app: dmlog-integration
+    environment: production
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: dmlog-integration
+  template:
+    metadata:
+      labels:
+        app: dmlog-integration
+        environment: production
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8203"
+        prometheus.io/path: "/metrics"
+    spec:
+      imagePullSecrets:
+        - name: registry-secret
+      containers:
+        - name: dmlog-integration
+          image: ghcr.io/dmlog/dmlog-integration:latest
+          ports:
+            - containerPort: 8203
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "8203"
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: dmlog-config
+                  key: NODE_ENV
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: dmlog-config
+                  key: LOG_LEVEL
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dmlog-database
+                  key: DATABASE_URL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dmlog-redis
+                  key: REDIS_URL
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: dmlog-jwt
+                  key: JWT_SECRET
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8203
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8203
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+      restartPolicy: Always

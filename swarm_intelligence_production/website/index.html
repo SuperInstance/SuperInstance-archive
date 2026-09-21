@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swarm Intelligence - GPT-4 Power at 200x Lower Cost</title>
+    <meta name="description" content="Deploy production-ready AI swarms in 30 seconds. Enterprise AI infrastructure for $9/month. 1M agents coordinating intelligently.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <svg class="logo-icon" width="40" height="40" viewBox="0 0 40 40">
+                    <circle cx="20" cy="20" r="3" fill="#6366F1"/>
+                    <circle cx="12" cy="15" r="2" fill="#8B5CF6"/>
+                    <circle cx="28" cy="15" r="2" fill="#8B5CF6"/>
+                    <circle cx="15" cy="25" r="2" fill="#8B5CF6"/>
+                    <circle cx="25" cy="25" r="2" fill="#8B5CF6"/>
+                    <circle cx="8" cy="20" r="1.5" fill="#C084FC"/>
+                    <circle cx="32" cy="20" r="1.5" fill="#C084FC"/>
+                    <circle cx="20" cy="10" r="1.5" fill="#C084FC"/>
+                    <circle cx="20" cy="30" r="1.5" fill="#C084FC"/>
+                </svg>
+                <span class="logo-text">Swarm Intelligence</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#features">Features</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="docs.html">Docs</a></li>
+                <li><a href="demo.html">Demo</a></li>
+                <li><a href="#" class="btn-secondary">Sign In</a></li>
+                <li><a href="#" class="btn-primary">Start Free</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="badge">200x Cheaper Than GPT-4</div>
+                <h1 class="hero-title">
+                    Enterprise AI Infrastructure<br/>
+                    <span class="gradient-text">For $9/Month</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Deploy self-organizing AI agent swarms in 30 seconds. Coordinate 1,000+ specialized agents
+                    that work together like nature's most intelligent systems. No DevOps. No GPUs. Just results.
+                </p>
+                <div class="hero-cta">
+                    <a href="#" class="btn-primary btn-large">
+                        Start Free - No Credit Card
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 3l7 7-7 7M17 10H3"/>
+                        </svg>
+                    </a>
+                    <a href="demo.html" class="btn-secondary btn-large">
+                        Watch Demo
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M8 5l7 5-7 5V5z"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-number">1M+</div>
+                        <div class="stat-label">Agents Coordinated</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">200x</div>
+                        <div class="stat-label">Cost Reduction</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">30s</div>
+                        <div class="stat-label">Deploy Time</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">99.9%</div>
+                        <div class="stat-label">Uptime SLA</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="swarm-demo">
+                    <canvas id="swarm-canvas" width="600" height="600"></canvas>
+                    <div class="demo-stats">
+                        <div class="demo-stat">
+                            <span class="label">Agents Active:</span>
+                            <span class="value" id="agent-count">1,000</span>
+                        </div>
+                        <div class="demo-stat">
+                            <span class="label">FPS:</span>
+                            <span class="value" id="fps">60</span>
+                        </div>
+                        <div class="demo-stat">
+                            <span class="label">Cost:</span>
+                            <span class="value">$0.003/min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof -->
+    <section class="social-proof">
+        <div class="container">
+            <p class="trusted-by">Trusted by innovative teams at</p>
+            <div class="company-logos">
+                <div class="company-logo">Startup Alpha</div>
+                <div class="company-logo">Tech Corp</div>
+                <div class="company-logo">Creative Studio</div>
+                <div class="company-logo">Research Lab</div>
+                <div class="company-logo">Game Studio</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Features -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why Developers Love Swarm Intelligence</h2>
+                <p>Everything you need to build production AI applications, without the complexity or cost</p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3>200x Cost Savings</h3>
+                    <p>Run on $5/month ARM instances instead of $1,000/month GPU servers. Same power, fraction of the cost.</p>
+                    <div class="feature-detail">
+                        <strong>Traditional AI:</strong> $2,200/month minimum<br/>
+                        <strong>Swarm Intelligence:</strong> $9/month
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>30-Second Deploy</h3>
+                    <p>From idea to production in seconds. No DevOps, no infrastructure, no configuration. Just code and go.</p>
+                    <div class="feature-detail">
+                        <code>$ swarm deploy my-agents.py</code><br/>
+                        <span class="success">✓ Deployed in 8.2 seconds</span>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Visual Designer</h3>
+                    <p>Build complex swarms with drag-and-drop. No coding required for standard workflows.</p>
+                    <a href="demo.html" class="feature-link">Try Designer →</a>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔧</div>
+                    <h3>1M Agent Coordination</h3>
+                    <p>Coordinate millions of specialized agents at 60 FPS. Self-organizing, self-healing, always available.</p>
+                    <div class="feature-detail">
+                        Memory: 64 bytes/agent<br/>
+                        Latency: &lt;50ms coordination
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>Natural Language Config</h3>
+                    <p>Describe what you want in plain English. AI generates the swarm configuration automatically.</p>
+                    <div class="feature-detail">
+                        "Generate 10 blog variations"<br/>
+                        <span class="arrow">→</span> 100-agent writing swarm
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Real-Time Analytics</h3>
+                    <p>Watch your swarms work. Full observability with metrics, logs, and 3D visualization.</p>
+                    <a href="#" class="feature-link">View Dashboard →</a>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Enterprise Security</h3>
+                    <p>SOC 2 Type II certified. GDPR compliant. Private cloud deployment available.</p>
+                    <div class="feature-detail">
+                        SSO • RBAC • Audit Logs • VPC
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3>Template Marketplace</h3>
+                    <p>200+ pre-built swarms for every use case. Deploy proven solutions in one click.</p>
+                    <a href="#" class="feature-link">Browse Templates →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases -->
+    <section class="use-cases">
+        <div class="container">
+            <div class="section-header">
+                <h2>Powering Every Type of AI Application</h2>
+                <p>From creative tools to enterprise automation</p>
+            </div>
+
+            <div class="use-case-tabs">
+                <button class="tab-btn active" data-tab="code">Code & Testing</button>
+                <button class="tab-btn" data-tab="creative">Creative AI</button>
+                <button class="tab-btn" data-tab="data">Data & Research</button>
+                <button class="tab-btn" data-tab="enterprise">Enterprise</button>
+            </div>
+
+            <div class="use-case-content">
+                <div class="tab-content active" id="code">
+                    <div class="use-case-split">
+                        <div class="use-case-info">
+                            <h3>Automated Code Review & Testing</h3>
+                            <p>Deploy swarms that review pull requests, write tests, catch bugs, and suggest improvements - all in parallel.</p>
+                            <ul class="feature-list">
+                                <li>80% bug detection rate</li>
+                                <li>10-second analysis time</li>
+                                <li>Automated test generation</li>
+                                <li>Security vulnerability scanning</li>
+                            </ul>
+                            <a href="#" class="btn-primary">Try Code Swarm</a>
+                        </div>
+                        <div class="use-case-visual">
+                            <div class="code-example">
+                                <pre><code>swarm = Swarm(
+  agents=[
+    CodeReviewAgent(style='security'),
+    TestGeneratorAgent(coverage=0.9),
+    BugDetectorAgent(severity='high')
+  ]
+)
+
+result = swarm.analyze(pull_request)
+# 15 issues found, 23 tests generated
+# Analysis complete in 8.3 seconds</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="creative">
+                    <div class="use-case-split">
+                        <div class="use-case-info">
+                            <h3>Music, Art & Content Creation</h3>
+                            <p>Generate professional creative content with swarms that understand aesthetics, harmony, and narrative.</p>
+                            <ul class="feature-list">
+                                <li>SwarmComposer: Music generation</li>
+                                <li>SwarmWriter: Novel and story creation</li>
+                                <li>SwarmDesign: Visual art generation</li>
+                                <li>SwarmVideo: Automated video editing</li>
+                            </ul>
+                            <a href="#" class="btn-primary">Explore Creative Tools</a>
+                        </div>
+                        <div class="use-case-visual">
+                            <div class="creative-showcase">
+                                <div class="showcase-item">🎵 200 melodies/min</div>
+                                <div class="showcase-item">🎨 100 designs/min</div>
+                                <div class="showcase-item">✍️ 50 stories/hour</div>
+                                <div class="showcase-item">🎬 30 video edits/hour</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="data">
+                    <div class="use-case-split">
+                        <div class="use-case-info">
+                            <h3>Data Analysis & Research</h3>
+                            <p>Parallel data processing, hypothesis testing, and scientific simulation with coordinated agent swarms.</p>
+                            <ul class="feature-list">
+                                <li>Distributed data analysis</li>
+                                <li>Hypothesis generation & testing</li>
+                                <li>Scientific simulation</li>
+                                <li>Pattern recognition at scale</li>
+                            </ul>
+                            <a href="#" class="btn-primary">Start Research Project</a>
+                        </div>
+                        <div class="use-case-visual">
+                            <div class="metrics-display">
+                                <div class="metric">10M+ data points analyzed</div>
+                                <div class="metric">95% accuracy</div>
+                                <div class="metric">100x faster processing</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="enterprise">
+                    <div class="use-case-split">
+                        <div class="use-case-info">
+                            <h3>Enterprise Automation</h3>
+                            <p>Replace expensive AI infrastructure with self-organizing swarms. 90% cost reduction, 100% reliability.</p>
+                            <ul class="feature-list">
+                                <li>Customer service automation</li>
+                                <li>Document processing</li>
+                                <li>Business intelligence</li>
+                                <li>Process optimization</li>
+                            </ul>
+                            <a href="#" class="btn-primary">Contact Sales</a>
+                        </div>
+                        <div class="use-case-visual">
+                            <div class="roi-calculator">
+                                <div class="calc-row">
+                                    <span>Current AI Spend:</span>
+                                    <span>$50,000/month</span>
+                                </div>
+                                <div class="calc-row">
+                                    <span>With Swarm Intelligence:</span>
+                                    <span>$5,000/month</span>
+                                </div>
+                                <div class="calc-row highlight">
+                                    <span>Annual Savings:</span>
+                                    <span>$540,000</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Preview -->
+    <section class="pricing-preview">
+        <div class="container">
+            <div class="section-header">
+                <h2>Simple, Transparent Pricing</h2>
+                <p>Start free, scale as you grow</p>
+            </div>
+
+            <div class="pricing-cards">
+                <div class="pricing-card">
+                    <div class="plan-name">Free</div>
+                    <div class="plan-price">$0<span>/month</span></div>
+                    <div class="plan-desc">Perfect for experimenting</div>
+                    <ul class="plan-features">
+                        <li>100 agent-hours/month</li>
+                        <li>3 concurrent swarms</li>
+                        <li>Community support</li>
+                        <li>Public projects</li>
+                    </ul>
+                    <a href="#" class="btn-outline">Start Free</a>
+                </div>
+
+                <div class="pricing-card featured">
+                    <div class="popular-badge">Most Popular</div>
+                    <div class="plan-name">Pro</div>
+                    <div class="plan-price">$49<span>/month</span></div>
+                    <div class="plan-desc">For professional developers</div>
+                    <ul class="plan-features">
+                        <li>10,000 agent-hours/month</li>
+                        <li>Unlimited swarms</li>
+                        <li>Priority support</li>
+                        <li>Private projects</li>
+                        <li>Advanced analytics</li>
+                    </ul>
+                    <a href="#" class="btn-primary">Start Pro Trial</a>
+                </div>
+
+                <div class="pricing-card">
+                    <div class="plan-name">Enterprise</div>
+                    <div class="plan-price">Custom</div>
+                    <div class="plan-desc">For large teams</div>
+                    <ul class="plan-features">
+                        <li>Unlimited everything</li>
+                        <li>Dedicated infrastructure</li>
+                        <li>24/7 support</li>
+                        <li>SLA guarantees</li>
+                        <li>Custom integrations</li>
+                    </ul>
+                    <a href="#" class="btn-outline">Contact Sales</a>
+                </div>
+            </div>
+
+            <div class="pricing-footer">
+                <a href="pricing.html" class="link-primary">See full pricing details →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2>What Developers Are Saying</h2>
+            </div>
+
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <div class="stars">★★★★★</div>
+                    <p class="testimonial-text">"Swarm Intelligence cut our AI infrastructure costs by 95%. We went from $10K/month to $500/month with better performance."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SJ</div>
+                        <div class="author-info">
+                            <div class="author-name">Sarah Johnson</div>
+                            <div class="author-title">CTO, TechStart</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="stars">★★★★★</div>
+                    <p class="testimonial-text">"The visual designer is mind-blowing. I built a 200-agent code review system in 10 minutes without writing code."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">MK</div>
+                        <div class="author-info">
+                            <div class="author-name">Marcus Kim</div>
+                            <div class="author-title">Lead Developer, CodeCraft</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="stars">★★★★★</div>
+                    <p class="testimonial-text">"We use SwarmComposer to generate music for our games. It's created 10,000+ unique tracks and saved us $200K in licensing."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">AL</div>
+                        <div class="author-info">
+                            <div class="author-name">Alex Liu</div>
+                            <div class="author-title">Creative Director, PixelGames</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="stars">★★★★★</div>
+                    <p class="testimonial-text">"The marketplace has templates for everything. We deployed customer service automation in 5 minutes. ROI was immediate."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">RS</div>
+                        <div class="author-info">
+                            <div class="author-name">Rachel Santos</div>
+                            <div class="author-title">Product Manager, Support Pro</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="stars">★★★★★</div>
+                    <p class="testimonial-text">"Deploy in 30 seconds is real. We prototype AI features faster than our competitors can plan them."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">DM</div>
+                        <div class="author-info">
+                            <div class="author-name">David Martinez</div>
+                            <div class="author-title">Founder, InnovateAI</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="stars">★★★★★</div>
+                    <p class="testimonial-text">"Running 1M agents on our $5/month instances is incredible. This changes everything about AI economics."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">EP</div>
+                        <div class="author-info">
+                            <div class="author-name">Elena Popov</div>
+                            <div class="author-title">Research Lead, DataLab</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Build with Swarms?</h2>
+                <p>Join thousands of developers building the future of AI</p>
+                <div class="cta-buttons">
+                    <a href="#" class="btn-primary btn-large">Start Free - No Credit Card</a>
+                    <a href="docs.html" class="btn-secondary btn-large">Read Documentation</a>
+                </div>
+                <p class="cta-note">Deploy your first swarm in under 60 seconds</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="pricing.html">Pricing</a></li>
+                        <li><a href="docs.html">Documentation</a></li>
+                        <li><a href="demo.html">Demo</a></li>
+                        <li><a href="#">API Reference</a></li>
+                        <li><a href="#">Marketplace</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Tutorials</a></li>
+                        <li><a href="#">Case Studies</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="#">GitHub</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press Kit</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Security</a></li>
+                        <li><a href="#">Compliance</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Swarm Intelligence Platform. All rights reserved.</p>
+                <div class="social-links">
+                    <a href="#">Twitter</a>
+                    <a href="#">GitHub</a>
+                    <a href="#">LinkedIn</a>
+                    <a href="#">Discord</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="swarm-demo.js"></script>
+</body>
+</html>

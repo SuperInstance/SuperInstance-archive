@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperInstance AI Integration Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #0A0E1A, #1A1F2E);
+            color: #F8F9FA;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #ADB5BD;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+        }
+        
+        .integration-box {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(78, 205, 196, 0.1));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .feature-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .demo-section {
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SuperInstance AI</h1>
+        <p class="subtitle">Universal Claude-powered AI assistant for all your websites and apps</p>
+        
+        <div class="integration-box">
+            <h2>🚀 Quick Integration</h2>
+            <p>Add this single line to any website to enable voice AI assistance:</p>
+            
+            <div class="code-block">
+&lt;script src="https://your-domain.com/superinstance-ai.js" 
+        data-superinstance-ai
+        data-user-id="your-user-id"
+        data-admin-mode="false"&gt;&lt;/script&gt;
+            </div>
+            
+            <h3>Advanced Configuration</h3>
+            <div class="code-block">
+&lt;script&gt;
+window.SuperInstanceAIConfig = {
+    apiEndpoint: 'http://172.22.219.126:8099',
+    userId: 'admin_max', // Use 'admin_max' for admin mode
+    adminMode: true,
+    theme: 'lightning-dark',
+    position: 'bottom-right',
+    autoShow: false
+};
+&lt;/script&gt;
+&lt;script src="superinstance-ai.js"&gt;&lt;/script&gt;
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🎤</div>
+                <h3>Push-to-Talk Voice</h3>
+                <p>Hold the microphone button and speak your requests</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">🎨</div>
+                <h3>Interface Customization</h3>
+                <p>Change colors, layouts, and styles with voice commands</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <h3>Data Analysis</h3>
+                <p>Analyze and manipulate your data using natural language</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">🧠</div>
+                <h3>Claude AI Intelligence</h3>
+                <p>Powered by Claude for complex reasoning and creativity</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">👑</div>
+                <h3>Admin Developer Mode</h3>
+                <p>Advanced features for system administrators</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">📱</div>
+                <h3>Cross-Platform</h3>
+                <p>Works on desktop, mobile, and all modern browsers</p>
+            </div>
+        </div>
+        
+        <div class="integration-box">
+            <h2>🎯 Usage Examples</h2>
+            
+            <h3>For Regular Users:</h3>
+            <ul>
+                <li>"Change the background color to blue"</li>
+                <li>"Make the text larger on this page"</li>
+                <li>"Analyze this data and show me trends"</li>
+                <li>"Help me understand this D&D spell"</li>
+                <li>"Create a summary of this content"</li>
+            </ul>
+            
+            <h3>For Admin (Developer Mode):</h3>
+            <ul>
+                <li>"Enable developer mode"</li>
+                <li>"Generate a new React component for user profiles"</li>
+                <li>"Create a dashboard widget for analytics"</li>
+                <li>"Apply this color scheme to all users"</li>
+                <li>"Make this feature the new default"</li>
+            </ul>
+        </div>
+        
+        <div class="integration-box">
+            <h2>⚙️ API Endpoints</h2>
+            
+            <h3>Regular Users:</h3>
+            <div class="code-block">
+POST /chat/message
+{
+    "message": "User request",
+    "user_id": "user_123",
+    "context": {...}
+}
+            </div>
+            
+            <h3>Admin Users:</h3>
+            <div class="code-block">
+POST /admin/chat
+{
+    "message": "Admin request", 
+    "user_id": "admin_max",
+    "context": {...}
+}
+
+POST /admin/toggle-dev-mode
+{
+    "user_id": "admin_max"
+}
+
+GET /admin/status/{user_id}
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>🎪 Try It Now!</h2>
+            <p>The SuperInstance AI widget should appear in the bottom-right corner of this page.</p>
+            <p>Click it and try these commands:</p>
+            
+            <button class="btn" onclick="testAI('Roll a d20')">🎲 Roll a d20</button>
+            <button class="btn" onclick="testAI('Change the background color')">🎨 Change Background</button>
+            <button class="btn" onclick="testAI('Enable developer mode')" id="devModeBtn">👑 Enable Dev Mode</button>
+        </div>
+        
+        <div class="integration-box">
+            <h2>📚 Integration Steps</h2>
+            
+            <ol>
+                <li><strong>Include the Script:</strong> Add the SuperInstance AI script to your website</li>
+                <li><strong>Configure Options:</strong> Set your API endpoint, user ID, and preferences</li>
+                <li><strong>Customize Appearance:</strong> Adjust position, theme, and styling to match your site</li>
+                <li><strong>Enable Admin Mode:</strong> For administrators, use "admin_max" as the user ID</li>
+                <li><strong>Test Voice Features:</strong> Ensure microphone permissions are granted</li>
+            </ol>
+            
+            <h3>🔒 Admin Setup:</h3>
+            <p>To enable admin developer mode:</p>
+            <ol>
+                <li>Set userId to "admin_max" in the configuration</li>
+                <li>Say "enable developer mode" or "turn on developer mode"</li>
+                <li>You'll see the widget turn green indicating admin status</li>
+                <li>Now you can generate code, modify defaults, and approve user changes</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- SuperInstance AI Widget Integration -->
+    <script>
+        window.SuperInstanceAIConfig = {
+            apiEndpoint: 'http://172.22.219.126:8099',
+            userId: 'admin_max', // Set to 'admin_max' for demo
+            adminMode: true,
+            theme: 'lightning-dark',
+            position: 'bottom-right',
+            autoShow: false
+        };
+        
+        function testAI(message) {
+            if (window.superInstanceAI) {
+                window.superInstanceAI.show();
+                // Auto-populate the message (you'd need to modify the widget to support this)
+                setTimeout(() => {
+                    const input = document.querySelector('.superinstance-ai-input');
+                    if (input) {
+                        input.value = message;
+                        input.focus();
+                    }
+                }, 300);
+            }
+        }
+        
+        // Store reference for testing
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.SuperInstanceAI) {
+                window.superInstanceAI = new window.SuperInstanceAI(window.SuperInstanceAIConfig);
+            }
+        });
+    </script>
+    <script src="superinstance-ai.js"></script>
+    
+    <script>
+        // Demo functionality
+        document.getElementById('devModeBtn').addEventListener('click', async () => {
+            if (window.superInstanceAI) {
+                try {
+                    const response = await fetch('http://172.22.219.126:8099/admin/toggle-dev-mode', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user_id: 'admin_max' })
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        alert(`Developer mode ${data.developer_mode ? 'enabled' : 'disabled'}!`);
+                        window.location.reload(); // Refresh to show new status
+                    }
+                } catch (error) {
+                    console.error('Dev mode toggle failed:', error);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

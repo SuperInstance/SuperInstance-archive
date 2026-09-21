@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ActiveLog Installation Wizard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wizard-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wizard-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4CAF50, #2196F3, #FF9800, #E91E63);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #2196F3);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .phase-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            font-size: 0.9em;
+        }
+
+        .phase-step {
+            padding: 8px 12px;
+            border-radius: 20px;
+            background: #f5f5f5;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .phase-step.active {
+            background: #2196F3;
+            color: white;
+        }
+
+        .phase-step.completed {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .content {
+            text-align: center;
+            padding: 40px 0;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .message {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .question-container {
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .question {
+            font-size: 1.1em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .option:hover {
+            border-color: #2196F3;
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: #2196F3;
+            background: #e3f2fd;
+        }
+
+        .option-label {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .option-impact {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .hardware-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .hardware-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+
+        .recommendations {
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .recommendation {
+            background: #e8f5e8;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .recommendation-category {
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 5px;
+        }
+
+        .recommendation-text {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .recommendation-impact {
+            font-size: 0.9em;
+            color: #666;
+            font-style: italic;
+        }
+
+        .buttons {
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+
+        .btn-primary {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            background: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .completion-message {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .launch-button {
+            background: #FF5722;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .launch-button:hover {
+            background: #E64A19;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 87, 34, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .wizard-container {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .phase-indicator {
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+            
+            .phase-step {
+                font-size: 0.8em;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wizard-container">
+        <div class="header">
+            <h1>ActiveLog</h1>
+            <p>Intelligent Installation Wizard</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="phase-indicator">
+            <div class="phase-step" data-phase="welcome">Welcome</div>
+            <div class="phase-step" data-phase="use_case">Use Case</div>
+            <div class="phase-step" data-phase="trade_offs">Trade-offs</div>
+            <div class="phase-step" data-phase="installation">Installation</div>
+            <div class="phase-step" data-phase="first_run">First Run</div>
+            <div class="phase-step" data-phase="optimization">Optimization</div>
+        </div>
+        
+        <div class="content" id="content">
+            <div class="message">Connecting to installation wizard...</div>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                Initializing...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class InstallationWizard {
+            constructor() {
+                this.sessionId = this.generateSessionId();
+                this.websocket = null;
+                this.currentPhase = null;
+                this.userData = {};
+                this.init();
+            }
+
+            generateSessionId() {
+                return Math.random().toString(36).substr(2, 9);
+            }
+
+            init() {
+                this.connectWebSocket();
+            }
+
+            connectWebSocket() {
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = `${protocol}//${window.location.host}/ws/${this.sessionId}`;
+                
+                this.websocket = new WebSocket(wsUrl);
+                
+                this.websocket.onopen = () => {
+                    console.log('Connected to installation wizard');
+                };
+                
+                this.websocket.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    this.handleMessage(data);
+                };
+                
+                this.websocket.onclose = () => {
+                    console.log('Disconnected from installation wizard');
+                    setTimeout(() => this.connectWebSocket(), 3000);
+                };
+                
+                this.websocket.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                };
+            }
+
+            handleMessage(data) {
+                this.updateProgress(data.progress || 0);
+                this.updatePhase(data.phase);
+                
+                switch(data.phase) {
+                    case 'welcome':
+                        this.renderWelcomePhase(data);
+                        break;
+                    case 'use_case':
+                        this.renderUseCasePhase(data);
+                        break;
+                    case 'trade_offs':
+                        this.renderTradeOffsPhase(data);
+                        break;
+                    case 'installation':
+                        this.renderInstallationPhase(data);
+                        break;
+                    case 'first_run':
+                        this.renderFirstRunPhase(data);
+                        break;
+                    case 'optimization':
+                        this.renderOptimizationPhase(data);
+                        break;
+                }
+            }
+
+            updateProgress(progress) {
+                document.getElementById('progressFill').style.width = `${progress}%`;
+            }
+
+            updatePhase(phase) {
+                if (this.currentPhase) {
+                    document.querySelector(`[data-phase="${this.currentPhase}"]`).classList.add('completed');
+                }
+                
+                if (phase) {
+                    document.querySelector(`[data-phase="${phase}"]`).classList.add('active');
+                    this.currentPhase = phase;
+                }
+            }
+
+            renderWelcomePhase(data) {
+                let html = `
+                    <div class="message">${data.message}</div>
+                `;
+                
+                if (data.hardware) {
+                    html += `
+                        <div class="hardware-info">
+                            <h3>System Information</h3>
+                            <div class="hardware-item">
+                                <span>Processor:</span>
+                                <span>${data.hardware.cpu_model}</span>
+                            </div>
+                            <div class="hardware-item">
+                                <span>Memory:</span>
+                                <span>${data.hardware.memory_gb} GB</span>
+                            </div>
+                            <div class="hardware-item">
+                                <span>Storage:</span>
+                                <span>${data.hardware.storage_type}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('content').innerHTML = html;
+            }
+
+            renderUseCasePhase(data) {
+                let html = `<div class="message">${data.message}</div>`;
+                
+                if (data.questions) {
+                    data.questions.forEach((question, index) => {
+                        html += `
+                            <div class="question-container">
+                                <div class="question">${question.question}</div>
+                                <div class="options">
+                        `;
+                        
+                        question.options.forEach(option => {
+                            html += `
+                                <div class="option" data-question="${question.id}" data-value="${option.value}">
+                                    <div class="option-label">${option.label}</div>
+                                </div>
+                            `;
+                        });
+                        
+                        html += `</div></div>`;
+                    });
+                    
+                    html += `
+                        <div class="buttons">
+                            <button class="btn btn-primary" onclick="wizard.submitUseCaseAnswers()">Continue</button>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('content').innerHTML = html;
+                this.attachOptionListeners();
+            }
+
+            renderTradeOffsPhase(data) {
+                let html = `<div class="message">${data.message}</div>`;
+                
+                if (data.recommendations) {
+                    html += `<div class="recommendations">`;
+                    data.recommendations.forEach(rec => {
+                        html += `
+                            <div class="recommendation">
+                                <div class="recommendation-category">${rec.category}</div>
+                                <div class="recommendation-text">${rec.recommendation}</div>
+                                <div class="recommendation-impact">${rec.impact}</div>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                }
+                
+                if (data.trade_offs) {
+                    data.trade_offs.forEach(tradeOff => {
+                        html += `
+                            <div class="question-container">
+                                <div class="question">${tradeOff.category}</div>
+                                <div class="options">
+                        `;
+                        
+                        tradeOff.options.forEach(option => {
+                            html += `
+                                <div class="option" data-category="${tradeOff.category}" data-value="${option.value}">
+                                    <div class="option-label">${option.label}</div>
+                                    <div class="option-impact">${option.impact}</div>
+                                </div>
+                            `;
+                        });
+                        
+                        html += `</div></div>`;
+                    });
+                    
+                    html += `
+                        <div class="buttons">
+                            <button class="btn btn-primary" onclick="wizard.submitTradeOffAnswers()">Continue</button>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('content').innerHTML = html;
+                this.attachOptionListeners();
+            }
+
+            renderInstallationPhase(data) {
+                const html = `
+                    <div class="message">${data.message}</div>
+                    <div class="status-indicator">
+                        <div class="status-dot"></div>
+                        Installing components...
+                    </div>
+                `;
+                document.getElementById('content').innerHTML = html;
+            }
+
+            renderFirstRunPhase(data) {
+                let html = `<div class="message">${data.message}</div>`;
+                
+                if (data.quick_tour) {
+                    html += `
+                        <div class="feature-grid">
+                    `;
+                    
+                    data.quick_tour.features.forEach(feature => {
+                        html += `
+                            <div class="feature-card">
+                                <div>✓ ${feature}</div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `</div>`;
+                }
+                
+                document.getElementById('content').innerHTML = html;
+            }
+
+            renderOptimizationPhase(data) {
+                let html = `<div class="message">${data.message}</div>`;
+                
+                if (data.completion) {
+                    html += `
+                        <div class="completion-message">
+                            <h2>🎉 Installation Complete!</h2>
+                            <p>${data.completion.message}</p>
+                            <button class="launch-button" onclick="window.open('${data.completion.launch_url}', '_blank')">
+                                Launch ActiveLog
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('content').innerHTML = html;
+            }
+
+            attachOptionListeners() {
+                document.querySelectorAll('.option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        // Remove selection from siblings
+                        const siblings = option.parentElement.querySelectorAll('.option');
+                        siblings.forEach(sibling => sibling.classList.remove('selected'));
+                        
+                        // Add selection to clicked option
+                        option.classList.add('selected');
+                        
+                        // Store selection
+                        const question = option.dataset.question || option.dataset.category;
+                        const value = option.dataset.value;
+                        this.userData[question] = value;
+                    });
+                });
+            }
+
+            submitUseCaseAnswers() {
+                if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                    this.websocket.send(JSON.stringify({
+                        type: 'use_case_answers',
+                        data: this.userData
+                    }));
+                }
+            }
+
+            submitTradeOffAnswers() {
+                if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                    this.websocket.send(JSON.stringify({
+                        type: 'trade_off_answers',
+                        data: this.userData
+                    }));
+                }
+            }
+        }
+
+        // Initialize wizard when page loads
+        let wizard;
+        document.addEventListener('DOMContentLoaded', () => {
+            wizard = new InstallationWizard();
+        });
+    </script>
+</body>
+</html>

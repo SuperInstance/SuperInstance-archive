@@ -1,0 +1,33 @@
+{
+  "name": "activelog-chaos-testing",
+  "version": "1.0.0",
+  "description": "Chaos engineering tests for ActiveLog system",
+  "main": "index.js",
+  "scripts": {
+    "chaos:network": "node scenarios/network-chaos.js",
+    "chaos:resource": "node scenarios/resource-chaos.js",
+    "chaos:dependency": "node scenarios/dependency-chaos.js",
+    "chaos:data": "node scenarios/data-chaos.js",
+    "chaos:all": "npm run chaos:network && npm run chaos:resource && npm run chaos:dependency && npm run chaos:data",
+    "chaos:report": "node utils/chaos-reporter.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "dockerode": "^4.0.0",
+    "node-cron": "^3.0.3",
+    "winston": "^3.11.0",
+    "redis": "^4.6.0",
+    "mongodb": "^6.3.0",
+    "elasticsearch": "^16.7.3",
+    "@kubernetes/client-node": "^0.20.0",
+    "child_process": "^1.0.2",
+    "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3"
+  },
+  "keywords": ["chaos", "testing", "reliability", "resilience"],
+  "author": "ActiveLog Team",
+  "license": "MIT"
+}

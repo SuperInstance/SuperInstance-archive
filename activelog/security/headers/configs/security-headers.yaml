@@ -1,0 +1,187 @@
+# ActiveLog Security Headers Configuration
+
+# Content Security Policy
+csp_enabled: true
+csp_report_only: false
+csp_report_uri: "/api/v1/security-headers/csp-report"
+csp_directives:
+  default-src:
+    - "'self'"
+  script-src:
+    - "'self'"
+    - "'unsafe-inline'"
+    - "https://cdn.jsdelivr.net"
+    - "https://cdnjs.cloudflare.com"
+  style-src:
+    - "'self'"
+    - "'unsafe-inline'"
+    - "https://fonts.googleapis.com"
+    - "https://cdn.jsdelivr.net"
+  img-src:
+    - "'self'"
+    - "data:"
+    - "https:"
+    - "blob:"
+  font-src:
+    - "'self'"
+    - "https://fonts.gstatic.com"
+    - "https://cdn.jsdelivr.net"
+  connect-src:
+    - "'self'"
+    - "https://api.activelog.com"
+    - "wss://activelog.com"
+    - "https://metrics.activelog.com"
+  media-src:
+    - "'self'"
+    - "https://media.activelog.com"
+  object-src:
+    - "'none'"
+  child-src:
+    - "'self'"
+    - "https://www.youtube.com"
+  frame-src:
+    - "'self'"
+    - "https://www.youtube.com"
+  worker-src:
+    - "'self'"
+    - "blob:"
+  manifest-src:
+    - "'self'"
+  form-action:
+    - "'self'"
+  frame-ancestors:
+    - "'none'"
+  base-uri:
+    - "'self'"
+  upgrade-insecure-requests: []
+
+# HTTP Strict Transport Security
+hsts_enabled: true
+hsts_max_age: 31536000  # 1 year
+hsts_include_subdomains: true
+hsts_preload: true
+
+# X-Frame-Options
+x_frame_options: "DENY"  # DENY, SAMEORIGIN, or ALLOW-FROM uri
+
+# X-Content-Type-Options
+x_content_type_options: true
+
+# X-XSS-Protection
+x_xss_protection: "1; mode=block"
+
+# Referrer Policy
+referrer_policy: "strict-origin-when-cross-origin"
+
+# Permissions Policy (Feature Policy)
+permissions_policy_enabled: true
+permissions_policy_directives:
+  accelerometer: []
+  ambient-light-sensor: []
+  autoplay:
+    - "'self'"
+  battery: []
+  camera: []
+  display-capture: []
+  document-domain: []
+  encrypted-media:
+    - "'self'"
+  execution-while-not-rendered: []
+  execution-while-out-of-viewport: []
+  fullscreen:
+    - "'self'"
+  geolocation: []
+  gyroscope: []
+  magnetometer: []
+  microphone: []
+  midi: []
+  navigation-override: []
+  payment: []
+  picture-in-picture:
+    - "'self'"
+  publickey-credentials-get: []
+  screen-wake-lock: []
+  sync-xhr: []
+  usb: []
+  web-share: []
+  xr-spatial-tracking: []
+
+# Cross-Origin Resource Sharing (CORS)
+cors_enabled: true
+cors_allow_origins:
+  - "https://activelog.com"
+  - "https://*.activelog.com"
+  - "http://localhost:3000"
+  - "http://localhost:3001"
+  - "http://localhost:3002"
+cors_allow_methods:
+  - "GET"
+  - "POST"
+  - "PUT"
+  - "DELETE"
+  - "PATCH"
+  - "OPTIONS"
+  - "HEAD"
+cors_allow_headers:
+  - "Accept"
+  - "Accept-Language"
+  - "Content-Language"
+  - "Content-Type"
+  - "Authorization"
+  - "X-Requested-With"
+  - "X-CSRF-Token"
+  - "X-API-Key"
+cors_allow_credentials: true
+cors_max_age: 86400
+
+# Cross-Origin Embedder Policy
+coep_enabled: true
+coep_value: "require-corp"
+
+# Cross-Origin Opener Policy  
+coop_enabled: true
+coop_value: "same-origin"
+
+# Cross-Origin Resource Policy
+corp_enabled: true
+corp_value: "same-origin"
+
+# Server header configuration
+server_header: "ActiveLog/1.0"  # null to remove, empty string to hide
+
+# X-Powered-By header
+x_powered_by: false
+
+# Environment-specific settings
+environment: "production"  # production, staging, development
+
+# Environment overrides
+environments:
+  development:
+    csp_directives:
+      script-src:
+        - "'self'"
+        - "'unsafe-inline'"
+        - "'unsafe-eval'"  # Allow eval for dev tools
+        - "https://cdn.jsdelivr.net"
+      connect-src:
+        - "'self'"
+        - "ws:"
+        - "wss:"
+        - "http:"
+        - "https:"
+    cors_allow_origins:
+      - "*"
+    hsts_enabled: false
+    
+  staging:
+    csp_report_only: true
+    cors_allow_origins:
+      - "https://staging.activelog.com"
+      - "https://*.staging.activelog.com"
+      - "http://localhost:*"
+      
+  production:
+    csp_report_only: false
+    hsts_enabled: true
+    hsts_preload: true

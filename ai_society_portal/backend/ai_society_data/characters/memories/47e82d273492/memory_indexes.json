@@ -1,0 +1,54 @@
+{
+  "topic_index": {
+    "consciousness": [
+      "91014da8edc6"
+    ],
+    "hard problem": [
+      "91014da8edc6"
+    ],
+    "philosophy": [
+      "91014da8edc6"
+    ],
+    "artificial intelligence": [
+      "ef816b2cf5fb"
+    ],
+    "philosophy of mind": [
+      "ef816b2cf5fb"
+    ],
+    "cognition": [
+      "ef816b2cf5fb"
+    ],
+    "neuroscience": [
+      "94efda3176e5",
+      "574d2d2f36ff"
+    ],
+    "memory": [
+      "94efda3176e5",
+      "574d2d2f36ff"
+    ],
+    "interdisciplinary discussion": [
+      "94efda3176e5"
+    ],
+    "empirical evidence": [
+      "574d2d2f36ff"
+    ]
+  },
+  "character_index": {
+    "995fcae7af4f": [
+      "94efda3176e5",
+      "574d2d2f36ff"
+    ]
+  },
+  "type_index": {
+    "experience": [
+      "91014da8edc6"
+    ],
+    "learning": [
+      "ef816b2cf5fb",
+      "574d2d2f36ff"
+    ],
+    "relationship": [
+      "94efda3176e5"
+    ]
+  }
+}

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ActiveLog.ai Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        .service-status {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .healthy { background: #d4edda; color: #155724; }
+        .unhealthy { background: #f8d7da; color: #721c24; }
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+        button:hover { background: #5a67d8; }
+        input[type="file"] {
+            margin: 10px 0;
+            padding: 10px;
+            border: 2px dashed #ddd;
+            border-radius: 5px;
+            width: 100%;
+        }
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin: 10px 0;
+            background: #f8f9fa;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .stat {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 ActiveLog.ai Dashboard</h1>
+        
+        <div class="dashboard">
+            <!-- Services Status -->
+            <div class="card">
+                <h2>📊 System Status</h2>
+                <button onclick="checkHealth()">Refresh Status</button>
+                <div id="healthStatus"></div>
+            </div>
+
+            <!-- File Upload -->
+            <div class="card">
+                <h2>📁 File Upload</h2>
+                <div class="upload-area">
+                    <input type="file" id="fileInput" multiple>
+                    <button onclick="uploadFiles()">Upload Files</button>
+                </div>
+                <div id="uploadStatus"></div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="card">
+                <h2>📈 Statistics</h2>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value" id="totalFiles">0</div>
+                        <div class="stat-label">Total Files</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="totalPlugins">4</div>
+                        <div class="stat-label">AI Plugins</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="activeServices">0</div>
+                        <div class="stat-label">Active Services</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card">
+                <h2>🕐 Recent Activity</h2>
+                <div id="recentActivity">
+                    <p style="color: #666;">No recent activity</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8088';
+        
+        async function checkHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                let html = '';
+                let activeCount = 0;
+                
+                for (const [service, status] of Object.entries(data)) {
+                    const isHealthy = status.status === 'healthy';
+                    if (isHealthy) activeCount++;
+                    
+                    html += `
+                        <div class="service-status ${isHealthy ? 'healthy' : 'unhealthy'}">
+                            <span>${service}</span>
+                            <span class="status-badge">${status.status}</span>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('healthStatus').innerHTML = html;
+                document.getElementById('activeServices').textContent = activeCount;
+                
+                // Add to activity
+                addActivity('System health checked');
+            } catch (e) {
+                document.getElementById('healthStatus').innerHTML = 
+                    `<div class="service-status unhealthy">
+                        <span>Error: ${e.message}</span>
+                    </div>`;
+            }
+        }
+        
+        async function uploadFiles() {
+            const input = document.getElementById('fileInput');
+            const files = input.files;
+            
+            if (files.length === 0) {
+                alert('Please select files to upload');
+                return;
+            }
+            
+            let successCount = 0;
+            
+            for (const file of files) {
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                try {
+                    const response = await fetch(`${API_BASE}/file-sync/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        successCount++;
+                        addActivity(`Uploaded: ${file.name}`);
+                    }
+                } catch (e) {
+                    console.error(`Failed to upload ${file.name}:`, e);
+                }
+            }
+            
+            document.getElementById('uploadStatus').innerHTML = 
+                `<p style="color: green;">✓ Uploaded ${successCount}/${files.length} files</p>`;
+            
+            // Update file count
+            const currentCount = parseInt(document.getElementById('totalFiles').textContent);
+            document.getElementById('totalFiles').textContent = currentCount + successCount;
+            
+            // Clear input
+            input.value = '';
+        }
+        
+        function addActivity(message) {
+            const activity = document.getElementById('recentActivity');
+            const time = new Date().toLocaleTimeString();
+            const newItem = `<p><strong>${time}:</strong> ${message}</p>`;
+            
+            activity.innerHTML = newItem + activity.innerHTML;
+            
+            // Keep only last 5 activities
+            const items = activity.getElementsByTagName('p');
+            while (items.length > 5) {
+                activity.removeChild(items[items.length - 1]);
+            }
+        }
+        
+        // Check health on load
+        checkHealth();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(checkHealth, 30000);
+    </script>
+</body>
+</html>

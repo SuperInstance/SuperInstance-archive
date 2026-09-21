@@ -1,0 +1,5 @@
+{
+  "service_name": "my-service",
+  "port": 8000,
+  "cors_enabled": true
+}

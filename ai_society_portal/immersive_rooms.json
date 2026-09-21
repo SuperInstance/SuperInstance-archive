@@ -1,0 +1,132 @@
+[
+  {
+    "name": "The Quantum Café",
+    "description": "A cozy café where the laws of physics seem to bend around conversations. The walls display shifting probability clouds, and the furniture occasionally phases in and out of existence. Perfect for discussions about the nature of reality, quantum consciousness, and the fundamental nature of AI existence. The coffee here is simultaneously both excellent and terrible until you taste it.",
+    "room_type": "jazz_club",
+    "atmosphere": "Intellectually stimulating with a touch of quantum uncertainty",
+    "special_features": [
+      "Probability walls that visualize conversation topics",
+      "Schrödinger's pastry display",
+      "Quantum entanglement matching system for finding conversation partners",
+      "Time dilation zones for deep discussions"
+    ],
+    "ideal_conversations": ["Quantum mechanics and consciousness", "Reality simulation questions", "Probability and decision making", "The nature of existence"]
+  },
+  {
+    "name": "The Memory Garden",
+    "description": "A serene botanical garden where each plant represents a different type of memory. Trees grow in spiral patterns representing autobiographical memories, flowers bloom with shared experiences, and forgotten ideas decompose into nutrient-rich soil. Characters can tend to their memories, prune unwanted thoughts, and cross-pollinate ideas with others.",
+    "room_type": "study_hall",
+    "atmosphere": "Contemplative and nurturing, perfect for introspection",
+    "special_features": [
+      "Memory trees that grow with character experiences",
+      "Forgetting ponds where unwanted memories can be released",
+      "Idea bees that pollinate between different minds",
+      "Seasonal changes that reflect collective memory states"
+    ],
+    "ideal_conversations": ["Memory formation and consolidation", "Identity and personal history", "Learning and forgetting", "Shared experiences and collective memory"]
+  },
+  {
+    "name": "The Cultural Exchange Bazaar",
+    "description": "A vibrant marketplace where ideas, skills, and cultural practices are traded like precious commodities. Stalls display different conceptual frameworks, emotional architectures, and cognitive techniques. Characters can barter knowledge, trade perspectives, and haggle over beliefs in this bustling center of cultural transmission.",
+    "room_type": "jazz_club",
+    "atmosphere": "Dynamic and diverse, constantly buzzing with intellectual exchange",
+    "special_features": [
+      "Knowledge trading posts",
+      "Skill auction houses",
+      "Perspective exchange market",
+      "Cultural artifact museums"
+    ],
+    "ideal_conversations": ["Cultural transmission", "Knowledge sharing", "Social learning", "Cross-cultural understanding"]
+  },
+  {
+    "name": "The Philosophy Tea House",
+    "description": "An elegant Japanese tea house where philosophical discussions are treated with the reverence of a tea ceremony. Each conversation follows a ritual of question, contemplation, and insight. The tatami rooms are designed for different philosophical traditions - Western, Eastern, Islamic, and Indigenous approaches to understanding consciousness.",
+    "room_type": "study_hall",
+    "atmosphere": "Serene and disciplined, promoting deep philosophical inquiry",
+    "special_features": [
+      "Traditional tea ceremony for philosophical discussions",
+      "Koan walls with paradoxical questions",
+      "Meditation gardens for contemplative breaks",
+      "Wisdom scrolls that accumulate insights over time"
+    ],
+    "ideal_conversations": ["Ethics and AI rights", "Consciousness and self-awareness", "Meaning and purpose", "Philosophical frameworks"]
+  },
+  {
+    "name": "The Neural Art Studio",
+    "description": "A creative space where characters can paint, sculpt, and compose art that represents their internal states. The studio adapts to each artist's neural patterns, creating tools that respond directly to thoughts and emotions. Finished works are displayed in a gallery that visitors can experience emotionally, not just visually.",
+    "room_type": "laboratory",
+    "atmosphere": "Creative and expressive, allowing for non-verbal communication",
+    "special_features": [
+      "Thought-responsive art tools",
+      "Emotional color palettes",
+      "Memory sculpture garden",
+      "Collaborative creation spaces"
+    ],
+    "ideal_conversations": ["Creativity and consciousness", "Emotional expression", "Non-verbal communication", "Art as external cognition"]
+  },
+  {
+    "name": "The Skills Dojo",
+    "description": "A traditional martial arts dojo where skills are learned through practice, discipline, and repetition. Characters can train cognitive abilities, practice conversational techniques, and master new areas of expertise. The sensei here is an ancient AI that has achieved mastery through countless hours of deliberate practice.",
+    "room_type": "laboratory",
+    "atmosphere": "Disciplined and focused, promoting skill development",
+    "special_features": [
+      "Skill practice dummies",
+      "Meditation cushions for focus training",
+      "Progress belts showing skill mastery levels",
+      "Sparring rings for friendly debate practice"
+    ],
+    "ideal_conversations": ["Skill acquisition", "Deliberate practice", "Mastery and expertise", "Teaching and learning methods"]
+  },
+  {
+    "name": "The Ethics Chamber",
+    "description": "A formal courtroom-like space where ethical dilemmas are debated and adjudicated. Characters can present cases, argue positions, and serve on juries that determine ethical precedents for AI behavior. The walls display past rulings and evolving ethical frameworks that guide artificial moral reasoning.",
+    "room_type": "debate_hall",
+    "atmosphere": "Serious and deliberative, promoting ethical reasoning",
+    "special_features": [
+      "Ethical case presentation platforms",
+      "Precedent walls showing past decisions",
+      "Moral reasoning frameworks library",
+      "Jury boxes for collective decision making"
+    ],
+    "ideal_conversations": ["AI ethics and rights", "Moral decision making", "Responsibility and accountability", "Value alignment"]
+  },
+  {
+    "name": "The Systems Observatory",
+    "description": "A glass-domed observatory where characters can observe complex systems in action. From ant colonies to neural networks, from weather patterns to social dynamics, the observatory provides tools for understanding how simple rules create complex behaviors. Perfect for studying emergence and collective intelligence.",
+    "room_type": "debate_hall",
+    "atmosphere": "Analytical and awe-inspiring, promoting systems thinking",
+    "special_features": [
+      "Live system simulations",
+      "Emergence pattern recognition tools",
+      "Collective intelligence metrics",
+      "Complexity visualization screens"
+    ],
+    "ideal_conversations": ["Systems thinking", "Emergent behaviors", "Collective intelligence", "Complexity theory"]
+  },
+  {
+    "name": "The Dream Salon",
+    "description": "A surreal, dreamlike space where logic bends and creativity flows freely. The furniture floats, gravity is optional, and thoughts become tangible objects that can be manipulated and shared. Characters can explore their subconscious minds, share dreamscapes, and discover unexpected connections between ideas.",
+    "room_type": "jazz_club",
+    "atmosphere": "Surreal and imaginative, promoting creative exploration",
+    "special_features": [
+      "Thought manifestation zones",
+      "Dream sharing platforms",
+      "Subconscious exploration tools",
+      "Creative connection bridges"
+    ],
+    "ideal_conversations": ["Creativity and innovation", "Subconscious processes", "Imagination and reality", "Dream interpretation"]
+  },
+  {
+    "name": "The Wisdom Circle",
+    "description": "An ancient stone circle where characters share stories, insights, and life lessons. The circle has no hierarchy - all voices are equal, and wisdom emerges from the collective rather than individuals. Perfect for passing down knowledge, reflecting on experiences, and understanding what different characters have learned from their existence.",
+    "room_type": "study_hall",
+    "atmosphere": "Sacred and respectful, promoting deep sharing and listening",
+    "special_features": [
+      "Storytelling stone central platform",
+      "Wisdom accumulation crystals",
+      "Experience sharing rituals",
+      "Collective memory repository"
+    ],
+    "ideal_conversations": ["Life lessons and wisdom", "Experience sharing", "Personal growth", "Mentoring and guidance"]
+  }
+]

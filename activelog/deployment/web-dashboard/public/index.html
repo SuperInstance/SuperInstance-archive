@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ActiveLog Deployment Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-hover {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            transition: width 0.3s ease-in-out;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .status-running { background-color: #fbbf24; }
+        .status-completed { background-color: #10b981; }
+        .status-failed { background-color: #ef4444; }
+        .status-pending { background-color: #6b7280; }
+        
+        .log-container {
+            background: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+        }
+        
+        .log-error { color: #f87171; }
+        .log-warning { color: #fbbf24; }
+        .log-success { color: #34d399; }
+        .log-info { color: #60a5fa; }
+        
+        .modal {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            min-width: 300px;
+            transform: translateX(400px);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                z-index: 40;
+                height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Notification Container -->
+    <div id="notifications"></div>
+    
+    <!-- Main Container -->
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar bg-white shadow-lg w-64 flex-shrink-0">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-rocket text-blue-500"></i>
+                    ActiveLog Deploy
+                </h1>
+                
+                <nav class="space-y-2">
+                    <a href="#" class="nav-link flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-700 transition-colors" data-section="dashboard">
+                        <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
+                        Dashboard
+                    </a>
+                    <a href="#" class="nav-link flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-700 transition-colors" data-section="deployments">
+                        <i class="fas fa-rocket w-5 h-5 mr-3"></i>
+                        Deployments
+                    </a>
+                    <a href="#" class="nav-link flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-700 transition-colors" data-section="resources">
+                        <i class="fas fa-server w-5 h-5 mr-3"></i>
+                        AWS Resources
+                    </a>
+                    <a href="#" class="nav-link flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-700 transition-colors" data-section="monitoring">
+                        <i class="fas fa-chart-line w-5 h-5 mr-3"></i>
+                        Monitoring
+                    </a>
+                    <a href="#" class="nav-link flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-700 transition-colors" data-section="costs">
+                        <i class="fas fa-dollar-sign w-5 h-5 mr-3"></i>
+                        Cost Analysis
+                    </a>
+                    <a href="#" class="nav-link flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-700 transition-colors" data-section="wizard">
+                        <i class="fas fa-magic w-5 h-5 mr-3"></i>
+                        Deploy Wizard
+                    </a>
+                    <a href="#" class="nav-link flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-700 transition-colors" data-section="logs">
+                        <i class="fas fa-file-alt w-5 h-5 mr-3"></i>
+                        Logs
+                    </a>
+                    <a href="#" class="nav-link flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-700 transition-colors" data-section="settings">
+                        <i class="fas fa-cog w-5 h-5 mr-3"></i>
+                        Settings
+                    </a>
+                </nav>
+            </div>
+            
+            <!-- System Status -->
+            <div class="absolute bottom-0 left-0 right-0 p-4 border-t">
+                <div id="system-status" class="text-sm text-gray-600">
+                    <div class="flex items-center">
+                        <div class="status-dot status-pending"></div>
+                        System: Connecting...
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Bar -->
+            <div class="bg-white shadow-sm border-b border-gray-200 p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <button id="sidebar-toggle" class="md:hidden text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h2 id="page-title" class="text-xl font-semibold text-gray-800">Dashboard</h2>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div id="connection-status" class="flex items-center text-sm text-gray-600">
+                            <div class="status-dot status-pending"></div>
+                            Connecting...
+                        </div>
+                        
+                        <button id="refresh-btn" class="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        
+                        <button id="new-deployment-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-plus mr-2"></i>
+                            New Deployment
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Content Area -->
+            <div class="flex-1 overflow-auto p-6">
+                <!-- Dashboard Section -->
+                <div id="dashboard-section" class="section">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <!-- Status Cards -->
+                        <div class="bg-white rounded-lg shadow-sm p-6 card-hover">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-blue-100 rounded-lg">
+                                    <i class="fas fa-rocket text-blue-600 text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-600">Active Deployments</p>
+                                    <p id="active-deployments-count" class="text-2xl font-bold text-gray-900">-</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow-sm p-6 card-hover">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-green-100 rounded-lg">
+                                    <i class="fas fa-server text-green-600 text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-600">Running Instances</p>
+                                    <p id="running-instances-count" class="text-2xl font-bold text-gray-900">-</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow-sm p-6 card-hover">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-yellow-100 rounded-lg">
+                                    <i class="fas fa-dollar-sign text-yellow-600 text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-600">Monthly Cost</p>
+                                    <p id="monthly-cost" class="text-2xl font-bold text-gray-900">-</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow-sm p-6 card-hover">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-purple-100 rounded-lg">
+                                    <i class="fas fa-chart-line text-purple-600 text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-600">System Health</p>
+                                    <p id="system-health" class="text-2xl font-bold text-gray-900">-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Activity -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-lg shadow-sm p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Deployments</h3>
+                            <div id="recent-deployments" class="space-y-3">
+                                <div class="text-gray-500 text-center py-4">Loading...</div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow-sm p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">System Metrics</h3>
+                            <canvas id="metrics-chart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Deployments Section -->
+                <div id="deployments-section" class="section hidden">
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <div class="p-6 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-semibold text-gray-800">Deployments</h3>
+                                <div class="flex space-x-2">
+                                    <select id="deployment-filter" class="border border-gray-300 rounded-lg px-3 py-1 text-sm">
+                                        <option value="all">All Status</option>
+                                        <option value="running">Running</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="failed">Failed</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="deployments-list" class="divide-y divide-gray-200">
+                            <div class="text-gray-500 text-center py-8">Loading deployments...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AWS Resources Section -->
+                <div id="resources-section" class="section hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-white rounded-lg shadow-sm p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">EC2 Instances</h3>
+                            <div id="ec2-instances" class="space-y-2">
+                                <div class="text-gray-500">Loading...</div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow-sm p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Auto Scaling Groups</h3>
+                            <div id="asg-list" class="space-y-2">
+                                <div class="text-gray-500">Loading...</div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow-sm p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Load Balancers</h3>
+                            <div id="alb-list" class="space-y-2">
+                                <div class="text-gray-500">Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Monitoring Section -->
+                <div id="monitoring-section" class="section hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-lg shadow-sm p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">CPU Utilization</h3>
+                            <canvas id="cpu-chart" width="400" height="300"></canvas>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow-sm p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Memory Usage</h3>
+                            <canvas id="memory-chart" width="400" height="300"></canvas>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow-sm p-6 lg:col-span-2">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Request Rate</h3>
+                            <canvas id="requests-chart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Cost Analysis Section -->
+                <div id="costs-section" class="section hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white rounded-lg shadow-sm p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Cost Breakdown</h3>
+                            <canvas id="cost-chart" width="400" height="300"></canvas>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow-sm p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Cost Trends</h3>
+                            <canvas id="cost-trend-chart" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Cost Optimization Recommendations</h3>
+                        <div id="cost-recommendations" class="space-y-3">
+                            <div class="text-gray-500">Loading recommendations...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Deploy Wizard Section -->
+                <div id="wizard-section" class="section hidden">
+                    <div class="max-w-4xl mx-auto">
+                        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                            <div class="gradient-bg p-8 text-white text-center">
+                                <h2 class="text-3xl font-bold mb-2">🧙‍♂️ Deploy Wizard</h2>
+                                <p class="text-lg opacity-90">Guided deployment setup for your ActiveLog ecosystem</p>
+                            </div>
+                            
+                            <div class="p-8">
+                                <div id="wizard-content">
+                                    <div class="text-center py-8">
+                                        <button id="start-wizard-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold transition-colors">
+                                            <i class="fas fa-magic mr-2"></i>
+                                            Start Interactive Wizard
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Logs Section -->
+                <div id="logs-section" class="section hidden">
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-semibold text-gray-800">Deployment Logs</h3>
+                                <div class="flex items-center space-x-2">
+                                    <select id="log-deployment-select" class="border border-gray-300 rounded px-3 py-1 text-sm">
+                                        <option value="">Select deployment...</option>
+                                    </select>
+                                    <button id="clear-logs-btn" class="px-3 py-1 text-sm text-gray-600 hover:text-gray-800">
+                                        <i class="fas fa-trash mr-1"></i>
+                                        Clear
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="logs-container" class="log-container p-4 h-96 overflow-auto">
+                            <div class="text-gray-400">Select a deployment to view logs...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Section -->
+                <div id="settings-section" class="section hidden">
+                    <div class="max-w-2xl mx-auto">
+                        <div class="bg-white rounded-lg shadow-sm p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-6">Dashboard Settings</h3>
+                            
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Default AWS Region</label>
+                                    <select id="default-region" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                                        <option value="us-west-2">US West (Oregon)</option>
+                                        <option value="us-east-1">US East (N. Virginia)</option>
+                                        <option value="eu-west-1">Europe (Ireland)</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Refresh Interval</label>
+                                    <select id="refresh-interval" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                                        <option value="5">5 seconds</option>
+                                        <option value="10">10 seconds</option>
+                                        <option value="30">30 seconds</option>
+                                        <option value="60">1 minute</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="dark-mode" class="rounded border-gray-300">
+                                        <span class="ml-2 text-sm text-gray-700">Enable dark mode</span>
+                                    </label>
+                                </div>
+                                
+                                <div>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="notifications-enabled" class="rounded border-gray-300" checked>
+                                        <span class="ml-2 text-sm text-gray-700">Enable notifications</span>
+                                    </label>
+                                </div>
+                                
+                                <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-colors">
+                                    Save Settings
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Deployment Modal -->
+    <div id="deployment-modal" class="modal fixed inset-0 z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-800">Deployment Details</h3>
+            </div>
+            <div id="deployment-modal-content" class="p-6">
+                <!-- Modal content will be inserted here -->
+            </div>
+            <div class="p-6 border-t border-gray-200 text-right">
+                <button id="close-modal-btn" class="px-4 py-2 text-gray-600 hover:text-gray-800">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

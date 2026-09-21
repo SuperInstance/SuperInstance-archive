@@ -1,0 +1,73 @@
+{
+  "competition_start": "2025-08-30T10:52:46.938974",
+  "total_bots": 7,
+  "total_storage_gb": 70,
+  "competition_goal": "Build most advanced firefly logic tensor system",
+  "upgrade_criteria": "Human-visible progress in tensor performance",
+  "sharing_policy": "Findings shared, competitive advantage retained",
+  "launched_bots": [
+    {
+      "bot_name": "vestige_researcher",
+      "specialization": "Death-rebirth optimization firefly tensors",
+      "instance_id": "i-0b61812de8ea6e0c1",
+      "private_ip": "10.0.1.149",
+      "storage_gb": 10,
+      "launched_at": "2025-08-30T10:52:41.660633",
+      "status": "initializing"
+    },
+    {
+      "bot_name": "holographic_researcher",
+      "specialization": "Fault-tolerant firefly tensor logic",
+      "instance_id": "i-0e4da12ade3468473",
+      "private_ip": "10.0.1.89",
+      "storage_gb": 10,
+      "launched_at": "2025-08-30T10:52:42.935192",
+      "status": "initializing"
+    },
+    {
+      "bot_name": "firefly_researcher",
+      "specialization": "Pure swarm intelligence optimization",
+      "instance_id": "i-02f80ff412d819349",
+      "private_ip": "10.0.1.123",
+      "storage_gb": 10,
+      "launched_at": "2025-08-30T10:52:44.132941",
+      "status": "initializing"
+    },
+    {
+      "bot_name": "spatial_researcher",
+      "specialization": "Semantic firefly tensor organization",
+      "instance_id": "i-0c3e7c1df714f297c",
+      "private_ip": "10.0.1.145",
+      "storage_gb": 10,
+      "launched_at": "2025-08-30T10:52:45.343236",
+      "status": "initializing"
+    },
+    {
+      "bot_name": "consciousness_researcher",
+      "specialization": "Self-aware firefly systems",
+      "instance_id": "i-03f56c900d7b38917",
+      "private_ip": "10.0.1.46",
+      "storage_gb": 10,
+      "launched_at": "2025-08-30T10:52:44.517175",
+      "status": "initializing"
+    },
+    {
+      "bot_name": "economics_researcher",
+      "specialization": "ROI-optimized firefly tensors",
+      "instance_id": "i-0cb272de25786bc54",
+      "private_ip": "10.0.1.163",
+      "storage_gb": 10,
+      "launched_at": "2025-08-30T10:52:45.795072",
+      "status": "initializing"
+    },
+    {
+      "bot_name": "integration_researcher",
+      "specialization": "Unified firefly tensor framework",
+      "instance_id": "i-07a5a3a6495788bd6",
+      "private_ip": "10.0.1.7",
+      "storage_gb": 10,
+      "launched_at": "2025-08-30T10:52:46.938959",
+      "status": "initializing"
+    }
+  ]
+}

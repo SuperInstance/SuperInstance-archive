@@ -1,0 +1,240 @@
+# Alertmanager configuration for ActiveLog monitoring
+# Production-ready configuration with multiple notification channels
+
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'alerts@activelog.com'
+  smtp_auth_username: 'alerts@activelog.com'
+  smtp_auth_password: '${SMTP_PASSWORD}'
+  smtp_require_tls: true
+
+# Inhibit rules to prevent alert spam
+inhibit_rules:
+  # Inhibit critical alerts if service is down
+  - source_matchers:
+      - alertname = "ServiceDown"
+    target_matchers:
+      - service =~ ".*"
+    equal: ['service']
+
+  # Inhibit disk space warnings if disk is critical
+  - source_matchers:
+      - alertname = "DiskSpaceCritical"
+    target_matchers:
+      - alertname = "DiskSpaceWarning"
+    equal: ['instance']
+
+  # Inhibit high response time alerts if error rate is high
+  - source_matchers:
+      - alertname = "HighErrorRate"
+    target_matchers:
+      - alertname = "HighResponseTime"
+    equal: ['service']
+
+# Route configuration
+route:
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: 'web.hook'
+  
+  routes:
+    # Critical alerts go to oncall and slack
+    - matchers:
+        - severity = "critical"
+      receiver: 'critical-alerts'
+      group_wait: 0s
+      group_interval: 5s
+      repeat_interval: 15m
+      
+    # Business alerts go to business team
+    - matchers:
+        - category = "business"
+      receiver: 'business-alerts'
+      group_wait: 30s
+      repeat_interval: 2h
+      
+    # Security alerts go to security team
+    - matchers:
+        - category = "security"
+      receiver: 'security-alerts'
+      group_wait: 0s
+      repeat_interval: 30m
+      
+    # ML model alerts go to data science team
+    - matchers:
+        - category = "ml"
+      receiver: 'ml-alerts'
+      repeat_interval: 4h
+      
+    # Cost alerts go to finance team
+    - matchers:
+        - category = "cost"
+      receiver: 'cost-alerts'
+      repeat_interval: 6h
+      
+    # Development environment alerts (less urgent)
+    - matchers:
+        - environment = "development"
+      receiver: 'dev-alerts'
+      repeat_interval: 4h
+
+# Notification receivers
+receivers:
+  # Default webhook receiver
+  - name: 'web.hook'
+    webhook_configs:
+      - url: 'http://activelog-dashboard:8080/alerts/webhook'
+        send_resolved: true
+
+  # Critical alerts - multiple channels
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'oncall@activelog.com'
+        subject: '[CRITICAL] {{ .GroupLabels.alertname }} - {{ .GroupLabels.service }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          
+          Labels:
+          {{ range .Labels.SortedPairs }}  - {{ .Name }} = {{ .Value }}
+          {{ end }}
+          
+          Runbook: {{ .Annotations.runbook_url }}
+          Dashboard: {{ .Annotations.dashboard_url }}
+          {{ end }}
+        
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '#alerts-critical'
+        title: 'Critical Alert: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *{{ .Annotations.summary }}*
+          
+          {{ .Annotations.description }}
+          
+          *Service:* {{ .Labels.service }}
+          *Environment:* {{ .Labels.environment }}
+          *Severity:* {{ .Labels.severity }}
+          
+          <{{ .Annotations.dashboard_url }}|View Dashboard> | <{{ .Annotations.runbook_url }}|Runbook>
+          {{ end }}
+        
+    pagerduty_configs:
+      - routing_key: '${PAGERDUTY_ROUTING_KEY}'
+        description: '{{ .GroupLabels.alertname }} - {{ .GroupLabels.service }}'
+        details:
+          summary: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+          source: 'ActiveLog Monitoring'
+          severity: 'critical'
+          custom_details:
+            environment: '{{ .CommonLabels.environment }}'
+            service: '{{ .CommonLabels.service }}'
+
+  # Business alerts
+  - name: 'business-alerts'
+    email_configs:
+      - to: 'business@activelog.com'
+        subject: '[BUSINESS] {{ .GroupLabels.alertname }}'
+        body: |
+          Business Alert Triggered
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Impact: {{ .Annotations.impact }}
+          
+          Current Value: {{ .Annotations.value }}
+          Threshold: {{ .Annotations.threshold }}
+          {{ end }}
+        
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '#business-metrics'
+        title: 'Business Alert: {{ .GroupLabels.alertname }}'
+        color: 'warning'
+
+  # Security alerts
+  - name: 'security-alerts'
+    email_configs:
+      - to: 'security@activelog.com'
+        subject: '[SECURITY] {{ .GroupLabels.alertname }}'
+        body: |
+          Security Alert Detected
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          
+          Potential Impact: {{ .Annotations.impact }}
+          Recommended Action: {{ .Annotations.action }}
+          {{ end }}
+        
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '#security-alerts'
+        title: 'Security Alert: {{ .GroupLabels.alertname }}'
+        color: 'danger'
+
+  # ML alerts
+  - name: 'ml-alerts'
+    email_configs:
+      - to: 'datascience@activelog.com'
+        subject: '[ML] {{ .GroupLabels.alertname }}'
+        body: |
+          Machine Learning Alert
+          
+          {{ range .Alerts }}
+          Model: {{ .Labels.model_name }}
+          Issue: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          
+          Current Performance: {{ .Annotations.value }}
+          Expected: {{ .Annotations.threshold }}
+          {{ end }}
+        
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '#ml-monitoring'
+        title: 'ML Alert: {{ .GroupLabels.alertname }}'
+
+  # Cost alerts
+  - name: 'cost-alerts'
+    email_configs:
+      - to: 'finance@activelog.com'
+        subject: '[COST] {{ .GroupLabels.alertname }}'
+        body: |
+          Cost Alert Triggered
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          
+          Current Cost: {{ .Annotations.value }}
+          Budget: {{ .Annotations.threshold }}
+          Projection: {{ .Annotations.projection }}
+          {{ end }}
+
+  # Development alerts (lower priority)
+  - name: 'dev-alerts'
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '#dev-alerts'
+        title: 'Dev Alert: {{ .GroupLabels.alertname }}'
+        color: 'good'
+
+# Notification templates
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# Webhook configuration for custom integrations
+webhook_configs:
+  - url: 'http://activelog-dashboard:8080/alerts/webhook'
+    send_resolved: true
+    http_config:
+      basic_auth:
+        username: 'alertmanager'
+        password: '${WEBHOOK_PASSWORD}'

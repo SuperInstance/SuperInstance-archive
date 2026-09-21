@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ActiveLog Edge Device Management Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .dashboard {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: auto 1fr;
+            grid-template-areas: 
+                "sidebar header"
+                "sidebar main";
+        }
+
+        .sidebar {
+            grid-area: sidebar;
+            background: var(--surface-color);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+
+        .sidebar h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-menu a {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            text-decoration: none;
+            color: var(--text-color);
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            background-color: var(--background-color);
+            color: var(--primary-color);
+        }
+
+        .nav-menu .icon {
+            margin-right: 0.5rem;
+            width: 1.25rem;
+            text-align: center;
+        }
+
+        .header {
+            grid-area: header;
+            background: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--success-color);
+            color: white;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .status-indicator.offline {
+            background: var(--error-color);
+        }
+
+        .main-content {
+            grid-area: main;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--surface-color);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-card .trend {
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .trend.up {
+            color: var(--success-color);
+        }
+
+        .trend.down {
+            color: var(--error-color);
+        }
+
+        .devices-section {
+            background: var(--surface-color);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-tab {
+            padding: 0.5rem 1rem;
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .filter-tab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .devices-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .device-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: auto 1fr auto auto auto;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .device-item:last-child {
+            border-bottom: none;
+        }
+
+        .device-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--error-color);
+        }
+
+        .device-status.online {
+            background: var(--success-color);
+        }
+
+        .device-status.warning {
+            background: var(--warning-color);
+        }
+
+        .device-info h4 {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .device-info p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .device-type {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--background-color);
+            color: var(--text-muted);
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .device-type.activelog {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .device-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .device-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: var(--background-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .btn-small {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .tabs {
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 0;
+        }
+
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .metric-item {
+            padding: 1rem;
+            background: var(--background-color);
+            border-radius: 0.5rem;
+        }
+
+        .metric-item label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-item .value {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .log-container {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.4;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 0.25rem;
+        }
+
+        .log-entry.error {
+            color: #fca5a5;
+        }
+
+        .log-entry.warning {
+            color: #fde68a;
+        }
+
+        .log-entry.info {
+            color: #a7f3d0;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr;
+                grid-template-areas: 
+                    "header"
+                    "sidebar"
+                    "main";
+            }
+
+            .sidebar {
+                padding: 1rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .device-item {
+                grid-template-columns: auto 1fr;
+                gap: 0.5rem;
+            }
+
+            .device-actions,
+            .device-metrics {
+                grid-column: 1 / -1;
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <nav class="sidebar">
+            <h2>ActiveLog Edge</h2>
+            <ul class="nav-menu">
+                <li><a href="#overview" class="nav-link active" data-section="overview">
+                    <span class="icon">📊</span>Overview
+                </a></li>
+                <li><a href="#devices" class="nav-link" data-section="devices">
+                    <span class="icon">📱</span>Devices
+                </a></li>
+                <li><a href="#monitoring" class="nav-link" data-section="monitoring">
+                    <span class="icon">📈</span>Monitoring
+                </a></li>
+                <li><a href="#logs" class="nav-link" data-section="logs">
+                    <span class="icon">📝</span>Logs
+                </a></li>
+                <li><a href="#settings" class="nav-link" data-section="settings">
+                    <span class="icon">⚙️</span>Settings
+                </a></li>
+            </ul>
+        </nav>
+
+        <header class="header">
+            <h1>Edge Device Management</h1>
+            <div class="header-actions">
+                <div class="status-indicator online">
+                    <span class="spinner" style="display: none;"></span>
+                    <span class="status-text">Online</span>
+                </div>
+                <button class="btn btn-primary" onclick="refreshData()">Refresh</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Overview Section -->
+            <div id="overview-section" class="content-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Devices</h3>
+                        <div class="value" id="total-devices">0</div>
+                        <div class="trend up" id="devices-trend">+0 this hour</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Online Devices</h3>
+                        <div class="value" id="online-devices">0</div>
+                        <div class="trend" id="online-trend">0% uptime</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>ActiveLog Devices</h3>
+                        <div class="value" id="activelog-devices">0</div>
+                        <div class="trend" id="activelog-trend">0 capabilities</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Data Synced</h3>
+                        <div class="value" id="data-synced">0 MB</div>
+                        <div class="trend up" id="sync-trend">+0 MB today</div>
+                    </div>
+                </div>
+
+                <div class="devices-section">
+                    <div class="section-header">
+                        <h2>Recent Devices</h2>
+                        <div class="filter-tabs">
+                            <button class="filter-tab active" data-filter="all">All</button>
+                            <button class="filter-tab" data-filter="activelog">ActiveLog</button>
+                            <button class="filter-tab" data-filter="online">Online</button>
+                            <button class="filter-tab" data-filter="offline">Offline</button>
+                        </div>
+                    </div>
+                    <div class="devices-list" id="recent-devices">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading devices...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Devices Section -->
+            <div id="devices-section" class="content-section">
+                <div class="devices-section">
+                    <div class="section-header">
+                        <h2>All Devices</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-secondary" onclick="scanDevices()">Scan Now</button>
+                            <button class="btn btn-primary" onclick="showAddDevice()">Add Device</button>
+                        </div>
+                    </div>
+                    <div class="devices-list" id="all-devices">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading devices...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monitoring Section -->
+            <div id="monitoring-section" class="content-section">
+                <h2>System Monitoring</h2>
+                <div class="metric-grid" id="monitoring-metrics">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading monitoring data...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs Section -->
+            <div id="logs-section" class="content-section">
+                <div class="section-header">
+                    <h2>System Logs</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" onclick="clearLogs()">Clear</button>
+                        <button class="btn btn-primary" onclick="downloadLogs()">Download</button>
+                    </div>
+                </div>
+                <div class="log-container" id="log-container">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading logs...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings-section" class="content-section">
+                <h2>Settings</h2>
+                <div class="settings-form">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading settings...
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Device Details Modal -->
+    <div id="device-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Device Details</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab-buttons">
+                    <button class="tab-button active" data-tab="overview">Overview</button>
+                    <button class="tab-button" data-tab="metrics">Metrics</button>
+                    <button class="tab-button" data-tab="logs">Logs</button>
+                    <button class="tab-button" data-tab="actions">Actions</button>
+                </div>
+            </div>
+
+            <div id="overview-tab" class="tab-content active">
+                <div id="device-overview">Loading device information...</div>
+            </div>
+
+            <div id="metrics-tab" class="tab-content">
+                <div class="metric-grid" id="device-metrics">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading metrics...
+                    </div>
+                </div>
+            </div>
+
+            <div id="logs-tab" class="tab-content">
+                <div class="log-container" id="device-logs">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading device logs...
+                    </div>
+                </div>
+            </div>
+
+            <div id="actions-tab" class="tab-content">
+                <div id="device-actions">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading available actions...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let devices = [];
+        let currentFilter = 'all';
+        let currentSection = 'overview';
+        let selectedDevice = null;
+        let updateInterval = null;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeNavigation();
+            loadInitialData();
+            startAutoUpdate();
+        });
+
+        function initializeNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.dataset.section;
+                    showSection(section);
+                });
+            });
+
+            const filterTabs = document.querySelectorAll('.filter-tab');
+            filterTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    setFilter(this.dataset.filter);
+                });
+            });
+
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    showTab(this.dataset.tab);
+                });
+            });
+        }
+
+        function showSection(section) {
+            // Update navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`[data-section="${section}"]`).classList.add('active');
+
+            // Update content
+            document.querySelectorAll('.content-section').forEach(sec => {
+                sec.style.display = 'none';
+            });
+            document.getElementById(`${section}-section`).style.display = 'block';
+
+            currentSection = section;
+
+            // Load section-specific data
+            switch(section) {
+                case 'devices':
+                    loadAllDevices();
+                    break;
+                case 'monitoring':
+                    loadMonitoringData();
+                    break;
+                case 'logs':
+                    loadLogs();
+                    break;
+                case 'settings':
+                    loadSettings();
+                    break;
+            }
+        }
+
+        function setFilter(filter) {
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+            
+            currentFilter = filter;
+            renderDevices();
+        }
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tab}-tab`).classList.add('active');
+
+            // Load tab-specific data if device is selected
+            if (selectedDevice) {
+                loadDeviceTabData(tab, selectedDevice);
+            }
+        }
+
+        async function loadInitialData() {
+            try {
+                await Promise.all([
+                    loadDevices(),
+                    loadStats()
+                ]);
+                renderOverview();
+            } catch (error) {
+                console.error('Failed to load initial data:', error);
+                showError('Failed to load dashboard data');
+            }
+        }
+
+        async function loadDevices() {
+            try {
+                const response = await fetch('/api/devices');
+                if (!response.ok) throw new Error('Failed to fetch devices');
+                
+                devices = await response.json();
+                renderDevices();
+            } catch (error) {
+                console.error('Failed to load devices:', error);
+                devices = generateMockDevices(); // Fallback to mock data
+                renderDevices();
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                if (!response.ok) throw new Error('Failed to fetch stats');
+                
+                const stats = await response.json();
+                updateStats(stats);
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+                updateStats(generateMockStats()); // Fallback to mock data
+            }
+        }
+
+        function generateMockDevices() {
+            return [
+                {
+                    device_id: 'pi_kitchen',
+                    device_type: 'activelog',
+                    name: 'Kitchen Pi Camera',
+                    address: '192.168.1.101',
+                    last_seen: new Date().toISOString(),
+                    is_trusted: true,
+                    activelog_capabilities: ['camera', 'motion-detection', 'ai-processing'],
+                    metadata: { 
+                        cpu_percent: 45,
+                        memory_percent: 62,
+                        temperature: 52,
+                        uptime: '2 days'
+                    }
+                },
+                {
+                    device_id: 'jetson_garage',
+                    device_type: 'activelog',
+                    name: 'Garage Jetson AI',
+                    address: '192.168.1.102',
+                    last_seen: new Date().toISOString(),
+                    is_trusted: true,
+                    activelog_capabilities: ['ai-inference', 'video-analysis', 'object-detection'],
+                    metadata: { 
+                        cpu_percent: 78,
+                        memory_percent: 84,
+                        gpu_percent: 92,
+                        temperature: 68,
+                        uptime: '1 day'
+                    }
+                },
+                {
+                    device_id: 'bt_sensor_01',
+                    device_type: 'bluetooth',
+                    name: 'Temperature Sensor',
+                    address: '00:11:22:33:44:55',
+                    last_seen: new Date(Date.now() - 300000).toISOString(),
+                    is_trusted: false,
+                    metadata: { 
+                        battery: 78,
+                        temperature: 22.5,
+                        humidity: 45
+                    }
+                },
+                {
+                    device_id: 'wifi_printer',
+                    device_type: 'network',
+                    name: 'Office Printer',
+                    address: '192.168.1.50',
+                    last_seen: new Date(Date.now() - 1800000).toISOString(),
+                    is_trusted: true,
+                    metadata: { 
+                        status: 'ready',
+                        paper_level: 85,
+                        ink_level: 42
+                    }
+                }
+            ];
+        }
+
+        function generateMockStats() {
+            return {
+                total_devices: devices.length,
+                online_devices: devices.filter(d => isDeviceOnline(d)).length,
+                activelog_devices: devices.filter(d => d.device_type === 'activelog').length,
+                data_synced_mb: 247.5,
+                uptime_percentage: 98.2,
+                capabilities_count: devices.reduce((acc, d) => acc + (d.activelog_capabilities?.length || 0), 0),
+                sync_trend_mb: 15.2
+            };
+        }
+
+        function isDeviceOnline(device) {
+            const lastSeen = new Date(device.last_seen);
+            const now = new Date();
+            const diffMinutes = (now - lastSeen) / (1000 * 60);
+            return diffMinutes < 5; // Consider online if seen within 5 minutes
+        }
+
+        function renderOverview() {
+            renderDevices('recent-devices', 5);
+        }
+
+        function renderDevices(containerId = 'recent-devices', limit = null) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            let filteredDevices = devices;
+
+            // Apply filter
+            switch(currentFilter) {
+                case 'activelog':
+                    filteredDevices = devices.filter(d => d.device_type === 'activelog');
+                    break;
+                case 'online':
+                    filteredDevices = devices.filter(d => isDeviceOnline(d));
+                    break;
+                case 'offline':
+                    filteredDevices = devices.filter(d => !isDeviceOnline(d));
+                    break;
+            }
+
+            // Apply limit
+            if (limit) {
+                filteredDevices = filteredDevices.slice(0, limit);
+            }
+
+            if (filteredDevices.length === 0) {
+                container.innerHTML = '<div class="loading">No devices found</div>';
+                return;
+            }
+
+            container.innerHTML = filteredDevices.map(device => `
+                <div class="device-item" onclick="showDeviceDetails('${device.device_id}')">
+                    <div class="device-status ${isDeviceOnline(device) ? 'online' : 'offline'}"></div>
+                    <div class="device-info">
+                        <h4>${device.name}</h4>
+                        <p>${device.address} • Last seen ${formatLastSeen(device.last_seen)}</p>
+                    </div>
+                    <div class="device-type ${device.device_type}">${device.device_type}</div>
+                    <div class="device-metrics">
+                        ${renderDeviceMetrics(device)}
+                    </div>
+                    <div class="device-actions">
+                        <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); trustDevice('${device.device_id}')">
+                            ${device.is_trusted ? 'Untrust' : 'Trust'}
+                        </button>
+                        <button class="btn btn-primary btn-small" onclick="event.stopPropagation(); showDeviceDetails('${device.device_id}')">
+                            Details
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderDeviceMetrics(device) {
+            const metrics = [];
+            
+            if (device.metadata?.cpu_percent) {
+                metrics.push(`CPU: ${device.metadata.cpu_percent}%`);
+            }
+            if (device.metadata?.memory_percent) {
+                metrics.push(`RAM: ${device.metadata.memory_percent}%`);
+            }
+            if (device.metadata?.temperature) {
+                metrics.push(`Temp: ${device.metadata.temperature}°C`);
+            }
+            if (device.metadata?.battery) {
+                metrics.push(`Battery: ${device.metadata.battery}%`);
+            }
+
+            return metrics.join('<br>');
+        }
+
+        function updateStats(stats) {
+            document.getElementById('total-devices').textContent = stats.total_devices;
+            document.getElementById('online-devices').textContent = stats.online_devices;
+            document.getElementById('activelog-devices').textContent = stats.activelog_devices;
+            document.getElementById('data-synced').textContent = `${stats.data_synced_mb} MB`;
+            
+            document.getElementById('devices-trend').textContent = `+${Math.floor(Math.random() * 3)} this hour`;
+            document.getElementById('online-trend').textContent = `${stats.uptime_percentage}% uptime`;
+            document.getElementById('activelog-trend').textContent = `${stats.capabilities_count} capabilities`;
+            document.getElementById('sync-trend').textContent = `+${stats.sync_trend_mb} MB today`;
+        }
+
+        function formatLastSeen(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            
+            if (diffMins < 1) return 'just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return `${diffHours}h ago`;
+            
+            const diffDays = Math.floor(diffHours / 24);
+            return `${diffDays}d ago`;
+        }
+
+        async function showDeviceDetails(deviceId) {
+            selectedDevice = devices.find(d => d.device_id === deviceId);
+            if (!selectedDevice) return;
+
+            document.getElementById('device-modal').classList.add('active');
+            
+            // Load overview tab
+            loadDeviceTabData('overview', selectedDevice);
+        }
+
+        function loadDeviceTabData(tab, device) {
+            switch(tab) {
+                case 'overview':
+                    document.getElementById('device-overview').innerHTML = `
+                        <div class="metric-grid">
+                            <div class="metric-item">
+                                <label>Device Name</label>
+                                <div class="value">${device.name}</div>
+                            </div>
+                            <div class="metric-item">
+                                <label>Type</label>
+                                <div class="value">${device.device_type}</div>
+                            </div>
+                            <div class="metric-item">
+                                <label>Address</label>
+                                <div class="value">${device.address}</div>
+                            </div>
+                            <div class="metric-item">
+                                <label>Status</label>
+                                <div class="value">${isDeviceOnline(device) ? 'Online' : 'Offline'}</div>
+                            </div>
+                            <div class="metric-item">
+                                <label>Last Seen</label>
+                                <div class="value">${formatLastSeen(device.last_seen)}</div>
+                            </div>
+                            <div class="metric-item">
+                                <label>Trusted</label>
+                                <div class="value">${device.is_trusted ? 'Yes' : 'No'}</div>
+                            </div>
+                        </div>
+                        ${device.activelog_capabilities ? `
+                            <h4 style="margin: 1.5rem 0 1rem 0;">Capabilities</h4>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                ${device.activelog_capabilities.map(cap => `
+                                    <span class="device-type activelog">${cap}</span>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    `;
+                    break;
+                    
+                case 'metrics':
+                    loadDeviceMetrics(device);
+                    break;
+                    
+                case 'logs':
+                    loadDeviceLogs(device);
+                    break;
+                    
+                case 'actions':
+                    loadDeviceActions(device);
+                    break;
+            }
+        }
+
+        function loadDeviceMetrics(device) {
+            const metricsContainer = document.getElementById('device-metrics');
+            
+            if (!device.metadata) {
+                metricsContainer.innerHTML = '<div class="loading">No metrics available</div>';
+                return;
+            }
+
+            const metrics = Object.entries(device.metadata).map(([key, value]) => {
+                let displayValue = value;
+                let unit = '';
+                
+                if (key.includes('percent')) {
+                    unit = '%';
+                } else if (key === 'temperature') {
+                    unit = '°C';
+                } else if (key === 'battery') {
+                    unit = '%';
+                }
+                
+                return `
+                    <div class="metric-item">
+                        <label>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</label>
+                        <div class="value">${displayValue}${unit}</div>
+                    </div>
+                `;
+            }).join('');
+
+            metricsContainer.innerHTML = metrics || '<div class="loading">No metrics available</div>';
+        }
+
+        function loadDeviceLogs(device) {
+            const logsContainer = document.getElementById('device-logs');
+            
+            // Mock log entries
+            const logEntries = [
+                { level: 'info', message: 'Device connected successfully', timestamp: new Date() },
+                { level: 'info', message: 'Started camera capture process', timestamp: new Date(Date.now() - 60000) },
+                { level: 'warning', message: 'High temperature detected: 68°C', timestamp: new Date(Date.now() - 120000) },
+                { level: 'info', message: 'Motion detected in zone 1', timestamp: new Date(Date.now() - 180000) },
+                { level: 'error', message: 'Failed to upload batch: network timeout', timestamp: new Date(Date.now() - 300000) }
+            ];
+
+            logsContainer.innerHTML = logEntries.map(entry => `
+                <div class="log-entry ${entry.level}">
+                    ${entry.timestamp.toLocaleTimeString()} [${entry.level.toUpperCase()}] ${entry.message}
+                </div>
+            `).join('');
+        }
+
+        function loadDeviceActions(device) {
+            const actionsContainer = document.getElementById('device-actions');
+            
+            const actions = [];
+            
+            if (device.device_type === 'activelog') {
+                actions.push(`
+                    <div style="margin-bottom: 1rem;">
+                        <h4>Device Control</h4>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                            <button class="btn btn-primary" onclick="restartDevice('${device.device_id}')">Restart</button>
+                            <button class="btn btn-secondary" onclick="updateDevice('${device.device_id}')">Update</button>
+                            <button class="btn btn-secondary" onclick="configureDevice('${device.device_id}')">Configure</button>
+                        </div>
+                    </div>
+                `);
+                
+                if (device.activelog_capabilities?.includes('camera')) {
+                    actions.push(`
+                        <div style="margin-bottom: 1rem;">
+                            <h4>Camera Control</h4>
+                            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                                <button class="btn btn-primary" onclick="capturePhoto('${device.device_id}')">Capture Photo</button>
+                                <button class="btn btn-secondary" onclick="enableMotionDetection('${device.device_id}')">Enable Motion</button>
+                            </div>
+                        </div>
+                    `);
+                }
+            }
+            
+            actions.push(`
+                <div style="margin-bottom: 1rem;">
+                    <h4>Network</h4>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                        <button class="btn btn-secondary" onclick="pingDevice('${device.device_id}')">Ping</button>
+                        <button class="btn btn-secondary" onclick="scanPorts('${device.device_id}')">Scan Ports</button>
+                    </div>
+                </div>
+            `);
+
+            actionsContainer.innerHTML = actions.join('');
+        }
+
+        function closeModal() {
+            document.getElementById('device-modal').classList.remove('active');
+            selectedDevice = null;
+        }
+
+        async function refreshData() {
+            const statusIndicator = document.querySelector('.status-indicator');
+            const spinner = statusIndicator.querySelector('.spinner');
+            
+            spinner.style.display = 'inline-block';
+            
+            try {
+                await loadInitialData();
+                showSuccess('Data refreshed successfully');
+            } catch (error) {
+                showError('Failed to refresh data');
+    } finally {
+                spinner.style.display = 'none';
+            }
+        }
+
+        async function scanDevices() {
+            showSuccess('Device scan initiated');
+            // In a real implementation, this would trigger a device scan
+            setTimeout(() => {
+                loadDevices();
+                showSuccess('Device scan completed');
+            }, 3000);
+        }
+
+        async function trustDevice(deviceId) {
+            const device = devices.find(d => d.device_id === deviceId);
+            if (device) {
+                device.is_trusted = !device.is_trusted;
+                renderDevices();
+                showSuccess(`Device ${device.is_trusted ? 'trusted' : 'untrusted'}`);
+            }
+        }
+
+        // Device action functions
+        function restartDevice(deviceId) {
+            showSuccess(`Restart command sent to ${deviceId}`);
+        }
+
+        function updateDevice(deviceId) {
+            showSuccess(`Update initiated for ${deviceId}`);
+        }
+
+        function configureDevice(deviceId) {
+            showSuccess(`Configuration panel opened for ${deviceId}`);
+        }
+
+        function capturePhoto(deviceId) {
+            showSuccess(`Photo capture requested from ${deviceId}`);
+        }
+
+        function enableMotionDetection(deviceId) {
+            showSuccess(`Motion detection enabled on ${deviceId}`);
+        }
+
+        function pingDevice(deviceId) {
+            showSuccess(`Ping sent to ${deviceId}`);
+        }
+
+        function scanPorts(deviceId) {
+            showSuccess(`Port scan initiated for ${deviceId}`);
+        }
+
+        // Utility functions
+        function showSuccess(message) {
+            showNotification(message, 'success');
+        }
+
+        function showError(message) {
+            showNotification(message, 'error');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                border-radius: 0.5rem;
+                color: white;
+                font-weight: 500;
+                z-index: 2000;
+                animation: slideIn 0.3s ease-out;
+                background: ${type === 'success' ? 'var(--success-color)' : 'var(--error-color)'};
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function startAutoUpdate() {
+            updateInterval = setInterval(() => {
+                if (currentSection === 'overview' || currentSection === 'devices') {
+                    loadDevices();
+                    loadStats();
+                }
+            }, 30000); // Update every 30 seconds
+        }
+
+        // Additional section loading functions
+        function loadAllDevices() {
+            loadDevices();
+        }
+
+        function loadMonitoringData() {
+            const container = document.getElementById('monitoring-metrics');
+            
+            // Mock monitoring data
+            const mockMetrics = [
+                { label: 'CPU Usage', value: '45%', status: 'normal' },
+                { label: 'Memory Usage', value: '62%', status: 'normal' },
+                { label: 'Disk Usage', value: '78%', status: 'warning' },
+                { label: 'Network I/O', value: '1.2 MB/s', status: 'normal' },
+                { label: 'Active Connections', value: '24', status: 'normal' },
+                { label: 'Error Rate', value: '0.01%', status: 'normal' }
+            ];
+
+            container.innerHTML = mockMetrics.map(metric => `
+                <div class="metric-item">
+                    <label>${metric.label}</label>
+                    <div class="value" style="color: ${getStatusColor(metric.status)}">${metric.value}</div>
+                </div>
+            `).join('');
+        }
+
+        function loadLogs() {
+            const container = document.getElementById('log-container');
+            
+            // Mock log entries
+            const mockLogs = [
+                { level: 'info', message: 'Device discovery scan completed - found 4 devices', timestamp: new Date() },
+                { level: 'info', message: 'Kitchen Pi Camera connected', timestamp: new Date(Date.now() - 30000) },
+                { level: 'warning', message: 'High GPU temperature on Garage Jetson AI: 68°C', timestamp: new Date(Date.now() - 60000) },
+                { level: 'info', message: 'Motion detected by Kitchen Pi Camera', timestamp: new Date(Date.now() - 90000) },
+                { level: 'error', message: 'Failed to sync data: network timeout', timestamp: new Date(Date.now() - 120000) },
+                { level: 'info', message: 'System started successfully', timestamp: new Date(Date.now() - 300000) }
+            ];
+
+            container.innerHTML = mockLogs.map(log => `
+                <div class="log-entry ${log.level}">
+                    ${log.timestamp.toLocaleString()} [${log.level.toUpperCase()}] ${log.message}
+                </div>
+            `).join('');
+        }
+
+        function loadSettings() {
+            const container = document.querySelector('#settings-section .settings-form');
+            
+            container.innerHTML = `
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <label>Scan Interval</label>
+                        <input type="number" value="60" min="10" max="3600"> seconds
+                    </div>
+                    <div class="metric-item">
+                        <label>Device Timeout</label>
+                        <input type="number" value="300" min="60" max="1800"> seconds
+                    </div>
+                    <div class="metric-item">
+                        <label>Auto Discovery</label>
+                        <input type="checkbox" checked>
+                    </div>
+                    <div class="metric-item">
+                        <label>Log Level</label>
+                        <select>
+                            <option>INFO</option>
+                            <option>DEBUG</option>
+                            <option>WARNING</option>
+                            <option>ERROR</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top: 2rem;">
+                    <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+                    <button class="btn btn-secondary" onclick="resetSettings()">Reset to Defaults</button>
+                </div>
+            `;
+        }
+
+        function getStatusColor(status) {
+            switch(status) {
+                case 'normal': return 'var(--success-color)';
+                case 'warning': return 'var(--warning-color)';
+                case 'error': return 'var(--error-color)';
+                default: return 'var(--text-color)';
+            }
+        }
+
+        function clearLogs() {
+            document.getElementById('log-container').innerHTML = '<div class="loading">Logs cleared</div>';
+            showSuccess('Logs cleared');
+        }
+
+        function downloadLogs() {
+            showSuccess('Logs download initiated');
+        }
+
+        function saveSettings() {
+            showSuccess('Settings saved successfully');
+        }
+
+        function resetSettings() {
+            showSuccess('Settings reset to defaults');
+            loadSettings();
+        }
+
+        function showAddDevice() {
+            showSuccess('Add device dialog would open here');
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (updateInterval) {
+                clearInterval(updateInterval);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+# OPTIMIZED TASK ASSIGNMENTS - Minimal Token Communication
+# Bot reads ONLY their section, updates status with single line
+
+=== BOT-SERVICES IMMEDIATE ACTIONS ===
+STATUS: CAN_START_NOW
+PRIORITY_1: kubectl apply auth-service (use existing /services/auth-service/main.py)
+PRIORITY_2: kubectl apply postgres-cluster
+PRIORITY_3: kubectl apply redis-cache
+UNBLOCKED_BY: /tmp/k8s-ready.flag (exists)
+UPDATE_FORMAT: services|TASK_NAME|PROGRESS%|ETA
+
+=== BOT-DOMAINS IMMEDIATE ACTIONS ===  
+STATUS: PREPARE_WHILE_WAITING
+PRIORITY_1: Design ActiveLog fitness schemas (SuperInstance critical)
+PRIORITY_2: Plan cross-domain APIs
+PRIORITY_3: Study existing domain patterns
+WAITING_FOR: /tmp/auth-service-ready.flag
+UPDATE_FORMAT: domains|TASK_NAME|PROGRESS%|ETA
+
+=== BOT-INFRASTRUCTURE STANDBY ===
+STATUS: MONITORING_MODE
+PRIORITY_1: Monitor cluster health
+PRIORITY_2: Setup Istio service mesh when services deployed
+PRIORITY_3: Configure SSL certificates
+UPDATE_FORMAT: infra|TASK_NAME|PROGRESS%|ETA

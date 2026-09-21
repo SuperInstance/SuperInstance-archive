@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: ai-society-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: QDRANT_URL
+        value: localhost:6333
+    healthCheckPath: /
+    
+  - type: web
+    name: ai-society-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/build
+    
+  - type: pserv
+    name: ai-society-qdrant
+    env: docker
+    dockerImage: qdrant/qdrant:latest
+    disk:
+      name: qdrant-data
+      mountPath: /qdrant/storage
+      sizeGB: 10

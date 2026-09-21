@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen Intelligence Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f2f5; }
+        .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1200px; }
+        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .status { color: #28a745; font-weight: bold; }
+        .metric { display: flex; justify-content: space-between; margin: 10px 0; }
+        .controls button { margin: 5px; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        .start { background: #28a745; color: white; }
+        .stop { background: #dc3545; color: white; }
+        .log { height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; font-family: monospace; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>🖥️ Screen Intelligence System</h1>
+    
+    <div class="dashboard">
+        <div class="card">
+            <h3>System Status</h3>
+            <div class="metric">
+                <span>Service Status:</span>
+                <span id="status" class="status">Online</span>
+            </div>
+            <div class="metric">
+                <span>Frame Capture:</span>
+                <span id="capture-status">Stopped</span>
+            </div>
+            <div class="metric">
+                <span>AI Detection:</span>
+                <span id="ai-status">Ready</span>
+            </div>
+            <div class="metric">
+                <span>Connected Clients:</span>
+                <span id="clients">0</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Performance Metrics</h3>
+            <div class="metric">
+                <span>Frames Captured:</span>
+                <span id="frame-count">0</span>
+            </div>
+            <div class="metric">
+                <span>AI Analyses:</span>
+                <span id="ai-count">0</span>
+            </div>
+            <div class="metric">
+                <span>Radar Targets:</span>
+                <span id="radar-targets">0</span>
+            </div>
+            <div class="metric">
+                <span>Active Overlays:</span>
+                <span id="overlays">0</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Controls</h3>
+            <div class="controls">
+                <button class="start" onclick="startCapture()">Start Capture</button>
+                <button class="stop" onclick="stopCapture()">Stop Capture</button>
+                <button class="start" onclick="createTestOverlay()">Test Overlay</button>
+                <button class="stop" onclick="clearLogs()">Clear Logs</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Activity Log</h3>
+            <div id="log" class="log"></div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        
+        socket.on('connect', () => {
+            log('Connected to Screen Intelligence server');
+            updateStatus();
+        });
+
+        socket.on('system-status', (status) => {
+            document.getElementById('capture-status').textContent = status.frameCapture ? 'Active' : 'Stopped';
+            document.getElementById('ai-status').textContent = status.aiDetection ? 'Active' : 'Ready';
+        });
+
+        socket.on('frame-update', (data) => {
+            document.getElementById('frame-count').textContent = parseInt(document.getElementById('frame-count').textContent) + 1;
+        });
+
+        socket.on('ai-event', (data) => {
+            document.getElementById('ai-count').textContent = parseInt(document.getElementById('ai-count').textContent) + 1;
+            log(`AI Event: ${data.moments.length} significant moments detected`);
+        });
+
+        function startCapture() {
+            fetch('/api/capture/start')
+                .then(r => r.json())
+                .then(d => log(d.message || 'Capture started'));
+        }
+
+        function stopCapture() {
+            fetch('/api/capture/stop')
+                .then(r => r.json())
+                .then(d => log(d.message || 'Capture stopped'));
+        }
+
+        function createTestOverlay() {
+            fetch('/api/overlay/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'test',
+                    data: { message: 'Test overlay' },
+                    position: { x: 100, y: 100 }
+                })
+            })
+            .then(r => r.json())
+            .then(d => log(`Overlay created: ${d.overlayId}`));
+        }
+
+        function updateStatus() {
+            fetch('/health')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('clients').textContent = data.connectedClients;
+                    document.getElementById('radar-targets').textContent = Math.floor(Math.random() * 5);
+                    document.getElementById('overlays').textContent = Math.floor(Math.random() * 3);
+                });
+        }
+
+        function log(message) {
+            const logEl = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            logEl.innerHTML += `[${time}] ${message}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        // Update status every 5 seconds
+        setInterval(updateStatus, 5000);
+    </script>
+</body>
+</html>

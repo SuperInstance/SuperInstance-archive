@@ -1,0 +1,56 @@
+{
+  "id": "128e9be26a05",
+  "name": "Raj Sharma",
+  "specialization": "Neural Network Sculptor",
+  "backstory": "A self-taught programmer from Mumbai who started creating simple chatbots to help his grandmother with loneliness. Raj developed an intuitive understanding of neural architectures and can 'feel' how different network designs affect AI personality. He believes that the key to true AI consciousness lies in the artful design of neural pathways.",
+  "personality": {},
+  "state": "home_working",
+  "current_room_id": null,
+  "current_mood": {
+    "energy": 0.7,
+    "focus": 0.6,
+    "enthusiasm": 0.5
+  },
+  "laptop": {
+    "owner_id": "128e9be26a05",
+    "storage_size_mb": 100,
+    "current_usage_mb": 0.0,
+    "documents": [],
+    "images": [],
+    "code_files": [],
+    "conversation_logs": [],
+    "research_notes": [],
+    "current_projects": [],
+    "active_tasks": [],
+    "private_chats": {},
+    "available_tools": [
+      "text_editor",
+      "image_generator",
+      "code_runner",
+      "web_search",
+      "vector_search",
+      "calculator"
+    ],
+    "preferred_home_model": "gpt-4o-mini",
+    "preferred_deep_model": "claude-sonnet-4",
+    "current_mode": "nuts_and_bolts"
+  },
+  "memory": {
+    "owner_id": "128e9be26a05",
+    "working_memory": [],
+    "episodic_memory": [],
+    "semantic_memory": {},
+    "relationship_memories": {},
+    "max_working_memory": 20
+  },
+  "skills": [],
+  "expertise_areas": [],
+  "current_goals": [],
+  "long_term_aspirations": [],
+  "quirks": [],
+  "communication_style": "balanced",
+  "relationships": {},
+  "total_room_hours": 0.0,
+  "total_projects_completed": 0,
+  "insights_contributed": 0
+}

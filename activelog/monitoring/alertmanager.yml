@@ -1,0 +1,134 @@
+# Alertmanager configuration for ActiveLog
+
+global:
+  smtp_smarthost: 'localhost:587'
+  smtp_from: 'alerts@activelog.example.com'
+  smtp_auth_username: 'alerts@activelog.example.com'
+  smtp_auth_password: 'your-smtp-password'
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: 'web.hook'
+  routes:
+  - match:
+      severity: critical
+    receiver: 'critical-alerts'
+    group_wait: 5s
+    repeat_interval: 30m
+  - match:
+      severity: warning
+    receiver: 'warning-alerts'
+    repeat_interval: 2h
+  - match:
+      team: infrastructure
+    receiver: 'infrastructure-team'
+  - match:
+      team: platform
+    receiver: 'platform-team'
+  - match:
+      team: product
+    receiver: 'product-team'
+
+receivers:
+- name: 'web.hook'
+  webhook_configs:
+  - url: 'http://127.0.0.1:5001/'
+
+- name: 'critical-alerts'
+  email_configs:
+  - to: 'critical-alerts@activelog.example.com'
+    subject: '🚨 CRITICAL: {{ .GroupLabels.alertname }} in ActiveLog'
+    body: |
+      {{ range .Alerts }}
+      Alert: {{ .Annotations.summary }}
+      Description: {{ .Annotations.description }}
+      Severity: {{ .Labels.severity }}
+      Instance: {{ .Labels.instance }}
+      Started: {{ .StartsAt }}
+      {{ end }}
+  slack_configs:
+  - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+    channel: '#alerts-critical'
+    title: '🚨 Critical Alert in ActiveLog'
+    text: |
+      {{ range .Alerts }}
+      *Alert:* {{ .Annotations.summary }}
+      *Description:* {{ .Annotations.description }}
+      *Severity:* {{ .Labels.severity }}
+      *Instance:* {{ .Labels.instance }}
+      {{ end }}
+  pagerduty_configs:
+  - routing_key: 'your-pagerduty-integration-key'
+    description: '{{ .GroupLabels.alertname }} - {{ .CommonAnnotations.summary }}'
+
+- name: 'warning-alerts'
+  email_configs:
+  - to: 'warnings@activelog.example.com'
+    subject: '⚠️ WARNING: {{ .GroupLabels.alertname }} in ActiveLog'
+    body: |
+      {{ range .Alerts }}
+      Alert: {{ .Annotations.summary }}
+      Description: {{ .Annotations.description }}
+      Severity: {{ .Labels.severity }}
+      Instance: {{ .Labels.instance }}
+      Started: {{ .StartsAt }}
+      {{ end }}
+  slack_configs:
+  - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+    channel: '#alerts-warning'
+    title: '⚠️ Warning Alert in ActiveLog'
+
+- name: 'infrastructure-team'
+  email_configs:
+  - to: 'infrastructure@activelog.example.com'
+    subject: '🔧 Infrastructure Alert: {{ .GroupLabels.alertname }}'
+    body: |
+      Infrastructure team alert in ActiveLog:
+      
+      {{ range .Alerts }}
+      Alert: {{ .Annotations.summary }}
+      Description: {{ .Annotations.description }}
+      Severity: {{ .Labels.severity }}
+      Instance: {{ .Labels.instance }}
+      Started: {{ .StartsAt }}
+      {{ end }}
+
+- name: 'platform-team'
+  email_configs:
+  - to: 'platform@activelog.example.com'
+    subject: '🛠️ Platform Alert: {{ .GroupLabels.alertname }}'
+    body: |
+      Platform team alert in ActiveLog:
+      
+      {{ range .Alerts }}
+      Alert: {{ .Annotations.summary }}
+      Description: {{ .Annotations.description }}
+      Severity: {{ .Labels.severity }}
+      Instance: {{ .Labels.instance }}
+      Started: {{ .StartsAt }}
+      {{ end }}
+
+- name: 'product-team'
+  email_configs:
+  - to: 'product@activelog.example.com'
+    subject: '📊 Product Alert: {{ .GroupLabels.alertname }}'
+    body: |
+      Product team alert in ActiveLog:
+      
+      {{ range .Alerts }}
+      Alert: {{ .Annotations.summary }}
+      Description: {{ .Annotations.description }}
+      Severity: {{ .Labels.severity }}
+      Instance: {{ .Labels.instance }}
+      Started: {{ .StartsAt }}
+      {{ end }}
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'dev', 'instance']

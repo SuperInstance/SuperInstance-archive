@@ -1,0 +1,65 @@
+# ActiveLog Healthcare Module Dependencies
+
+# Core healthcare data standards
+pydicom==2.4.3                    # DICOM medical imaging
+fhirpy==2.0.12                     # FHIR client
+python-hl7==0.3.4                 # HL7 message processing
+dicom2nifti==2.4.8                # DICOM conversion utilities
+
+# Medical imaging processing
+SimpleITK==2.3.1                  # Medical image processing
+nibabel==5.2.0                    # Neuroimaging data I/O
+pylibjpeg==1.4.0                  # JPEG compression for DICOM
+pylibjpeg-libjpeg==1.3.4         # JPEG library
+gdcm==3.0.21                      # DICOM toolkit
+
+# NLP for clinical notes
+spacy==3.7.2                      # NLP framework
+scispacy==0.5.3                   # Scientific/medical NLP
+transformers==4.36.2              # Hugging Face transformers
+torch==2.1.2                      # PyTorch for ML models
+scikit-learn==1.3.2               # ML utilities
+
+# Medical terminology and coding
+pymedtermino==0.3.3               # Medical terminologies
+icd10-cm==0.0.4                   # ICD-10 codes
+
+# Cryptography and security
+cryptography==41.0.8              # Encryption
+pycryptodome==3.19.0              # Additional crypto functions
+jwcrypto==1.5.0                   # JSON Web Encryption
+
+# Database and storage
+sqlalchemy==2.0.23                # ORM
+alembic==1.12.1                   # Database migrations
+redis==5.0.1                      # Caching
+boto3==1.34.0                     # AWS SDK for secure storage
+
+# API and web framework
+fastapi==0.104.1                  # REST API framework
+uvicorn[standard]==0.24.0         # ASGI server
+websockets==12.0                  # WebSocket support
+python-multipart==0.0.6          # File upload support
+
+# Data validation and serialization
+pydantic==2.5.0                   # Data validation
+marshmallow==3.20.2               # Serialization
+jsonschema==4.20.0                # JSON validation
+
+# Monitoring and logging
+structlog==23.2.0                 # Structured logging
+prometheus-client==0.19.0         # Metrics
+
+# Utilities
+python-dateutil==2.8.2           # Date utilities
+pytz==2023.3                      # Timezone handling
+python-dotenv==1.0.0              # Environment variables
+
+# Testing (for development)
+pytest==7.4.3                     # Testing framework
+pytest-asyncio==0.21.1            # Async testing
+pytest-mock==3.12.0               # Mocking
+
+# Development tools
+black==23.11.0                    # Code formatting
+ruff==0.1.6                       # Linting

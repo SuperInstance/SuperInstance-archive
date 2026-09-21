@@ -1,0 +1,162 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: swarm-gateway
+  namespace: swarm-intelligence
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+    tls:
+      httpsRedirect: true
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: swarm-tls-cert
+    hosts:
+    - "swarm.example.com"
+    - "api.swarm.example.com"
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: swarm-vs
+  namespace: swarm-intelligence
+spec:
+  hosts:
+  - "swarm.example.com"
+  gateways:
+  - swarm-gateway
+  http:
+  - match:
+    - uri:
+        prefix: "/"
+    route:
+    - destination:
+        host: swarm-frontend
+        port:
+          number: 80
+      weight: 100
+    timeout: 30s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+      retryOn: 5xx,reset,connect-failure,refused-stream
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: swarm-api-vs
+  namespace: swarm-intelligence
+spec:
+  hosts:
+  - "api.swarm.example.com"
+  gateways:
+  - swarm-gateway
+  http:
+  - match:
+    - uri:
+        prefix: "/api/"
+    route:
+    - destination:
+        host: swarm-api
+        port:
+          number: 3000
+      weight: 100
+    timeout: 60s
+    retries:
+      attempts: 3
+      perTryTimeout: 20s
+      retryOn: 5xx,reset,connect-failure
+    corsPolicy:
+      allowOrigins:
+      - regex: ".*"
+      allowMethods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - OPTIONS
+      allowHeaders:
+      - authorization
+      - content-type
+      - x-api-key
+      maxAge: 24h
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: swarm-core-dr
+  namespace: swarm-intelligence
+spec:
+  host: swarm-core
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 10000
+      http:
+        http1MaxPendingRequests: 1024
+        http2MaxRequests: 10000
+        maxRequestsPerConnection: 100
+        maxRetries: 3
+    loadBalancer:
+      consistentHash:
+        httpHeaderName: "x-swarm-bot-id"
+    outlierDetection:
+      consecutiveErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      minHealthPercent: 50
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: swarm-api-dr
+  namespace: swarm-intelligence
+spec:
+  host: swarm-api
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 5000
+      http:
+        http1MaxPendingRequests: 512
+        http2MaxRequests: 5000
+        maxRequestsPerConnection: 50
+    loadBalancer:
+      simple: LEAST_REQUEST
+    outlierDetection:
+      consecutiveErrors: 3
+      interval: 10s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 30
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: external-services
+  namespace: swarm-intelligence
+spec:
+  hosts:
+  - "*.amazonaws.com"
+  - "*.googleapis.com"
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  location: MESH_EXTERNAL
+  resolution: DNS

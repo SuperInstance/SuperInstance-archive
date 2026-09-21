@@ -1,0 +1,33 @@
+[
+  {
+    "override_id": "emergency_c51b1f65d76d",
+    "requester_id": "api_user",
+    "emergency_type": "security_incident",
+    "resource_id": "/critical/system",
+    "resource_type": "system",
+    "requested_permissions": [
+      "admin"
+    ],
+    "justification": "Critical security incident requires immediate access",
+    "business_impact": "System security compromise",
+    "duration_hours": 4,
+    "status": "pending",
+    "approval_level": "senior_manager",
+    "approved_by": null,
+    "approved_at": null,
+    "activated_at": null,
+    "expires_at": null,
+    "revoked_by": null,
+    "revoked_at": null,
+    "created_at": "2025-08-24T20:28:45.355128+00:00",
+    "emergency_contact": "security@company.com",
+    "witness_required": true,
+    "requires_documentation": true,
+    "follow_up_required": true,
+    "metadata": {
+      "incident_number": "INC-2024-001",
+      "ip_address": "unknown",
+      "user_agent": "unknown"
+    }
+  }
+]

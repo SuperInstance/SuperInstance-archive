@@ -1,0 +1,500 @@
+node:
+  cluster: activelog-mesh
+  id: envoy-proxy
+  metadata:
+    version: "1.0"
+    stage: "prod"
+
+static_resources:
+  listeners:
+  - name: activelog_listener
+    address:
+      socket_address:
+        protocol: TCP
+        address: 0.0.0.0
+        port_value: 8080
+    filter_chains:
+    - filters:
+      - name: envoy.filters.network.http_connection_manager
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+          stat_prefix: activelog_hcm
+          codec_type: AUTO
+          route_config:
+            name: activelog_route
+            virtual_hosts:
+            - name: activelog_services
+              domains: ["*"]
+              routes:
+              # API Gateway
+              - match:
+                  prefix: "/api/"
+                route:
+                  cluster: api-gateway-cluster
+                  retry_policy:
+                    retry_on: "5xx,gateway-error,connect-failure,refused-stream"
+                    num_retries: 3
+                    per_try_timeout: 10s
+                    retry_back_off:
+                      base_interval: 1s
+                      max_interval: 10s
+                  timeout: 30s
+                decorator:
+                  operation: api_gateway_request
+              
+              # Auth Service
+              - match:
+                  prefix: "/auth/"
+                route:
+                  cluster: auth-service-cluster
+                  retry_policy:
+                    retry_on: "5xx,gateway-error,connect-failure,refused-stream"
+                    num_retries: 5
+                    per_try_timeout: 5s
+                    retry_back_off:
+                      base_interval: 0.5s
+                      max_interval: 5s
+                  timeout: 15s
+                decorator:
+                  operation: auth_request
+
+              # GraphQL Service
+              - match:
+                  prefix: "/graphql"
+                route:
+                  cluster: graphql-service-cluster
+                  retry_policy:
+                    retry_on: "5xx,gateway-error,connect-failure,refused-stream"
+                    num_retries: 2
+                    per_try_timeout: 15s
+                    retry_back_off:
+                      base_interval: 2s
+                      max_interval: 8s
+                  timeout: 60s
+                decorator:
+                  operation: graphql_request
+
+              # Mobile API
+              - match:
+                  prefix: "/mobile/"
+                route:
+                  cluster: mobile-api-cluster
+                  retry_policy:
+                    retry_on: "5xx,gateway-error,connect-failure,refused-stream"
+                    num_retries: 3
+                    per_try_timeout: 8s
+                    retry_back_off:
+                      base_interval: 1s
+                      max_interval: 6s
+                  timeout: 20s
+                decorator:
+                  operation: mobile_api_request
+
+              # File Operations
+              - match:
+                  prefix: "/files/"
+                route:
+                  cluster: file-processor-cluster
+                  retry_policy:
+                    retry_on: "5xx,gateway-error,connect-failure,refused-stream"
+                    num_retries: 2
+                    per_try_timeout: 30s
+                    retry_back_off:
+                      base_interval: 3s
+                      max_interval: 15s
+                  timeout: 120s
+                decorator:
+                  operation: file_operation
+
+              # AI Services
+              - match:
+                  prefix: "/ai/"
+                route:
+                  cluster: ai-orchestrator-cluster
+                  retry_policy:
+                    retry_on: "5xx,gateway-error,connect-failure,refused-stream"
+                    num_retries: 1
+                    per_try_timeout: 60s
+                    retry_back_off:
+                      base_interval: 5s
+                      max_interval: 30s
+                  timeout: 300s
+                decorator:
+                  operation: ai_inference
+
+              # Health Check
+              - match:
+                  prefix: "/health"
+                route:
+                  cluster: health-check-cluster
+                decorator:
+                  operation: health_check
+
+              # Default route to API Gateway
+              - match:
+                  prefix: "/"
+                route:
+                  cluster: api-gateway-cluster
+                  retry_policy:
+                    retry_on: "5xx,gateway-error,connect-failure,refused-stream"
+                    num_retries: 2
+                    per_try_timeout: 10s
+                    retry_back_off:
+                      base_interval: 1s
+                      max_interval: 5s
+                  timeout: 30s
+                decorator:
+                  operation: default_request
+
+          http_filters:
+          # Rate limiting
+          - name: envoy.filters.http.local_ratelimit
+            typed_config:
+              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              type_url: type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
+              value:
+                stat_prefix: http_local_rate_limiter
+                token_bucket:
+                  max_tokens: 1000
+                  tokens_per_fill: 1000
+                  fill_interval: 60s
+                filter_enabled:
+                  runtime_key: local_rate_limit_enabled
+                  default_value:
+                    numerator: 100
+                    denominator: HUNDRED
+                filter_enforced:
+                  runtime_key: local_rate_limit_enforced
+                  default_value:
+                    numerator: 100
+                    denominator: HUNDRED
+
+          # Request/Response headers
+          - name: envoy.filters.http.header_to_metadata
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.http.header_to_metadata.v3.HeaderToMetadata
+              request_rules:
+              - header: "x-user-id"
+                on_header_present:
+                  metadata_namespace: envoy.common
+                  key: user_id
+                  type: STRING
+              - header: "x-trace-id"
+                on_header_present:
+                  metadata_namespace: envoy.common
+                  key: trace_id
+                  type: STRING
+
+          # CORS
+          - name: envoy.filters.http.cors
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
+
+          # Circuit breaker headers
+          - name: envoy.filters.http.fault
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.http.fault.v3.HTTPFault
+              abort:
+                percentage:
+                  numerator: 0
+                  denominator: MILLION
+                http_status: 503
+              delay:
+                percentage:
+                  numerator: 0
+                  denominator: MILLION
+                fixed_delay: 0s
+
+          # Router (must be last)
+          - name: envoy.filters.http.router
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+
+          access_log:
+          - name: envoy.access_loggers.stdout
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.access_loggers.stream.v3.StdoutAccessLog
+              log_format:
+                json_format:
+                  timestamp: "%START_TIME%"
+                  method: "%REQ(:METHOD)%"
+                  path: "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
+                  protocol: "%PROTOCOL%"
+                  response_code: "%RESPONSE_CODE%"
+                  response_flags: "%RESPONSE_FLAGS%"
+                  bytes_received: "%BYTES_RECEIVED%"
+                  bytes_sent: "%BYTES_SENT%"
+                  duration: "%DURATION%"
+                  upstream_service_time: "%RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%"
+                  x_forwarded_for: "%REQ(X-FORWARDED-FOR)%"
+                  user_agent: "%REQ(USER-AGENT)%"
+                  request_id: "%REQ(X-REQUEST-ID)%"
+                  authority: "%REQ(:AUTHORITY)%"
+                  upstream_host: "%UPSTREAM_HOST%"
+                  upstream_cluster: "%UPSTREAM_CLUSTER%"
+
+  clusters:
+  # API Gateway Cluster
+  - name: api-gateway-cluster
+    connect_timeout: 5s
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    circuit_breakers:
+      thresholds:
+      - priority: DEFAULT
+        max_connections: 100
+        max_pending_requests: 50
+        max_requests: 200
+        max_retries: 5
+        track_remaining: true
+      - priority: HIGH
+        max_connections: 200
+        max_pending_requests: 100
+        max_requests: 400
+        max_retries: 10
+        track_remaining: true
+    outlier_detection:
+      consecutive_5xx: 3
+      consecutive_gateway_failure: 3
+      interval: 30s
+      base_ejection_time: 30s
+      max_ejection_percent: 50
+      min_health_percent: 30
+    load_assignment:
+      cluster_name: api-gateway-cluster
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: api-gateway
+                port_value: 8000
+        - endpoint:
+            address:
+              socket_address:
+                address: api-gateway-blue
+                port_value: 8000
+          metadata:
+            filter_metadata:
+              envoy.lb:
+                version: blue
+        - endpoint:
+            address:
+              socket_address:
+                address: api-gateway-green
+                port_value: 8000
+          metadata:
+            filter_metadata:
+              envoy.lb:
+                version: green
+    health_checks:
+    - timeout: 5s
+      interval: 10s
+      unhealthy_threshold: 3
+      healthy_threshold: 2
+      http_health_check:
+        path: "/health"
+        expected_statuses:
+        - start: 200
+          end: 299
+
+  # Auth Service Cluster
+  - name: auth-service-cluster
+    connect_timeout: 3s
+    type: STRICT_DNS
+    lb_policy: LEAST_REQUEST
+    circuit_breakers:
+      thresholds:
+      - priority: DEFAULT
+        max_connections: 50
+        max_pending_requests: 25
+        max_requests: 100
+        max_retries: 3
+        track_remaining: true
+    outlier_detection:
+      consecutive_5xx: 2
+      consecutive_gateway_failure: 2
+      interval: 15s
+      base_ejection_time: 15s
+      max_ejection_percent: 30
+      min_health_percent: 50
+    load_assignment:
+      cluster_name: auth-service-cluster
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: auth-service
+                port_value: 8001
+        - endpoint:
+            address:
+              socket_address:
+                address: auth-service-canary
+                port_value: 8001
+          metadata:
+            filter_metadata:
+              envoy.lb:
+                version: canary
+                weight: 10
+    health_checks:
+    - timeout: 3s
+      interval: 8s
+      unhealthy_threshold: 2
+      healthy_threshold: 2
+      http_health_check:
+        path: "/health"
+
+  # GraphQL Service Cluster
+  - name: graphql-service-cluster
+    connect_timeout: 5s
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    circuit_breakers:
+      thresholds:
+      - priority: DEFAULT
+        max_connections: 75
+        max_pending_requests: 35
+        max_requests: 150
+        max_retries: 2
+        track_remaining: true
+    outlier_detection:
+      consecutive_5xx: 4
+      consecutive_gateway_failure: 4
+      interval: 45s
+      base_ejection_time: 45s
+      max_ejection_percent: 40
+      min_health_percent: 40
+    load_assignment:
+      cluster_name: graphql-service-cluster
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: graphql-service
+                port_value: 8010
+
+  # Mobile API Cluster
+  - name: mobile-api-cluster
+    connect_timeout: 4s
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    circuit_breakers:
+      thresholds:
+      - priority: DEFAULT
+        max_connections: 80
+        max_pending_requests: 40
+        max_requests: 160
+        max_retries: 3
+        track_remaining: true
+    outlier_detection:
+      consecutive_5xx: 3
+      consecutive_gateway_failure: 3
+      interval: 20s
+      base_ejection_time: 20s
+      max_ejection_percent: 35
+      min_health_percent: 45
+    load_assignment:
+      cluster_name: mobile-api-cluster
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: mobile-api
+                port_value: 8011
+
+  # File Processor Cluster
+  - name: file-processor-cluster
+    connect_timeout: 10s
+    type: STRICT_DNS
+    lb_policy: LEAST_REQUEST
+    circuit_breakers:
+      thresholds:
+      - priority: DEFAULT
+        max_connections: 30
+        max_pending_requests: 15
+        max_requests: 60
+        max_retries: 2
+        track_remaining: true
+    outlier_detection:
+      consecutive_5xx: 5
+      consecutive_gateway_failure: 5
+      interval: 60s
+      base_ejection_time: 60s
+      max_ejection_percent: 25
+      min_health_percent: 60
+    load_assignment:
+      cluster_name: file-processor-cluster
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: file-processor
+                port_value: 8003
+
+  # AI Orchestrator Cluster
+  - name: ai-orchestrator-cluster
+    connect_timeout: 15s
+    type: STRICT_DNS
+    lb_policy: LEAST_REQUEST
+    circuit_breakers:
+      thresholds:
+      - priority: DEFAULT
+        max_connections: 20
+        max_pending_requests: 10
+        max_requests: 40
+        max_retries: 1
+        track_remaining: true
+    outlier_detection:
+      consecutive_5xx: 2
+      consecutive_gateway_failure: 2
+      interval: 120s
+      base_ejection_time: 120s
+      max_ejection_percent: 50
+      min_health_percent: 30
+    load_assignment:
+      cluster_name: ai-orchestrator-cluster
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: ai-orchestrator
+                port_value: 8004
+
+  # Health Check Cluster
+  - name: health-check-cluster
+    connect_timeout: 2s
+    type: STATIC
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: health-check-cluster
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: 127.0.0.1
+                port_value: 8080
+
+admin:
+  address:
+    socket_address:
+      protocol: TCP
+      address: 0.0.0.0
+      port_value: 9901
+
+stats_config:
+  stats_tags:
+  - tag_name: cluster_name
+    regex: "^cluster\\.((.+?)\\.).*"
+    fixed_value: "\\1"
+  - tag_name: virtual_host_name
+    regex: "^vhost\\.((.+?)\\.).*"
+    fixed_value: "\\1"
+  - tag_name: listener_address
+    regex: "^listener\\.((.+?)\\.).*"
+    fixed_value: "\\1"

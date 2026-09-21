@@ -1,0 +1,159 @@
+=== __pycache__ ===
+=== activeledger ===
+=== ads ===
+=== ai-orchestrator ===
+@app.get("/")
+@app.get("/health")
+@app.get("/plugins")
+@app.get("/plugins/stats")
+@app.post("/ai/embeddings")
+=== ai-tools ===
+=== ai_orchestrator ===
+=== ambient ===
+=== analytics ===
+@app.get("/health")
+@app.post("/api/v1/metrics/file-upload")
+@app.post("/api/v1/metrics/api-call")
+@app.post("/api/v1/metrics/ai-operation")
+@app.get("/api/v1/reports/usage")
+=== api-gateway ===
+@app.get("/")
+@app.get("/health")
+@app.get("/metrics")
+@app.post("/auth/validate")
+=== api_gateway ===
+=== ar-layer ===
+=== auth ===
+@app.get("/")
+@app.get("/health")
+@app.get("/protected")
+@app.get("/admin-only")
+=== backup ===
+@app.get("/")
+@app.get("/health")
+@app.post("/api/v1/backups/full")
+@app.post("/api/v1/backups/incremental")
+@app.get("/api/v1/backups/{job_id}/status")
+=== batch-import ===
+@app.get("/")
+@app.get("/health")
+@app.get("/stats")
+=== biological ===
+=== blockchain ===
+=== cache ===
+=== cognitive ===
+=== collaboration ===
+@app.get("/")
+@app.get("/health")
+@app.get("/metrics")
+    @app.post("/dev/reset-db")
+=== creative-suite ===
+=== data-export ===
+@app.get("/")
+@app.get("/health")
+@app.get("/metrics")
+@app.get("/exports/progress/{export_id}")
+@app.delete("/exports/{export_id}")
+=== data-manager ===
+=== dmlog-ai-dm ===
+=== dmlog-battle ===
+@app.get("/")
+@app.get("/health")
+@app.post("/encounters", response_model=CombatResponse)
+@app.get("/encounters/{encounter_id}", response_model=CombatResponse)
+@app.post("/encounters/{encounter_id}/start", response_model=CombatResponse)
+=== dmlog-characters ===
+@app.get("/")
+@app.get("/health")
+@app.post("/personality/generate")
+@app.get("/personality/{character_id}")
+@app.post("/personality/{character_id}/predict-behavior")
+=== dmlog-converter ===
+=== dmlog-core ===
+@app.get("/health")
+@app.get("/")
+=== dmlog-marketplace ===
+=== dmlog-player ===
+=== dmlog-session ===
+=== dmlog-templates ===
+=== dmlog-world ===
+@app.get("/health")
+@app.post("/maps/dungeon", response_model=MapGenerationResponse)
+@app.post("/maps/settlement", response_model=MapGenerationResponse)
+@app.post("/maps/region", response_model=MapGenerationResponse)
+@app.post("/maps/world", response_model=MapGenerationResponse)
+=== document-ai ===
+@app.get("/health")
+@app.post("/documents/upload", response_model=DocumentUploadResponse)
+@app.post("/documents/{job_id}/process")
+@app.get("/documents/{job_id}/status", response_model=JobStatusResponse)
+@app.get("/documents/{job_id}/results", response_model=DocumentProcessingResults)
+=== education-ai ===
+=== emotional-ai ===
+=== file-sync ===
+@app.get("/")
+@app.post("/upload")
+@app.get("/health")
+=== file-watcher ===
+@app.get("/health", response_model=HealthResponse)
+@app.get("/stats", response_model=StatsResponse)
+@app.get("/config")
+@app.post("/watch/add")
+@app.delete("/watch/remove")
+=== file_processor ===
+=== gaming-platform ===
+=== graphql ===
+=== health-integration ===
+=== manufacturing ===
+=== marine-advanced ===
+=== memory-preservation ===
+=== metadata ===
+@app.get("/")
+@app.get("/health")
+=== ml-pipeline ===
+=== mobile-api ===
+@app.get("/health")
+@app.get("/")
+@app.get("/metrics/mobile")
+=== multiverse ===
+=== notification ===
+=== notifications ===
+@app.get("/")
+@app.get("/health")
+@app.get("/stats")
+=== p2p-sync ===
+=== predictive-ai ===
+=== predictive ===
+=== quantum-ready ===
+=== quantum-reality ===
+=== security-advanced ===
+=== simulation ===
+=== smart-folders ===
+@app.get("/")
+@app.get("/health")
+@app.get("/metrics")
+@app.get("/folders/suggestions/{user_id}")
+@app.post("/folders/apply-template")
+=== social-ai ===
+=== sync-engine ===
+@app.get("/")
+@app.get("/health")
+@app.post("/sync/upload")
+@app.get("/sync/status/{job_id}")
+@app.get("/sync/queue/stats")
+=== sync-v2 ===
+=== time-machine ===
+=== universal-translator ===
+=== video-pipeline ===
+=== video-processor ===
+@app.get("/health")
+@app.post("/videos/upload", response_model=VideoUploadResponse)
+@app.post("/videos/{job_id}/process")
+@app.get("/jobs/{job_id}/status")
+@app.get("/jobs/{job_id}/results")
+=== workflows ===
+@app.get("/")
+@app.get("/health")
+@app.get("/metrics")
+@app.post("/webhook/{endpoint_id}")
+@app.get("/marketplace/featured")

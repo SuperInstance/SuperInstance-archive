@@ -1,0 +1,58 @@
+{
+  "id": "room_memory_palace_1761094160.444228",
+  "name": "Memory Palace",
+  "room_type": "study_hall",
+  "created_at": "2025-10-21T16:49:20.444238",
+  "atmosphere": {
+    "room_type": "study_hall",
+    "description": "A quiet study hall with long tables. People work independently but occasionally whisper questions to neighbors. Focused atmosphere with mutual support.",
+    "ambient_sounds": [
+      "pages turning",
+      "pencil scratching",
+      "whispers",
+      "occasional questions",
+      "typing"
+    ],
+    "visual_elements": [
+      "long tables",
+      "desk lamps",
+      "books spread out",
+      "laptops",
+      "note cards"
+    ],
+    "mood_tags": [
+      "focused",
+      "quiet",
+      "studious",
+      "supportive",
+      "independent"
+    ],
+    "temperature": 0.5,
+    "pace": "slow",
+    "formality": 0.5,
+    "collaboration_level": 0.3,
+    "cognitive_effects": {
+      "focus": 0.4,
+      "independence": 0.3,
+      "patience": 0.2
+    },
+    "turn_taking": "minimal",
+    "speaking_style": "whispered",
+    "content_focus": [
+      "learning",
+      "problem-solving",
+      "peer tutoring",
+      "research"
+    ],
+    "discouraged_topics": []
+  },
+  "objects_in_room": [],
+  "background_media": [],
+  "current_session": null,
+  "characters_present": [],
+  "max_characters": 10,
+  "conversation_pace_seconds": 3.0,
+  "purpose": "",
+  "expected_outputs": [],
+  "past_sessions": []
+}

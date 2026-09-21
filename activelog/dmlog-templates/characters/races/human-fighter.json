@@ -1,0 +1,243 @@
+{
+  "template": {
+    "id": "human-fighter-template",
+    "name": "Human Fighter Template",
+    "description": "A versatile human warrior, perfect for new players. Strong in combat with good survivability.",
+    "level": 1,
+    "recommendedFor": ["New players", "Combat-focused campaigns", "Leadership roles"]
+  },
+  "character": {
+    "name": "[Character Name]",
+    "race": "Human",
+    "class": "Fighter",
+    "subclass": "Champion",
+    "level": 1,
+    "background": "Soldier",
+    "alignment": "Lawful Good"
+  },
+  "abilityScores": {
+    "strength": 16,
+    "dexterity": 14,
+    "constitution": 15,
+    "intelligence": 10,
+    "wisdom": 13,
+    "charisma": 12,
+    "method": "Point Buy",
+    "racialBonuses": {
+      "strength": "+1 (Human)",
+      "constitution": "+1 (Human)"
+    }
+  },
+  "hitPoints": {
+    "maximum": 11,
+    "current": 11,
+    "hitDie": "1d10",
+    "calculation": "10 (base) + 2 (Con modifier)"
+  },
+  "armorClass": {
+    "total": 16,
+    "calculation": "Chain mail (16)"
+  },
+  "proficiencies": {
+    "armor": ["All armor", "Shields"],
+    "weapons": ["Simple weapons", "Martial weapons"],
+    "tools": ["Smith's tools", "Vehicles (land)"],
+    "savingThrows": ["Strength", "Constitution"],
+    "skills": ["Athletics", "Intimidation"]
+  },
+  "languages": ["Common", "Orc"],
+  "equipment": {
+    "weapons": [
+      {
+        "name": "Longsword",
+        "type": "Martial Melee",
+        "damage": "1d8 slashing",
+        "properties": ["Versatile (1d10)"],
+        "equipped": true
+      },
+      {
+        "name": "Handaxe",
+        "type": "Simple Melee",
+        "damage": "1d6 slashing", 
+        "properties": ["Light", "Thrown (20/60)"],
+        "quantity": 2
+      },
+      {
+        "name": "Javelin",
+        "type": "Simple Melee",
+        "damage": "1d6 piercing",
+        "properties": ["Thrown (30/120)"],
+        "quantity": 4
+      }
+    ],
+    "armor": [
+      {
+        "name": "Chain Mail",
+        "type": "Heavy Armor",
+        "ac": 16,
+        "equipped": true,
+        "stealthDisadvantage": true
+      }
+    ],
+    "gear": [
+      "Explorer's pack",
+      "Smith's tools",
+      "Insignia of rank",
+      "Trophy from fallen enemy",
+      "Deck of cards",
+      "Common clothes",
+      "Belt pouch"
+    ],
+    "currency": {
+      "cp": 0,
+      "sp": 0,
+      "gp": 10,
+      "ep": 0,
+      "pp": 0
+    }
+  },
+  "features": {
+    "racial": [
+      {
+        "name": "Extra Language",
+        "description": "You can speak, read, and write one extra language of your choice."
+      },
+      {
+        "name": "Extra Skill",
+        "description": "You gain proficiency in one skill of your choice."
+      }
+    ],
+    "class": [
+      {
+        "name": "Fighting Style",
+        "description": "You adopt a particular style of fighting as your specialty.",
+        "choice": "Defense",
+        "effect": "+1 bonus to AC while wearing armor"
+      },
+      {
+        "name": "Second Wind",
+        "description": "You have a limited well of stamina that you can draw on to protect yourself from harm.",
+        "usage": "Once per short or long rest",
+        "healing": "1d10 + 1 hit points"
+      }
+    ],
+    "background": [
+      {
+        "name": "Military Rank",
+        "description": "You have a military rank from your career as a soldier. Soldiers loyal to your former military organization still recognize your authority and influence."
+      }
+    ]
+  },
+  "spells": {
+    "casterLevel": 0,
+    "spellcastingAbility": "None",
+    "spellSaveDC": "None",
+    "spellAttackBonus": "None",
+    "spellSlots": {},
+    "knownSpells": [],
+    "preparedSpells": []
+  },
+  "personality": {
+    "traits": [
+      "I'm always respectful to those in positions of authority.",
+      "I've faced down dragons and demons, but a simple insect makes me nervous."
+    ],
+    "ideals": [
+      "Courage: I never back down from a worthy challenge."
+    ],
+    "bonds": [
+      "I would still lay down my life for those I served with in my old unit."
+    ],
+    "flaws": [
+      "I have little respect for anyone who is not a proven warrior."
+    ]
+  },
+  "backstory": {
+    "summary": "A former soldier who served in the realm's army, now seeking adventure and purpose after completing military service. Skilled in combat and tactics, with a strong sense of duty and honor.",
+    "keyEvents": [
+      "Enlisted in the army at age 16",
+      "Served in border conflicts against orc raiders", 
+      "Earned recognition for bravery in battle",
+      "Completed term of service and received honorable discharge",
+      "Now seeks new purpose as an adventurer"
+    ],
+    "connections": [
+      "Former commanding officer who may provide missions",
+      "Fellow veterans scattered across the realm",
+      "Family members proud of military service"
+    ]
+  },
+  "levelProgression": {
+    "level2": {
+      "features": ["Action Surge (once per short/long rest)"],
+      "hitPoints": "+1d10+2",
+      "notes": "Action Surge allows an additional action on your turn"
+    },
+    "level3": {
+      "features": ["Martial Archetype: Champion", "Improved Critical"],
+      "hitPoints": "+1d10+2",
+      "notes": "Critical hits occur on rolls of 19-20"
+    },
+    "level4": {
+      "features": ["Ability Score Improvement"],
+      "hitPoints": "+1d10+2",
+      "recommendations": "Increase Strength to 18 or take a feat like Great Weapon Master"
+    },
+    "level5": {
+      "features": ["Extra Attack", "Proficiency Bonus increases to +3"],
+      "hitPoints": "+1d10+2",
+      "notes": "Can make two attacks when taking the Attack action"
+    }
+  },
+  "tactics": {
+    "combat": [
+      "Use longsword two-handed for 1d10 damage when not using a shield",
+      "Throw javelins at distant enemies before closing to melee",
+      "Use Second Wind when below half health",
+      "At level 2, use Action Surge for critical moments or extra attacks"
+    ],
+    "exploration": [
+      "Athletics for climbing and jumping",
+      "Intimidation for social encounters with hostile NPCs",
+      "Military background provides connections and knowledge"
+    ],
+    "social": [
+      "Take charge in combat situations due to military training",
+      "Respectful to authority figures",
+      "Can relate to other soldiers and guards"
+    ]
+  },
+  "alternativeBuilds": {
+    "greatWeaponFighter": {
+      "fightingStyle": "Great Weapon Fighting",
+      "equipment": "Greatsword instead of longsword",
+      "tactics": "Focus on two-handed weapon damage"
+    },
+    "archerFighter": {
+      "fightingStyle": "Archery",
+      "equipment": "Longbow and arrows",
+      "abilityFocus": "Dexterity over Strength",
+      "tactics": "Stay at range, use cover"
+    },
+    "protectorFighter": {
+      "fightingStyle": "Protection",
+      "equipment": "Shield and longsword",
+      "tactics": "Defend allies, tank damage"
+    }
+  },
+  "customization": {
+    "nameOptions": [
+      "Marcus Ironhold", "Elena Swordborn", "Gareth Strongarm", 
+      "Lyanna Steelstrike", "Thomas Battleborn", "Sera Ironwill"
+    ],
+    "backgroundAlternatives": [
+      "Folk Hero", "Noble", "Guild Artisan", "Outlander"
+    ],
+    "personalityOptions": {
+      "loyalCompanion": "Devoted to protecting party members",
+      "veteranWarrior": "Haunted by past battles but determined",
+      "nobleDefender": "Fights for justice and the innocent",
+      "pragmaticSoldier": "Practical approach to problems and combat"
+    }
+  }
+}

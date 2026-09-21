@@ -1,0 +1,11 @@
+{
+  "edge_nodes": [
+    "https://edge-us-east.activelog.ai",
+    "https://edge-eu-west.activelog.ai",
+    "https://edge-asia-pacific.activelog.ai"
+  ],
+  "load_balancing": "latency_based",
+  "failover": "automatic",
+  "data_locality": true,
+  "privacy_compliance": "gdpr_ccpa_compliant"
+}

@@ -1,0 +1,9 @@
+{
+  "max_total_storage_gb": 100,
+  "summarization_threshold_gb": 1.0,
+  "max_threshold_gb": 2.0,
+  "summarization_count": 0,
+  "last_summarization": null,
+  "slow_loop_interval_minutes": 15,
+  "current_api": "claude"
+}

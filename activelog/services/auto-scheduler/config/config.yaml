@@ -1,0 +1,69 @@
+service:
+  name: auto-scheduler
+  version: 1.0.0
+  port: 8500
+  host: 0.0.0.0
+  debug: false
+
+scheduler:
+  task_check_interval: 30          # seconds
+  backup_check_interval: 300       # 5 minutes
+  report_interval: 60              # 1 minute
+  max_concurrent_tasks: 10
+
+bot_manager:
+  night_start_hour: 22             # 10 PM
+  night_end_hour: 6                # 6 AM
+  night_acceleration_hour: 3       # 3 AM - peak acceleration
+  night_multiplier: 2.0            # 2x capacity during night
+  throttle_threshold: 0.5          # Hours remaining before throttling
+  default_daily_limit: 5.0         # Default 5 hour limit per bot
+
+backup:
+  enabled: true
+  backup_path: /home/activeloguser/activelog/backups
+  source_path: /home/activeloguser/activelog
+  compression: true
+  verification: true
+  cloud_sync: false
+  
+  # Retention policies for different backup types
+  retention:
+    incremental:
+      days: 7
+    stability:
+      weeks: 4
+    milestone:
+      months: 12
+    archive:
+      years: 3
+    permanent:
+      years: 50
+
+reporting:
+  db_path: /home/activeloguser/activelog/services/auto-scheduler/data/progress.db
+  report_retention_days: 90
+  cost_per_bot_hour: 0.50          # $0.50 per bot hour
+  enable_minute_updates: true
+  enable_hourly_summaries: true
+  enable_daily_reports: true
+
+logging:
+  level: INFO
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  file: /home/activeloguser/activelog/services/auto-scheduler/logs/auto-scheduler.log
+  max_bytes: 10485760              # 10MB
+  backup_count: 5
+
+security:
+  api_key_required: false
+  allowed_hosts:
+    - localhost
+    - 127.0.0.1
+    - 0.0.0.0
+  max_request_size: 1048576        # 1MB
+
+database:
+  url: sqlite:///home/activeloguser/activelog/services/auto-scheduler/data/auto_scheduler.db
+  pool_size: 5
+  max_overflow: 10

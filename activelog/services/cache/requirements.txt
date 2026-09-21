@@ -1,0 +1,27 @@
+# Redis Caching System Requirements
+
+# Core Redis dependencies
+redis>=4.5.0
+aioredis>=2.0.1
+
+# FastAPI for middleware
+fastapi>=0.68.0
+
+# Async support
+asyncio-throttle>=1.0.2
+
+# Utilities
+python-dateutil>=2.8.2
+pydantic>=1.10.0
+
+# Compression
+zstandard>=0.19.0
+
+# Monitoring and logging
+structlog>=22.1.0
+
+# Optional: Redis Cluster support
+redis-py-cluster>=2.1.3
+
+# Optional: Prometheus metrics
+prometheus-client>=0.14.1

@@ -1,0 +1,50 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+
+jobs:
+  security-scan:
+    name: Security Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        pip install bandit safety pip-audit
+        pip install -r requirements.txt
+    
+    - name: Run security checks
+      run: |
+        echo "Running Bandit..."
+        bandit -r activelog/ services/ -f json -o bandit-report.json || true
+        
+        echo "Running Safety..."
+        safety check --json --output safety-report.json || true
+        
+        echo "Running pip-audit..."
+        pip-audit --format=json --output=audit-report.json || true
+    
+    - name: Upload security reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          bandit-report.json
+          safety-report.json
+          audit-report.json

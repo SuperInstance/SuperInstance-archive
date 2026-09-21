@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sync Conflict - Action Required</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #dc2626; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f9f9f9; }
+        .alert { background: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .button { display: inline-block; background: #dc2626; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚨 Sync Conflict Detected</h1>
+        </div>
+        <div class="content">
+            <h2>Hi {{ user_name }},</h2>
+            
+            <div class="alert">
+                <strong>⚠️ Action Required:</strong> A sync conflict has been detected for your file.
+            </div>
+            
+            <p><strong>File:</strong> {{ file_name }}</p>
+            <p><strong>Conflict Type:</strong> {{ conflict_type }}</p>
+            <p><strong>Detected At:</strong> {{ conflict_time }}</p>
+            
+            <p>A sync conflict occurs when the same file is modified on multiple devices simultaneously. To resolve this:</p>
+            
+            <ol>
+                <li>Review both versions of the file</li>
+                <li>Choose which version to keep</li>
+                <li>Or merge the changes manually</li>
+            </ol>
+            
+            <p>Click below to resolve the conflict:</p>
+            <a href="{{ resolve_url }}" class="button">Resolve Conflict</a>
+            
+            <p>If you need assistance, contact our support team at <a href="mailto:support@activelog.com">support@activelog.com</a>.</p>
+            
+            <p>Best regards,<br>The ActiveLog Team</p>
+        </div>
+    </div>
+</body>
+</html>

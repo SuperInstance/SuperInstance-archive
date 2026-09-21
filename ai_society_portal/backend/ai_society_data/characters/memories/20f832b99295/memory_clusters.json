@@ -1,0 +1,36 @@
+{
+  "character_id": "20f832b99295",
+  "clusters": [
+    {
+      "id": "e400066c",
+      "name": "Physics Memories",
+      "topic": "physics",
+      "memory_ids": [
+        "14019a4fa6a9"
+      ],
+      "created_at": "2025-10-21T17:09:36.630544",
+      "importance": 9
+    },
+    {
+      "id": "a3c75675",
+      "name": "Relativity Memories",
+      "topic": "relativity",
+      "memory_ids": [
+        "14019a4fa6a9"
+      ],
+      "created_at": "2025-10-21T17:09:36.630549",
+      "importance": 9
+    },
+    {
+      "id": "391e6f04",
+      "name": "Energy Memories",
+      "topic": "energy",
+      "memory_ids": [
+        "14019a4fa6a9"
+      ],
+      "created_at": "2025-10-21T17:09:36.630551",
+      "importance": 9
+    }
+  ],
+  "last_saved": "2025-10-21T17:09:36.630706"
+}

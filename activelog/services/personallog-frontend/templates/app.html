@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .writing-area { min-height: 400px; }
+        .editor-content { outline: none; }
+        .mood-indicator { transition: all 0.3s ease; }
+        .ai-insight { animation: slideIn 0.5s ease-out; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .floating-action { 
+            animation: float 6s ease-in-out infinite;
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.3);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .tag-pill {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            animation: tagGlow 3s ease-in-out infinite alternate;
+        }
+        @keyframes tagGlow {
+            from { box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3); }
+            to { box-shadow: 0 2px 20px rgba(118, 75, 162, 0.5); }
+        }
+        .sidebar-enter { animation: slideInLeft 0.3s ease-out; }
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-4">
+                    <button id="sidebar-toggle" class="p-2 rounded-lg hover:bg-gray-100/50 transition-colors lg:hidden">
+                        <i data-lucide="menu" class="w-5 h-5 text-gray-600"></i>
+                    </button>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                            <i data-lucide="pen-tool" class="w-4 h-4 text-white"></i>
+                        </div>
+                        <h1 class="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                            PersonalLog.ai
+                        </h1>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="relative hidden sm:block">
+                        <input 
+                            type="text" 
+                            placeholder="Search entries..." 
+                            class="w-64 px-4 py-2 pl-10 pr-4 bg-gray-100/50 border border-gray-200/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50"
+                        >
+                        <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
+                    </div>
+                    
+                    <button class="p-2 rounded-lg hover:bg-gray-100/50 transition-colors relative">
+                        <i data-lucide="bell" class="w-5 h-5 text-gray-600"></i>
+                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                    </button>
+                    
+                    <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100/50 transition-colors">
+                        <i data-lucide="moon" class="w-5 h-5 text-gray-600"></i>
+                    </button>
+                    
+                    <div class="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full cursor-pointer"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex max-w-7xl mx-auto">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-80 bg-white/60 backdrop-blur-sm border-r border-gray-200/50 h-[calc(100vh-4rem)] overflow-y-auto hidden lg:block">
+            <div class="p-6">
+                <!-- Quick Actions -->
+                <div class="mb-6">
+                    <button id="new-entry-btn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-3 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl floating-action flex items-center justify-center space-x-2">
+                        <i data-lucide="plus" class="w-5 h-5"></i>
+                        <span class="font-medium">New Entry</span>
+                    </button>
+                </div>
+
+                <!-- Mood Tracker -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Today's Mood</h3>
+                    <div class="flex space-x-2">
+                        <button class="mood-indicator w-10 h-10 rounded-full bg-red-100 hover:bg-red-200 flex items-center justify-center text-red-600 transition-all">😢</button>
+                        <button class="mood-indicator w-10 h-10 rounded-full bg-orange-100 hover:bg-orange-200 flex items-center justify-center text-orange-600 transition-all">😐</button>
+                        <button class="mood-indicator w-10 h-10 rounded-full bg-yellow-100 hover:bg-yellow-200 flex items-center justify-center text-yellow-600 transition-all">🙂</button>
+                        <button class="mood-indicator w-10 h-10 rounded-full bg-green-100 hover:bg-green-200 flex items-center justify-center text-green-600 transition-all ring-2 ring-green-500 ring-opacity-50">😊</button>
+                        <button class="mood-indicator w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-blue-600 transition-all">🤗</button>
+                    </div>
+                </div>
+
+                <!-- Tags -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Tags</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tag-pill text-white px-3 py-1 rounded-full text-sm">#work</span>
+                        <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm cursor-pointer hover:bg-purple-200 transition-colors">#personal</span>
+                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm cursor-pointer hover:bg-green-200 transition-colors">#goals</span>
+                        <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm cursor-pointer hover:bg-orange-200 transition-colors">#travel</span>
+                    </div>
+                </div>
+
+                <!-- Recent Entries -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Recent Entries</h3>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-gray-50/50 rounded-lg cursor-pointer hover:bg-gray-100/50 transition-colors border border-gray-200/30">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-800">Morning Thoughts</span>
+                                <span class="text-xs text-gray-500">2h ago</span>
+                            </div>
+                            <p class="text-xs text-gray-600 line-clamp-2">Starting the day with gratitude and clear intentions...</p>
+                        </div>
+                        <div class="p-3 bg-gray-50/50 rounded-lg cursor-pointer hover:bg-gray-100/50 transition-colors border border-gray-200/30">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-800">Project Reflection</span>
+                                <span class="text-xs text-gray-500">1d ago</span>
+                            </div>
+                            <p class="text-xs text-gray-600 line-clamp-2">Completed the major milestone today. Feeling accomplished...</p>
+                        </div>
+                        <div class="p-3 bg-gray-50/50 rounded-lg cursor-pointer hover:bg-gray-100/50 transition-colors border border-gray-200/30">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-800">Weekend Plans</span>
+                                <span class="text-xs text-gray-500">3d ago</span>
+                            </div>
+                            <p class="text-xs text-gray-600 line-clamp-2">Looking forward to some downtime and creative projects...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Insights -->
+                <div class="ai-insight">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-purple-600"></i>
+                        <span>AI Insights</span>
+                    </h3>
+                    <div class="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg border border-purple-200/30">
+                        <p class="text-sm text-gray-700 mb-2">
+                            <strong>Pattern Detected:</strong> Your productivity peaks on Tuesday mornings.
+                        </p>
+                        <p class="text-xs text-gray-600">Based on 30 days of entries</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <!-- Writing Area -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 mb-6">
+                <div class="p-6 border-b border-gray-200/50">
+                    <div class="flex items-center justify-between mb-4">
+                        <input 
+                            type="text" 
+                            placeholder="Entry title..." 
+                            class="text-2xl font-bold text-gray-800 bg-transparent border-none outline-none flex-1"
+                            value="Today's Reflections"
+                        >
+                        <div class="flex items-center space-x-3 text-sm text-gray-500">
+                            <span id="word-count">247 words</span>
+                            <span>•</span>
+                            <span>Auto-saved</span>
+                            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Editor Toolbar -->
+                    <div class="flex items-center space-x-2 pb-4 border-b border-gray-200/30">
+                        <button class="p-2 rounded-lg hover:bg-gray-100/50 transition-colors">
+                            <i data-lucide="bold" class="w-4 h-4 text-gray-600"></i>
+                        </button>
+                        <button class="p-2 rounded-lg hover:bg-gray-100/50 transition-colors">
+                            <i data-lucide="italic" class="w-4 h-4 text-gray-600"></i>
+                        </button>
+                        <button class="p-2 rounded-lg hover:bg-gray-100/50 transition-colors">
+                            <i data-lucide="underline" class="w-4 h-4 text-gray-600"></i>
+                        </button>
+                        <div class="w-px h-6 bg-gray-300 mx-2"></div>
+                        <button class="p-2 rounded-lg hover:bg-gray-100/50 transition-colors">
+                            <i data-lucide="list" class="w-4 h-4 text-gray-600"></i>
+                        </button>
+                        <button class="p-2 rounded-lg hover:bg-gray-100/50 transition-colors">
+                            <i data-lucide="list-ordered" class="w-4 h-4 text-gray-600"></i>
+                        </button>
+                        <button class="p-2 rounded-lg hover:bg-gray-100/50 transition-colors">
+                            <i data-lucide="quote" class="w-4 h-4 text-gray-600"></i>
+                        </button>
+                        <div class="w-px h-6 bg-gray-300 mx-2"></div>
+                        <button class="p-2 rounded-lg hover:bg-gray-100/50 transition-colors">
+                            <i data-lucide="image" class="w-4 h-4 text-gray-600"></i>
+                        </button>
+                        <button class="p-2 rounded-lg hover:bg-gray-100/50 transition-colors">
+                            <i data-lucide="paperclip" class="w-4 h-4 text-gray-600"></i>
+                        </button>
+                        <div class="flex-1"></div>
+                        <button class="flex items-center space-x-2 px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            <span class="text-sm font-medium">AI Assist</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <div 
+                        class="writing-area editor-content text-gray-800 leading-relaxed"
+                        contenteditable="true"
+                        data-placeholder="Start writing your thoughts..."
+                    >
+                        <p class="mb-4">Today has been one of those days where everything seems to click into place. The morning started with a sense of clarity that I haven't felt in weeks.</p>
+                        
+                        <p class="mb-4">I've been thinking about the importance of taking moments to pause and reflect. In our fast-paced world, it's easy to rush from one task to the next without truly processing our experiences.</p>
+                        
+                        <p class="mb-4"><strong>Key insights from today:</strong></p>
+                        <ul class="list-disc list-inside mb-4 text-gray-700">
+                            <li>Mindful mornings set the tone for productive days</li>
+                            <li>Regular reflection helps identify patterns in my thinking</li>
+                            <li>Small wins compound into significant progress</li>
+                        </ul>
+                        
+                        <p class="text-gray-600 italic">The power of journaling continues to amaze me. Each entry feels like a conversation with my future self.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Suggestions Panel -->
+            <div class="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-200/30">
+                <div class="flex items-center space-x-2 mb-3">
+                    <i data-lucide="sparkles" class="w-5 h-5 text-purple-600"></i>
+                    <h3 class="font-semibold text-gray-800">AI Writing Suggestions</h3>
+                </div>
+                <div class="space-y-2">
+                    <div class="bg-white/60 p-3 rounded-lg cursor-pointer hover:bg-white/80 transition-colors">
+                        <p class="text-sm text-gray-700">Consider exploring how this clarity affects your relationships with others.</p>
+                    </div>
+                    <div class="bg-white/60 p-3 rounded-lg cursor-pointer hover:bg-white/80 transition-colors">
+                        <p class="text-sm text-gray-700">You might want to elaborate on what specific practices contribute to your mindful mornings.</p>
+                    </div>
+                    <div class="bg-white/60 p-3 rounded-lg cursor-pointer hover:bg-white/80 transition-colors">
+                        <p class="text-sm text-gray-700">This entry shows themes of growth and self-reflection. Consider setting an intention for tomorrow.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Backend configuration
+        const BACKEND_URL = '{{ backend_url }}';
+
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            const icon = themeToggle.querySelector('[data-lucide]');
+            if (document.body.classList.contains('dark')) {
+                icon.setAttribute('data-lucide', 'sun');
+            } else {
+                icon.setAttribute('data-lucide', 'moon');
+            }
+            lucide.createIcons();
+        });
+
+        // Sidebar toggle for mobile
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('sidebar-enter');
+        });
+
+        // Auto-save functionality
+        const editor = document.querySelector('.editor-content');
+        const wordCountDisplay = document.getElementById('word-count');
+        
+        function updateWordCount() {
+            const text = editor.textContent;
+            const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+            wordCountDisplay.textContent = `${wordCount} words`;
+        }
+
+        function autoSave() {
+            // Simulate auto-save
+            const content = editor.innerHTML;
+            const title = document.querySelector('input[placeholder="Entry title..."]').value;
+            
+            // In a real implementation, this would save to the backend
+            console.log('Auto-saving entry:', { title, content });
+        }
+
+        let autoSaveTimer;
+        editor.addEventListener('input', () => {
+            updateWordCount();
+            
+            // Auto-save after 2 seconds of inactivity
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(autoSave, 2000);
+        });
+
+        // Mood tracking
+        const moodButtons = document.querySelectorAll('.mood-indicator');
+        moodButtons.forEach((button, index) => {
+            button.addEventListener('click', () => {
+                // Remove active state from all buttons
+                moodButtons.forEach(btn => {
+                    btn.classList.remove('ring-2', 'ring-green-500', 'ring-opacity-50');
+                });
+                
+                // Add active state to clicked button
+                button.classList.add('ring-2', 'ring-green-500', 'ring-opacity-50');
+                
+                // Save mood to backend
+                const moods = ['sad', 'neutral', 'happy', 'very_happy', 'excited'];
+                console.log('Mood selected:', moods[index]);
+            });
+        });
+
+        // New entry functionality
+        const newEntryBtn = document.getElementById('new-entry-btn');
+        newEntryBtn.addEventListener('click', () => {
+            editor.innerHTML = '';
+            document.querySelector('input[placeholder="Entry title..."]').value = '';
+            updateWordCount();
+            editor.focus();
+        });
+
+        // AI suggestions interaction
+        const suggestions = document.querySelectorAll('.bg-white\\/60');
+        suggestions.forEach(suggestion => {
+            suggestion.addEventListener('click', () => {
+                const suggestionText = suggestion.textContent;
+                editor.innerHTML += `<p class="mb-4">${suggestionText}</p>`;
+                updateWordCount();
+                
+                // Animate the added content
+                const newParagraph = editor.lastElementChild;
+                newParagraph.style.opacity = '0';
+                newParagraph.style.transform = 'translateY(10px)';
+                
+                setTimeout(() => {
+                    newParagraph.style.transition = 'all 0.3s ease';
+                    newParagraph.style.opacity = '1';
+                    newParagraph.style.transform = 'translateY(0)';
+                }, 10);
+            });
+        });
+
+        // Tag interaction
+        const tags = document.querySelectorAll('.tag-pill, .bg-purple-100, .bg-green-100, .bg-orange-100');
+        tags.forEach(tag => {
+            tag.addEventListener('click', () => {
+                const tagText = tag.textContent;
+                console.log('Tag selected:', tagText);
+                
+                // Visual feedback
+                tag.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    tag.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+
+        // Initialize word count
+        updateWordCount();
+
+        // Placeholder functionality for contenteditable
+        editor.addEventListener('focus', function() {
+            if (this.textContent === 'Start writing your thoughts...') {
+                this.textContent = '';
+            }
+        });
+
+        editor.addEventListener('blur', function() {
+            if (this.textContent.trim() === '') {
+                this.textContent = 'Start writing your thoughts...';
+                this.style.color = '#9CA3AF';
+            } else {
+                this.style.color = '#1F2937';
+            }
+        });
+
+        // Real-time AI insights (simulated)
+        setInterval(() => {
+            const insights = [
+                "Your writing flow is strongest in the evening hours.",
+                "You often write about personal growth themes.",
+                "Your mood correlates with outdoor activities mentions.",
+                "You're maintaining a consistent journaling habit - great job!"
+            ];
+            
+            if (Math.random() > 0.95) { // Occasional insights
+                const insight = insights[Math.floor(Math.random() * insights.length)];
+                console.log('New AI insight:', insight);
+            }
+        }, 5000);
+
+        console.log('PersonalLog.ai frontend loaded successfully');
+        console.log('Backend URL:', BACKEND_URL);
+    </script>
+
+    <!-- Universal Accessibility Enhancer -->
+    <script src="/static/accessibility-enhancer.js" onerror="console.log('Accessibility enhancer not available')"></script>
+</body>
+</html>

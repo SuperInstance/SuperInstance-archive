@@ -1,0 +1,86 @@
+# Development and testing dependencies
+
+# Testing frameworks
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+pytest-xdist==3.3.1
+pytest-playwright==0.4.3
+
+# Test utilities
+factory-boy==3.3.0
+faker==20.1.0
+freezegun==1.2.2
+responses==0.23.3
+httpx==0.25.2
+
+# Load testing
+locust==2.17.0
+
+# Code quality
+ruff==0.1.6
+mypy==1.7.1
+black==23.11.0
+isort==5.12.0
+
+# Security scanning
+bandit==1.7.5
+safety==2.3.5
+pip-audit==2.6.1
+semgrep==1.45.0
+
+# License checking
+pip-licenses==4.3.2
+
+# Documentation
+mkdocs==1.5.3
+mkdocs-material==9.4.8
+mkdocs-mermaid2-plugin==1.1.1
+
+# Database testing
+psycopg2-binary==2.9.9
+alembic==1.12.1
+
+# Mocking and testing utilities
+respx==0.20.2
+aioresponses==0.7.4
+unittest-xml-reporting==3.2.0
+
+# Performance profiling
+py-spy==0.3.14
+memory-profiler==0.61.0
+
+# Environment management
+python-dotenv==1.0.0
+
+# API testing
+httpie==3.2.2
+
+# Development server
+uvicorn[standard]==0.24.0
+
+# Redis testing
+fakeredis==2.20.1
+
+# File handling for tests
+pillow==10.1.0
+python-magic==0.4.27
+
+# Jupyter notebooks (for analysis)
+jupyter==1.0.0
+notebook==7.0.6
+
+# Monitoring and observability
+prometheus-client==0.19.0
+opentelemetry-api==1.21.0
+opentelemetry-sdk==1.21.0
+opentelemetry-instrumentation-fastapi==0.42b0
+opentelemetry-instrumentation-asyncpg==0.42b0
+opentelemetry-instrumentation-redis==0.42b0
+
+# Development utilities
+ipython==8.17.2
+ipdb==0.13.13
+rich==13.7.0
+typer==0.9.0

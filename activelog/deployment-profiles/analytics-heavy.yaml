@@ -1,0 +1,347 @@
+# Analytics Heavy Workload Profile
+# Optimized for big data processing, ML workloads, and batch analytics
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: analytics-heavy-profile
+  namespace: activelog
+data:
+  profile_name: "AnalyticsHeavy"
+  workload_type: "analytics_heavy"
+  
+  # Resource allocation for compute-intensive workloads
+  resource_allocation: |
+    analytics:
+      cpu: "6000m"
+      memory: "12Gi"
+      priority: 1
+      instances: 4
+      node_affinity: "compute-optimized"
+      
+    data-orchestrator:
+      cpu: "4000m"
+      memory: "8Gi"
+      priority: 1
+      instances: 2
+      node_affinity: "compute-optimized"
+      
+    ml-pipeline:
+      cpu: "8000m"
+      memory: "16Gi"
+      priority: 1
+      instances: 2
+      node_affinity: "gpu-enabled"
+      
+    reporting:
+      cpu: "2000m"
+      memory: "4Gi"
+      priority: 2
+      instances: 2
+      node_affinity: "standard"
+      
+    observability-stack:
+      cpu: "2000m"
+      memory: "4Gi"
+      priority: 2
+      instances: 1
+      node_affinity: "standard"
+      
+    trading-engine:
+      cpu: "1000m"
+      memory: "2Gi"
+      priority: 3
+      instances: 1
+      node_affinity: "standard"
+
+  # Performance targets for analytics workloads
+  performance_targets: |
+    processing:
+      batch_job_completion: "300s"
+      data_ingestion_rate: "1GB/min"
+      query_response_time: "5s"
+      ml_model_training: "30min"
+      
+    throughput:
+      records_per_second: 100000
+      concurrent_queries: 50
+      batch_jobs_per_hour: 20
+      
+    resource_efficiency:
+      cpu_utilization_target: 85
+      memory_utilization_target: 80
+      gpu_utilization_target: 90
+      
+    data_quality:
+      processing_accuracy: 99.9
+      data_completeness: 99.5
+      pipeline_success_rate: 98.0
+
+  # Scaling optimized for batch workloads
+  scaling_rules: |
+    auto_scaling:
+      enabled: true
+      cpu_threshold: 80
+      memory_threshold: 85
+      queue_depth_threshold: 100
+      
+    scaling_policies:
+      scale_up_cooldown: 180
+      scale_down_cooldown: 900
+      min_instances: 1
+      max_instances: 20
+      
+    batch_scaling:
+      enabled: true
+      schedule: "0 2 * * *"  # Scale up at 2 AM for daily processing
+      peak_instances: 10
+      off_peak_instances: 2
+      
+    triggers:
+      - metric: "queue_depth"
+        threshold: 100
+        duration: 300
+        action: "scale_up"
+        
+      - metric: "job_completion_time"
+        threshold: 600
+        duration: 300
+        action: "scale_up"
+        
+      - metric: "memory_pressure"
+        threshold: 90
+        duration: 60
+        action: "scale_up"
+
+  # Monitoring for data pipelines
+  monitoring: |
+    metrics_collection:
+      interval: 30
+      retention: "90d"
+      
+    pipeline_metrics:
+      - "pipeline.jobs.running"
+      - "pipeline.jobs.completed"
+      - "pipeline.jobs.failed"
+      - "pipeline.data.processed.bytes"
+      - "pipeline.latency.end_to_end"
+      - "ml.model.accuracy"
+      - "ml.training.duration"
+      
+    alerting:
+      job_failure_threshold: 3
+      data_quality_threshold: 95
+      notification_channels:
+        - "data-team-slack"
+        - "ml-ops-email"
+
+  # Storage configuration for big data
+  storage: |
+    data_lake:
+      enabled: true
+      storage_class: "high_throughput"
+      replication: 3
+      compression: "snappy"
+      
+    cache_layer:
+      enabled: true
+      type: "redis_cluster"
+      size: "50Gi"
+      eviction_policy: "lru"
+      
+    model_registry:
+      enabled: true
+      versioning: true
+      artifact_storage: "s3_compatible"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analytics-optimized
+  namespace: activelog
+spec:
+  replicas: 4
+  strategy:
+    type: Recreate  # Better for stateful analytics workloads
+  selector:
+    matchLabels:
+      app: analytics
+      profile: analytics-heavy
+  template:
+    metadata:
+      labels:
+        app: analytics
+        profile: analytics-heavy
+    spec:
+      nodeSelector:
+        node-type: compute-optimized
+      containers:
+      - name: analytics
+        image: activelog/analytics:latest
+        resources:
+          requests:
+            cpu: "6000m"
+            memory: "12Gi"
+          limits:
+            cpu: "6000m"
+            memory: "12Gi"
+        env:
+        - name: WORKLOAD_PROFILE
+          value: "analytics_heavy"
+        - name: SPARK_DRIVER_MEMORY
+          value: "4g"
+        - name: SPARK_EXECUTOR_MEMORY
+          value: "6g"
+        - name: SPARK_EXECUTOR_CORES
+          value: "4"
+        - name: HADOOP_CONF_DIR
+          value: "/opt/hadoop/conf"
+        volumeMounts:
+        - name: data-volume
+          mountPath: /data
+        - name: models-volume
+          mountPath: /models
+        ports:
+        - containerPort: 8500
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8500
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8500
+          initialDelaySeconds: 30
+          periodSeconds: 15
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: analytics-data-pvc
+      - name: models-volume
+        persistentVolumeClaim:
+          claimName: ml-models-pvc
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: analytics-data-pvc
+  namespace: activelog
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: high-throughput-ssd
+  resources:
+    requests:
+      storage: 500Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ml-models-pvc
+  namespace: activelog
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: standard-ssd
+  resources:
+    requests:
+      storage: 100Gi
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: daily-analytics-job
+  namespace: activelog
+spec:
+  schedule: "0 2 * * *"  # Run at 2 AM daily
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      template:
+        metadata:
+          labels:
+            app: analytics-batch
+            profile: analytics-heavy
+        spec:
+          restartPolicy: OnFailure
+          nodeSelector:
+            node-type: compute-optimized
+          containers:
+          - name: batch-analytics
+            image: activelog/analytics-batch:latest
+            resources:
+              requests:
+                cpu: "8000m"
+                memory: "16Gi"
+              limits:
+                cpu: "8000m"
+                memory: "16Gi"
+            env:
+            - name: JOB_TYPE
+              value: "daily_processing"
+            - name: DATA_SOURCE
+              value: "s3://activelog-data-lake"
+            - name: OUTPUT_PATH
+              value: "s3://activelog-processed-data"
+            volumeMounts:
+            - name: temp-data
+              mountPath: /tmp/processing
+          volumes:
+          - name: temp-data
+            emptyDir:
+              sizeLimit: 50Gi
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: analytics-hpa
+  namespace: activelog
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: analytics-optimized
+  minReplicas: 2
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 85
+  - type: Pods
+    pods:
+      metric:
+        name: analytics_queue_depth
+      target:
+        type: AverageValue
+        averageValue: "50"
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 180
+      policies:
+      - type: Percent
+        value: 200
+        periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 900
+      policies:
+      - type: Percent
+        value: 25
+        periodSeconds: 300

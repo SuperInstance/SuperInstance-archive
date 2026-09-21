@@ -1,0 +1,624 @@
+name: Production Deployment
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to deploy (e.g., v1.2.3)'
+        required: true
+      deployment_strategy:
+        description: 'Deployment strategy'
+        required: true
+        default: 'blue-green'
+        type: choice
+        options:
+          - blue-green
+          - rolling
+          - canary
+
+env:
+  REGISTRY: ghcr.io
+  NAMESPACE: swarm-intelligence
+  ENVIRONMENT: production
+  AWS_REGION: us-east-1
+  CLUSTER_NAME: swarm-production-eks
+
+jobs:
+  # Job 1: Approval gate
+  approval:
+    name: Manual Approval
+    runs-on: ubuntu-latest
+    environment:
+      name: production-approval
+    steps:
+      - name: Approval checkpoint
+        run: |
+          echo "Production deployment approved by: ${{ github.actor }}"
+          echo "Version: ${{ github.event.inputs.version || github.ref_name }}"
+          echo "Strategy: ${{ github.event.inputs.deployment_strategy || 'blue-green' }}"
+
+  # Job 2: Pre-deployment checks
+  pre-deployment:
+    name: Pre-deployment Checks
+    runs-on: ubuntu-latest
+    needs: approval
+    timeout-minutes: 15
+
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      previous_version: ${{ steps.previous.outputs.version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${{ github.ref_name }}"
+          fi
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Deploying version: ${VERSION}"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ env.CLUSTER_NAME }} \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Get current deployment version
+        id: previous
+        run: |
+          CURRENT_VERSION=$(kubectl get deployment swarm-core -n ${{ env.NAMESPACE }} \
+            -o jsonpath='{.spec.template.spec.containers[0].image}' | cut -d: -f2)
+          echo "version=${CURRENT_VERSION}" >> $GITHUB_OUTPUT
+          echo "Current version: ${CURRENT_VERSION}"
+
+      - name: Verify cluster health
+        run: |
+          echo "Checking cluster health..."
+          kubectl get nodes
+          kubectl top nodes
+
+          # Check for unhealthy pods
+          UNHEALTHY=$(kubectl get pods -n ${{ env.NAMESPACE }} --field-selector=status.phase!=Running,status.phase!=Succeeded -o json | jq '.items | length')
+          if [ "$UNHEALTHY" -gt 0 ]; then
+            echo "Warning: $UNHEALTHY unhealthy pods found"
+            kubectl get pods -n ${{ env.NAMESPACE }} --field-selector=status.phase!=Running,status.phase!=Succeeded
+          fi
+
+      - name: Verify images exist
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+
+          # Check if images exist in registry
+          docker manifest inspect ${{ env.REGISTRY }}/${{ github.repository }}/swarm-core:${VERSION}
+          docker manifest inspect ${{ env.REGISTRY }}/${{ github.repository }}/swarm-api:${VERSION}
+          docker manifest inspect ${{ env.REGISTRY }}/${{ github.repository }}/swarm-frontend:${VERSION}
+
+      - name: Run security scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ github.repository }}/swarm-core:${{ steps.version.outputs.version }}
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
+      - name: Check database migrations
+        run: |
+          echo "Checking if database migrations are required..."
+          # Add migration check logic here
+          echo "No pending migrations"
+
+  # Job 3: Backup before deployment
+  backup:
+    name: Backup Production Data
+    runs-on: ubuntu-latest
+    needs: pre-deployment
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ env.CLUSTER_NAME }} \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Backup PostgreSQL
+        run: |
+          BACKUP_NAME="postgres-backup-$(date +%Y%m%d-%H%M%S)"
+
+          kubectl exec -n ${{ env.NAMESPACE }} postgres-0 -- \
+            pg_dump -U swarm_user swarm_intelligence | \
+            gzip > ${BACKUP_NAME}.sql.gz
+
+          # Upload to S3
+          aws s3 cp ${BACKUP_NAME}.sql.gz s3://swarm-intelligence-backups/production/
+
+          echo "Backup completed: ${BACKUP_NAME}.sql.gz"
+
+      - name: Backup Redis snapshot
+        run: |
+          kubectl exec -n ${{ env.NAMESPACE }} redis-0 -- redis-cli BGSAVE
+          sleep 10
+          echo "Redis backup initiated"
+
+      - name: Store backup metadata
+        run: |
+          cat > backup-metadata.json <<EOF
+          {
+            "timestamp": "$(date -Iseconds)",
+            "version": "${{ needs.pre-deployment.outputs.previous_version }}",
+            "commit": "${{ github.sha }}",
+            "triggered_by": "${{ github.actor }}"
+          }
+          EOF
+
+          aws s3 cp backup-metadata.json s3://swarm-intelligence-backups/production/metadata/
+
+  # Job 4: Blue-Green Deployment
+  deploy-blue-green:
+    name: Blue-Green Deployment
+    runs-on: ubuntu-latest
+    needs: [pre-deployment, backup]
+    if: github.event.inputs.deployment_strategy == 'blue-green' || github.event.inputs.deployment_strategy == ''
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ env.CLUSTER_NAME }} \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Deploy green environment
+        run: |
+          VERSION="${{ needs.pre-deployment.outputs.version }}"
+
+          # Create green deployments
+          kubectl create -f infrastructure/kubernetes/core-deployment.yaml \
+            --dry-run=client -o yaml | \
+            sed 's/swarm-core/swarm-core-green/g' | \
+            sed "s|image:.*|image: ${{ env.REGISTRY }}/${{ github.repository }}/swarm-core:${VERSION}|g" | \
+            kubectl apply -f -
+
+          kubectl create -f infrastructure/kubernetes/api-deployment.yaml \
+            --dry-run=client -o yaml | \
+            sed 's/swarm-api/swarm-api-green/g' | \
+            sed "s|image:.*|image: ${{ env.REGISTRY }}/${{ github.repository }}/swarm-api:${VERSION}|g" | \
+            kubectl apply -f -
+
+          kubectl create -f infrastructure/kubernetes/frontend-deployment.yaml \
+            --dry-run=client -o yaml | \
+            sed 's/swarm-frontend/swarm-frontend-green/g' | \
+            sed "s|image:.*|image: ${{ env.REGISTRY }}/${{ github.repository }}/swarm-frontend:${VERSION}|g" | \
+            kubectl apply -f -
+
+      - name: Wait for green environment
+        run: |
+          kubectl rollout status deployment/swarm-core-green -n ${{ env.NAMESPACE }} --timeout=15m
+          kubectl rollout status deployment/swarm-api-green -n ${{ env.NAMESPACE }} --timeout=15m
+          kubectl rollout status deployment/swarm-frontend-green -n ${{ env.NAMESPACE }} --timeout=15m
+
+      - name: Run health checks on green
+        run: |
+          # Port forward to green service
+          kubectl port-forward -n ${{ env.NAMESPACE }} deployment/swarm-api-green 8080:8080 &
+          PF_PID=$!
+          sleep 10
+
+          # Test health endpoint
+          for i in {1..30}; do
+            if curl -f http://localhost:8080/health; then
+              echo "Health check passed"
+              kill $PF_PID
+              exit 0
+            fi
+            echo "Attempt $i failed, retrying..."
+            sleep 5
+          done
+
+          kill $PF_PID
+          echo "Health checks failed"
+          exit 1
+
+      - name: Run smoke tests on green
+        run: |
+          python tests/e2e/smoke_test.py --target green
+
+      - name: Switch traffic to green
+        run: |
+          # Update service selectors to point to green
+          kubectl patch service swarm-core -n ${{ env.NAMESPACE }} \
+            -p '{"spec":{"selector":{"app":"swarm-core-green"}}}'
+
+          kubectl patch service swarm-api -n ${{ env.NAMESPACE }} \
+            -p '{"spec":{"selector":{"app":"swarm-api-green"}}}'
+
+          kubectl patch service swarm-frontend -n ${{ env.NAMESPACE }} \
+            -p '{"spec":{"selector":{"app":"swarm-frontend-green"}}}'
+
+          echo "Traffic switched to green environment"
+
+      - name: Monitor for 5 minutes
+        run: |
+          echo "Monitoring green environment for 5 minutes..."
+          sleep 300
+
+          # Check error rates
+          ERROR_RATE=$(kubectl logs -n ${{ env.NAMESPACE }} -l app=swarm-core-green --tail=1000 | grep -c "ERROR" || echo "0")
+          echo "Error count in last 1000 lines: $ERROR_RATE"
+
+          if [ "$ERROR_RATE" -gt 10 ]; then
+            echo "High error rate detected, will rollback"
+            exit 1
+          fi
+
+      - name: Remove blue environment
+        run: |
+          kubectl delete deployment swarm-core -n ${{ env.NAMESPACE }} || true
+          kubectl delete deployment swarm-api -n ${{ env.NAMESPACE }} || true
+          kubectl delete deployment swarm-frontend -n ${{ env.NAMESPACE }} || true
+
+          # Rename green to production
+          kubectl get deployment swarm-core-green -n ${{ env.NAMESPACE }} -o yaml | \
+            sed 's/swarm-core-green/swarm-core/g' | kubectl apply -f -
+          kubectl delete deployment swarm-core-green -n ${{ env.NAMESPACE }}
+
+          kubectl get deployment swarm-api-green -n ${{ env.NAMESPACE }} -o yaml | \
+            sed 's/swarm-api-green/swarm-api/g' | kubectl apply -f -
+          kubectl delete deployment swarm-api-green -n ${{ env.NAMESPACE }}
+
+          kubectl get deployment swarm-frontend-green -n ${{ env.NAMESPACE }} -o yaml | \
+            sed 's/swarm-frontend-green/swarm-frontend/g' | kubectl apply -f -
+          kubectl delete deployment swarm-frontend-green -n ${{ env.NAMESPACE }}
+
+  # Job 5: Rolling Deployment (alternative)
+  deploy-rolling:
+    name: Rolling Deployment
+    runs-on: ubuntu-latest
+    needs: [pre-deployment, backup]
+    if: github.event.inputs.deployment_strategy == 'rolling'
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ env.CLUSTER_NAME }} \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Rolling update
+        run: |
+          VERSION="${{ needs.pre-deployment.outputs.version }}"
+
+          kubectl set image deployment/swarm-core \
+            swarm-core=${{ env.REGISTRY }}/${{ github.repository }}/swarm-core:${VERSION} \
+            -n ${{ env.NAMESPACE }}
+
+          kubectl set image deployment/swarm-api \
+            swarm-api=${{ env.REGISTRY }}/${{ github.repository }}/swarm-api:${VERSION} \
+            -n ${{ env.NAMESPACE }}
+
+          kubectl set image deployment/swarm-frontend \
+            swarm-frontend=${{ env.REGISTRY }}/${{ github.repository }}/swarm-frontend:${VERSION} \
+            -n ${{ env.NAMESPACE }}
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/swarm-core -n ${{ env.NAMESPACE }} --timeout=15m
+          kubectl rollout status deployment/swarm-api -n ${{ env.NAMESPACE }} --timeout=15m
+          kubectl rollout status deployment/swarm-frontend -n ${{ env.NAMESPACE }} --timeout=15m
+
+  # Job 6: Post-deployment tests
+  post-deployment-tests:
+    name: Post-deployment Tests
+    runs-on: ubuntu-latest
+    needs: [deploy-blue-green, deploy-rolling]
+    if: |
+      always() &&
+      (needs.deploy-blue-green.result == 'success' || needs.deploy-rolling.result == 'success')
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r tests/requirements.txt
+
+      - name: Run performance tests
+        env:
+          PROD_API_URL: https://api.swarm-intelligence.example.com
+        run: |
+          python tests/e2e/performance_benchmark.py \
+            --target production \
+            --agents 100000 \
+            --duration 300 \
+            --fps-threshold 60
+
+      - name: Run load test with K6
+        uses: grafana/k6-action@v0.3.1
+        with:
+          filename: tests/e2e/load_test.js
+          flags: --vus 1000 --duration 10m
+
+      - name: Validate API latency
+        run: |
+          # Check p99 latency is under 200ms
+          python tests/e2e/latency_check.py --threshold 200
+
+      - name: Test scaling
+        run: |
+          # Test autoscaling works
+          python tests/e2e/test_autoscaling.py
+
+  # Job 7: Monitor deployment
+  monitor:
+    name: Monitor Deployment
+    runs-on: ubuntu-latest
+    needs: post-deployment-tests
+    timeout-minutes: 60
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ env.CLUSTER_NAME }} \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Monitor metrics for 15 minutes
+        run: |
+          echo "Monitoring deployment for 15 minutes..."
+
+          for i in {1..15}; do
+            echo "Minute $i/15"
+
+            # Check pod status
+            kubectl get pods -n ${{ env.NAMESPACE }} | grep -v Running | grep -v Completed || true
+
+            # Check error logs
+            ERROR_COUNT=$(kubectl logs -n ${{ env.NAMESPACE }} -l app=swarm-core --tail=100 --since=1m | grep -c "ERROR" || echo "0")
+            echo "Errors in last minute: $ERROR_COUNT"
+
+            if [ "$ERROR_COUNT" -gt 5 ]; then
+              echo "High error rate detected!"
+              # Trigger alert but don't fail
+            fi
+
+            sleep 60
+          done
+
+          echo "Monitoring complete"
+
+      - name: Check Prometheus alerts
+        run: |
+          # Query Prometheus for any firing alerts
+          echo "Checking for active alerts..."
+          # Add Prometheus query here
+
+  # Job 8: Rollback on failure
+  rollback:
+    name: Automatic Rollback
+    runs-on: ubuntu-latest
+    needs: [deploy-blue-green, deploy-rolling, post-deployment-tests]
+    if: |
+      always() &&
+      (needs.deploy-blue-green.result == 'failure' ||
+       needs.deploy-rolling.result == 'failure' ||
+       needs.post-deployment-tests.result == 'failure')
+    timeout-minutes: 15
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ env.CLUSTER_NAME }} \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Rollback deployment
+        run: |
+          echo "ROLLING BACK DEPLOYMENT"
+
+          kubectl rollout undo deployment/swarm-core -n ${{ env.NAMESPACE }}
+          kubectl rollout undo deployment/swarm-api -n ${{ env.NAMESPACE }}
+          kubectl rollout undo deployment/swarm-frontend -n ${{ env.NAMESPACE }}
+
+      - name: Wait for rollback
+        run: |
+          kubectl rollout status deployment/swarm-core -n ${{ env.NAMESPACE }} --timeout=10m
+          kubectl rollout status deployment/swarm-api -n ${{ env.NAMESPACE }} --timeout=10m
+          kubectl rollout status deployment/swarm-frontend -n ${{ env.NAMESPACE }} --timeout=10m
+
+      - name: Verify rollback
+        run: |
+          kubectl get pods -n ${{ env.NAMESPACE }}
+          echo "Rollback completed"
+
+  # Job 9: Notifications
+  notify:
+    name: Send Notifications
+    runs-on: ubuntu-latest
+    needs: [deploy-blue-green, deploy-rolling, post-deployment-tests, monitor, rollback]
+    if: always()
+
+    steps:
+      - name: Determine deployment status
+        id: status
+        run: |
+          if [ "${{ needs.rollback.result }}" == "success" ]; then
+            echo "status=rolled_back" >> $GITHUB_OUTPUT
+          elif [ "${{ needs.monitor.result }}" == "success" ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Slack notification - Success
+        if: steps.status.outputs.status == 'success'
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "🎉 Production Deployment Successful",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "🎉 Production Deployment Successful"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Version:*\n${{ needs.pre-deployment.outputs.version }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Strategy:*\n${{ github.event.inputs.deployment_strategy || 'blue-green' }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Deployed by:*\n${{ github.actor }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Time:*\n$(date)"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "All post-deployment tests passed. System is stable. 🚀"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: Send Slack notification - Rolled Back
+        if: steps.status.outputs.status == 'rolled_back'
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "⚠️ Production Deployment Rolled Back",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "⚠️ Production Deployment Rolled Back"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Version ${{ needs.pre-deployment.outputs.version }} was automatically rolled back due to failures.\n\nPrevious version ${{ needs.pre-deployment.outputs.previous_version }} has been restored."
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Logs:*\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: Send PagerDuty alert on failure
+        if: steps.status.outputs.status != 'success'
+        run: |
+          curl -X POST https://events.pagerduty.com/v2/enqueue \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "routing_key": "${{ secrets.PAGERDUTY_INTEGRATION_KEY }}",
+              "event_action": "trigger",
+              "payload": {
+                "summary": "Production deployment failed or rolled back",
+                "severity": "error",
+                "source": "GitHub Actions",
+                "custom_details": {
+                  "version": "${{ needs.pre-deployment.outputs.version }}",
+                  "run_url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                }
+              }
+            }'

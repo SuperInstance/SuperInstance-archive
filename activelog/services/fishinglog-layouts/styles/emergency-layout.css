@@ -1,0 +1,686 @@
+/* Emergency Layout Specific Styles */
+
+.emergency-layout .layout-container {
+    grid-template-areas: 
+        "alert alert alert"
+        "chart ais comms"
+        "status status status";
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: auto 1fr auto;
+}
+
+.emergency-layout .emergency-alert {
+    grid-area: alert;
+    background: var(--marine-emergency);
+    border: 2px solid var(--marine-danger);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    animation: emergencyFlash 2s infinite;
+}
+
+@keyframes emergencyFlash {
+    0%, 100% { 
+        background: var(--marine-emergency);
+        box-shadow: 0 0 0 rgba(255, 0, 0, 0);
+    }
+    50% { 
+        background: #cc0000;
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+    }
+}
+
+.emergency-layout .chart-main {
+    grid-area: chart;
+}
+
+.emergency-layout .ais-panel {
+    grid-area: ais;
+    background: var(--marine-panel-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.emergency-layout .comms-panel {
+    grid-area: comms;
+    background: var(--marine-panel-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.emergency-layout .status-bar {
+    grid-area: status;
+}
+
+/* Emergency Alert Banner */
+.alert-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.alert-status {
+    color: white;
+    font-size: var(--font-size-xl);
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.alert-icon {
+    font-size: 2rem;
+    animation: alertPulse 1s infinite;
+}
+
+@keyframes alertPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.emergency-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.emergency-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: white;
+    color: var(--marine-emergency);
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 100px;
+}
+
+.emergency-btn:hover {
+    background: #f0f0f0;
+    transform: scale(1.05);
+}
+
+.emergency-btn.mayday {
+    background: var(--marine-danger);
+    color: white;
+    font-size: var(--font-size-large);
+    animation: maydayPulse 3s infinite;
+}
+
+@keyframes maydayPulse {
+    0%, 100% { box-shadow: 0 0 0 rgba(255, 56, 56, 0); }
+    50% { box-shadow: 0 0 20px rgba(255, 56, 56, 0.8); }
+}
+
+.alert-details {
+    color: white;
+    font-size: var(--font-size-medium);
+}
+
+.alert-time {
+    font-weight: bold;
+    margin-right: var(--spacing-md);
+}
+
+.alert-position {
+    font-family: monospace;
+}
+
+/* Emergency Overlays */
+.emergency-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.rescue-assets {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.rescue-asset {
+    position: absolute;
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.rescue-asset .asset-marker {
+    font-size: var(--font-size-xl);
+    animation: rescueBeacon 2s infinite;
+}
+
+.rescue-asset.coast-guard .asset-marker {
+    color: var(--marine-accent);
+    filter: drop-shadow(0 0 10px var(--marine-accent));
+}
+
+.rescue-asset.helicopter .asset-marker {
+    color: var(--marine-warning);
+    filter: drop-shadow(0 0 10px var(--marine-warning));
+}
+
+.rescue-asset.vessel .asset-marker {
+    color: var(--marine-success);
+    filter: drop-shadow(0 0 10px var(--marine-success));
+}
+
+@keyframes rescueBeacon {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+.rescue-asset .asset-info {
+    position: absolute;
+    top: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-small);
+    text-align: center;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.rescue-asset:hover .asset-info {
+    opacity: 1;
+}
+
+/* Nearby Vessels */
+.nearby-vessels {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.nearby-vessel {
+    position: absolute;
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.nearby-vessel .vessel-marker {
+    font-size: var(--font-size-large);
+    color: var(--waypoint-color);
+    animation: vesselBlink 3s infinite;
+}
+
+@keyframes vesselBlink {
+    0%, 80%, 100% { opacity: 1; }
+    85%, 95% { opacity: 0.3; }
+}
+
+.nearby-vessel .vessel-info {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-small);
+    text-align: center;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.nearby-vessel:hover .vessel-info {
+    opacity: 1;
+}
+
+/* Emergency Zones */
+.emergency-zones {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.danger-zone {
+    position: absolute;
+    border: 3px dashed var(--marine-danger);
+    border-radius: 50%;
+    background: rgba(255, 56, 56, 0.1);
+    animation: dangerZonePulse 4s infinite;
+}
+
+@keyframes dangerZonePulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+.safe-zone {
+    position: absolute;
+    border: 2px dashed var(--marine-success);
+    border-radius: 50%;
+    background: rgba(46, 213, 115, 0.1);
+}
+
+/* AIS Panel */
+.ais-traffic {
+    flex: 1;
+    padding: var(--spacing-md);
+}
+
+.ais-traffic h4 {
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+.ais-vessel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm);
+    background: var(--marine-darker-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ais-vessel:hover {
+    background: var(--marine-panel-bg);
+    border-color: var(--marine-accent);
+}
+
+.ais-vessel.emergency {
+    border-color: var(--marine-danger);
+    background: rgba(255, 56, 56, 0.1);
+}
+
+.ais-vessel.coast-guard {
+    border-color: var(--marine-accent);
+    background: rgba(0, 168, 255, 0.1);
+}
+
+.vessel-details {
+    flex: 1;
+}
+
+.vessel-name {
+    color: var(--marine-text);
+    font-weight: bold;
+    font-size: var(--font-size-small);
+    margin-bottom: var(--spacing-xs);
+}
+
+.vessel-type {
+    color: var(--marine-text-secondary);
+    font-size: var(--font-size-small);
+}
+
+.vessel-metrics {
+    text-align: right;
+    font-size: var(--font-size-small);
+}
+
+.vessel-distance {
+    color: var(--marine-accent);
+    font-weight: bold;
+    margin-bottom: var(--spacing-xs);
+}
+
+.vessel-bearing {
+    color: var(--marine-text-secondary);
+}
+
+.emergency-contacts {
+    padding: var(--spacing-md);
+    border-top: 1px solid var(--marine-border);
+}
+
+.emergency-contacts h4 {
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+.contact-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm);
+    background: var(--marine-darker-bg);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.contact-info {
+    flex: 1;
+}
+
+.contact-name {
+    color: var(--marine-text);
+    font-weight: bold;
+    font-size: var(--font-size-small);
+    margin-bottom: var(--spacing-xs);
+}
+
+.contact-channel {
+    color: var(--marine-text-secondary);
+    font-size: var(--font-size-small);
+}
+
+.contact-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--marine-accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-small);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.contact-btn:hover {
+    background: var(--marine-accent-hover);
+    transform: scale(1.05);
+}
+
+/* Communications Panel */
+.radio-controls {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--marine-border);
+}
+
+.radio-controls h4 {
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+.radio-channels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.channel-btn {
+    padding: var(--spacing-sm);
+    background: var(--marine-darker-bg);
+    border: 2px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    color: var(--marine-text);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+    font-size: var(--font-size-small);
+}
+
+.channel-btn:hover {
+    background: var(--marine-panel-bg);
+    border-color: var(--marine-accent);
+}
+
+.channel-btn.active {
+    background: var(--marine-accent);
+    border-color: var(--marine-accent);
+    color: white;
+    font-weight: bold;
+}
+
+.channel-btn.emergency {
+    background: var(--marine-danger);
+    border-color: var(--marine-danger);
+    color: white;
+    font-weight: bold;
+    animation: emergencyChannel 2s infinite;
+}
+
+@keyframes emergencyChannel {
+    0%, 100% { box-shadow: 0 0 0 rgba(255, 56, 56, 0); }
+    50% { box-shadow: 0 0 15px rgba(255, 56, 56, 0.6); }
+}
+
+.channel-number {
+    display: block;
+    font-weight: bold;
+    margin-bottom: var(--spacing-xs);
+}
+
+.channel-name {
+    font-size: var(--font-size-small);
+    opacity: 0.8;
+}
+
+.distress-signals {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--marine-border);
+}
+
+.distress-signals h4 {
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+.distress-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+}
+
+.distress-btn {
+    padding: var(--spacing-md);
+    background: var(--marine-darker-bg);
+    border: 2px solid var(--marine-danger);
+    border-radius: var(--radius-md);
+    color: var(--marine-text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.distress-btn:hover {
+    background: var(--marine-danger);
+    color: white;
+    transform: scale(1.02);
+}
+
+.distress-btn:active {
+    transform: scale(0.98);
+}
+
+.distress-type {
+    font-weight: bold;
+    font-size: var(--font-size-medium);
+    margin-bottom: var(--spacing-xs);
+}
+
+.distress-desc {
+    font-size: var(--font-size-small);
+    opacity: 0.8;
+}
+
+.emergency-procedures {
+    padding: var(--spacing-md);
+}
+
+.emergency-procedures h4 {
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+.procedure-checklist {
+    list-style: none;
+    padding: 0;
+}
+
+.procedure-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background: var(--marine-darker-bg);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-small);
+}
+
+.procedure-checkbox {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--marine-border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.procedure-checkbox.completed {
+    background: var(--marine-success);
+    border-color: var(--marine-success);
+    position: relative;
+}
+
+.procedure-checkbox.completed::after {
+    content: '✓';
+    position: absolute;
+    top: -2px;
+    left: 2px;
+    color: white;
+    font-weight: bold;
+    font-size: var(--font-size-small);
+}
+
+.procedure-text {
+    flex: 1;
+    color: var(--marine-text);
+    line-height: 1.4;
+}
+
+.procedure-item.completed .procedure-text {
+    color: var(--marine-text-secondary);
+    text-decoration: line-through;
+}
+
+/* Equipment Status */
+.equipment-status {
+    position: absolute;
+    bottom: var(--spacing-md);
+    left: var(--spacing-md);
+    background: var(--marine-panel-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    backdrop-filter: blur(10px);
+    z-index: 20;
+    min-width: 200px;
+}
+
+.equipment-status h4 {
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+.equipment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-small);
+}
+
+.equipment-name {
+    color: var(--marine-text);
+}
+
+.equipment-indicator {
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    font-weight: bold;
+    font-size: var(--font-size-small);
+    min-width: 60px;
+    text-align: center;
+}
+
+.equipment-indicator.operational {
+    background: var(--marine-success);
+    color: white;
+}
+
+.equipment-indicator.warning {
+    background: var(--marine-warning);
+    color: black;
+}
+
+.equipment-indicator.offline {
+    background: var(--marine-danger);
+    color: white;
+}
+
+/* Responsive Design for Emergency Layout */
+@media (max-width: 1200px) {
+    .emergency-layout .layout-container {
+        grid-template-areas: 
+            "alert alert"
+            "chart chart"
+            "ais comms"
+            "status status";
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto 2fr 1fr auto;
+    }
+    
+    .radio-channels {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .emergency-layout .layout-container {
+        grid-template-areas: 
+            "alert"
+            "chart"
+            "ais"
+            "comms"
+            "status";
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 2fr 1fr 1fr auto;
+    }
+    
+    .emergency-actions {
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
+    
+    .equipment-status {
+        position: static;
+        margin-top: var(--spacing-md);
+    }
+    
+    .radio-channels {
+        grid-template-columns: 1fr;
+    }
+    
+    .alert-details {
+        font-size: var(--font-size-small);
+    }
+    
+    .alert-time {
+        display: block;
+        margin-bottom: var(--spacing-xs);
+    }
+}

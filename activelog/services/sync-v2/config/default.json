@@ -1,0 +1,132 @@
+{
+  "sync_engine": {
+    "sync_interval": 30,
+    "max_concurrent_syncs": 5,
+    "database_path": "sync_v2.db",
+    "conflict_resolution_strategy": "smart_merge"
+  },
+  
+  "network_monitoring": {
+    "monitor_interval": 30,
+    "bandwidth_detection": true,
+    "connection_quality_thresholds": {
+      "excellent": {"min_bandwidth_mbps": 50, "max_latency_ms": 20, "max_packet_loss": 1},
+      "good": {"min_bandwidth_mbps": 10, "max_latency_ms": 50, "max_packet_loss": 2},
+      "fair": {"min_bandwidth_mbps": 1, "max_latency_ms": 100, "max_packet_loss": 5},
+      "poor": {"max_latency_ms": 200, "max_packet_loss": 10}
+    }
+  },
+  
+  "selective_sync": {
+    "enabled": true,
+    "device_specific_rules": true,
+    "auto_optimize_batch": true,
+    "content_analysis": true
+  },
+  
+  "conflict_resolution": {
+    "auto_resolve_low_severity": true,
+    "auto_resolve_threshold": 0.8,
+    "default_strategies": {
+      "concurrent_edit": "smart_merge",
+      "delete_edit": "user_choice", 
+      "move_move": "last_writer_wins",
+      "rename_rename": "last_writer_wins",
+      "type_change": "user_choice",
+      "schema_mismatch": "user_choice"
+    }
+  },
+  
+  "collaboration": {
+    "enabled": true,
+    "websocket_port": 8765,
+    "websocket_host": "0.0.0.0",
+    "max_operation_history": 1000,
+    "presence_timeout_minutes": 5,
+    "operational_transform": {
+      "enabled": true,
+      "conflict_prevention": true
+    }
+  },
+  
+  "protocols": {
+    "mobile": {
+      "wifi_only_large_files": true,
+      "battery_aware_sync": true,
+      "background_sync_enabled": true,
+      "compression_preferred": true,
+      "heartbeat_interval": 60
+    },
+    "desktop": {
+      "real_time_sync": true,
+      "version_history": true,
+      "bulk_operations": true,
+      "collaboration_enabled": true,
+      "heartbeat_interval": 30
+    },
+    "web": {
+      "progressive_sync": true,
+      "reference_only_large_files": true,
+      "session_based_sync": true,
+      "storage_quota": 52428800,
+      "heartbeat_interval": 45
+    }
+  },
+  
+  "endpoints": {
+    "mobile": "https://sync.activelog.ai/mobile/v2",
+    "desktop": "https://sync.activelog.ai/desktop/v2", 
+    "web": "https://sync.activelog.ai/web/v2",
+    "api": "https://sync.activelog.ai/api/v2",
+    "websocket": "wss://sync.activelog.ai/ws/v2"
+  },
+  
+  "security": {
+    "encryption_enabled": true,
+    "token_auth": true,
+    "device_verification": true,
+    "rate_limiting": {
+      "enabled": true,
+      "requests_per_minute": 60,
+      "burst_size": 10
+    }
+  },
+  
+  "performance": {
+    "connection_pool_size": 20,
+    "request_timeout": 30,
+    "retry_policy": {
+      "max_retries": 3,
+      "backoff_multiplier": 2.0,
+      "initial_delay": 1.0
+    },
+    "compression": {
+      "enabled": true,
+      "min_size": 1024,
+      "algorithm": "gzip"
+    }
+  },
+  
+  "logging": {
+    "level": "INFO",
+    "file": "sync_v2.log",
+    "max_size_mb": 50,
+    "backup_count": 5,
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  },
+  
+  "monitoring": {
+    "metrics_enabled": true,
+    "prometheus_port": 9090,
+    "health_check_enabled": true,
+    "stats_collection_interval": 60
+  },
+  
+  "storage": {
+    "cleanup_interval_hours": 24,
+    "max_operation_history": 10000,
+    "max_log_age_days": 30,
+    "database_backup_enabled": true,
+    "backup_interval_hours": 6
+  }
+}

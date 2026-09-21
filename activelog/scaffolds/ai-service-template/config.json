@@ -1,0 +1,5 @@
+{
+  "secret_key": "your-secret-key-here",
+  "algorithm": "HS256",
+  "token_expire_minutes": 30
+}

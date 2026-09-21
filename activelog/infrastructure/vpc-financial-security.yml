@@ -1,0 +1,314 @@
+# ActiveLedger Financial Infrastructure VPC Configuration
+# Separate VPC for financial services with enhanced security
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: financial-vpc-config
+data:
+  vpc_cidr: "10.10.0.0/16"
+  
+  # Private subnets for financial services
+  private_subnets:
+    - cidr: "10.10.1.0/24"
+      az: "us-east-1a"
+      name: "financial-private-1a"
+    - cidr: "10.10.2.0/24" 
+      az: "us-east-1b"
+      name: "financial-private-1b"
+    - cidr: "10.10.3.0/24"
+      az: "us-east-1c"
+      name: "financial-private-1c"
+
+  # Public subnets for load balancers only
+  public_subnets:
+    - cidr: "10.10.101.0/24"
+      az: "us-east-1a"
+      name: "financial-public-1a"
+    - cidr: "10.10.102.0/24"
+      az: "us-east-1b" 
+      name: "financial-public-1b"
+
+  # Security Groups
+  security_groups:
+    trading_engine_sg:
+      ingress:
+        - port: 8500
+          protocol: "tcp"
+          source: "load_balancer_sg"
+        - port: 6379
+          protocol: "tcp"
+          source: "redis_sg"
+      egress:
+        - port: 0
+          protocol: "-1"
+          destination: "0.0.0.0/0"
+    
+    settlement_sg:
+      ingress:
+        - port: 8501
+          protocol: "tcp"
+          source: "load_balancer_sg"
+        - port: 6379
+          protocol: "tcp"
+          source: "redis_sg"
+      egress:
+        - port: 0
+          protocol: "-1"
+          destination: "0.0.0.0/0"
+    
+    compliance_sg:
+      ingress:
+        - port: 8502
+          protocol: "tcp"
+          source: "load_balancer_sg"
+      egress:
+        - port: 443
+          protocol: "tcp"
+          destination: "0.0.0.0/0"  # For regulatory reporting APIs
+    
+    market_data_sg:
+      ingress:
+        - port: 8503
+          protocol: "tcp"
+          source: "load_balancer_sg"
+        - port: 8080
+          protocol: "tcp"
+          source: "websocket_sg"
+      egress:
+        - port: 0
+          protocol: "-1"
+          destination: "0.0.0.0/0"
+    
+    wallet_sg:
+      ingress:
+        - port: 8504
+          protocol: "tcp"
+          source: "load_balancer_sg"
+        - port: 6379
+          protocol: "tcp"
+          source: "redis_sg"
+      egress:
+        - port: 443
+          protocol: "tcp"
+          destination: "0.0.0.0/0"  # For payment processors
+    
+    audit_logger_sg:
+      ingress:
+        - port: 8505
+          protocol: "tcp"
+          source: "internal"
+      egress:
+        - port: 0
+          protocol: "-1"
+          destination: "0.0.0.0/0"
+    
+    load_balancer_sg:
+      ingress:
+        - port: 443
+          protocol: "tcp"
+          source: "0.0.0.0/0"
+        - port: 80
+          protocol: "tcp"
+          source: "0.0.0.0/0"
+      egress:
+        - port: 0
+          protocol: "-1"
+          destination: "10.10.0.0/16"
+    
+    redis_sg:
+      ingress:
+        - port: 6379
+          protocol: "tcp"
+          source: "financial_services_sg"
+      egress: []
+
+  # Network ACLs for additional security
+  network_acls:
+    private_nacl:
+      ingress:
+        - rule_number: 100
+          protocol: "tcp"
+          port_range: "8500-8505"
+          cidr_block: "10.10.0.0/16"
+          action: "allow"
+        - rule_number: 200
+          protocol: "tcp"
+          port_range: "6379"
+          cidr_block: "10.10.0.0/16"
+          action: "allow"
+        - rule_number: 300
+          protocol: "tcp"
+          port_range: "443"
+          cidr_block: "0.0.0.0/0"
+          action: "allow"
+        - rule_number: 900
+          protocol: "-1"
+          cidr_block: "0.0.0.0/0"
+          action: "deny"
+      egress:
+        - rule_number: 100
+          protocol: "-1"
+          cidr_block: "0.0.0.0/0"
+          action: "allow"
+
+  # Instance specifications
+  instances:
+    trading_engine:
+      instance_type: "c5.xlarge"
+      cpu: 4
+      memory: "8GB"
+      storage: "100GB SSD"
+      redundancy: 2
+      
+    settlement_server:
+      instance_type: "t3.large"
+      cpu: 2
+      memory: "8GB"
+      storage: "50GB SSD"
+      redundancy: 2
+      
+    compliance_server:
+      instance_type: "t3.medium"
+      cpu: 2
+      memory: "4GB"
+      storage: "20GB SSD"
+      redundancy: 1
+      
+    market_data_feed:
+      instance_type: "c5.large"
+      cpu: 2
+      memory: "4GB"
+      storage: "20GB SSD"
+      redundancy: 2
+      
+    wallet_server:
+      instance_type: "t3.medium"
+      cpu: 2
+      memory: "4GB"
+      storage: "50GB SSD"
+      redundancy: 2
+      
+    audit_logger:
+      instance_type: "t3.small"
+      cpu: 2
+      memory: "2GB"
+      storage: "100GB SSD"
+      redundancy: 1
+
+  # Database configurations
+  databases:
+    redis_cluster:
+      engine: "Redis"
+      version: "7.0"
+      instance_type: "cache.r7g.large"
+      num_nodes: 3
+      encryption_at_rest: true
+      encryption_in_transit: true
+      backup_retention: 7
+      
+    settlement_db:
+      engine: "PostgreSQL"
+      version: "15.4"
+      instance_type: "db.t3.micro"
+      storage: "50GB"
+      backup_retention: 30
+      encryption: true
+      multi_az: true
+      
+    audit_db:
+      engine: "PostgreSQL"
+      version: "15.4"
+      instance_type: "db.t3.small"
+      storage: "100GB"
+      backup_retention: 90  # Extended retention for audit logs
+      encryption: true
+      multi_az: true
+
+  # Load balancer configuration
+  load_balancer:
+    type: "Application Load Balancer"
+    scheme: "internet-facing"
+    listeners:
+      - port: 443
+        protocol: "HTTPS"
+        ssl_certificate: "arn:aws:acm:us-east-1:account:certificate/cert-id"
+      - port: 80
+        protocol: "HTTP"
+        redirect_to_https: true
+    
+    target_groups:
+      trading_engine:
+        port: 8500
+        health_check_path: "/health"
+        health_check_interval: 30
+        
+      settlement_server:
+        port: 8501
+        health_check_path: "/health"
+        health_check_interval: 30
+        
+      compliance_server:
+        port: 8502
+        health_check_path: "/health"
+        health_check_interval: 30
+        
+      market_data_feed:
+        port: 8503
+        health_check_path: "/health"
+        health_check_interval: 30
+        
+      wallet_server:
+        port: 8504
+        health_check_path: "/health"
+        health_check_interval: 30
+
+  # Monitoring and alerting
+  monitoring:
+    cloudwatch_metrics:
+      - namespace: "ActiveLedger/TradingEngine"
+        metrics: ["OrdersPerMinute", "TradesPerMinute", "LatencyP99"]
+      - namespace: "ActiveLedger/Settlement"
+        metrics: ["SettlementsPerMinute", "FailedSettlements", "ProcessingTime"]
+      - namespace: "ActiveLedger/Compliance"
+        metrics: ["ComplianceChecks", "RegulatoryReports", "ViolationAlerts"]
+    
+    alarms:
+      - name: "TradingEngineHighLatency"
+        metric: "LatencyP99"
+        threshold: 100  # milliseconds
+        action: "scale_up"
+      - name: "SettlementFailureRate"
+        metric: "FailedSettlements"
+        threshold: 5  # percent
+        action: "alert_admin"
+      - name: "ComplianceViolation"
+        metric: "ViolationAlerts"
+        threshold: 1
+        action: "immediate_alert"
+
+  # Security configurations
+  security:
+    encryption:
+      at_rest: true
+      in_transit: true
+      key_management: "AWS KMS"
+      
+    access_control:
+      iam_roles:
+        - name: "TradingEngineRole"
+          policies: ["TradingEnginePolicy", "RedisAccessPolicy"]
+        - name: "SettlementRole"
+          policies: ["SettlementPolicy", "DatabaseAccessPolicy"]
+        - name: "ComplianceRole"
+          policies: ["CompliancePolicy", "RegulatoryAPIPolicy"]
+          
+    logging:
+      cloudtrail: true
+      vpc_flow_logs: true
+      application_logs: true
+      
+    compliance:
+      pci_dss: true
+      sox: true
+      gdpr: true

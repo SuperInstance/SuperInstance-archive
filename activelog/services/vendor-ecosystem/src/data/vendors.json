@@ -1,0 +1,206 @@
+[
+  {
+    "id": "techparts_direct",
+    "name": "TechParts Direct",
+    "api_endpoint": "https://api.techparts.com/v1/pricing",
+    "api_key_env": "TECHPARTS_API_KEY",
+    "markup_percentage": 5,
+    "shipping_cost": 15.99,
+    "processing_time": "2-3 days",
+    "reliability_score": 0.92,
+    "specialties": ["electronics", "semiconductors", "passive_components"],
+    "minimum_order": 1,
+    "maximum_order": 10000,
+    "payment_terms": "Net 30",
+    "warranty": "1 year manufacturer warranty",
+    "return_policy": "30 days return policy",
+    "bulk_discount_tiers": [
+      { "min_quantity": 10, "discount": 0.05 },
+      { "min_quantity": 50, "discount": 0.10 },
+      { "min_quantity": 100, "discount": 0.15 },
+      { "min_quantity": 500, "discount": 0.20 }
+    ],
+    "shipping_options": [
+      { "method": "standard", "cost": 15.99, "time": "5-7 days" },
+      { "method": "expedited", "cost": 29.99, "time": "2-3 days" },
+      { "method": "overnight", "cost": 49.99, "time": "1 day" }
+    ]
+  },
+  {
+    "id": "component_central",
+    "name": "Component Central",
+    "api_endpoint": "https://api.componentcentral.com/prices",
+    "api_key_env": "COMPONENT_API_KEY",
+    "markup_percentage": 8,
+    "shipping_cost": 12.50,
+    "processing_time": "1-2 days",
+    "reliability_score": 0.89,
+    "specialties": ["mechanical_parts", "fasteners", "industrial_components"],
+    "minimum_order": 5,
+    "maximum_order": 5000,
+    "payment_terms": "Net 15",
+    "warranty": "6 months warranty",
+    "return_policy": "15 days return policy",
+    "bulk_discount_tiers": [
+      { "min_quantity": 25, "discount": 0.08 },
+      { "min_quantity": 100, "discount": 0.12 },
+      { "min_quantity": 250, "discount": 0.16 }
+    ],
+    "shipping_options": [
+      { "method": "standard", "cost": 12.50, "time": "3-5 days" },
+      { "method": "express", "cost": 24.99, "time": "1-2 days" }
+    ]
+  },
+  {
+    "id": "electro_supply",
+    "name": "ElectroSupply Co",
+    "website_url": "https://electrosupply.com",
+    "scrape_config": {
+      "search_url": "https://electrosupply.com/search?q={{part_number}}",
+      "price_selector": ".price-current",
+      "availability_selector": ".stock-status",
+      "shipping_selector": ".shipping-cost",
+      "lead_time_selector": ".delivery-time"
+    },
+    "markup_percentage": 12,
+    "shipping_cost": 8.99,
+    "processing_time": "3-5 days",
+    "reliability_score": 0.85,
+    "specialties": ["electrical_supplies", "wire_cable", "connectors"],
+    "minimum_order": 1,
+    "maximum_order": 1000,
+    "payment_terms": "Credit card or PayPal",
+    "warranty": "Manufacturer warranty",
+    "return_policy": "30 days return policy",
+    "bulk_discount_tiers": [
+      { "min_quantity": 50, "discount": 0.05 },
+      { "min_quantity": 200, "discount": 0.10 }
+    ]
+  },
+  {
+    "id": "precision_parts",
+    "name": "Precision Parts Inc",
+    "api_endpoint": "https://api.precisionparts.com/v2/quote",
+    "api_key_env": "PRECISION_API_KEY",
+    "markup_percentage": 15,
+    "shipping_cost": 18.50,
+    "processing_time": "5-7 days",
+    "reliability_score": 0.94,
+    "specialties": ["precision_machined", "custom_parts", "aerospace_components"],
+    "minimum_order": 1,
+    "maximum_order": 500,
+    "payment_terms": "Net 60",
+    "warranty": "2 year warranty on custom parts",
+    "return_policy": "No returns on custom parts",
+    "certifications": ["ISO_9001", "AS9100", "ITAR_Registered"],
+    "bulk_discount_tiers": [
+      { "min_quantity": 5, "discount": 0.05 },
+      { "min_quantity": 25, "discount": 0.12 },
+      { "min_quantity": 100, "discount": 0.18 }
+    ],
+    "custom_pricing": true,
+    "quote_required": true
+  },
+  {
+    "id": "global_electronics",
+    "name": "Global Electronics Distributors",
+    "api_endpoint": "https://ged-api.com/pricing/v1",
+    "api_key_env": "GED_API_KEY",
+    "markup_percentage": 6,
+    "shipping_cost": 0,
+    "free_shipping_minimum": 100,
+    "processing_time": "1-3 days",
+    "reliability_score": 0.91,
+    "specialties": ["semiconductors", "integrated_circuits", "microcontrollers"],
+    "minimum_order": 10,
+    "maximum_order": 50000,
+    "payment_terms": "Net 30 for approved accounts",
+    "warranty": "Manufacturer warranty plus 90 days",
+    "return_policy": "60 days return policy",
+    "bulk_discount_tiers": [
+      { "min_quantity": 100, "discount": 0.08 },
+      { "min_quantity": 1000, "discount": 0.15 },
+      { "min_quantity": 5000, "discount": 0.22 },
+      { "min_quantity": 10000, "discount": 0.28 }
+    ],
+    "volume_pricing": true,
+    "stock_levels": "real_time"
+  },
+  {
+    "id": "rapid_supply",
+    "name": "Rapid Supply Solutions",
+    "website_url": "https://rapidsupply.net",
+    "scrape_config": {
+      "search_url": "https://rapidsupply.net/products/search?part={{part_number}}",
+      "price_selector": ".product-price .current",
+      "availability_selector": ".stock-indicator",
+      "shipping_selector": ".shipping-info .cost"
+    },
+    "markup_percentage": 10,
+    "shipping_cost": 9.95,
+    "processing_time": "same day",
+    "reliability_score": 0.87,
+    "specialties": ["maintenance_supplies", "emergency_parts", "consumables"],
+    "minimum_order": 1,
+    "maximum_order": 2000,
+    "payment_terms": "Credit card",
+    "warranty": "Standard manufacturer warranty",
+    "return_policy": "30 days unopened",
+    "bulk_discount_tiers": [
+      { "min_quantity": 20, "discount": 0.05 },
+      { "min_quantity": 100, "discount": 0.10 }
+    ],
+    "same_day_shipping": true,
+    "emergency_service": true
+  },
+  {
+    "id": "industrial_components",
+    "name": "Industrial Components Warehouse",
+    "api_endpoint": "https://icw-portal.com/api/pricing",
+    "api_key_env": "ICW_API_KEY",
+    "markup_percentage": 9,
+    "shipping_cost": 14.25,
+    "processing_time": "2-4 days",
+    "reliability_score": 0.88,
+    "specialties": ["industrial_automation", "pneumatic_parts", "hydraulic_components"],
+    "minimum_order": 25,
+    "maximum_order": 1000,
+    "payment_terms": "Net 45",
+    "warranty": "1 year parts and labor",
+    "return_policy": "45 days return policy",
+    "bulk_discount_tiers": [
+      { "min_quantity": 50, "discount": 0.07 },
+      { "min_quantity": 200, "discount": 0.13 },
+      { "min_quantity": 500, "discount": 0.18 }
+    ],
+    "technical_support": true,
+    "installation_service": true
+  },
+  {
+    "id": "automotive_parts_pro",
+    "name": "Automotive Parts Pro",
+    "website_url": "https://autopartspro.com",
+    "scrape_config": {
+      "search_url": "https://autopartspro.com/catalog?search={{part_number}}",
+      "price_selector": ".part-price .amount",
+      "availability_selector": ".availability-status",
+      "shipping_selector": ".shipping-calculator .total"
+    },
+    "markup_percentage": 11,
+    "shipping_cost": 11.99,
+    "processing_time": "2-3 days",
+    "reliability_score": 0.86,
+    "specialties": ["automotive_parts", "oem_replacements", "performance_parts"],
+    "minimum_order": 1,
+    "maximum_order": 100,
+    "payment_terms": "Credit card or PayPal",
+    "warranty": "OEM warranty or 1 year",
+    "return_policy": "30 days core return",
+    "bulk_discount_tiers": [
+      { "min_quantity": 10, "discount": 0.05 },
+      { "min_quantity": 50, "discount": 0.10 }
+    ],
+    "core_exchange": true,
+    "vehicle_compatibility": true
+  }
+]

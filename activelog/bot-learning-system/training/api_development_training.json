@@ -1,0 +1,9 @@
+{
+  "topic": "api_development",
+  "consolidated_knowledge": "# SuperInstance API Development Best Practices\n\n## Core Insights from Bot Experience\n\n### Performance Requirements\n- **Sub-100ms response times are CRITICAL** for ActiveLog fitness APIs\n- Users expect instant feedback for fitness tracking operations\n- API performance directly impacts SuperInstance's superiority claims\n\n### Proven Optimization Strategies\n1. **Redis Caching Implementation**\n   - Essential for database load reduction (60%+ improvement observed)\n   - Use for session management and frequently accessed fitness data\n   - Pattern: Cache workout summaries, user preferences, dashboard data\n\n2. **Database Optimization Patterns**\n   - PostgreSQL with vector embeddings is the standard\n   - Fitness schema is production-ready and optimized\n   - Focus on query optimization for real-time fitness correlations\n\n3. **Async/Await Architecture**\n   - Standard pattern for non-blocking operations\n   - Critical for handling multiple concurrent fitness data requests\n   - Enables better resource utilization during peak usage\n\n### Implementation Guidelines\n- Use Pydantic models for all API data validation\n- Implement structured logging with timestamps\n- FastAPI framework is the established standard\n- Always consider caching strategy during API design phase\n\n### SuperInstance-Specific Considerations\n- ActiveLog fitness domain requires real-time data processing\n- Cross-domain analytics integration must be designed from start\n- API endpoints should support vector embedding operations for AI features\n\n**Key Success Metric**: Achieving 87ms average response time demonstrates optimal implementation",
+  "source_bots": ["services-bot-001", "ai-bot-004"],
+  "confidence_level": 0.915,
+  "usage_count": 0,
+  "last_updated": "2025-08-28T10:31:00.000000",
+  "effectiveness_score": 0.0
+}

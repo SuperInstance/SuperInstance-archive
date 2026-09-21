@@ -1,0 +1,1 @@
+"""Utilities package for smart folders service"""

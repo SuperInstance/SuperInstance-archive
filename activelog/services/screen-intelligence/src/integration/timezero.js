@@ -1,0 +1,1 @@
+const EventEmitter = require("events"); module.exports = class TimeZeroIntegration extends EventEmitter { constructor(options = {}) { super(); this.options = options; this.isConnected = false; } async initialize() {} isConnected() { return this.isConnected; } getVessels() { return []; } getWaypoints() { return []; } async cleanup() {} };

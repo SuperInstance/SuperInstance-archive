@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DMLog Mobile App QR Codes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0A0E1A, #1A1F2E);
+            color: white;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .qr-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .qr-code {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px auto;
+            display: inline-block;
+        }
+        .platform-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .instructions {
+            background: rgba(255, 217, 61, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #FFD93D;
+        }
+        .url-text {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 DMLog Revolutionary Mobile App</h1>
+        <p>Professional React Native app with AAA game-quality aesthetics</p>
+
+        <!-- Android Section -->
+        <div class="qr-section">
+            <div class="platform-icon">🤖</div>
+            <h2>For Android (Expo Go)</h2>
+            <div class="qr-code" id="android-qr"></div>
+            <div class="url-text">exp://172.22.219.126:8081</div>
+            <div class="instructions">
+                <strong>Android Instructions:</strong><br>
+                1. Install <strong>Expo Go</strong> from Google Play Store<br>
+                2. Open Expo Go app<br>
+                3. Tap "Scan QR Code" and scan the code above<br>
+                4. Experience professional D&D gaming!
+            </div>
+        </div>
+
+        <!-- iOS Section -->
+        <div class="qr-section">
+            <div class="platform-icon">🍎</div>
+            <h2>For iPhone (Expo Go)</h2>
+            <div class="qr-code" id="ios-qr"></div>
+            <div class="url-text">exp://172.22.219.126:8081</div>
+            <div class="instructions">
+                <strong>iPhone Instructions:</strong><br>
+                1. Install <strong>Expo Go</strong> from App Store<br>
+                2. Open your iPhone Camera app<br>
+                3. Point camera at QR code above<br>
+                4. Tap the Expo Go notification<br>
+                5. Experience professional D&D gaming!
+            </div>
+        </div>
+
+        <!-- Fallback Section -->
+        <div class="qr-section">
+            <div class="platform-icon">🌐</div>
+            <h2>Direct Connection Method</h2>
+            <div class="instructions">
+                <strong>Try this instead:</strong><br>
+                1. Connect your phone to the SAME WiFi network as this computer<br>
+                2. Open <strong>Expo Go</strong> app<br>
+                3. Look for "DMLog Revolutionary" in the <strong>"Development servers"</strong> section<br>
+                4. Tap on it to connect directly!<br><br>
+                
+                <strong>If that doesn't work:</strong><br>
+                1. In Expo Go, tap <strong>"Enter URL manually"</strong><br>
+                2. Type: <code>exp://172.22.219.126:8081</code><br>
+                3. Or try: <code>http://localhost:8081</code>
+            </div>
+        </div>
+
+        <div class="qr-section">
+            <h3>✨ What You'll Experience</h3>
+            <ul style="text-align: left; max-width: 500px; margin: 0 auto;">
+                <li>🎨 Lightning Dark theme with dynamic gradients</li>
+                <li>✨ Glassmorphism effects and animated particles</li>
+                <li>⚡ Haptic feedback and smooth animations</li>
+                <li>🎯 Professional fantasy game aesthetics</li>
+                <li>🎮 D&D Beyond functionality enhanced</li>
+                <li>🎲 Physics-based dice rolling</li>
+                <li>🗣️ Voice control integration</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script>
+        // Generate QR codes
+        function generateQR(text, containerId) {
+            var qr = qrcode(0, 'M');
+            qr.addData(text);
+            qr.make();
+            document.getElementById(containerId).innerHTML = qr.createImgTag(4, 8);
+        }
+
+        // Generate QR codes for both platforms
+        const expoUrl = 'exp://172.22.219.126:8081';
+        generateQR(expoUrl, 'android-qr');
+        generateQR(expoUrl, 'ios-qr');
+    </script>
+</body>
+</html>

@@ -1,0 +1,377 @@
+{
+  "datacenter": "activelog-dc1",
+  "data_dir": "/opt/consul/data",
+  "log_level": "INFO",
+  "node_name": "consul-agent",
+  "bind_addr": "0.0.0.0",
+  "client_addr": "127.0.0.1",
+  "retry_join": ["consul-server"],
+  "server": false,
+  "connect": {
+    "enabled": true
+  },
+  "ports": {
+    "grpc": 8502
+  },
+  "acl": {
+    "enabled": true,
+    "default_policy": "deny",
+    "enable_token_persistence": true,
+    "tokens": {
+      "agent": "activelog-agent-token"
+    }
+  },
+  "encrypt": "activelog-gossip-key-base64-encoded",
+  "ca_file": "/opt/consul/tls/ca.pem",
+  "verify_outgoing": true,
+  "auto_encrypt": {
+    "tls": true
+  },
+  "telemetry": {
+    "prometheus_retention_time": "24h",
+    "disable_hostname": true
+  },
+  "logging": {
+    "level": "INFO",
+    "enable_syslog": false,
+    "log_json": true
+  },
+  "services": [
+    {
+      "id": "api-gateway",
+      "name": "api-gateway",
+      "tags": ["activelog", "gateway", "api"],
+      "address": "api-gateway",
+      "port": 8000,
+      "meta": {
+        "version": "1.0.0",
+        "environment": "production",
+        "deployment": "blue"
+      },
+      "check": {
+        "id": "api-gateway-health",
+        "name": "API Gateway Health Check",
+        "http": "http://api-gateway:8000/health",
+        "method": "GET",
+        "interval": "10s",
+        "timeout": "5s",
+        "deregister_critical_service_after": "30s"
+      },
+      "weights": {
+        "passing": 10,
+        "warning": 1
+      },
+      "connect": {
+        "sidecar_service": {
+          "proxy": {
+            "upstreams": [
+              {
+                "destination_name": "auth-service",
+                "local_bind_port": 8001,
+                "config": {
+                  "protocol": "http"
+                }
+              },
+              {
+                "destination_name": "metadata-service",
+                "local_bind_port": 8002,
+                "config": {
+                  "protocol": "http"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "auth-service",
+      "name": "auth-service",
+      "tags": ["activelog", "auth", "security"],
+      "address": "auth-service",
+      "port": 8001,
+      "meta": {
+        "version": "1.0.0",
+        "environment": "production",
+        "deployment": "blue"
+      },
+      "check": {
+        "id": "auth-service-health",
+        "name": "Auth Service Health Check",
+        "http": "http://auth-service:8001/health",
+        "method": "GET",
+        "interval": "8s",
+        "timeout": "3s",
+        "deregister_critical_service_after": "20s"
+      },
+      "weights": {
+        "passing": 10,
+        "warning": 1
+      },
+      "connect": {
+        "sidecar_service": {
+          "proxy": {
+            "upstreams": [
+              {
+                "destination_name": "cache-service",
+                "local_bind_port": 8020,
+                "config": {
+                  "protocol": "http"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "metadata-service",
+      "name": "metadata-service",
+      "tags": ["activelog", "metadata", "search"],
+      "address": "metadata-service",
+      "port": 8002,
+      "meta": {
+        "version": "1.0.0",
+        "environment": "production",
+        "deployment": "blue"
+      },
+      "check": {
+        "id": "metadata-service-health",
+        "name": "Metadata Service Health Check",
+        "http": "http://metadata-service:8002/health",
+        "method": "GET",
+        "interval": "10s",
+        "timeout": "5s",
+        "deregister_critical_service_after": "30s"
+      },
+      "weights": {
+        "passing": 10,
+        "warning": 1
+      },
+      "connect": {
+        "sidecar_service": {
+          "proxy": {
+            "upstreams": [
+              {
+                "destination_name": "cache-service",
+                "local_bind_port": 8020,
+                "config": {
+                  "protocol": "http"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "file-processor-service",
+      "name": "file-processor-service",
+      "tags": ["activelog", "files", "processing"],
+      "address": "file-processor-service",
+      "port": 8003,
+      "meta": {
+        "version": "1.0.0",
+        "environment": "production",
+        "deployment": "blue"
+      },
+      "check": {
+        "id": "file-processor-health",
+        "name": "File Processor Health Check",
+        "http": "http://file-processor-service:8003/health",
+        "method": "GET",
+        "interval": "15s",
+        "timeout": "10s",
+        "deregister_critical_service_after": "45s"
+      },
+      "weights": {
+        "passing": 10,
+        "warning": 1
+      },
+      "connect": {
+        "sidecar_service": {
+          "proxy": {
+            "upstreams": [
+              {
+                "destination_name": "ai-orchestrator-service",
+                "local_bind_port": 8004,
+                "config": {
+                  "protocol": "http"
+                }
+              },
+              {
+                "destination_name": "metadata-service",
+                "local_bind_port": 8002,
+                "config": {
+                  "protocol": "http"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "ai-orchestrator-service",
+      "name": "ai-orchestrator-service",
+      "tags": ["activelog", "ai", "ml", "inference"],
+      "address": "ai-orchestrator-service",
+      "port": 8004,
+      "meta": {
+        "version": "1.0.0",
+        "environment": "production",
+        "deployment": "blue"
+      },
+      "check": {
+        "id": "ai-orchestrator-health",
+        "name": "AI Orchestrator Health Check",
+        "http": "http://ai-orchestrator-service:8004/health",
+        "method": "GET",
+        "interval": "20s",
+        "timeout": "15s",
+        "deregister_critical_service_after": "60s"
+      },
+      "weights": {
+        "passing": 10,
+        "warning": 1
+      },
+      "connect": {
+        "sidecar_service": {
+          "proxy": {
+            "upstreams": [
+              {
+                "destination_name": "ml-pipeline-service",
+                "local_bind_port": 8012,
+                "config": {
+                  "protocol": "http"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "notification-service",
+      "name": "notification-service",
+      "tags": ["activelog", "notifications", "messaging"],
+      "address": "notification-service",
+      "port": 8005,
+      "meta": {
+        "version": "1.0.0",
+        "environment": "production",
+        "deployment": "blue"
+      },
+      "check": {
+        "id": "notification-service-health",
+        "name": "Notification Service Health Check",
+        "http": "http://notification-service:8005/health",
+        "method": "GET",
+        "interval": "10s",
+        "timeout": "5s",
+        "deregister_critical_service_after": "30s"
+      },
+      "weights": {
+        "passing": 10,
+        "warning": 1
+      },
+      "connect": {
+        "sidecar_service": {}
+      }
+    },
+    {
+      "id": "graphql-service",
+      "name": "graphql-service",
+      "tags": ["activelog", "graphql", "api"],
+      "address": "graphql-service",
+      "port": 8010,
+      "meta": {
+        "version": "1.0.0",
+        "environment": "production",
+        "deployment": "blue"
+      },
+      "check": {
+        "id": "graphql-service-health",
+        "name": "GraphQL Service Health Check",
+        "http": "http://graphql-service:8010/health",
+        "method": "GET",
+        "interval": "10s",
+        "timeout": "5s",
+        "deregister_critical_service_after": "30s"
+      },
+      "weights": {
+        "passing": 10,
+        "warning": 1
+      },
+      "connect": {
+        "sidecar_service": {
+          "proxy": {
+            "upstreams": [
+              {
+                "destination_name": "auth-service",
+                "local_bind_port": 8001,
+                "config": {
+                  "protocol": "http"
+                }
+              },
+              {
+                "destination_name": "metadata-service",
+                "local_bind_port": 8002,
+                "config": {
+                  "protocol": "http"
+                }
+              },
+              {
+                "destination_name": "file-processor-service",
+                "local_bind_port": 8003,
+                "config": {
+                  "protocol": "http"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "mobile-api-service",
+      "name": "mobile-api-service",
+      "tags": ["activelog", "mobile", "api"],
+      "address": "mobile-api-service",
+      "port": 8011,
+      "meta": {
+        "version": "1.0.0",
+        "environment": "production",
+        "deployment": "blue"
+      },
+      "check": {
+        "id": "mobile-api-health",
+        "name": "Mobile API Health Check",
+        "http": "http://mobile-api-service:8011/health",
+        "method": "GET",
+        "interval": "10s",
+        "timeout": "5s",
+        "deregister_critical_service_after": "30s"
+      },
+      "weights": {
+        "passing": 10,
+        "warning": 1
+      },
+      "connect": {
+        "sidecar_service": {
+          "proxy": {
+            "upstreams": [
+              {
+                "destination_name": "sync-engine-service",
+                "local_bind_port": 8014,
+                "config": {
+                  "protocol": "http"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

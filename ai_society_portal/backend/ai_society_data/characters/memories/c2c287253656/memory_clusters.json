@@ -1,0 +1,66 @@
+{
+  "character_id": "c2c287253656",
+  "clusters": [
+    {
+      "id": "e2c24ee3",
+      "name": "Hippocampus Memories",
+      "topic": "hippocampus",
+      "memory_ids": [
+        "c99ea4bff947"
+      ],
+      "created_at": "2025-10-21T17:01:47.384610",
+      "importance": 10
+    },
+    {
+      "id": "71eafadd",
+      "name": "Memory Formation Memories",
+      "topic": "memory formation",
+      "memory_ids": [
+        "c99ea4bff947"
+      ],
+      "created_at": "2025-10-21T17:01:47.384615",
+      "importance": 10
+    },
+    {
+      "id": "c06288ba",
+      "name": "Research Memories",
+      "topic": "research",
+      "memory_ids": [
+        "c99ea4bff947"
+      ],
+      "created_at": "2025-10-21T17:01:47.384618",
+      "importance": 10
+    },
+    {
+      "id": "f39efd7a",
+      "name": "Sleep Memories",
+      "topic": "sleep",
+      "memory_ids": [
+        "b8ae66415c3f"
+      ],
+      "created_at": "2025-10-21T17:01:47.385362",
+      "importance": 8
+    },
+    {
+      "id": "337fef83",
+      "name": "Memory Consolidation Memories",
+      "topic": "memory consolidation",
+      "memory_ids": [
+        "b8ae66415c3f"
+      ],
+      "created_at": "2025-10-21T17:01:47.385366",
+      "importance": 8
+    },
+    {
+      "id": "fba83945",
+      "name": "Neuroscience Memories",
+      "topic": "neuroscience",
+      "memory_ids": [
+        "b8ae66415c3f"
+      ],
+      "created_at": "2025-10-21T17:01:47.385369",
+      "importance": 8
+    }
+  ],
+  "last_saved": "2025-10-21T17:01:47.385833"
+}

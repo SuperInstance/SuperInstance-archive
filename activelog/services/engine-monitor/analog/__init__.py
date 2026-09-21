@@ -1,0 +1,1 @@
+# Analog Gauge Digitization Module

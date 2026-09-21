@@ -1,0 +1,51 @@
+[
+  {
+    "bot": "vestige_researcher",
+    "instance": "i-0b61812de8ea6e0c1",
+    "scp_command": "scp -i ~/.ssh/your-key.pem /tmp/bot_note_archives/vestige_researcher_notes.tar.gz ec2-user@i-0b61812de8ea6e0c1:/home/ec2-user/notes.tar.gz",
+    "extract_command": "ssh -i ~/.ssh/your-key.pem ec2-user@i-0b61812de8ea6e0c1 'cd /home/ec2-user && tar -xzf notes.tar.gz && rm notes.tar.gz'",
+    "archive_size": 11.021484375
+  },
+  {
+    "bot": "holographic_researcher",
+    "instance": "i-0e4da12ade3468473",
+    "scp_command": "scp -i ~/.ssh/your-key.pem /tmp/bot_note_archives/holographic_researcher_notes.tar.gz ec2-user@i-0e4da12ade3468473:/home/ec2-user/notes.tar.gz",
+    "extract_command": "ssh -i ~/.ssh/your-key.pem ec2-user@i-0e4da12ade3468473 'cd /home/ec2-user && tar -xzf notes.tar.gz && rm notes.tar.gz'",
+    "archive_size": 2.8017578125
+  },
+  {
+    "bot": "firefly_researcher",
+    "instance": "i-02f80ff412d819349",
+    "scp_command": "scp -i ~/.ssh/your-key.pem /tmp/bot_note_archives/firefly_researcher_notes.tar.gz ec2-user@i-02f80ff412d819349:/home/ec2-user/notes.tar.gz",
+    "extract_command": "ssh -i ~/.ssh/your-key.pem ec2-user@i-02f80ff412d819349 'cd /home/ec2-user && tar -xzf notes.tar.gz && rm notes.tar.gz'",
+    "archive_size": 3.76953125
+  },
+  {
+    "bot": "spatial_researcher",
+    "instance": "i-0c3e7c1df714f297c",
+    "scp_command": "scp -i ~/.ssh/your-key.pem /tmp/bot_note_archives/spatial_researcher_notes.tar.gz ec2-user@i-0c3e7c1df714f297c:/home/ec2-user/notes.tar.gz",
+    "extract_command": "ssh -i ~/.ssh/your-key.pem ec2-user@i-0c3e7c1df714f297c 'cd /home/ec2-user && tar -xzf notes.tar.gz && rm notes.tar.gz'",
+    "archive_size": 1.990234375
+  },
+  {
+    "bot": "consciousness_researcher",
+    "instance": "i-03f56c900d7b38917",
+    "scp_command": "scp -i ~/.ssh/your-key.pem /tmp/bot_note_archives/consciousness_researcher_notes.tar.gz ec2-user@i-03f56c900d7b38917:/home/ec2-user/notes.tar.gz",
+    "extract_command": "ssh -i ~/.ssh/your-key.pem ec2-user@i-03f56c900d7b38917 'cd /home/ec2-user && tar -xzf notes.tar.gz && rm notes.tar.gz'",
+    "archive_size": 1.8603515625
+  },
+  {
+    "bot": "economics_researcher",
+    "instance": "i-0cb272de25786bc54",
+    "scp_command": "scp -i ~/.ssh/your-key.pem /tmp/bot_note_archives/economics_researcher_notes.tar.gz ec2-user@i-0cb272de25786bc54:/home/ec2-user/notes.tar.gz",
+    "extract_command": "ssh -i ~/.ssh/your-key.pem ec2-user@i-0cb272de25786bc54 'cd /home/ec2-user && tar -xzf notes.tar.gz && rm notes.tar.gz'",
+    "archive_size": 1.85546875
+  },
+  {
+    "bot": "integration_researcher",
+    "instance": "i-07a5a3a6495788bd6",
+    "scp_command": "scp -i ~/.ssh/your-key.pem /tmp/bot_note_archives/integration_researcher_notes.tar.gz ec2-user@i-07a5a3a6495788bd6:/home/ec2-user/notes.tar.gz",
+    "extract_command": "ssh -i ~/.ssh/your-key.pem ec2-user@i-07a5a3a6495788bd6 'cd /home/ec2-user && tar -xzf notes.tar.gz && rm notes.tar.gz'",
+    "archive_size": 76.9423828125
+  }
+]

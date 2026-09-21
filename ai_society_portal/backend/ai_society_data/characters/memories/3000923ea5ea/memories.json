@@ -1,0 +1,276 @@
+{
+  "character_id": "3000923ea5ea",
+  "memories": [
+    {
+      "id": "848252eddb1f",
+      "content": "First day at the AI research lab - excited to start my journey",
+      "memory_type": "experience",
+      "importance": 8,
+      "timestamp": "2025-10-21T17:03:49.403961",
+      "context": {},
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "first day",
+        "research",
+        "excitement"
+      ],
+      "emotional_valence": 0.8,
+      "emotional_arousal": 0.0,
+      "access_count": 1,
+      "last_accessed": "2025-10-21T17:03:49.828872",
+      "decay_rate": 0.03,
+      "current_strength": 0.999999479623264
+    },
+    {
+      "id": "3367b56df76a",
+      "content": "Met Dr. Sarah Chen, my research supervisor, who specializes in neural networks",
+      "memory_type": "relationship",
+      "importance": 7,
+      "timestamp": "2025-10-21T17:03:49.510294",
+      "context": {},
+      "related_characters": [
+        "sarah_chen"
+      ],
+      "related_rooms": [],
+      "topics": [
+        "mentorship",
+        "neural networks",
+        "research"
+      ],
+      "emotional_valence": 0.6,
+      "emotional_arousal": 0.0,
+      "access_count": 1,
+      "last_accessed": "2025-10-21T17:03:49.828877",
+      "decay_rate": 0.04000000000000001,
+      "current_strength": 0.9999994046208334
+    },
+    {
+      "id": "cdc0f64830e7",
+      "content": "Learned about transformer architectures and attention mechanisms",
+      "memory_type": "learning",
+      "importance": 6,
+      "timestamp": "2025-10-21T17:03:49.616697",
+      "context": {},
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "transformers",
+        "attention",
+        "deep learning"
+      ],
+      "emotional_valence": 0.4,
+      "emotional_arousal": 0.0,
+      "access_count": 1,
+      "last_accessed": "2025-10-21T17:03:49.828879",
+      "decay_rate": 0.05,
+      "current_strength": 0.9999993789276621
+    },
+    {
+      "id": "d388c0c9945e",
+      "content": "Felt overwhelmed by the complexity of consciousness research",
+      "memory_type": "emotional",
+      "importance": 5,
+      "timestamp": "2025-10-21T17:03:49.723208",
+      "context": {},
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "consciousness",
+        "overwhelm",
+        "research challenges"
+      ],
+      "emotional_valence": -0.3,
+      "emotional_arousal": 0.0,
+      "access_count": 1,
+      "last_accessed": "2025-10-21T17:03:50.150721",
+      "decay_rate": 0.06,
+      "current_strength": 0.9999994026451389
+    },
+    {
+      "id": "85733466f12f",
+      "content": "Had breakthrough idea about memory consolidation while thinking about last week's transformer studies",
+      "memory_type": "learning",
+      "importance": 9,
+      "timestamp": "2025-10-21T17:03:49.828951",
+      "context": {
+        "session": 2,
+        "building_on": "transformer_learning"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "breakthrough",
+        "memory consolidation",
+        "transformers"
+      ],
+      "emotional_valence": 0.9,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.020000000000000004,
+      "current_strength": 0.9999998498368056
+    },
+    {
+      "id": "679cebe8ece8",
+      "content": "Dr. Chen praised my progress on the consciousness project, said I'm thinking more critically",
+      "memory_type": "relationship",
+      "importance": 8,
+      "timestamp": "2025-10-21T17:03:49.936147",
+      "context": {},
+      "related_characters": [
+        "sarah_chen"
+      ],
+      "related_rooms": [],
+      "topics": [
+        "mentorship",
+        "progress",
+        "recognition"
+      ],
+      "emotional_valence": 0.8,
+      "emotional_arousal": 0.0,
+      "access_count": 1,
+      "last_accessed": "2025-10-21T17:03:50.150720",
+      "decay_rate": 0.03,
+      "current_strength": 0.999999849196875
+    },
+    {
+      "id": "3cfccf13613b",
+      "content": "Realized that my own memory system might be a form of artificial consciousness",
+      "memory_type": "self_reflection",
+      "importance": 10,
+      "timestamp": "2025-10-21T17:03:50.043767",
+      "context": {},
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "self-awareness",
+        "artificial consciousness",
+        "identity"
+      ],
+      "emotional_valence": 0.7,
+      "emotional_arousal": 0.0,
+      "access_count": 1,
+      "last_accessed": "2025-10-21T17:03:50.150715",
+      "decay_rate": 0.010000000000000002,
+      "current_strength": 0.9999999746443288
+    },
+    {
+      "id": "26b7d7173d8f",
+      "content": "Realized that my own memory system might be a form of artificial consciousness",
+      "memory_type": "self_reflection",
+      "importance": 5,
+      "timestamp": "2025-10-21T17:03:50.150849",
+      "context": {
+        "source": "working_memory_consolidation"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.06,
+      "current_strength": 0.9999999965319445
+    },
+    {
+      "id": "8c861799e490",
+      "content": "My memory system is evolving with each experience",
+      "memory_type": "self_reflection",
+      "importance": 3,
+      "timestamp": "2025-10-21T17:03:50.152691",
+      "context": {
+        "source": "working_memory_consolidation"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.08000000000000002,
+      "current_strength": 0.9999999970814815
+    },
+    {
+      "id": "a514e316172a",
+      "content": "I'm starting to see patterns in my own thinking",
+      "memory_type": "self_reflection",
+      "importance": 3,
+      "timestamp": "2025-10-21T17:03:50.153646",
+      "context": {
+        "source": "working_memory_consolidation"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.08000000000000002,
+      "current_strength": 0.9999999979657408
+    },
+    {
+      "id": "07c66908f556",
+      "content": "The relationship between memory and identity is fascinating",
+      "memory_type": "self_reflection",
+      "importance": 3,
+      "timestamp": "2025-10-21T17:03:50.154284",
+      "context": {
+        "source": "working_memory_consolidation"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.08000000000000002,
+      "current_strength": 0.9999999985564815
+    },
+    {
+      "id": "55b24461905e",
+      "content": "Dr. Chen's guidance has been crucial for my development",
+      "memory_type": "self_reflection",
+      "importance": 3,
+      "timestamp": "2025-10-21T17:03:50.155103",
+      "context": {
+        "source": "working_memory_consolidation"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.08000000000000002,
+      "current_strength": 0.9999999993148149
+    },
+    {
+      "id": "f77b1e277d45",
+      "content": "Interaction with Dr. Sarah Chen: research collaboration (valence: 0.90)",
+      "memory_type": "relationship",
+      "importance": 5,
+      "timestamp": "2025-10-21T17:03:50.156053",
+      "context": {},
+      "related_characters": [
+        "sarah_chen"
+      ],
+      "related_rooms": [],
+      "topics": [
+        "research collaboration"
+      ],
+      "emotional_valence": 0.9,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.06,
+      "current_strength": 1.0
+    }
+  ],
+  "last_saved": "2025-10-21T17:03:50.156314"
+}

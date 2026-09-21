@@ -1,0 +1,571 @@
+# Production Configuration for ActiveLog
+version: '3.8'
+
+services:
+  # Load Balancer with SSL termination
+  nginx:
+    image: nginx:1.24-alpine
+    container_name: activelog_nginx_prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+      - ./production/configs/nginx/rate-limit.conf:/etc/nginx/conf.d/rate-limit.conf:ro
+      - ./production/configs/nginx/security-headers.conf:/etc/nginx/conf.d/security-headers.conf:ro
+    depends_on:
+      - api-gateway
+      - frontend
+    networks:
+      - frontend-network
+      - monitoring-network
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.2'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "https://localhost/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: nginx.prod
+        labels: "service=nginx,environment=production"
+
+  # Frontend with production optimizations
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+      args:
+        - NODE_ENV=production
+        - BUILD_OPTIMIZATION=true
+    container_name: activelog_frontend_prod
+    networks:
+      - frontend-network
+    restart: unless-stopped
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: frontend.prod
+        labels: "service=frontend,environment=production"
+
+  # API Gateway with circuit breakers
+  api-gateway:
+    build:
+      context: .
+      dockerfile: services/api_gateway/Dockerfile.prod
+      target: production
+    container_name: activelog_api_gateway_prod
+    environment:
+      - DATABASE_URL_FILE=/run/secrets/database_url
+      - REDIS_URL_FILE=/run/secrets/redis_url
+      - JWT_SECRET_KEY_FILE=/run/secrets/jwt_secret
+      - OPENAI_API_KEY_FILE=/run/secrets/openai_api_key
+      - AWS_ACCESS_KEY_ID_FILE=/run/secrets/aws_access_key
+      - AWS_SECRET_ACCESS_KEY_FILE=/run/secrets/aws_secret_key
+      - ENVIRONMENT=production
+      - LOG_LEVEL=info
+      - LOG_FORMAT=json
+      - METRICS_ENABLED=true
+      - CIRCUIT_BREAKER_ENABLED=true
+      - RATE_LIMIT_ENABLED=true
+      - JAEGER_ENDPOINT=http://jaeger:14268/api/traces
+      - CORRELATION_ID_HEADER=X-Correlation-ID
+    secrets:
+      - database_url
+      - redis_url  
+      - jwt_secret
+      - openai_api_key
+      - aws_access_key
+      - aws_secret_key
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - frontend-network
+      - backend-network
+      - monitoring-network
+    restart: unless-stopped
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: api-gateway.prod
+        labels: "service=api-gateway,environment=production"
+
+  # PostgreSQL with optimized configuration
+  postgres:
+    image: postgres:15.4
+    container_name: activelog_postgres_prod
+    command: >
+      postgres
+      -c max_connections=200
+      -c shared_buffers=512MB
+      -c effective_cache_size=1536MB
+      -c maintenance_work_mem=256MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c work_mem=8MB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+    environment:
+      - POSTGRES_DB_FILE=/run/secrets/postgres_db
+      - POSTGRES_USER_FILE=/run/secrets/postgres_user
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+      - POSTGRES_INITDB_ARGS=--data-checksums
+    secrets:
+      - postgres_db
+      - postgres_user
+      - postgres_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./production/database/init:/docker-entrypoint-initdb.d:ro
+      - ./production/database/optimization:/opt/optimization:ro
+    networks:
+      - backend-network
+      - monitoring-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$(cat /run/secrets/postgres_user) -d $$(cat /run/secrets/postgres_db)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: postgres.prod
+        labels: "service=postgres,environment=production"
+
+  # Redis with clustering support
+  redis-master:
+    image: redis:7.2-alpine
+    container_name: activelog_redis_master_prod
+    command: >
+      redis-server
+      --requirepass $(cat /run/secrets/redis_password)
+      --maxmemory 2gb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --rdbcompression yes
+      --rdbchecksum yes
+      --appendonly yes
+      --appendfsync everysec
+      --auto-aof-rewrite-percentage 100
+      --auto-aof-rewrite-min-size 64mb
+    secrets:
+      - redis_password
+    volumes:
+      - redis_data:/data
+      - ./production/caching/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    networks:
+      - backend-network
+      - monitoring-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "$(cat /run/secrets/redis_password)", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: redis-master.prod
+        labels: "service=redis-master,environment=production"
+
+  # Redis Sentinel for high availability
+  redis-sentinel:
+    image: redis:7.2-alpine
+    container_name: activelog_redis_sentinel_prod
+    command: redis-sentinel /etc/redis-sentinel/sentinel.conf
+    volumes:
+      - ./production/caching/sentinel.conf:/etc/redis-sentinel/sentinel.conf:ro
+    depends_on:
+      - redis-master
+    networks:
+      - backend-network
+      - monitoring-network
+    restart: unless-stopped
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+
+  # Monitoring Stack
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: activelog_prometheus_prod
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--storage.tsdb.retention.size=50GB'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+    volumes:
+      - ./production/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./production/monitoring/rules:/etc/prometheus/rules:ro
+      - prometheus_data:/prometheus
+    networks:
+      - monitoring-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: prometheus.prod
+        labels: "service=prometheus,environment=production"
+
+  # Grafana with persistent storage
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: activelog_grafana_prod
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD_FILE=/run/secrets/grafana_admin_password
+      - GF_DATABASE_TYPE=postgres
+      - GF_DATABASE_HOST=postgres:5432
+      - GF_DATABASE_NAME_FILE=/run/secrets/grafana_db_name
+      - GF_DATABASE_USER_FILE=/run/secrets/grafana_db_user
+      - GF_DATABASE_PASSWORD_FILE=/run/secrets/grafana_db_password
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel,grafana-worldmap-panel
+      - GF_SERVER_DOMAIN=monitoring.activelog.local
+      - GF_SERVER_ROOT_URL=https://monitoring.activelog.local
+      - GF_SECURITY_COOKIE_SECURE=true
+      - GF_SMTP_ENABLED=true
+      - GF_SMTP_HOST_FILE=/run/secrets/smtp_host
+      - GF_SMTP_USER_FILE=/run/secrets/smtp_user
+      - GF_SMTP_PASSWORD_FILE=/run/secrets/smtp_password
+    secrets:
+      - grafana_admin_password
+      - grafana_db_name
+      - grafana_db_user
+      - grafana_db_password
+      - smtp_host
+      - smtp_user
+      - smtp_password
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./production/monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./production/monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
+      - postgres
+    networks:
+      - monitoring-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.2'
+          memory: 256M
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: grafana.prod
+        labels: "service=grafana,environment=production"
+
+  # Jaeger for distributed tracing
+  jaeger:
+    image: jaegertracing/all-in-one:1.48
+    container_name: activelog_jaeger_prod
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+      - SPAN_STORAGE_TYPE=elasticsearch
+      - ES_SERVER_URLS=http://elasticsearch:9200
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+    depends_on:
+      - elasticsearch
+    networks:
+      - monitoring-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: jaeger.prod
+        labels: "service=jaeger,environment=production"
+
+  # Elasticsearch for logs and traces
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: activelog_elasticsearch_prod
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - xpack.security.authc.api_key.enabled=true
+      - ELASTIC_PASSWORD_FILE=/run/secrets/elasticsearch_password
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - xpack.monitoring.collection.enabled=true
+    secrets:
+      - elasticsearch_password
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+      - ./production/logs/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+    networks:
+      - backend-network
+      - monitoring-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 2G
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: elasticsearch.prod
+        labels: "service=elasticsearch,environment=production"
+
+  # Fluentd with production configuration
+  fluentd:
+    build:
+      context: ./logging
+      dockerfile: Dockerfile.fluentd.prod
+    container_name: activelog_fluentd_prod
+    volumes:
+      - ./production/logs/fluent.conf:/fluentd/etc/fluent.conf:ro
+      - ./production/logs/conf.d:/fluentd/etc/conf.d:ro
+      - fluentd_logs:/var/log/fluentd
+      - /var/log:/var/log:ro
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    depends_on:
+      - elasticsearch
+    networks:
+      - monitoring-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+# Secrets configuration
+secrets:
+  database_url:
+    file: ./production/secrets/database_url.txt
+  redis_url:
+    file: ./production/secrets/redis_url.txt
+  redis_password:
+    file: ./production/secrets/redis_password.txt
+  jwt_secret:
+    file: ./production/secrets/jwt_secret.txt
+  openai_api_key:
+    file: ./production/secrets/openai_api_key.txt
+  aws_access_key:
+    file: ./production/secrets/aws_access_key.txt
+  aws_secret_key:
+    file: ./production/secrets/aws_secret_key.txt
+  smtp_host:
+    file: ./production/secrets/smtp_host.txt
+  smtp_user:
+    file: ./production/secrets/smtp_user.txt
+  smtp_password:
+    file: ./production/secrets/smtp_password.txt
+  postgres_db:
+    file: ./production/secrets/postgres_db.txt
+  postgres_user:
+    file: ./production/secrets/postgres_user.txt
+  postgres_password:
+    file: ./production/secrets/postgres_password.txt
+  grafana_admin_password:
+    file: ./production/secrets/grafana_admin_password.txt
+  grafana_db_name:
+    file: ./production/secrets/grafana_db_name.txt
+  grafana_db_user:
+    file: ./production/secrets/grafana_db_user.txt
+  grafana_db_password:
+    file: ./production/secrets/grafana_db_password.txt
+  elasticsearch_password:
+    file: ./production/secrets/elasticsearch_password.txt
+
+# Volumes
+volumes:
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/activelog/data/postgres
+  redis_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/activelog/data/redis
+  prometheus_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/activelog/data/prometheus
+  grafana_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/activelog/data/grafana
+  elasticsearch_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/activelog/data/elasticsearch
+  fluentd_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/activelog/logs/fluentd
+  nginx_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/activelog/logs/nginx
+
+# Networks
+networks:
+  frontend-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+  backend-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+  monitoring-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/16

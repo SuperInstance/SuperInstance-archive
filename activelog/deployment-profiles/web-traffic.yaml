@@ -1,0 +1,448 @@
+# Web Traffic Workload Profile
+# Optimized for high-concurrency web traffic, user-facing applications
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-traffic-profile
+  namespace: activelog
+data:
+  profile_name: "WebTrafficOptimized"
+  workload_type: "web_traffic"
+  
+  # Resource allocation for web-scale applications
+  resource_allocation: |
+    api-gateway:
+      cpu: "4000m"
+      memory: "4Gi"
+      priority: 1
+      instances: 5
+      node_affinity: "network-optimized"
+      
+    frontend:
+      cpu: "2000m"
+      memory: "2Gi"
+      priority: 1
+      instances: 4
+      node_affinity: "standard"
+      
+    user-management:
+      cpu: "2000m"
+      memory: "4Gi"
+      priority: 2
+      instances: 3
+      node_affinity: "standard"
+      
+    content-delivery:
+      cpu: "1000m"
+      memory: "2Gi"
+      priority: 2
+      instances: 3
+      node_affinity: "network-optimized"
+      
+    cache-service:
+      cpu: "2000m"
+      memory: "4Gi"
+      priority: 1
+      instances: 2
+      node_affinity: "memory-optimized"
+      
+    analytics:
+      cpu: "1000m"
+      memory: "2Gi"
+      priority: 4
+      instances: 1
+      node_affinity: "standard"
+
+  # Performance targets for web applications
+  performance_targets: |
+    response_time:
+      api_gateway: "50ms"
+      static_content: "20ms"
+      dynamic_content: "100ms"
+      database_queries: "10ms"
+      
+    throughput:
+      requests_per_second: 10000
+      concurrent_users: 5000
+      page_views_per_minute: 50000
+      
+    availability:
+      uptime_target: "99.9%"
+      error_rate_threshold: 0.2
+      cdn_hit_ratio: 95
+      
+    user_experience:
+      first_contentful_paint: "1.5s"
+      largest_contentful_paint: "2.5s"
+      cumulative_layout_shift: 0.1
+      time_to_interactive: "3.5s"
+
+  # Scaling rules for web traffic patterns
+  scaling_rules: |
+    auto_scaling:
+      enabled: true
+      cpu_threshold: 65
+      memory_threshold: 75
+      connection_threshold: 1000
+      
+    scaling_policies:
+      scale_up_cooldown: 120
+      scale_down_cooldown: 300
+      min_instances: 2
+      max_instances: 50
+      
+    traffic_patterns:
+      business_hours_scaling: true
+      peak_hours: "09:00-18:00"
+      weekend_scaling: true
+      holiday_scaling: true
+      
+    triggers:
+      - metric: "concurrent_connections"
+        threshold: 1000
+        duration: 60
+        action: "scale_up"
+        
+      - metric: "response_time_p95"
+        threshold: 500
+        duration: 120
+        action: "scale_up"
+        
+      - metric: "error_rate"
+        threshold: 1.0
+        duration: 60
+        action: "alert_and_scale"
+
+  # Monitoring for web applications
+  monitoring: |
+    metrics_collection:
+      interval: 10
+      retention: "30d"
+      real_user_monitoring: true
+      
+    web_metrics:
+      - "http.requests.total"
+      - "http.request.duration"
+      - "http.response.status"
+      - "frontend.page.load_time"
+      - "frontend.user.sessions"
+      - "cdn.cache.hit_ratio"
+      - "api.response.time.p95"
+      
+    alerting:
+      response_time_threshold: 500
+      error_rate_threshold: 1.0
+      availability_threshold: 99.5
+      notification_channels:
+        - "web-ops-slack"
+        - "frontend-team-email"
+        - "sre-oncall"
+
+  # CDN and caching configuration
+  caching: |
+    cdn:
+      enabled: true
+      provider: "cloudfront"
+      cache_policies:
+        static_content: "max-age=86400"
+        dynamic_content: "max-age=300"
+        api_responses: "max-age=60"
+        
+    application_cache:
+      redis_cluster: true
+      cache_size: "10Gi"
+      ttl_default: 3600
+      eviction_policy: "lru"
+      
+    browser_cache:
+      static_assets: "max-age=31536000"
+      html_pages: "max-age=300"
+      api_responses: "no-cache"
+
+  # Security for web applications
+  security: |
+    web_application_firewall:
+      enabled: true
+      rules: "owasp_top10"
+      rate_limiting: true
+      geo_blocking: false
+      
+    ssl_tls:
+      enabled: true
+      min_version: "1.2"
+      cipher_suites: "modern"
+      hsts_enabled: true
+      
+    ddos_protection:
+      enabled: true
+      threshold: 10000
+      mitigation: "automatic"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway-optimized
+  namespace: activelog
+spec:
+  replicas: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 2
+  selector:
+    matchLabels:
+      app: api-gateway
+      profile: web-traffic
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+        profile: web-traffic
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+    spec:
+      nodeSelector:
+        node-type: network-optimized
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - api-gateway
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: api-gateway
+        image: activelog/api-gateway:latest
+        resources:
+          requests:
+            cpu: "4000m"
+            memory: "4Gi"
+          limits:
+            cpu: "4000m"
+            memory: "4Gi"
+        env:
+        - name: WORKLOAD_PROFILE
+          value: "web_traffic"
+        - name: MAX_CONNECTIONS
+          value: "10000"
+        - name: CONNECTION_POOL_SIZE
+          value: "200"
+        - name: CACHE_ENABLED
+          value: "true"
+        - name: RATE_LIMIT_RPS
+          value: "1000"
+        ports:
+        - name: http
+          containerPort: 8000
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /startup
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway-service
+  namespace: activelog
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+spec:
+  selector:
+    app: api-gateway
+    profile: web-traffic
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: http
+  - name: https
+    protocol: TCP
+    port: 443
+    targetPort: http
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-optimized
+  namespace: activelog
+spec:
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 2
+  selector:
+    matchLabels:
+      app: frontend
+      profile: web-traffic
+  template:
+    metadata:
+      labels:
+        app: frontend
+        profile: web-traffic
+    spec:
+      containers:
+      - name: frontend
+        image: activelog/frontend:latest
+        resources:
+          requests:
+            cpu: "2000m"
+            memory: "2Gi"
+          limits:
+            cpu: "2000m"
+            memory: "2Gi"
+        env:
+        - name: WORKLOAD_PROFILE
+          value: "web_traffic"
+        - name: API_GATEWAY_URL
+          value: "http://api-gateway-service"
+        - name: CDN_ENABLED
+          value: "true"
+        - name: COMPRESSION_ENABLED
+          value: "true"
+        ports:
+        - containerPort: 3000
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-gateway-hpa
+  namespace: activelog
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-gateway-optimized
+  minReplicas: 3
+  maxReplicas: 50
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 65
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 75
+  - type: Pods
+    pods:
+      metric:
+        name: http_requests_per_second
+      target:
+        type: AverageValue
+        averageValue: "100"
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 120
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 60
+      - type: Pods
+        value: 4
+        periodSeconds: 60
+      selectPolicy: Max
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: activelog-ingress
+  namespace: activelog
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "1000"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+    - activelog.ai
+    - api.activelog.ai
+    secretName: activelog-tls
+  rules:
+  - host: activelog.ai
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80
+  - host: api.activelog.ai
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway-service
+            port:
+              number: 80

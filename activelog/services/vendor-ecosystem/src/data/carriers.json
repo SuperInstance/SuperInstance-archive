@@ -1,0 +1,444 @@
+[
+  {
+    "id": "fedex",
+    "name": "FedEx",
+    "api_endpoint": "https://apis.fedex.com/ship/v1/shipments",
+    "api_key_env": "FEDEX_API_KEY",
+    "secret_env": "FEDEX_SECRET",
+    "account_number_env": "FEDEX_ACCOUNT",
+    "meter_number_env": "FEDEX_METER",
+    "services": [
+      {
+        "code": "FEDEX_GROUND",
+        "name": "FedEx Ground",
+        "transit_time": "1-5 days",
+        "cost_multiplier": 1.0,
+        "service_type": "ground",
+        "residential_delivery": true,
+        "saturday_delivery": false
+      },
+      {
+        "code": "FEDEX_2_DAY",
+        "name": "FedEx 2Day",
+        "transit_time": "2 days",
+        "cost_multiplier": 1.8,
+        "service_type": "air",
+        "residential_delivery": true,
+        "saturday_delivery": true
+      },
+      {
+        "code": "FEDEX_OVERNIGHT",
+        "name": "FedEx Standard Overnight",
+        "transit_time": "1 day",
+        "cost_multiplier": 3.2,
+        "service_type": "express",
+        "residential_delivery": true,
+        "saturday_delivery": true,
+        "delivery_by": "3:00 PM"
+      },
+      {
+        "code": "FIRST_OVERNIGHT",
+        "name": "FedEx First Overnight",
+        "transit_time": "1 day",
+        "cost_multiplier": 4.1,
+        "service_type": "express",
+        "residential_delivery": true,
+        "saturday_delivery": true,
+        "delivery_by": "10:30 AM"
+      },
+      {
+        "code": "PRIORITY_OVERNIGHT",
+        "name": "FedEx Priority Overnight",
+        "transit_time": "1 day",
+        "cost_multiplier": 3.5,
+        "service_type": "express",
+        "residential_delivery": true,
+        "saturday_delivery": true,
+        "delivery_by": "12:00 PM"
+      }
+    ],
+    "max_weight": 150,
+    "max_dimensions": {
+      "length": 108,
+      "width": 70,
+      "height": 70
+    },
+    "zones": [1, 2, 3, 4, 5, 6, 7, 8],
+    "signature_required": false,
+    "insurance_available": true,
+    "tracking": true,
+    "pickup_service": true,
+    "international": true,
+    "hazmat_service": true,
+    "reliability_score": 0.94
+  },
+  {
+    "id": "ups",
+    "name": "UPS",
+    "api_endpoint": "https://wwwcie.ups.com/rest/Rate",
+    "api_key_env": "UPS_API_KEY",
+    "username_env": "UPS_USERNAME",
+    "password_env": "UPS_PASSWORD",
+    "account_number_env": "UPS_ACCOUNT",
+    "services": [
+      {
+        "code": "UPS_GROUND",
+        "name": "UPS Ground",
+        "transit_time": "1-5 days",
+        "cost_multiplier": 0.98,
+        "service_type": "ground",
+        "residential_delivery": true,
+        "saturday_delivery": false
+      },
+      {
+        "code": "UPS_2_DAY_AIR",
+        "name": "UPS 2nd Day Air",
+        "transit_time": "2 days",
+        "cost_multiplier": 1.75,
+        "service_type": "air",
+        "residential_delivery": true,
+        "saturday_delivery": true
+      },
+      {
+        "code": "UPS_NEXT_DAY_AIR",
+        "name": "UPS Next Day Air",
+        "transit_time": "1 day",
+        "cost_multiplier": 3.1,
+        "service_type": "express",
+        "residential_delivery": true,
+        "saturday_delivery": true,
+        "delivery_by": "3:00 PM"
+      },
+      {
+        "code": "UPS_NEXT_DAY_AIR_SAVER",
+        "name": "UPS Next Day Air Saver",
+        "transit_time": "1 day",
+        "cost_multiplier": 2.8,
+        "service_type": "express",
+        "residential_delivery": true,
+        "saturday_delivery": false,
+        "delivery_by": "3:00 PM"
+      },
+      {
+        "code": "UPS_NEXT_DAY_AIR_EARLY",
+        "name": "UPS Next Day Air Early",
+        "transit_time": "1 day",
+        "cost_multiplier": 3.8,
+        "service_type": "express",
+        "residential_delivery": false,
+        "saturday_delivery": true,
+        "delivery_by": "8:30 AM"
+      }
+    ],
+    "max_weight": 150,
+    "max_dimensions": {
+      "length": 108,
+      "width": 70,
+      "height": 70
+    },
+    "zones": [1, 2, 3, 4, 5, 6, 7, 8],
+    "signature_required": false,
+    "insurance_available": true,
+    "tracking": true,
+    "pickup_service": true,
+    "international": true,
+    "hazmat_service": true,
+    "reliability_score": 0.92
+  },
+  {
+    "id": "usps",
+    "name": "USPS",
+    "api_endpoint": "https://secure.shippingapis.com/ShippingAPI.dll",
+    "api_key_env": "USPS_API_KEY",
+    "username_env": "USPS_USERNAME",
+    "services": [
+      {
+        "code": "PRIORITY_MAIL",
+        "name": "USPS Priority Mail",
+        "transit_time": "1-3 days",
+        "cost_multiplier": 0.85,
+        "service_type": "ground",
+        "residential_delivery": true,
+        "saturday_delivery": true
+      },
+      {
+        "code": "PRIORITY_EXPRESS",
+        "name": "USPS Priority Express",
+        "transit_time": "1-2 days",
+        "cost_multiplier": 2.1,
+        "service_type": "express",
+        "residential_delivery": true,
+        "saturday_delivery": true,
+        "delivery_by": "12:00 PM"
+      },
+      {
+        "code": "GROUND_ADVANTAGE",
+        "name": "USPS Ground Advantage",
+        "transit_time": "2-5 days",
+        "cost_multiplier": 0.75,
+        "service_type": "ground",
+        "residential_delivery": true,
+        "saturday_delivery": false
+      },
+      {
+        "code": "FIRST_CLASS",
+        "name": "USPS First Class",
+        "transit_time": "1-3 days",
+        "cost_multiplier": 0.60,
+        "service_type": "ground",
+        "residential_delivery": true,
+        "saturday_delivery": false,
+        "max_weight": 13
+      },
+      {
+        "code": "MEDIA_MAIL",
+        "name": "USPS Media Mail",
+        "transit_time": "2-8 days",
+        "cost_multiplier": 0.45,
+        "service_type": "ground",
+        "residential_delivery": true,
+        "saturday_delivery": false,
+        "restrictions": ["books", "educational_materials", "media_only"]
+      }
+    ],
+    "max_weight": 70,
+    "max_dimensions": {
+      "length": 108,
+      "width": 70,
+      "height": 70
+    },
+    "zones": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    "signature_required": false,
+    "insurance_available": true,
+    "tracking": true,
+    "pickup_service": false,
+    "international": true,
+    "hazmat_service": false,
+    "reliability_score": 0.87
+  },
+  {
+    "id": "dhl",
+    "name": "DHL Express",
+    "api_endpoint": "https://express.api.dhl.com/mydhlapi/shipments",
+    "api_key_env": "DHL_API_KEY",
+    "secret_env": "DHL_SECRET",
+    "account_number_env": "DHL_ACCOUNT",
+    "services": [
+      {
+        "code": "DHL_EXPRESS_WORLDWIDE",
+        "name": "DHL Express Worldwide",
+        "transit_time": "1-3 days",
+        "cost_multiplier": 4.5,
+        "service_type": "express",
+        "residential_delivery": true,
+        "saturday_delivery": true,
+        "international_only": true
+      },
+      {
+        "code": "DHL_EXPRESS_12",
+        "name": "DHL Express 12:00",
+        "transit_time": "1-2 days",
+        "cost_multiplier": 5.2,
+        "service_type": "express",
+        "residential_delivery": true,
+        "saturday_delivery": true,
+        "delivery_by": "12:00 PM",
+        "international_only": true
+      },
+      {
+        "code": "DHL_EXPRESS_10",
+        "name": "DHL Express 10:30",
+        "transit_time": "1 day",
+        "cost_multiplier": 6.1,
+        "service_type": "express",
+        "residential_delivery": false,
+        "saturday_delivery": false,
+        "delivery_by": "10:30 AM",
+        "international_only": true
+      },
+      {
+        "code": "DHL_EXPRESS_9",
+        "name": "DHL Express 9:00",
+        "transit_time": "1 day",
+        "cost_multiplier": 7.2,
+        "service_type": "express",
+        "residential_delivery": false,
+        "saturday_delivery": false,
+        "delivery_by": "9:00 AM",
+        "international_only": true
+      }
+    ],
+    "max_weight": 154,
+    "max_dimensions": {
+      "length": 120,
+      "width": 80,
+      "height": 80
+    },
+    "international": true,
+    "domestic": false,
+    "customs_forms": true,
+    "signature_required": true,
+    "insurance_available": true,
+    "tracking": true,
+    "pickup_service": true,
+    "hazmat_service": true,
+    "reliability_score": 0.96
+  },
+  {
+    "id": "amazon_logistics",
+    "name": "Amazon Logistics",
+    "api_endpoint": "https://sellingpartnerapi-na.amazon.com/shipping/v1/shipments",
+    "api_key_env": "AMAZON_API_KEY",
+    "secret_env": "AMAZON_SECRET",
+    "seller_id_env": "AMAZON_SELLER_ID",
+    "services": [
+      {
+        "code": "AMAZON_STANDARD",
+        "name": "Amazon Standard Delivery",
+        "transit_time": "2-5 days",
+        "cost_multiplier": 0.80,
+        "service_type": "ground",
+        "residential_delivery": true,
+        "saturday_delivery": false
+      },
+      {
+        "code": "AMAZON_EXPEDITED",
+        "name": "Amazon Expedited Delivery",
+        "transit_time": "1-2 days",
+        "cost_multiplier": 1.5,
+        "service_type": "air",
+        "residential_delivery": true,
+        "saturday_delivery": true
+      },
+      {
+        "code": "AMAZON_SAME_DAY",
+        "name": "Amazon Same Day Delivery",
+        "transit_time": "same day",
+        "cost_multiplier": 2.8,
+        "service_type": "local",
+        "residential_delivery": true,
+        "saturday_delivery": true,
+        "coverage_limited": true
+      }
+    ],
+    "max_weight": 50,
+    "max_dimensions": {
+      "length": 108,
+      "width": 70,
+      "height": 70
+    },
+    "signature_required": false,
+    "insurance_available": true,
+    "tracking": true,
+    "pickup_service": true,
+    "international": false,
+    "hazmat_service": false,
+    "reliability_score": 0.91,
+    "requires_amazon_account": true
+  },
+  {
+    "id": "ontrac",
+    "name": "OnTrac",
+    "api_endpoint": "https://www.ontrac.com/api/v1/shipping",
+    "api_key_env": "ONTRAC_API_KEY",
+    "account_number_env": "ONTRAC_ACCOUNT",
+    "services": [
+      {
+        "code": "ONTRAC_GROUND",
+        "name": "OnTrac Ground",
+        "transit_time": "1-4 days",
+        "cost_multiplier": 0.88,
+        "service_type": "ground",
+        "residential_delivery": true,
+        "saturday_delivery": false
+      },
+      {
+        "code": "ONTRAC_SUNRISE",
+        "name": "OnTrac Sunrise",
+        "transit_time": "1 day",
+        "cost_multiplier": 2.5,
+        "service_type": "express",
+        "residential_delivery": true,
+        "saturday_delivery": false,
+        "delivery_by": "8:00 AM"
+      },
+      {
+        "code": "ONTRAC_GOLD",
+        "name": "OnTrac Gold",
+        "transit_time": "1 day",
+        "cost_multiplier": 2.2,
+        "service_type": "express",
+        "residential_delivery": true,
+        "saturday_delivery": false,
+        "delivery_by": "12:00 PM"
+      }
+    ],
+    "max_weight": 70,
+    "max_dimensions": {
+      "length": 96,
+      "width": 60,
+      "height": 60
+    },
+    "coverage_areas": ["CA", "NV", "AZ", "OR", "WA", "UT", "CO", "NM"],
+    "signature_required": false,
+    "insurance_available": true,
+    "tracking": true,
+    "pickup_service": true,
+    "international": false,
+    "hazmat_service": false,
+    "reliability_score": 0.89
+  },
+  {
+    "id": "lasership",
+    "name": "LaserShip",
+    "api_endpoint": "https://api.lasership.com/web/v1/api",
+    "api_key_env": "LASERSHIP_API_KEY",
+    "api_id_env": "LASERSHIP_API_ID",
+    "services": [
+      {
+        "code": "LASERSHIP_ROUTED",
+        "name": "LaserShip Routed Delivery",
+        "transit_time": "1-3 days",
+        "cost_multiplier": 0.82,
+        "service_type": "ground",
+        "residential_delivery": true,
+        "saturday_delivery": true
+      },
+      {
+        "code": "LASERSHIP_NEXT_DAY",
+        "name": "LaserShip Next Day",
+        "transit_time": "1 day",
+        "cost_multiplier": 2.3,
+        "service_type": "express",
+        "residential_delivery": true,
+        "saturday_delivery": false
+      },
+      {
+        "code": "LASERSHIP_SAME_DAY",
+        "name": "LaserShip Same Day",
+        "transit_time": "same day",
+        "cost_multiplier": 3.5,
+        "service_type": "local",
+        "residential_delivery": true,
+        "saturday_delivery": true,
+        "coverage_limited": true
+      }
+    ],
+    "max_weight": 50,
+    "max_dimensions": {
+      "length": 108,
+      "width": 70,
+      "height": 70
+    },
+    "coverage_areas": [
+      "CT", "DE", "MA", "MD", "ME", "NH", "NJ", "NY", "PA", "RI", "VT", "VA", "WV", "DC"
+    ],
+    "signature_required": false,
+    "insurance_available": false,
+    "tracking": true,
+    "pickup_service": false,
+    "international": false,
+    "hazmat_service": false,
+    "reliability_score": 0.84
+  }
+]

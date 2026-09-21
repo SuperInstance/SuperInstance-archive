@@ -1,0 +1,403 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blue-green-deployment-config
+  namespace: activelog
+data:
+  config.yaml: |
+    deployments:
+      api-gateway:
+        blue:
+          image: "activelog/api-gateway:v1.0.0"
+          replicas: 3
+          service_name: "api-gateway-blue"
+          port: 8000
+          weight: 100
+          health_check: "/health"
+          environment:
+            - name: DEPLOYMENT_COLOR
+              value: "blue"
+            - name: VERSION
+              value: "v1.0.0"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+        green:
+          image: "activelog/api-gateway:v1.1.0"
+          replicas: 3
+          service_name: "api-gateway-green"
+          port: 8000
+          weight: 0
+          health_check: "/health"
+          environment:
+            - name: DEPLOYMENT_COLOR
+              value: "green"
+            - name: VERSION
+              value: "v1.1.0"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+        
+      auth-service:
+        blue:
+          image: "activelog/auth-service:v1.0.0"
+          replicas: 2
+          service_name: "auth-service-blue"
+          port: 8001
+          weight: 100
+          health_check: "/health"
+          environment:
+            - name: DEPLOYMENT_COLOR
+              value: "blue"
+            - name: VERSION
+              value: "v1.0.0"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "125m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+        green:
+          image: "activelog/auth-service:v1.1.0"
+          replicas: 2
+          service_name: "auth-service-green"
+          port: 8001
+          weight: 0
+          health_check: "/health"
+          environment:
+            - name: DEPLOYMENT_COLOR
+              value: "green"
+            - name: VERSION
+              value: "v1.1.0"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "125m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+
+      graphql-service:
+        blue:
+          image: "activelog/graphql-service:v1.0.0"
+          replicas: 2
+          service_name: "graphql-service-blue"
+          port: 8010
+          weight: 100
+          health_check: "/health"
+          environment:
+            - name: DEPLOYMENT_COLOR
+              value: "blue"
+            - name: VERSION
+              value: "v1.0.0"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+        green:
+          image: "activelog/graphql-service:v1.1.0"
+          replicas: 2
+          service_name: "graphql-service-green"
+          port: 8010
+          weight: 0
+          health_check: "/health"
+          environment:
+            - name: DEPLOYMENT_COLOR
+              value: "green"
+            - name: VERSION
+              value: "v1.1.0"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+
+    routing:
+      # Traffic splitting configuration
+      traffic_split:
+        default_route: "blue"
+        switch_strategy: "instant" # instant, gradual
+        validation:
+          health_check_timeout: 30s
+          success_threshold: 95.0
+          error_threshold: 5.0
+          latency_threshold: 2000ms
+        
+      # Load balancer configuration
+      load_balancing:
+        algorithm: "round_robin" # round_robin, least_conn, ip_hash
+        session_affinity: false
+        health_check_interval: 10s
+        
+    monitoring:
+      metrics:
+        enabled: true
+        prometheus_endpoint: "/metrics"
+      
+      health_checks:
+        enabled: true
+        interval: 10s
+        timeout: 5s
+        retries: 3
+        
+      alerts:
+        deployment_failure: true
+        traffic_anomaly: true
+        health_degradation: true
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blue-green-scripts
+  namespace: activelog
+data:
+  switch-traffic.sh: |
+    #!/bin/bash
+    set -e
+    
+    SERVICE_NAME=${1:-"api-gateway"}
+    TARGET_COLOR=${2:-"green"}
+    STRATEGY=${3:-"instant"}
+    
+    echo "Switching traffic for $SERVICE_NAME to $TARGET_COLOR using $STRATEGY strategy"
+    
+    # Validate target deployment is healthy
+    check_deployment_health() {
+        local service=$1
+        local color=$2
+        
+        echo "Checking health of $service-$color"
+        health_url="http://${service}-${color}:8000/health"
+        
+        for i in {1..10}; do
+            if curl -f -s "$health_url" > /dev/null; then
+                echo "$service-$color is healthy"
+                return 0
+            fi
+            echo "Health check attempt $i failed, retrying..."
+            sleep 5
+        done
+        
+        echo "Health check failed for $service-$color"
+        return 1
+    }
+    
+    # Update Consul service weights
+    update_consul_weights() {
+        local service=$1
+        local blue_weight=$2
+        local green_weight=$3
+        
+        # Update blue deployment weight
+        consul kv put "service/$service/blue/weight" "$blue_weight"
+        
+        # Update green deployment weight
+        consul kv put "service/$service/green/weight" "$green_weight"
+        
+        # Trigger Envoy configuration reload
+        curl -X POST "http://envoy:9901/clusters"
+    }
+    
+    # Gradual traffic switch
+    gradual_switch() {
+        local service=$1
+        local target_color=$2
+        
+        echo "Starting gradual traffic switch for $service to $target_color"
+        
+        if [ "$target_color" = "green" ]; then
+            # Switch from blue to green gradually
+            for weight in 10 25 50 75 90 100; do
+                blue_weight=$((100 - weight))
+                echo "Setting traffic split: blue=$blue_weight%, green=$weight%"
+                update_consul_weights "$service" "$blue_weight" "$weight"
+                sleep 30
+                
+                # Monitor metrics during switch
+                monitor_traffic_during_switch "$service"
+            done
+        else
+            # Switch from green to blue gradually
+            for weight in 10 25 50 75 90 100; do
+                green_weight=$((100 - weight))
+                echo "Setting traffic split: blue=$weight%, green=$green_weight%"
+                update_consul_weights "$service" "$weight" "$green_weight"
+                sleep 30
+                
+                # Monitor metrics during switch
+                monitor_traffic_during_switch "$service"
+            done
+        fi
+    }
+    
+    # Instant traffic switch
+    instant_switch() {
+        local service=$1
+        local target_color=$2
+        
+        echo "Performing instant traffic switch for $service to $target_color"
+        
+        if [ "$target_color" = "green" ]; then
+            update_consul_weights "$service" "0" "100"
+        else
+            update_consul_weights "$service" "100" "0"
+        fi
+    }
+    
+    # Monitor traffic during switch
+    monitor_traffic_during_switch() {
+        local service=$1
+        
+        # Check error rates
+        error_rate=$(curl -s "http://prometheus:9090/api/v1/query?query=rate(http_requests_total{service=\"$service\",status=~\"5..\"}[1m])" | jq -r '.data.result[0].value[1] // "0"')
+        
+        # Check response times
+        p95_latency=$(curl -s "http://prometheus:9090/api/v1/query?query=histogram_quantile(0.95,rate(http_request_duration_seconds_bucket{service=\"$service\"}[1m]))" | jq -r '.data.result[0].value[1] // "0"')
+        
+        echo "Current metrics - Error rate: $error_rate, P95 latency: ${p95_latency}s"
+        
+        # Alert if metrics exceed thresholds
+        if (( $(echo "$error_rate > 0.05" | bc -l) )); then
+            echo "WARNING: Error rate ($error_rate) exceeds threshold (0.05)"
+        fi
+        
+        if (( $(echo "$p95_latency > 2.0" | bc -l) )); then
+            echo "WARNING: P95 latency (${p95_latency}s) exceeds threshold (2.0s)"
+        fi
+    }
+    
+    # Rollback function
+    rollback() {
+        local service=$1
+        local source_color=$2
+        
+        echo "ROLLING BACK: Switching traffic for $service back to $source_color"
+        
+        if [ "$source_color" = "blue" ]; then
+            update_consul_weights "$service" "100" "0"
+        else
+            update_consul_weights "$service" "0" "100"
+        fi
+        
+        echo "Rollback completed"
+    }
+    
+    # Main execution
+    main() {
+        # Check if target deployment is healthy
+        if ! check_deployment_health "$SERVICE_NAME" "$TARGET_COLOR"; then
+            echo "Target deployment is not healthy. Aborting traffic switch."
+            exit 1
+        fi
+        
+        # Store current state for potential rollback
+        current_color="blue"
+        if [ "$TARGET_COLOR" = "blue" ]; then
+            current_color="green"
+        fi
+        
+        # Perform traffic switch based on strategy
+        case $STRATEGY in
+            "gradual")
+                gradual_switch "$SERVICE_NAME" "$TARGET_COLOR"
+                ;;
+            "instant")
+                instant_switch "$SERVICE_NAME" "$TARGET_COLOR"
+                ;;
+            *)
+                echo "Unknown strategy: $STRATEGY. Use 'instant' or 'gradual'"
+                exit 1
+                ;;
+        esac
+        
+        # Final health check
+        sleep 10
+        if ! check_deployment_health "$SERVICE_NAME" "$TARGET_COLOR"; then
+            echo "Post-switch health check failed. Initiating rollback."
+            rollback "$SERVICE_NAME" "$current_color"
+            exit 1
+        fi
+        
+        echo "Traffic switch completed successfully!"
+    }
+    
+    main
+    
+  rollback.sh: |
+    #!/bin/bash
+    set -e
+    
+    SERVICE_NAME=${1:-"api-gateway"}
+    TARGET_COLOR=${2:-"blue"}
+    
+    echo "Rolling back $SERVICE_NAME to $TARGET_COLOR"
+    
+    # Update Consul weights for immediate rollback
+    if [ "$TARGET_COLOR" = "blue" ]; then
+        consul kv put "service/$SERVICE_NAME/blue/weight" "100"
+        consul kv put "service/$SERVICE_NAME/green/weight" "0"
+    else
+        consul kv put "service/$SERVICE_NAME/blue/weight" "0"
+        consul kv put "service/$SERVICE_NAME/green/weight" "100"
+    fi
+    
+    # Trigger Envoy configuration reload
+    curl -X POST "http://envoy:9901/clusters"
+    
+    echo "Rollback completed for $SERVICE_NAME to $TARGET_COLOR"
+    
+  deploy.sh: |
+    #!/bin/bash
+    set -e
+    
+    SERVICE_NAME=${1}
+    NEW_IMAGE=${2}
+    TARGET_COLOR=${3:-"green"}
+    
+    if [ -z "$SERVICE_NAME" ] || [ -z "$NEW_IMAGE" ]; then
+        echo "Usage: $0 <service-name> <new-image> [target-color]"
+        exit 1
+    fi
+    
+    echo "Deploying $NEW_IMAGE to $SERVICE_NAME-$TARGET_COLOR"
+    
+    # Update deployment with new image
+    kubectl set image deployment/$SERVICE_NAME-$TARGET_COLOR $SERVICE_NAME=$NEW_IMAGE -n activelog
+    
+    # Wait for rollout to complete
+    kubectl rollout status deployment/$SERVICE_NAME-$TARGET_COLOR -n activelog --timeout=300s
+    
+    # Verify deployment health
+    sleep 10
+    health_url="http://${SERVICE_NAME}-${TARGET_COLOR}:8000/health"
+    
+    for i in {1..10}; do
+        if curl -f -s "$health_url" > /dev/null; then
+            echo "Deployment successful and healthy"
+            break
+        fi
+        echo "Health check attempt $i failed, retrying..."
+        sleep 5
+        
+        if [ $i -eq 10 ]; then
+            echo "Deployment health check failed"
+            exit 1
+        fi
+    done
+    
+    echo "Deployment completed successfully!"
+    echo "Use 'switch-traffic.sh $SERVICE_NAME $TARGET_COLOR' to switch traffic"

@@ -1,0 +1,476 @@
+/* Navigation Layout Specific Styles */
+
+.navigation-layout .layout-container {
+    grid-template-areas: 
+        "chart route weather"
+        "status status status";
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 1fr auto;
+}
+
+.navigation-layout .chart-main {
+    grid-area: chart;
+}
+
+.navigation-layout .route-panel {
+    grid-area: route;
+    background: var(--marine-panel-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.navigation-layout .weather-panel {
+    grid-area: weather;
+    background: var(--marine-panel-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.navigation-layout .status-bar {
+    grid-area: status;
+}
+
+/* Route Overlay */
+.route-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.waypoint {
+    position: absolute;
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.waypoint-marker {
+    width: 24px;
+    height: 24px;
+    background: var(--waypoint-color);
+    color: black;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: var(--font-size-small);
+    box-shadow: 0 0 10px var(--waypoint-color);
+    animation: waypointPulse 2s infinite;
+}
+
+@keyframes waypointPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.waypoint-info {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-small);
+    text-align: center;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.waypoint:hover .waypoint-info {
+    opacity: 1;
+}
+
+.route-line {
+    position: absolute;
+    height: 2px;
+    background: var(--route-color);
+    box-shadow: 0 0 8px var(--route-color);
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+/* Weather Overlay */
+.weather-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.wind-barb {
+    position: absolute;
+    font-size: var(--font-size-large);
+    color: var(--marine-accent);
+    animation: windRotate 5s linear infinite;
+}
+
+@keyframes windRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Route Panel */
+.route-list {
+    flex: 1;
+    padding: var(--spacing-md);
+}
+
+.active-route {
+    background: var(--marine-darker-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.route-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.route-header h4 {
+    color: var(--marine-accent);
+    margin: 0;
+    font-size: var(--font-size-medium);
+}
+
+.route-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.waypoints-table {
+    background: var(--marine-panel-bg);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.waypoint-row {
+    display: grid;
+    grid-template-columns: 50px 1fr 50px 60px 50px;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-small);
+    border-bottom: 1px solid var(--marine-border);
+}
+
+.waypoint-row.header {
+    background: var(--marine-darker-bg);
+    color: var(--marine-text-secondary);
+    font-weight: bold;
+}
+
+.waypoint-row.active {
+    background: rgba(0, 168, 255, 0.1);
+    color: var(--marine-accent);
+}
+
+.waypoint-row:last-child {
+    border-bottom: none;
+}
+
+.route-totals {
+    background: var(--marine-darker-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.total-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-small);
+}
+
+.total-item:last-child {
+    margin-bottom: 0;
+}
+
+.total-item label {
+    color: var(--marine-text-secondary);
+}
+
+.total-item span {
+    color: var(--marine-text);
+    font-weight: bold;
+}
+
+.route-planning-tools {
+    padding: var(--spacing-md);
+    border-top: 1px solid var(--marine-border);
+}
+
+.route-planning-tools h4 {
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+.navigation-aids {
+    padding: var(--spacing-md);
+    border-top: 1px solid var(--marine-border);
+}
+
+.navigation-aids h4 {
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+.aid-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-small);
+}
+
+.aid-item input[type="checkbox"] {
+    margin-right: var(--spacing-sm);
+    accent-color: var(--marine-accent);
+}
+
+/* Weather Panel */
+.current-conditions {
+    padding: var(--spacing-md);
+}
+
+.condition-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.condition-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.condition-icon {
+    font-size: var(--font-size-xl);
+}
+
+.condition-primary {
+    font-weight: bold;
+    color: var(--marine-text);
+    font-size: var(--font-size-medium);
+}
+
+.condition-secondary {
+    color: var(--marine-text-secondary);
+    font-size: var(--font-size-small);
+}
+
+.weather-data {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+}
+
+.data-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-xs);
+    background: var(--marine-darker-bg);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-small);
+}
+
+.data-item label {
+    color: var(--marine-text-secondary);
+}
+
+.data-item span {
+    color: var(--marine-text);
+    font-weight: bold;
+}
+
+.trend {
+    color: var(--marine-success);
+    font-size: var(--font-size-medium);
+}
+
+.direction {
+    color: var(--marine-accent);
+    font-size: var(--font-size-small);
+}
+
+.weather-forecast {
+    padding: var(--spacing-md);
+    border-top: 1px solid var(--marine-border);
+}
+
+.weather-forecast h4 {
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+.forecast-timeline {
+    display: flex;
+    gap: var(--spacing-md);
+    overflow-x: auto;
+}
+
+.forecast-hour {
+    min-width: 60px;
+    text-align: center;
+    font-size: var(--font-size-small);
+}
+
+.forecast-hour .hour {
+    color: var(--marine-text-secondary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.forecast-hour .icon {
+    font-size: var(--font-size-large);
+    margin-bottom: var(--spacing-xs);
+}
+
+.forecast-hour .wind,
+.forecast-hour .wave {
+    color: var(--marine-text);
+    font-size: var(--font-size-small);
+}
+
+.weather-alerts {
+    padding: var(--spacing-md);
+    border-top: 1px solid var(--marine-border);
+}
+
+.alert-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background: var(--marine-darker-bg);
+    border-radius: var(--radius-sm);
+    border-left: 4px solid var(--marine-warning);
+}
+
+.alert-item.info {
+    border-left-color: var(--marine-accent);
+}
+
+.alert-icon {
+    font-size: var(--font-size-medium);
+}
+
+.alert-text {
+    font-size: var(--font-size-small);
+    line-height: 1.4;
+}
+
+.weather-routing {
+    padding: var(--spacing-md);
+    border-top: 1px solid var(--marine-border);
+}
+
+.weather-routing h4 {
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+/* Navigation Tools */
+.nav-tools {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    background: var(--marine-panel-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    backdrop-filter: blur(10px);
+    z-index: 20;
+}
+
+.tool-group {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.nav-btn {
+    flex: 1;
+    font-size: var(--font-size-small);
+    white-space: nowrap;
+}
+
+.measurement-display {
+    text-align: center;
+    font-size: var(--font-size-small);
+    color: var(--marine-accent);
+    font-weight: bold;
+}
+
+/* Responsive Design for Navigation Layout */
+@media (max-width: 1200px) {
+    .navigation-layout .layout-container {
+        grid-template-areas: 
+            "chart chart"
+            "route weather"
+            "status status";
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 2fr 1fr auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .navigation-layout .layout-container {
+        grid-template-areas: 
+            "chart"
+            "route"
+            "weather"
+            "status";
+        grid-template-columns: 1fr;
+        grid-template-rows: 2fr 1fr 1fr auto;
+    }
+    
+    .waypoint-row {
+        grid-template-columns: 40px 1fr 40px;
+        gap: var(--spacing-xs);
+    }
+    
+    .waypoint-row span:nth-child(4),
+    .waypoint-row span:nth-child(5) {
+        display: none;
+    }
+    
+    .nav-tools {
+        position: static;
+        margin-top: var(--spacing-md);
+    }
+    
+    .tool-group {
+        flex-direction: column;
+    }
+    
+    .forecast-timeline {
+        gap: var(--spacing-sm);
+    }
+    
+    .forecast-hour {
+        min-width: 50px;
+    }
+}

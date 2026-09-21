@@ -1,0 +1,285 @@
+{
+  "name": "social-media-import",
+  "version": "1.2.0",
+  "display_name": "Social Media Import Plugin",
+  "description": "Import and analyze social media posts from various platforms",
+  "author": {
+    "name": "ActiveLog Team",
+    "email": "plugins@activelog.ai",
+    "url": "https://activelog.ai"
+  },
+  "license": "MIT",
+  "keywords": ["social", "media", "import", "analytics", "content"],
+  "category": "data-import",
+  "main": "main.py",
+  "runtime": {
+    "type": "python",
+    "version": ">=3.8",
+    "environment": "python3"
+  },
+  "permissions": {
+    "network": {
+      "enabled": true,
+      "domains": [
+        "api.twitter.com",
+        "graph.facebook.com", 
+        "api.instagram.com",
+        "www.linkedin.com",
+        "api.github.com"
+      ],
+      "ports": [80, 443]
+    },
+    "filesystem": {
+      "temp": true,
+      "read": ["/tmp"],
+      "write": ["/tmp"]
+    },
+    "database": {
+      "read": true,
+      "write": true,
+      "tables": ["social_posts", "user_accounts", "analytics_data"]
+    },
+    "services": ["metadata", "ai-orchestrator", "analytics", "notifications"]
+  },
+  "resources": {
+    "cpu": 1.0,
+    "memory": "512MB",
+    "disk": "200MB",
+    "network": "100MB",
+    "timeout": 300
+  },
+  "triggers": [
+    {
+      "type": "schedule",
+      "config": {
+        "cron": "0 */2 * * *",
+        "description": "Import social media data every 2 hours"
+      }
+    },
+    {
+      "type": "user-action",
+      "config": {
+        "action": "manual_import",
+        "description": "User-triggered manual import"
+      }
+    },
+    {
+      "type": "webhook",
+      "config": {
+        "path": "/import/:platform",
+        "methods": ["POST"]
+      }
+    }
+  ],
+  "config": {
+    "schema": {
+      "type": "object",
+      "properties": {
+        "platforms": {
+          "type": "object",
+          "properties": {
+            "twitter": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": false },
+                "api_key": { "type": "string", "description": "Twitter API key" },
+                "api_secret": { "type": "string", "description": "Twitter API secret" },
+                "access_token": { "type": "string", "description": "Twitter access token" },
+                "access_token_secret": { "type": "string", "description": "Twitter access token secret" }
+              }
+            },
+            "facebook": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": false },
+                "app_id": { "type": "string", "description": "Facebook App ID" },
+                "app_secret": { "type": "string", "description": "Facebook App Secret" },
+                "access_token": { "type": "string", "description": "Facebook access token" }
+              }
+            },
+            "instagram": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": false },
+                "access_token": { "type": "string", "description": "Instagram access token" }
+              }
+            },
+            "linkedin": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": false },
+                "client_id": { "type": "string", "description": "LinkedIn Client ID" },
+                "client_secret": { "type": "string", "description": "LinkedIn Client Secret" },
+                "access_token": { "type": "string", "description": "LinkedIn access token" }
+              }
+            }
+          }
+        },
+        "import_settings": {
+          "type": "object",
+          "properties": {
+            "max_posts_per_run": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 100,
+              "description": "Maximum posts to import per run"
+            },
+            "include_media": {
+              "type": "boolean",
+              "default": true,
+              "description": "Download and store media files"
+            },
+            "analyze_sentiment": {
+              "type": "boolean",
+              "default": true,
+              "description": "Perform sentiment analysis on posts"
+            },
+            "extract_hashtags": {
+              "type": "boolean",
+              "default": true,
+              "description": "Extract and analyze hashtags"
+            },
+            "track_engagement": {
+              "type": "boolean",
+              "default": true,
+              "description": "Track likes, shares, and comments"
+            }
+          }
+        },
+        "filters": {
+          "type": "object",
+          "properties": {
+            "keywords": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Filter posts by keywords"
+            },
+            "date_range": {
+              "type": "object",
+              "properties": {
+                "start_date": { "type": "string", "format": "date" },
+                "end_date": { "type": "string", "format": "date" }
+              }
+            },
+            "min_engagement": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Minimum engagement threshold"
+            }
+          }
+        },
+        "notifications": {
+          "type": "object",
+          "properties": {
+            "email_reports": {
+              "type": "boolean",
+              "default": false,
+              "description": "Send email reports after import"
+            },
+            "alert_on_mentions": {
+              "type": "boolean", 
+              "default": false,
+              "description": "Alert when brand mentions are found"
+            },
+            "report_frequency": {
+              "type": "string",
+              "enum": ["daily", "weekly", "monthly"],
+              "default": "weekly"
+            }
+          }
+        }
+      }
+    },
+    "defaults": {
+      "platforms": {
+        "twitter": { "enabled": false },
+        "facebook": { "enabled": false },
+        "instagram": { "enabled": false },
+        "linkedin": { "enabled": false }
+      },
+      "import_settings": {
+        "max_posts_per_run": 100,
+        "include_media": true,
+        "analyze_sentiment": true,
+        "extract_hashtags": true,
+        "track_engagement": true
+      },
+      "filters": {
+        "keywords": [],
+        "min_engagement": 0
+      },
+      "notifications": {
+        "email_reports": false,
+        "alert_on_mentions": false,
+        "report_frequency": "weekly"
+      }
+    }
+  },
+  "api": {
+    "endpoints": [
+      {
+        "path": "/import/:platform",
+        "method": "POST",
+        "description": "Trigger import for specific platform"
+      },
+      {
+        "path": "/posts",
+        "method": "GET",
+        "description": "Get imported social media posts"
+      },
+      {
+        "path": "/analytics/:platform",
+        "method": "GET",
+        "description": "Get analytics data for platform"
+      },
+      {
+        "path": "/sentiment/:post_id",
+        "method": "GET",
+        "description": "Get sentiment analysis for a post"
+      },
+      {
+        "path": "/accounts",
+        "method": "GET",
+        "description": "List connected social media accounts"
+      },
+      {
+        "path": "/accounts/:platform",
+        "method": "POST",
+        "description": "Connect a new social media account"
+      }
+    ]
+  },
+  "ui": {
+    "settings": "settings.html",
+    "dashboard": "dashboard.html",
+    "icon": "social-media-icon.svg"
+  },
+  "dependencies": {
+    "pip": {
+      "requests": ">=2.31.0",
+      "tweepy": ">=4.14.0",
+      "facebook-sdk": ">=3.1.0",
+      "python-instagram": ">=1.3.2",
+      "linkedin-api": ">=2.2.0",
+      "textblob": ">=0.17.1",
+      "pillow": ">=10.0.0",
+      "pandas": ">=2.1.0",
+      "numpy": ">=1.24.0"
+    }
+  },
+  "compatibility": {
+    "activelog_version": ">=2.0.0",
+    "os": ["linux", "macos", "windows"],
+    "arch": ["x64", "arm64"]
+  },
+  "marketplace": {
+    "pricing": {
+      "model": "freemium",
+      "price": 9.99,
+      "currency": "USD"
+    },
+    "featured": true,
+    "verified": true
+  }
+}

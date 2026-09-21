@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}} - Phase 2 Visual Revolution</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Drag and Drop Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/draggable.bundle.js"></script>
+    
+    <!-- WebSocket for real-time updates -->
+    <style>
+        .component-block {
+            transition: all 0.3s ease;
+            cursor: grab;
+        }
+        .component-block:active {
+            cursor: grabbing;
+        }
+        .component-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .assembly-canvas {
+            background-image: radial-gradient(circle, #e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .connection-line {
+            stroke: #3b82f6;
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead);
+        }
+        .bot-suggestion {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold">🧩 SuperInstance Visual Assembly</h1>
+                    <p class="text-blue-100">Phase 2: Revolutionary Drag & Drop Application Builder</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="bg-white/20 rounded-lg px-4 py-2">
+                        <span class="text-sm">Components Available:</span>
+                        <span class="font-bold text-xl ml-2">{{components_count}}+</span>
+                    </div>
+                    <button id="deploy-btn" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-lg font-semibold transition-colors">
+                        🚀 Deploy App
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex h-screen">
+        <!-- Component Library Sidebar -->
+        <div class="w-80 bg-white shadow-lg border-r overflow-y-auto">
+            <div class="p-4 border-b">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">🎯 Lego Component Library</h2>
+                
+                <!-- Category Filter -->
+                <div class="mb-4">
+                    <select id="category-filter" class="w-full p-2 border rounded-lg">
+                        <option value="">All Categories</option>
+                        <option value="authentication">🔐 Authentication</option>
+                        <option value="ai">🤖 AI & Machine Learning</option>
+                        <option value="infrastructure">⚙️ Infrastructure</option>
+                        <option value="data">💾 Data & Storage</option>
+                        <option value="ui">🎨 User Interface</option>
+                    </select>
+                </div>
+
+                <!-- Search -->
+                <input type="text" id="component-search" placeholder="Search components..." 
+                       class="w-full p-2 border rounded-lg mb-4">
+            </div>
+            
+            <!-- Components List -->
+            <div id="components-list" class="p-4 space-y-3">
+                <!-- Components will be loaded here via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Main Assembly Canvas -->
+        <div class="flex-1 flex flex-col">
+            <!-- Canvas Toolbar -->
+            <div class="bg-white border-b p-4 flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <h3 class="text-lg font-semibold">Assembly Canvas</h3>
+                    <button id="validate-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                        ✅ Validate Assembly
+                    </button>
+                    <button id="clear-btn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">
+                        🗑️ Clear Canvas
+                    </button>
+                </div>
+                
+                <div class="flex items-center space-x-2 text-sm text-gray-600">
+                    <span>Bot Status:</span>
+                    <span id="bot-status" class="bg-green-100 text-green-800 px-2 py-1 rounded-full font-semibold">
+                        🤖 Active
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Assembly Canvas Area -->
+            <div class="flex-1 assembly-canvas p-8 relative overflow-auto" id="assembly-canvas">
+                <!-- SVG for connection lines -->
+                <svg id="connections-svg" class="absolute inset-0 pointer-events-none" style="z-index: 1;">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                                refX="9" refY="3.5" orient="auto" markerUnits="strokeWidth">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6"/>
+                        </marker>
+                    </defs>
+                </svg>
+                
+                <!-- Dropped components will appear here -->
+                <div class="text-center text-gray-500 mt-20" id="empty-canvas-message">
+                    <div class="text-6xl mb-4">🎨</div>
+                    <h3 class="text-xl font-semibold mb-2">Start Building Your Application</h3>
+                    <p>Drag components from the left panel to start assembling your app</p>
+                    <p class="text-sm mt-2">🤖 AI bots will provide real-time suggestions as you build</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bot Suggestions Panel -->
+        <div class="w-80 bg-white shadow-lg border-l">
+            <div class="p-4 border-b">
+                <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                    🤖 Bot Suggestions
+                    <span class="ml-2 w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                </h2>
+                <p class="text-sm text-gray-600">AI-powered assembly recommendations</p>
+            </div>
+            
+            <div id="bot-suggestions" class="p-4 space-y-3 overflow-y-auto h-96">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <div class="flex items-center mb-2">
+                        <span class="text-blue-600 font-semibold">💡 Assembly Bot</span>
+                    </div>
+                    <p class="text-sm text-gray-700">
+                        Start by adding an authentication component to secure your application.
+                        Recommended: <strong>auth-service</strong>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Assembly Statistics -->
+            <div class="p-4 border-t bg-gray-50">
+                <h3 class="font-semibold text-gray-700 mb-3">📊 Assembly Stats</h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span>Components:</span>
+                        <span id="stats-components" class="font-semibold">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Connections:</span>
+                        <span id="stats-connections" class="font-semibold">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Estimated Deploy:</span>
+                        <span id="stats-deploy-time" class="font-semibold">~5 min</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Cost/Month:</span>
+                        <span id="stats-cost" class="font-semibold text-green-600">$2</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Component Details Modal -->
+    <div id="component-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h2 id="modal-title" class="text-2xl font-bold text-gray-800"></h2>
+                    <button id="close-modal" class="text-gray-500 hover:text-gray-700 text-xl">&times;</button>
+                </div>
+                <div id="modal-content">
+                    <!-- Component details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Interactive Assembly -->
+    <script>
+        class SuperInstanceAssembly {
+            constructor() {
+                this.components = [];
+                this.assemblyData = {
+                    components: [],
+                    connections: []
+                };
+                this.websocket = null;
+                this.init();
+            }
+
+            init() {
+                this.setupWebSocket();
+                this.loadComponents();
+                this.setupEventListeners();
+                this.setupDragAndDrop();
+            }
+
+            setupWebSocket() {
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                this.websocket = new WebSocket(`${protocol}//${window.location.host}/ws/assembly`);
+                
+                this.websocket.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'bot_suggestions') {
+                        this.updateBotSuggestions(data.suggestions);
+                    }
+                };
+            }
+
+            async loadComponents() {
+                try {
+                    const response = await fetch('/api/components');
+                    const data = await response.json();
+                    this.components = data.components;
+                    this.renderComponents();
+                } catch (error) {
+                    console.error('Failed to load components:', error);
+                }
+            }
+
+            renderComponents(filter = '') {
+                const container = document.getElementById('components-list');
+                const category = document.getElementById('category-filter').value;
+                
+                let filtered = this.components.filter(comp => {
+                    const matchesFilter = comp.name.toLowerCase().includes(filter.toLowerCase()) ||
+                                        comp.description.toLowerCase().includes(filter.toLowerCase());
+                    const matchesCategory = !category || comp.category === category;
+                    return matchesFilter && matchesCategory;
+                });
+
+                container.innerHTML = filtered.map(component => `
+                    <div class="component-block bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-lg p-3 cursor-grab hover:shadow-lg transition-all"
+                         data-component-id="${component.id}"
+                         draggable="true">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-semibold text-gray-800">${component.name}</h3>
+                            <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">${component.category}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">${component.description.substring(0, 100)}...</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex space-x-1">
+                                ${(component.tags || ['web']).slice(0, 3).map(tag => 
+                                    `<span class="text-xs bg-gray-200 text-gray-700 px-1 py-1 rounded">${tag}</span>`
+                                ).join('')}
+                            </div>
+                            <button class="text-blue-600 hover:text-blue-800 text-sm font-semibold"
+                                    onclick="assembly.showComponentDetails('${component.id}')">
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            setupEventListeners() {
+                // Search functionality
+                document.getElementById('component-search').addEventListener('input', (e) => {
+                    this.renderComponents(e.target.value);
+                });
+
+                // Category filter
+                document.getElementById('category-filter').addEventListener('change', () => {
+                    this.renderComponents(document.getElementById('component-search').value);
+                });
+
+                // Validate button
+                document.getElementById('validate-btn').addEventListener('click', () => {
+                    this.validateAssembly();
+                });
+
+                // Deploy button
+                document.getElementById('deploy-btn').addEventListener('click', () => {
+                    this.deployAssembly();
+                });
+
+                // Clear button
+                document.getElementById('clear-btn').addEventListener('click', () => {
+                    this.clearCanvas();
+                });
+
+                // Modal close
+                document.getElementById('close-modal').addEventListener('click', () => {
+                    document.getElementById('component-modal').classList.add('hidden');
+                });
+            }
+
+            setupDragAndDrop() {
+                const canvas = document.getElementById('assembly-canvas');
+                
+                // Allow drop on canvas
+                canvas.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                });
+
+                canvas.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const componentId = e.dataTransfer.getData('text/plain');
+                    this.addComponentToCanvas(componentId, e.offsetX, e.offsetY);
+                });
+
+                // Setup drag start for components
+                document.addEventListener('dragstart', (e) => {
+                    if (e.target.classList.contains('component-block')) {
+                        e.dataTransfer.setData('text/plain', e.target.dataset.componentId);
+                    }
+                });
+            }
+
+            addComponentToCanvas(componentId, x, y) {
+                const component = this.components.find(c => c.id === componentId);
+                if (!component) return;
+
+                const canvasComponent = document.createElement('div');
+                canvasComponent.className = 'absolute bg-white border-2 border-blue-400 rounded-lg p-4 shadow-lg cursor-move min-w-32';
+                canvasComponent.style.left = `${x}px`;
+                canvasComponent.style.top = `${y}px`;
+                canvasComponent.style.zIndex = '10';
+                canvasComponent.dataset.componentId = componentId;
+                
+                canvasComponent.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-semibold text-sm">${component.name}</h3>
+                        <button onclick="assembly.removeComponent('${componentId}')" 
+                                class="text-red-500 hover:text-red-700 text-lg">&times;</button>
+                    </div>
+                    <div class="text-xs text-gray-600">${component.category}</div>
+                    <div class="mt-2 text-xs">
+                        <div class="flex space-x-1">
+                            <span class="w-2 h-2 bg-green-500 rounded-full" title="Input"></span>
+                            <span class="w-2 h-2 bg-blue-500 rounded-full" title="Output"></span>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('assembly-canvas').appendChild(canvasComponent);
+                
+                // Hide empty message
+                document.getElementById('empty-canvas-message').style.display = 'none';
+                
+                // Update assembly data
+                this.assemblyData.components.push(componentId);
+                this.updateStats();
+                this.sendAssemblyUpdate();
+            }
+
+            removeComponent(componentId) {
+                const element = document.querySelector(`[data-component-id="${componentId}"]`);
+                if (element && element.parentElement.id === 'assembly-canvas') {
+                    element.remove();
+                }
+                
+                // Update assembly data
+                this.assemblyData.components = this.assemblyData.components.filter(id => id !== componentId);
+                this.updateStats();
+                this.sendAssemblyUpdate();
+                
+                // Show empty message if no components
+                if (this.assemblyData.components.length === 0) {
+                    document.getElementById('empty-canvas-message').style.display = 'block';
+                }
+            }
+
+            async showComponentDetails(componentId) {
+                try {
+                    const response = await fetch(`/api/components/${componentId}`);
+                    const component = await response.json();
+                    
+                    document.getElementById('modal-title').textContent = component.name;
+                    document.getElementById('modal-content').innerHTML = `
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="font-semibold text-gray-800 mb-2">Description</h3>
+                                <p class="text-gray-600">${component.description}</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="font-semibold text-gray-800 mb-2">Category</h3>
+                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">${component.category}</span>
+                            </div>
+                            
+                            <div>
+                                <h3 class="font-semibold text-gray-800 mb-2">Compatible Components</h3>
+                                <div class="space-y-2">
+                                    ${component.compatible_components.slice(0, 5).map(comp => `
+                                        <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                            <span>${comp.name}</span>
+                                            <span class="text-sm text-green-600">${Math.round(comp.compatibility_score * 100)}% match</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            
+                            <div class="pt-4">
+                                <button onclick="assembly.addComponentToCanvas('${componentId}', 100, 100)" 
+                                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                                    Add to Canvas
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.getElementById('component-modal').classList.remove('hidden');
+                } catch (error) {
+                    console.error('Failed to load component details:', error);
+                }
+            }
+
+            async validateAssembly() {
+                if (this.assemblyData.components.length === 0) {
+                    alert('Add some components first!');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/assembly/validate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(this.assemblyData)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    let message = result.valid ? 
+                        '✅ Assembly is valid and ready to deploy!' : 
+                        '❌ Assembly has issues:\n' + result.errors.join('\n');
+                    
+                    if (result.suggestions.length > 0) {
+                        message += '\n\n💡 Suggestions:\n' + result.suggestions.join('\n');
+                    }
+                    
+                    alert(message);
+                } catch (error) {
+                    console.error('Validation failed:', error);
+                }
+            }
+
+            async deployAssembly() {
+                if (this.assemblyData.components.length === 0) {
+                    alert('Add some components first!');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/assembly/deploy', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            assembly_id: 'my_app_' + Date.now(),
+                            target: 'cloud',
+                            ...this.assemblyData
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    alert(`🚀 Deployment started!\n\nID: ${result.deployment_id}\nEstimated time: ${result.estimated_time}\nMain URL: ${result.endpoints.main}`);
+                } catch (error) {
+                    console.error('Deployment failed:', error);
+                }
+            }
+
+            clearCanvas() {
+                if (confirm('Clear the entire assembly canvas?')) {
+                    const canvas = document.getElementById('assembly-canvas');
+                    const components = canvas.querySelectorAll('[data-component-id]');
+                    components.forEach(comp => comp.remove());
+                    
+                    this.assemblyData = { components: [], connections: [] };
+                    this.updateStats();
+                    document.getElementById('empty-canvas-message').style.display = 'block';
+                }
+            }
+
+            updateStats() {
+                document.getElementById('stats-components').textContent = this.assemblyData.components.length;
+                document.getElementById('stats-connections').textContent = this.assemblyData.connections.length;
+                
+                // Estimate deploy time based on complexity
+                const deployTime = Math.max(5, this.assemblyData.components.length * 2);
+                document.getElementById('stats-deploy-time').textContent = `~${deployTime} min`;
+            }
+
+            updateBotSuggestions(suggestions) {
+                const container = document.getElementById('bot-suggestions');
+                container.innerHTML = suggestions.map(suggestion => `
+                    <div class="bot-suggestion bg-${suggestion.type === 'security' ? 'red' : 'blue'}-50 border border-${suggestion.type === 'security' ? 'red' : 'blue'}-200 rounded-lg p-3">
+                        <div class="flex items-center mb-2">
+                            <span class="text-${suggestion.type === 'security' ? 'red' : 'blue'}-600 font-semibold">
+                                ${suggestion.type === 'security' ? '🔐' : '💡'} ${suggestion.type === 'security' ? 'Security Bot' : 'Assembly Bot'}
+                            </span>
+                        </div>
+                        <h4 class="font-semibold text-gray-800 mb-1">${suggestion.title}</h4>
+                        <p class="text-sm text-gray-700 mb-2">${suggestion.description}</p>
+                        <div class="text-xs text-gray-600">Impact: ${suggestion.impact}</div>
+                        ${suggestion.suggested_component ? `
+                            <button onclick="assembly.addComponentToCanvas('${suggestion.suggested_component}', 200, 100)"
+                                    class="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
+                                Add ${suggestion.suggested_component}
+                            </button>
+                        ` : ''}
+                    </div>
+                `).join('');
+            }
+
+            sendAssemblyUpdate() {
+                if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                    this.websocket.send(JSON.stringify(this.assemblyData));
+                }
+            }
+        }
+
+        // Initialize the assembly system
+        const assembly = new SuperInstanceAssembly();
+    </script>
+</body>
+</html>

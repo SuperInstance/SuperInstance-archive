@@ -1,0 +1,339 @@
+# ActiveLedger Financial App - App Store Metadata
+# Professional financial management and cryptocurrency platform
+
+app_info:
+  name: "ActiveLedger"
+  bundle_id: "com.activelog.ledger"
+  category: "Finance"
+  subcategory: "Financial Planning"
+  content_rating: "17+"
+  
+  # Version information
+  version: "1.0.0"
+  build_number: "1"
+  minimum_os_version:
+    ios: "15.0"
+    android: "8.0"
+  
+  # Pricing
+  pricing_model: "freemium"
+  base_price: "free"
+  in_app_purchases: true
+
+# App Store descriptions
+descriptions:
+  short_description: "Professional financial platform with Compute Credits, multi-currency support, transparent pricing, and advanced analytics."
+  
+  full_description: |
+    ActiveLedger revolutionizes financial management with its innovative Compute Credit (CC) system, transparent pricing model, and comprehensive suite of financial tools designed for individuals, businesses, and enterprises.
+
+    💰 COMPUTE CREDIT SYSTEM
+    • Universal digital currency (1 CC = $0.01 USD)
+    • Multi-currency automatic conversion
+    • Transparent 15% markup on all costs
+    • Real-time exchange rates
+    • Global payment acceptance
+    • Blockchain-like transparency
+
+    🌍 MULTI-CURRENCY SUPPORT
+    • 20+ supported currencies
+    • Real-time exchange rates
+    • Automatic CC conversion
+    • Low exchange fees (1%)
+    • Cross-border payments
+    • Currency hedging tools
+
+    💳 PAYMENT INTEGRATIONS
+    • PayPal, Stripe, Google Pay
+    • Venmo and Zelle support
+    • Apple Pay integration
+    • Bank transfers (ACH/Wire)
+    • Cryptocurrency payments
+    • International wire transfers
+
+    📊 SUBSCRIPTION MANAGEMENT
+    • Free tier (5GB, 10 hours, 90% ad revenue)
+    • Paid tier (15GB, 100 hours, $9.99/month)
+    • Pro tier (100GB, 500 hours, $29.99/month)
+    • Enterprise (Custom pricing)
+    • Prorated billing and upgrades
+    • Usage tracking and alerts
+
+    🖥️ COMPUTE RENTALS
+    • EC2 instance rentals by day/month
+    • T3 micro to C5 large instances
+    • 20% monthly discount
+    • Auto-renewal options
+    • Performance monitoring
+    • Cost optimization
+
+    🛒 MARKETPLACE SYSTEM
+    • Buy and sell digital goods
+    • Escrow protection
+    • 5% marketplace fee
+    • Reputation system
+    • Dispute resolution
+    • Secure transactions
+
+    💼 AFFILIATE PROGRAM
+    • 10% commission on referrals
+    • Lifetime earnings tracking
+    • Real-time payouts
+    • Marketing materials
+    • Performance analytics
+    • Tiered rewards
+
+    📈 ADVANCED ANALYTICS
+    • Real-time cost tracking
+    • Profit/loss analysis
+    • Spending patterns
+    • Budget forecasting
+    • Custom reports
+    • Financial insights
+
+    🔒 ENTERPRISE FEATURES
+    • Custom pricing models
+    • Advanced security controls
+    • Dedicated support
+    • API access
+    • White-label options
+    • Compliance tools
+
+    🛡️ SECURITY & COMPLIANCE
+    • Bank-level encryption
+    • PCI DSS compliance
+    • SOX compliance
+    • GDPR/CCPA compliant
+    • Multi-factor authentication
+    • Fraud detection
+
+    ⚡ SMART FEATURES
+    • AI-powered insights
+    • Automated cost optimization
+    • Smart contract integration
+    • Predictive analytics
+    • Risk assessment
+    • Portfolio optimization
+
+    🌐 INTEGRATIONS
+    • Banking APIs (Open Banking)
+    • Accounting software (QuickBooks)
+    • Tax preparation tools
+    • Investment platforms
+    • Business tools (Slack, Teams)
+    • Developer APIs
+
+    Perfect for:
+    • Freelancers and consultants
+    • Small business owners
+    • Crypto traders and investors
+    • Digital nomads
+    • E-commerce businesses
+    • SaaS companies
+    • Enterprise organizations
+    • Financial advisors
+
+    Key Benefits:
+    • Transparent pricing (no hidden fees)
+    • Global accessibility
+    • Multi-currency simplicity
+    • Professional-grade security
+    • Scalable for any business size
+    • Comprehensive financial tools
+
+    Join thousands of users who trust ActiveLedger for their financial management needs!
+
+  whats_new: |
+    🎉 ActiveLedger 1.0 Launch!
+
+    💰 Compute Credit System:
+    • Universal digital currency
+    • Transparent 15% markup model
+    • Multi-currency auto-conversion
+    • Real-time cost tracking
+
+    🌍 Global Features:
+    • 20+ supported currencies
+    • International payment methods
+    • Cross-border fee optimization
+    • Regulatory compliance
+
+    🔐 Enterprise Security:
+    • Bank-level encryption
+    • PCI DSS compliance
+    • Advanced fraud detection
+    • Multi-factor authentication
+
+    📊 Professional Tools:
+    • Advanced analytics dashboard
+    • Subscription management
+    • Marketplace transactions
+    • Affiliate program
+
+    🚀 Performance:
+    • Lightning-fast transactions
+    • Real-time synchronization
+    • Optimized mobile experience
+    • 99.9% uptime guarantee
+
+    Transform your financial management today!
+
+# Keywords for app store search
+keywords:
+  primary: ["finance", "financial management", "cryptocurrency", "payments", "business"]
+  secondary: ["compute credits", "multi-currency", "subscription billing", "marketplace", "affiliate"]
+  long_tail: ["transparent pricing financial app", "multi-currency business platform", "compute credit system", "professional financial tools"]
+
+# App Store Connect metadata
+app_store_connect:
+  developer_name: "ActiveLog Technologies"
+  support_url: "https://activelog.com/ledger-support"
+  marketing_url: "https://activelog.com/ledger"
+  privacy_policy_url: "https://activelog.com/ledger-privacy"
+  copyright: "© 2024 ActiveLog Technologies. All rights reserved."
+  
+  # Age rating - 17+ for financial services
+  age_rating:
+    rating: "17+"
+    reasons: ["Unrestricted Web Access", "Financial Services", "Mature Content"]
+  
+  # Localization for global markets
+  locales:
+    - language: "en-US"
+      territory: "US"
+    - language: "en-GB"
+      territory: "GB"
+    - language: "es-ES" 
+      territory: "ES"
+    - language: "fr-FR"
+      territory: "FR"
+    - language: "de-DE"
+      territory: "DE"
+    - language: "ja-JP"
+      territory: "JP"
+    - language: "ko-KR"
+      territory: "KR"
+    - language: "zh-CN"
+      territory: "CN"
+    - language: "pt-BR"
+      territory: "BR"
+    - language: "it-IT"
+      territory: "IT"
+
+# Google Play Store specific
+google_play:
+  developer_name: "ActiveLog Technologies"
+  contact_email: "ledger-support@activelog.com"
+  contact_phone: "+1-555-LEDGER"
+  website: "https://activelog.com/ledger"
+  privacy_policy: "https://activelog.com/ledger-privacy"
+  
+  # Content rating - Mature for financial services
+  content_rating:
+    violence: "none"
+    blood: "none"
+    sexual_content: "none"
+    profanity: "none"
+    drugs_alcohol: "none"
+    gambling: "simulated"  # Investment features
+    horror: "none"
+    financial_services: true
+    
+# Screenshots configuration
+screenshots:
+  required_sizes:
+    ios:
+      - "6.7_inch_display"  # iPhone 14 Pro Max
+      - "6.1_inch_display"  # iPhone 14 Pro
+      - "5.5_inch_display"  # iPhone 8 Plus
+      - "12.9_inch_display" # iPad Pro 12.9"
+      - "11_inch_display"   # iPad Pro 11"
+    android:
+      - "phone_portrait"
+      - "phone_landscape" 
+      - "7_inch_tablet"
+      - "10_inch_tablet"
+  
+  scenes:
+    - name: "dashboard"
+      title: "Financial Command Center"
+      description: "Comprehensive overview of all your financial activities"
+      
+    - name: "compute_credits"
+      title: "Compute Credit System"
+      description: "Universal digital currency with transparent pricing"
+      
+    - name: "multi_currency"
+      title: "Global Payments"
+      description: "Seamless multi-currency transactions and conversions"
+      
+    - name: "subscription_management"
+      title: "Subscription Control"
+      description: "Manage all your subscriptions and billing in one place"
+      
+    - name: "marketplace"
+      title: "Secure Marketplace"
+      description: "Buy and sell with confidence using escrow protection"
+      
+    - name: "analytics"
+      title: "Financial Analytics"
+      description: "Deep insights into your spending and earning patterns"
+      
+    - name: "enterprise"
+      title: "Enterprise Features"
+      description: "Professional tools for businesses and organizations"
+
+# App review guidelines compliance
+compliance:
+  data_collection:
+    financial_data: true
+    transaction_history: true
+    user_identity: true
+    usage_analytics: true
+    
+  permissions_required:
+    camera: "Document scanning and QR code payments"
+    location: "Fraud detection and compliance"
+    contacts: "Payment recipient selection"
+    biometrics: "Secure authentication"
+    notifications: "Transaction alerts and updates"
+    
+  age_rating:
+    ios: "17+"
+    android: "Mature 17+"
+    
+  financial_compliance:
+    kyc_required: true
+    aml_compliance: true
+    pci_dss: true
+    sox_compliance: true
+    gdpr_compliant: true
+    
+# Marketing assets
+marketing:
+  app_icon_variants:
+    - "standard"
+    - "gold_accent"
+    - "dark_mode"
+    - "professional"
+  
+  promotional_text: "Revolutionary financial platform with transparent pricing, multi-currency support, and professional-grade security."
+  
+  feature_graphic_text: "Compute Credits • Multi-Currency • Transparent Pricing • Enterprise Security"
+  
+  # Financial-specific marketing points
+  financial_highlights:
+    - "Transparent 15% markup model"
+    - "Multi-currency auto-conversion"
+    - "Bank-level security"
+    - "Professional financial tools"
+    - "Global payment acceptance"
+    - "Enterprise-ready platform"
+    
+  trust_indicators:
+    - "PCI DSS Compliant"
+    - "SOX Compliant"
+    - "GDPR Compliant"
+    - "Bank-level encryption"
+    - "99.9% uptime SLA"
+    - "24/7 customer support"

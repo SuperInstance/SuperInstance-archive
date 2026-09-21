@@ -1,0 +1,70 @@
+# Mobile API Service Dependencies
+
+# Core FastAPI and async support
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+httpx==0.25.2
+
+# Database
+asyncpg==0.29.0
+databases[postgresql]==0.8.0
+sqlalchemy[asyncio]==2.0.23
+alembic==1.12.1
+
+# Protocol Buffers
+protobuf==4.25.1
+grpcio==1.60.0
+grpcio-tools==1.60.0
+
+# Redis for caching and pub/sub
+redis[hiredis]==5.0.1
+aioredis==2.0.1
+
+# Push notifications
+aioapns==3.0
+pyfcm==1.5.4
+py-vapid==1.9.0
+
+# Image optimization
+Pillow==10.1.0
+pillow-simd==10.0.1.post1
+opencv-python-headless==4.8.1.78
+imageio==2.31.6
+
+# Compression and serialization
+lz4==4.3.2
+brotli==1.1.0
+msgpack==1.0.7
+orjson==3.9.10
+
+# Cryptography and security
+cryptography==41.0.7
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
+python-multipart==0.0.6
+
+# Mobile optimization
+user-agents==2.2.0
+mobile-detect==0.1.2
+
+# Monitoring and logging
+structlog==23.2.0
+prometheus-client==0.19.0
+sentry-sdk[fastapi]==1.38.0
+
+# Utils
+python-dotenv==1.0.0
+pydantic[email]==2.5.0
+pydantic-settings==2.1.0
+tenacity==8.2.3
+schedule==1.2.0
+
+# Development
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-mock==3.12.0
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+mypy==1.7.1

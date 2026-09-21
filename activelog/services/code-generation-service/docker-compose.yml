@@ -1,0 +1,113 @@
+version: '3.8'
+
+services:
+  code-generation-service:
+    build: .
+    container_name: bbn-code-generation-service
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - LOG_LEVEL=INFO
+      - BBN_QUALITY_LEVEL=production
+      - BBN_HUB_ENDPOINT=http://hub:8080
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - LOCAL_LLAMA_ENDPOINT=http://ollama:11434
+      - ENABLE_ML_FEATURES=true
+      - ENABLE_CORS=true
+      - DB_PATH=/app/data/code_generation.db
+    volumes:
+      - code_gen_data:/app/data
+      - code_gen_logs:/app/logs
+      - code_gen_models:/app/ml_models
+    networks:
+      - bbn-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - redis
+    labels:
+      - "org.buildingbots.network.service=code-generation-service"
+      - "org.buildingbots.network.version=1.0.0"
+      - "traefik.enable=true"
+      - "traefik.http.routers.code-gen.rule=Host(`code-gen.buildingbots.local`)"
+      - "traefik.http.services.code-gen.loadbalancer.server.port=8000"
+
+  redis:
+    image: redis:7-alpine
+    container_name: bbn-code-gen-redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - bbn-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: bbn-code-gen-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - bbn-network
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  # Optional: Local model setup
+  model-loader:
+    image: curlimages/curl:latest
+    container_name: bbn-code-gen-model-loader
+    networks:
+      - bbn-network
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: "no"
+    command: >
+      sh -c "
+        echo 'Waiting for Ollama to be ready...' &&
+        sleep 30 &&
+        echo 'Loading CodeLlama model...' &&
+        curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"codellama:7b\"}' &&
+        echo 'Loading StarCoder model...' &&
+        curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"starcoder:7b\"}' &&
+        echo 'Model loading complete!'
+      "
+
+volumes:
+  code_gen_data:
+    name: bbn_code_gen_data
+  code_gen_logs:
+    name: bbn_code_gen_logs
+  code_gen_models:
+    name: bbn_code_gen_models
+  redis_data:
+    name: bbn_code_gen_redis
+  ollama_data:
+    name: bbn_code_gen_ollama
+
+networks:
+  bbn-network:
+    name: building-bots-network
+    external: true

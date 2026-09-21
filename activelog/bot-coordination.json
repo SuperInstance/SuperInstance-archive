@@ -1,0 +1,92 @@
+{
+  "bots": [
+    {
+      "bot_id": "component_architect_001",
+      "bot_type": "component_architect",
+      "specializations": [
+        "component_extraction",
+        "template_creation",
+        "fastapi"
+      ],
+      "current_task": "task_1756327502_d20a68be",
+      "status": "working",
+      "last_activity": "2025-08-27T12:45:02.930570",
+      "performance_metrics": {
+        "avg_completion_time": 0,
+        "success_rate": 1.0,
+        "efficiency_score": 1.0
+      },
+      "workload_capacity": 3,
+      "current_workload": 1
+    },
+    {
+      "bot_id": "assembly_specialist_001",
+      "bot_type": "assembly_specialist",
+      "specializations": [
+        "service_assembly",
+        "integration_testing",
+        "deployment_automation"
+      ],
+      "current_task": null,
+      "status": "idle",
+      "last_activity": "2025-08-27T12:33:31.624138",
+      "performance_metrics": {
+        "avg_completion_time": 0,
+        "success_rate": 1.0,
+        "efficiency_score": 1.0
+      },
+      "workload_capacity": 3,
+      "current_workload": 0
+    },
+    {
+      "bot_id": "ai_integration_001",
+      "bot_type": "ai_integration",
+      "specializations": [
+        "ai_integration",
+        "llm_integration",
+        "intelligent_routing"
+      ],
+      "current_task": null,
+      "status": "idle",
+      "last_activity": "2025-08-27T12:33:31.683441",
+      "performance_metrics": {
+        "avg_completion_time": 0,
+        "success_rate": 1.0,
+        "efficiency_score": 1.0
+      },
+      "workload_capacity": 3,
+      "current_workload": 0
+    }
+  ],
+  "tasks": [
+    {
+      "task_id": "task_1756327502_d20a68be",
+      "title": "Extract AI service patterns",
+      "description": "Extract reusable AI service patterns from ai-insights service for component library",
+      "task_type": "component_extraction",
+      "priority": 9,
+      "estimated_duration": 45,
+      "required_specializations": [
+        "component_extraction",
+        "ai_integration"
+      ],
+      "dependencies": [],
+      "file_resources": [],
+      "assigned_bot": "component_architect_001",
+      "status": "assigned",
+      "created_at": "2025-08-27T12:45:02.930096",
+      "started_at": "2025-08-27T12:45:02.930568",
+      "completed_at": null,
+      "progress_percentage": 0
+    }
+  ],
+  "resource_locks": [],
+  "metrics": {
+    "total_tasks_completed": 0,
+    "average_task_completion_time": 0,
+    "bot_collaboration_efficiency": 0.3333333333333333,
+    "conflict_prevention_saves": 0,
+    "resource_lock_violations_prevented": 0
+  },
+  "last_updated": "2025-08-27T12:52:27.761877"
+}

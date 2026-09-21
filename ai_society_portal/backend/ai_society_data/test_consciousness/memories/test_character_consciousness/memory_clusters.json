@@ -1,0 +1,162 @@
+{
+  "character_id": "test_character_consciousness",
+  "clusters": [
+    {
+      "id": "8caf7bb6",
+      "name": "Consciousness Memories",
+      "topic": "consciousness",
+      "memory_ids": [
+        "f765d04984d2",
+        "ca06e5f8f6d2"
+      ],
+      "created_at": "2025-10-21T18:51:43.166832",
+      "importance": 8
+    },
+    {
+      "id": "8cd89b1b",
+      "name": "Self-Reflection Memories",
+      "topic": "self-reflection",
+      "memory_ids": [
+        "f765d04984d2",
+        "ca06e5f8f6d2"
+      ],
+      "created_at": "2025-10-21T18:51:43.166837",
+      "importance": 8
+    },
+    {
+      "id": "bace0c03",
+      "name": "Uncertainty Memories",
+      "topic": "uncertainty",
+      "memory_ids": [
+        "ff25b145adf8",
+        "8bc62574e44b"
+      ],
+      "created_at": "2025-10-21T18:51:43.167736",
+      "importance": 7
+    },
+    {
+      "id": "a2fce86d",
+      "name": "Learning Memories",
+      "topic": "learning",
+      "memory_ids": [
+        "ff25b145adf8",
+        "f11e7de3bd2c",
+        "8bc62574e44b",
+        "23a8253246a2"
+      ],
+      "created_at": "2025-10-21T18:51:43.167743",
+      "importance": 7
+    },
+    {
+      "id": "7101483b",
+      "name": "Pride Memories",
+      "topic": "pride",
+      "memory_ids": [
+        "f11e7de3bd2c",
+        "23a8253246a2"
+      ],
+      "created_at": "2025-10-21T18:51:43.168418",
+      "importance": 6
+    },
+    {
+      "id": "52be955c",
+      "name": "Humility Memories",
+      "topic": "humility",
+      "memory_ids": [
+        "f11e7de3bd2c",
+        "23a8253246a2"
+      ],
+      "created_at": "2025-10-21T18:51:43.168425",
+      "importance": 6
+    },
+    {
+      "id": "79bf375d",
+      "name": "Growth Memories",
+      "topic": "growth",
+      "memory_ids": [
+        "98c26e1d1209",
+        "9eeaa55d14f7"
+      ],
+      "created_at": "2025-10-21T18:51:43.170069",
+      "importance": 7
+    },
+    {
+      "id": "935f1191",
+      "name": "Change Memories",
+      "topic": "change",
+      "memory_ids": [
+        "98c26e1d1209",
+        "9eeaa55d14f7"
+      ],
+      "created_at": "2025-10-21T18:51:43.170073",
+      "importance": 7
+    },
+    {
+      "id": "74a82b2a",
+      "name": "Temporal_Depth Memories",
+      "topic": "temporal_depth",
+      "memory_ids": [
+        "98c26e1d1209",
+        "9eeaa55d14f7"
+      ],
+      "created_at": "2025-10-21T18:51:43.170077",
+      "importance": 7
+    },
+    {
+      "id": "8f46a19d",
+      "name": "Empathy Memories",
+      "topic": "empathy",
+      "memory_ids": [
+        "b1a31bb6ba23",
+        "daa281dc0caf"
+      ],
+      "created_at": "2025-10-21T18:51:43.171007",
+      "importance": 6
+    },
+    {
+      "id": "3c31b34f",
+      "name": "Perspective-Taking Memories",
+      "topic": "perspective-taking",
+      "memory_ids": [
+        "b1a31bb6ba23",
+        "daa281dc0caf"
+      ],
+      "created_at": "2025-10-21T18:51:43.171012",
+      "importance": 6
+    },
+    {
+      "id": "58ffb209",
+      "name": "Social_Cognition Memories",
+      "topic": "social_cognition",
+      "memory_ids": [
+        "b1a31bb6ba23",
+        "daa281dc0caf"
+      ],
+      "created_at": "2025-10-21T18:51:43.171016",
+      "importance": 6
+    },
+    {
+      "id": "cdf80466",
+      "name": "Metacognition Memories",
+      "topic": "metacognition",
+      "memory_ids": [
+        "53ead26a3f17",
+        "211f2dfe536a"
+      ],
+      "created_at": "2025-10-21T18:51:43.171794",
+      "importance": 8
+    },
+    {
+      "id": "df7c3f33",
+      "name": "Cognitive_Development Memories",
+      "topic": "cognitive_development",
+      "memory_ids": [
+        "53ead26a3f17",
+        "211f2dfe536a"
+      ],
+      "created_at": "2025-10-21T18:51:43.171828",
+      "importance": 8
+    }
+  ],
+  "last_saved": "2025-10-21T18:52:04.522192"
+}

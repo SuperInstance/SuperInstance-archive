@@ -1,0 +1,22 @@
+{
+  "name": "activelog-frontend",
+  "version": "1.0.0",
+  "description": "ActiveLog.ai Frontend Application",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "http-server dist -p 3000"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {
+    "sortablejs": "^1.15.0",
+    "fuse.js": "^7.0.0",
+    "file-saver": "^2.0.5",
+    "canvas-confetti": "^1.9.2"
+  }
+}

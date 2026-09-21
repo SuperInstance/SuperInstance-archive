@@ -1,0 +1,247 @@
+{
+  "name": "FishingLog.ai",
+  "version": "1.0.0",
+  "title": "FishingLog.ai - Smart Fishing Companion",
+  "description": "Depth sounder, radar, fish counting for fishing enthusiasts",
+  "favicon": "/assets/fishinglog/favicon.ico",
+  "domain": "fishinglog.ai",
+  "devPort": 3003,
+  "theme": "marine",
+  "layout": "marine-dashboard",
+  "monetization": {
+    "type": "freemium",
+    "tiers": ["free", "pro", "captain"],
+    "trialPeriod": "7d"
+  },
+  "features": {
+    "depthSounder": true,
+    "radar": true,
+    "fishCounting": true,
+    "weatherTracking": true,
+    "logbook": true,
+    "gpsMapping": true,
+    "tideCharts": true,
+    "baitTracking": true,
+    "photoCapture": true,
+    "speciesIdentification": true,
+    "socialSharing": true,
+    "tournaments": true
+  },
+  "modules": [
+    {
+      "name": "sonar",
+      "component": "SonarModule",
+      "props": {
+        "enableDepthReading": true,
+        "enableFishDetection": true,
+        "enableBottomHardness": true,
+        "enableTemperature": true,
+        "maxDepth": "200ft",
+        "updateFrequency": "1s"
+      }
+    },
+    {
+      "name": "radar",
+      "component": "RadarModule",
+      "props": {
+        "enableWeatherOverlay": true,
+        "enableVesselTracking": true,
+        "enableHazardDetection": true,
+        "rangeSettings": ["0.5nm", "1nm", "2nm", "5nm", "10nm"],
+        "enableRecording": true
+      }
+    },
+    {
+      "name": "fishCounter",
+      "component": "FishCountingModule",
+      "props": {
+        "enableSpeciesRecognition": true,
+        "enableSizeEstimation": true,
+        "enableWeightEstimation": true,
+        "enablePhotoCapture": true,
+        "enableGPSTagging": true
+      }
+    },
+    {
+      "name": "logbook",
+      "component": "FishingLogbookModule",
+      "props": {
+        "enableQuickEntry": true,
+        "enableWeatherLogging": true,
+        "enableBaitTracking": true,
+        "enableLocationTagging": true,
+        "enablePhotoAttachments": true,
+        "enableNotes": true
+      }
+    },
+    {
+      "name": "navigation",
+      "component": "NavigationModule",
+      "props": {
+        "enableGPS": true,
+        "enableWaypoints": true,
+        "enableRoutes": true,
+        "enableCharts": true,
+        "chartTypes": ["nautical", "bathymetric", "fishing"]
+      }
+    },
+    {
+      "name": "weather",
+      "component": "WeatherModule",
+      "props": {
+        "enableCurrentConditions": true,
+        "enableForecast": true,
+        "enableTides": true,
+        "enableSolunar": true,
+        "enableAlerts": true,
+        "updateFrequency": "15m"
+      }
+    },
+    {
+      "name": "social",
+      "component": "FishingSocialModule",
+      "props": {
+        "enableCommunity": true,
+        "enableTournaments": true,
+        "enableLeaderboards": true,
+        "enablePhotoSharing": true,
+        "enableSpotSharing": false
+      }
+    }
+  ],
+  "aiModels": [
+    {
+      "name": "fish-identifier",
+      "type": "image-classification",
+      "endpoint": "/ai/fish-identification",
+      "features": ["species-recognition", "size-estimation", "weight-estimation"]
+    },
+    {
+      "name": "sonar-analyzer",
+      "type": "signal-processing",
+      "endpoint": "/ai/sonar-analysis",
+      "features": ["fish-detection", "school-analysis", "bottom-classification"]
+    },
+    {
+      "name": "bite-predictor",
+      "type": "prediction",
+      "endpoint": "/ai/bite-prediction",
+      "features": ["weather-correlation", "time-prediction", "location-scoring"]
+    },
+    {
+      "name": "spot-recommender",
+      "type": "recommendation",
+      "endpoint": "/ai/spot-recommendation",
+      "features": ["historical-analysis", "weather-correlation", "species-targeting"]
+    }
+  ],
+  "auth": {
+    "providers": ["email", "facebook", "google"],
+    "requireEmailVerification": false,
+    "enableTwoFactor": false,
+    "sessionDuration": "30d",
+    "rememberDevice": true,
+    "enableGuestMode": true
+  },
+  "dataSync": {
+    "enabled": true,
+    "cloudProvider": "activelog-cloud",
+    "encryption": "standard",
+    "conflictResolution": "latest-wins",
+    "syncFrequency": "when-online",
+    "offlineSupport": true,
+    "enableBackup": true
+  },
+  "settings": {
+    "privacy": {
+      "defaultVisibility": "private",
+      "enableLocationSharing": false,
+      "enableDataExport": true,
+      "enableDataDeletion": true,
+      "showDataUsage": true
+    },
+    "notifications": {
+      "enablePush": true,
+      "enableEmail": false,
+      "enableSMS": false,
+      "enableWeatherAlerts": true,
+      "enableBiteAlerts": true,
+      "enableTournamentUpdates": true
+    },
+    "appearance": {
+      "defaultTheme": "marine",
+      "enableNightMode": true,
+      "enableCustomization": true,
+      "enableColorSchemes": false
+    },
+    "units": {
+      "depth": "feet",
+      "distance": "miles",
+      "temperature": "fahrenheit",
+      "weight": "pounds",
+      "speed": "mph"
+    }
+  },
+  "customModules": [
+    {
+      "name": "tournament-manager",
+      "path": "/modules/fishinglog/TournamentManager.js"
+    },
+    {
+      "name": "tackle-tracker",
+      "path": "/modules/fishinglog/TackleTracker.js"
+    },
+    {
+      "name": "marine-forecaster",
+      "path": "/modules/fishinglog/MarineForecaster.js"
+    }
+  ],
+  "integrations": [
+    {
+      "name": "noaa-weather",
+      "enabled": true,
+      "realTimeData": true
+    },
+    {
+      "name": "navionics",
+      "enabled": true,
+      "chartAccess": true
+    },
+    {
+      "name": "garmin-connect",
+      "enabled": true,
+      "deviceSync": true
+    },
+    {
+      "name": "humminbird",
+      "enabled": true,
+      "sonarData": true
+    },
+    {
+      "name": "lowrance",
+      "enabled": true,
+      "chartSync": true
+    },
+    {
+      "name": "raymarine",
+      "enabled": false,
+      "radarData": true
+    }
+  ],
+  "analytics": {
+    "provider": "privacy-focused",
+    "enableUserTracking": false,
+    "enablePerformanceTracking": true,
+    "enableErrorTracking": true,
+    "enableLocationTracking": false,
+    "respectDoNotTrack": true
+  },
+  "hardware": {
+    "enableBluetoothLE": true,
+    "enableWiFi": true,
+    "enableGPS": true,
+    "enableCamera": true,
+    "enableMicrophone": false,
+    "supportedDevices": ["garmin", "humminbird", "lowrance", "raymarine"]
+  }
+}

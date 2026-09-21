@@ -1,0 +1,43 @@
+{
+  "character_id": "test_consolidation",
+  "clusters": [
+    {
+      "id": "c7c7dfcc",
+      "name": "Topic_0 Memories",
+      "topic": "topic_0",
+      "memory_ids": [
+        "01d2e8e63a38",
+        "3031c70d4ec5",
+        "1bb2c112438e",
+        "ae748b8a7f67"
+      ],
+      "created_at": "2025-10-21T18:52:04.533624",
+      "importance": 7
+    },
+    {
+      "id": "ab3135db",
+      "name": "Topic_1 Memories",
+      "topic": "topic_1",
+      "memory_ids": [
+        "4ce964289f9f",
+        "b949733ee5e1",
+        "d95a1008825c"
+      ],
+      "created_at": "2025-10-21T18:52:04.534104",
+      "importance": 8
+    },
+    {
+      "id": "69394287",
+      "name": "Topic_2 Memories",
+      "topic": "topic_2",
+      "memory_ids": [
+        "8c80295705bc",
+        "3c1aabfea76a",
+        "c95cb69fd0cb"
+      ],
+      "created_at": "2025-10-21T18:52:04.534482",
+      "importance": 9
+    }
+  ],
+  "last_saved": "2025-10-21T18:52:04.540229"
+}

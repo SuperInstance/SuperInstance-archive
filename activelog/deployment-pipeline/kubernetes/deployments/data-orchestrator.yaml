@@ -1,0 +1,153 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-orchestrator
+  namespace: dmlog-staging
+  labels:
+    app: data-orchestrator
+    environment: staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-orchestrator
+  template:
+    metadata:
+      labels:
+        app: data-orchestrator
+        environment: staging
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9204"
+        prometheus.io/path: "/metrics"
+    spec:
+      imagePullSecrets:
+        - name: registry-secret
+      containers:
+        - name: data-orchestrator
+          image: ghcr.io/dmlog/data-orchestrator:latest
+          ports:
+            - containerPort: 8204
+              protocol: TCP
+            - containerPort: 9204
+              name: metrics
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "8204"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dmlog-database
+                  key: DATABASE_URL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dmlog-redis
+                  key: REDIS_URL
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: dmlog-config
+                  key: LOG_LEVEL
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8204
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8204
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 2
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-orchestrator
+  namespace: dmlog-production
+  labels:
+    app: data-orchestrator
+    environment: production
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: data-orchestrator
+  template:
+    metadata:
+      labels:
+        app: data-orchestrator
+        environment: production
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9204"
+        prometheus.io/path: "/metrics"
+    spec:
+      imagePullSecrets:
+        - name: registry-secret
+      containers:
+        - name: data-orchestrator
+          image: ghcr.io/dmlog/data-orchestrator:latest
+          ports:
+            - containerPort: 8204
+              protocol: TCP
+            - containerPort: 9204
+              name: metrics
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "8204"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dmlog-database
+                  key: DATABASE_URL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dmlog-redis
+                  key: REDIS_URL
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: dmlog-config
+                  key: LOG_LEVEL
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8204
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8204
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 2
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: 2000m
+              memory: 4Gi
+      restartPolicy: Always

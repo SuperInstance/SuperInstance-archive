@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ActiveLog AI Professor College Portal</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 20px auto;
+            gap: 20px;
+            padding: 0 20px;
+        }
+        
+        .documents-panel, .debate-panel, .experiments-panel {
+            flex: 1;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .experiment-card {
+            background: white;
+            border-left: 4px solid #3498db;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .experiment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .bot-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .instance-count {
+            background: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+        
+        .experiment-question {
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+        
+        .experiment-details {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            line-height: 1.4;
+        }
+        
+        .panel-title {
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .download-all-btn {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        .category {
+            margin-bottom: 30px;
+            border: 1px solid #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .category-header {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .file-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .file-download {
+            background: #27ae60;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+        }
+        
+        .debate-chat {
+            height: 70vh;
+            border: 1px solid #ecf0f1;
+            border-radius: 10px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #fafafa;
+            scroll-behavior: smooth;
+        }
+        
+        .live-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #e74c3c;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        
+        .chat-message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .bot-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+        
+        .message-content {
+            flex: 1;
+            background: white;
+            padding: 12px 16px;
+            border-radius: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎓 ActiveLog AI Professor College</h1>
+        <p>Research Documents & Live Debate Portal</p>
+    </div>
+    
+    <div class="container">
+        <div class="documents-panel">
+            <h2 class="panel-title">📚 Research Documents</h2>
+            <button class="download-all-btn" onclick="downloadAll()">
+                📦 Download Complete Archive
+            </button>
+            <div id="documents-content">Loading documents...</div>
+        </div>
+        
+        <div class="debate-panel">
+            <h2 class="panel-title">
+                <span class="live-indicator"></span>
+                💬 Live AI Professor Debates
+            </h2>
+            <div id="debate-chat" class="debate-chat">
+                <div>Loading recent debates...</div>
+            </div>
+            <div style="text-align: center; margin-top: 10px; color: #7f8c8d; font-size: 0.9em;">
+                Auto-refreshing every 10 seconds • Showing most recent messages
+            </div>
+        </div>
+        
+        <div class="experiments-panel" style="flex: 1; background: rgba(255,255,255,0.95); border-radius: 15px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <h2 class="panel-title">
+                ☁️ Active EC2 Experiments
+            </h2>
+            <div id="ec2-experiments" style="height: 70vh; overflow-y: auto; padding: 20px; background: #fafafa; border: 1px solid #ecf0f1; border-radius: 10px;">
+                <div>Loading active experiments...</div>
+            </div>
+            <div style="text-align: center; margin-top: 10px; color: #7f8c8d; font-size: 0.9em;">
+                Showing current EC2 experiments by bot
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        async function loadDocuments() {
+            try {
+                const response = await fetch('/api/documents');
+                const documents = await response.json();
+                
+                const container = document.getElementById('documents-content');
+                container.innerHTML = '';
+                
+                const sortedCategories = Object.entries(documents)
+                    .sort(([,a], [,b]) => (a.priority || 999) - (b.priority || 999));
+                
+                for (const [category, info] of sortedCategories) {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'category';
+                    
+                    let filesHTML = info.files.map(file => `
+                        <div class="file-item">
+                            <div>
+                                <strong>${file.name}</strong><br>
+                                <small>${file.size} • ${file.modified}</small>
+                            </div>
+                            <button class="file-download" onclick="downloadFile('${file.relative_path}')">
+                                ⬇️ Download
+                            </button>
+                        </div>
+                    `).join('');
+                    
+                    categoryDiv.innerHTML = `
+                        <div class="category-header">
+                            <h3>${category}</h3>
+                            <button onclick="downloadCategory('${category}')" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 16px; border-radius: 20px; cursor: pointer;">
+                                📁 Download All
+                            </button>
+                        </div>
+                        <div>${filesHTML}</div>
+                    `;
+                    
+                    container.appendChild(categoryDiv);
+                }
+                
+            } catch (error) {
+                document.getElementById('documents-content').innerHTML = 'Error loading documents';
+            }
+        }
+        
+        async function loadDebates() {
+            try {
+                const response = await fetch('/api/debates');
+                const messages = await response.json();
+                
+                const chatContainer = document.getElementById('debate-chat');
+                chatContainer.innerHTML = '';
+                
+                for (const message of messages) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'chat-message';
+                    
+                    const timestamp = new Date(message.timestamp).toLocaleString();
+                    const initials = message.bot_name.split(' ').map(word => word[0]).join('').slice(0, 2);
+                    
+                    messageDiv.innerHTML = `
+                        <div class="bot-avatar" style="background-color: ${message.bot_color}">
+                            ${initials}
+                        </div>
+                        <div class="message-content">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <strong>${message.bot_name}</strong>
+                                <small>${timestamp}</small>
+                            </div>
+                            <div>${message.message.substring(0, 300)}...</div>
+                        </div>
+                    `;
+                    
+                    chatContainer.appendChild(messageDiv);
+                }
+                
+            } catch (error) {
+                document.getElementById('debate-chat').innerHTML = 'Error loading debates';
+            }
+        }
+        
+        function downloadFile(relativePath) {
+            window.open('/download/file/' + relativePath, '_blank');
+        }
+        
+        function downloadCategory(category) {
+            window.open('/download/category/' + encodeURIComponent(category), '_blank');
+        }
+        
+        function downloadAll() {
+            window.open('/download/all', '_blank');
+        }
+        
+        async function loadEC2Experiments() {
+            try {
+                const response = await fetch('/api/ec2-experiments');
+                const experiments = await response.json();
+                
+                const container = document.getElementById('ec2-experiments');
+                container.innerHTML = '';
+                
+                if (experiments.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; color: #7f8c8d; padding: 50px;">No active EC2 experiments</div>';
+                    return;
+                }
+                
+                for (const exp of experiments) {
+                    const expDiv = document.createElement('div');
+                    expDiv.className = 'experiment-card';
+                    
+                    const botName = exp.bot_id.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    const timestamp = new Date(exp.timestamp).toLocaleString();
+                    
+                    expDiv.innerHTML = `
+                        <div class="experiment-header">
+                            <div class="bot-name">${botName}</div>
+                            <div class="instance-count">${exp.instance_count} instances</div>
+                        </div>
+                        <div class="experiment-question">${exp.question}</div>
+                        <div class="experiment-details">
+                            <strong>Hypothesis:</strong> ${exp.hypothesis}<br>
+                            <strong>Method:</strong> ${exp.method}<br>
+                            <strong>Started:</strong> ${timestamp}
+                        </div>
+                    `;
+                    
+                    container.appendChild(expDiv);
+                }
+                
+            } catch (error) {
+                document.getElementById('ec2-experiments').innerHTML = 'Error loading experiments';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDocuments();
+            loadDebates();
+            loadEC2Experiments();
+            
+            // Auto-refresh debates and experiments every 10 seconds
+            setInterval(() => {
+                loadDebates();
+                loadEC2Experiments();
+            }, 10000);
+            
+            // Scroll to bottom on new messages
+            function scrollToBottom() {
+                const chatContainer = document.getElementById('debate-chat');
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            // Auto-scroll after loading debates
+            setTimeout(scrollToBottom, 1000);
+        });
+    </script>
+</body>
+</html>

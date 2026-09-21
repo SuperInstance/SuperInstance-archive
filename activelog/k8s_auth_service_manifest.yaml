@@ -1,0 +1,141 @@
+# Auth Service Kubernetes Deployment - Ready for Bot-Services to apply
+# Created by Foreman to help accelerate deployment
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: default
+  labels:
+    app: auth-service
+    domain: core
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+        domain: core
+    spec:
+      containers:
+      - name: auth-service
+        image: python:3.11-slim
+        ports:
+        - containerPort: 8000
+        env:
+        - name: JWT_SECRET_KEY
+          value: "superinstance-production-secret-2025"
+        - name: DATABASE_URL
+          value: "sqlite:///./auth.db"
+        - name: REDIS_URL
+          value: "redis://redis-service:6379"
+        command: ["/bin/bash"]
+        args:
+        - -c
+        - |
+          pip install fastapi uvicorn sqlalchemy bcrypt pyjwt redis python-multipart
+          cd /app
+          python main.py --port 8000
+        volumeMounts:
+        - name: auth-code
+          mountPath: /app
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      volumes:
+      - name: auth-code
+        configMap:
+          name: auth-service-code
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: default
+spec:
+  selector:
+    app: auth-service
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-service-code
+  namespace: default
+data:
+  main.py: |
+    # Simplified auth service for K8s deployment
+    import os
+    import jwt
+    import bcrypt
+    import logging
+    from datetime import datetime, timedelta
+    from fastapi import FastAPI, HTTPException
+    from pydantic import BaseModel
+    import uvicorn
+
+    app = FastAPI(title="SuperInstance Auth Service", version="2.0.0")
+    logging.basicConfig(level=logging.INFO)
+
+    class UserLogin(BaseModel):
+        username: str
+        password: str
+
+    class Token(BaseModel):
+        access_token: str
+        token_type: str = "bearer"
+
+    SECRET_KEY = os.getenv("JWT_SECRET_KEY", "superinstance-production-secret-2025")
+    ALGORITHM = "HS256"
+
+    # Mock user for demo
+    users_db = {
+        "admin": {
+            "username": "admin",
+            "password_hash": bcrypt.hashpw("admin123".encode(), bcrypt.gensalt()).decode()
+        }
+    }
+
+    @app.get("/health")
+    async def health():
+        return {"status": "healthy", "service": "auth-service", "version": "2.0.0"}
+
+    @app.post("/auth/login", response_model=Token)
+    async def login(user: UserLogin):
+        if user.username not in users_db:
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+        
+        stored_user = users_db[user.username]
+        if not bcrypt.checkpw(user.password.encode(), stored_user["password_hash"].encode()):
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+        
+        token_data = {
+            "sub": user.username,
+            "exp": datetime.utcnow() + timedelta(hours=24)
+        }
+        token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+        return Token(access_token=token)
+
+    @app.get("/auth/verify")
+    async def verify_token(token: str):
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            return {"valid": True, "username": payload.get("sub")}
+        except jwt.ExpiredSignatureError:
+            raise HTTPException(status_code=401, detail="Token expired")
+        except jwt.JWTError:
+            raise HTTPException(status_code=401, detail="Invalid token")
+
+    if __name__ == "__main__":
+        uvicorn.run(app, host="0.0.0.0", port=8000)

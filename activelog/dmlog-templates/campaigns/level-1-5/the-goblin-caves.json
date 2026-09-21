@@ -1,0 +1,471 @@
+{
+  "campaign": {
+    "id": "goblin-caves-001",
+    "title": "The Goblin Caves of Thornwick",
+    "subtitle": "A Classic D&D 5e Adventure for Levels 1-3",
+    "description": "A traditional dungeon crawl through goblin-infested caves, perfect for new players and Dungeon Masters. Features exploration, combat, roleplay, and treasure hunting.",
+    "levelRange": "1-3",
+    "estimatedSessions": 3,
+    "playerCount": "3-6",
+    "themes": ["dungeon crawl", "rescue mission", "goblins", "classic fantasy"],
+    "difficulty": "beginner",
+    "author": "DMLog Templates",
+    "version": "1.0",
+    "lastUpdated": "2025-01-01"
+  },
+  "setup": {
+    "premise": "The peaceful village of Thornwick has been plagued by goblin raids. Merchant caravans have been attacked, and the village elder's daughter, Mira, has been kidnapped. The party must venture into the Thornwick Caves to rescue her and put an end to the goblin threat.",
+    "hooks": [
+      "The party arrives in Thornwick just as a merchant caravan limps into town, wounded and robbed",
+      "A desperate village elder offers gold and magical rewards for rescuing his daughter",
+      "Local rumors speak of ancient dwarven ruins within the caves, promising treasure",
+      "A surviving merchant mentions seeing organized goblins with unusual weapons"
+    ],
+    "backgroundInformation": {
+      "village": "Thornwick is a small farming community of about 200 people, known for its apple orchards and position along the main trade route.",
+      "goblins": "The Redfang Tribe has recently been driven from their ancestral home by expanding human settlements. They've taken refuge in old dwarven caves.",
+      "caves": "Originally mined by dwarves 200 years ago, the caves were abandoned after a cave-in. Recent goblin activity has opened new passages.",
+      "kidnapVictim": "Mira Thornwick, 16, is the village elder's daughter and apprentice healer. She was taken during a herb-gathering expedition."
+    }
+  },
+  "acts": [
+    {
+      "act": 1,
+      "title": "Arrival in Thornwick",
+      "description": "The party arrives in the village and learns of the goblin problem",
+      "scenes": [
+        {
+          "id": "scene-01",
+          "title": "The Wounded Caravan",
+          "type": "roleplay",
+          "description": "A merchant caravan arrives wounded and robbed as the party enters Thornwick",
+          "keyNPCs": ["Gareth the Merchant", "Village Elder Aldric"],
+          "objectives": ["Learn about the goblin attacks", "Meet the village elder", "Gather initial information"],
+          "skillChallenges": [
+            {
+              "skill": "Medicine",
+              "DC": 12,
+              "success": "Heal wounded merchants, gain their trust and additional information",
+              "failure": "Merchants remain suspicious, limited information shared"
+            },
+            {
+              "skill": "Insight",
+              "DC": 13,
+              "success": "Realize the attacks are more organized than typical goblin raids",
+              "failure": "Miss important tactical information about goblin strategy"
+            }
+          ],
+          "rewards": ["Information about cave location", "Healing potion from grateful merchant"]
+        },
+        {
+          "id": "scene-02",
+          "title": "The Elder's Plea",
+          "type": "roleplay",
+          "description": "Village Elder Aldric explains the situation and offers rewards for rescuing his daughter",
+          "keyNPCs": ["Village Elder Aldric", "Guard Captain Marcus"],
+          "objectives": ["Accept the rescue mission", "Learn about Mira", "Receive initial equipment/information"],
+          "rewards": [
+            "50 gp upfront payment",
+            "Promise of 200 gp upon Mira's return",
+            "Healing potions (2)",
+            "Map to cave entrance"
+          ],
+          "information": [
+            "Mira was taken 3 days ago while gathering moonflower herbs",
+            "Goblins left clear tracks toward the old mining caves",
+            "Previous rescue attempts by village guards failed",
+            "Strange goblin war cries heard from the caves at night"
+          ]
+        }
+      ]
+    },
+    {
+      "act": 2,
+      "title": "The Journey to the Caves",
+      "description": "Travel through the Thornwick Forest to reach the cave entrance",
+      "scenes": [
+        {
+          "id": "scene-03",
+          "title": "Forest Ambush",
+          "type": "combat",
+          "description": "Goblin scouts attempt to ambush the party on the forest path",
+          "enemies": [
+            {
+              "name": "Goblin Scout",
+              "count": 3,
+              "cr": "1/4",
+              "tactics": "Use hit-and-run tactics from behind trees, focus fire on spellcasters"
+            },
+            {
+              "name": "Goblin Boss",
+              "count": 1,
+              "cr": "1",
+              "tactics": "Stays back initially, charges when scouts are defeated"
+            }
+          ],
+          "terrain": "Dense forest with large trees providing cover, stream running through center",
+          "objectives": ["Defeat the goblin patrol", "Interrogate survivors for information"],
+          "treasures": [
+            "Crude map showing cave layout (partial)",
+            "Goblin-crafted arrows (20)",
+            "Mira's torn cloak piece (proof she's alive)"
+          ],
+          "skillChallenges": [
+            {
+              "skill": "Intimidation/Persuasion",
+              "DC": 14,
+              "success": "Learn password to enter caves safely",
+              "failure": "Goblin dies before revealing information"
+            }
+          ]
+        },
+        {
+          "id": "scene-04",
+          "title": "The Cave Entrance",
+          "type": "exploration",
+          "description": "The party reaches the caves and must decide how to enter",
+          "objectives": ["Scout the cave entrance", "Choose entry strategy", "Prepare for dungeon exploration"],
+          "features": [
+            "Main entrance guarded by 2 goblins",
+            "Hidden side entrance (Perception DC 15)",
+            "Old mining equipment scattered around",
+            "Fresh goblin tracks leading in and out"
+          ],
+          "skillChallenges": [
+            {
+              "skill": "Stealth",
+              "DC": 13,
+              "success": "Bypass entrance guards undetected",
+              "failure": "Guards raise alarm, +2 goblins in first cave room"
+            },
+            {
+              "skill": "Investigation",
+              "DC": 12,
+              "success": "Discover hidden cache with minor healing potions",
+              "failure": "No additional discoveries"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "act": 3,
+      "title": "Into the Goblin Caves",
+      "description": "Explore the cave complex, face increasing challenges, and rescue Mira",
+      "scenes": [
+        {
+          "id": "scene-05",
+          "title": "The Guard Post",
+          "type": "combat",
+          "description": "The first chamber of the caves, used as a guard post by the goblins",
+          "enemies": [
+            {
+              "name": "Goblin",
+              "count": 4,
+              "cr": "1/4",
+              "tactics": "Two guard the main passage, two sleep by fire (can be surprised)"
+            }
+          ],
+          "terrain": "Natural cave chamber with fire pit, sleeping furs, crude barricade",
+          "features": [
+            "Fire provides light and warmth",
+            "Three passages leading deeper",
+            "Crude warning signs in Goblin",
+            "Small weapon cache"
+          ],
+          "treasures": [
+            "Scimitar +1 (hidden under furs)",
+            "Goblin rations (bitter but edible)",
+            "Copper pieces (47 cp)"
+          ],
+          "skillChallenges": [
+            {
+              "skill": "Stealth",
+              "DC": 11,
+              "success": "Surprise sleeping goblins",
+              "failure": "All goblins are alert"
+            }
+          ]
+        },
+        {
+          "id": "scene-06",
+          "title": "The Mushroom Garden",
+          "type": "exploration",
+          "description": "A chamber where goblins cultivate phosphorescent mushrooms for light and food",
+          "features": [
+            "Glowing mushrooms provide dim light",
+            "Small goblin tending the garden",
+            "Underground stream flows through chamber",
+            "Hidden passage behind mushroom growth"
+          ],
+          "enemies": [
+            {
+              "name": "Goblin Gardener",
+              "count": 1,
+              "cr": "1/4",
+              "note": "Frightened, may surrender if threatened"
+            }
+          ],
+          "skillChallenges": [
+            {
+              "skill": "Intimidation",
+              "DC": 10,
+              "success": "Goblin surrenders and provides information about Mira's location",
+              "failure": "Goblin attempts to flee and alert others"
+            },
+            {
+              "skill": "Nature",
+              "DC": 14,
+              "success": "Identify edible mushrooms, gain rations and discover medicinal variety",
+              "failure": "No special discoveries"
+            }
+          ],
+          "treasures": [
+            "Phosphorescent mushrooms (can be used as light sources)",
+            "Small silver coins scattered in stream (15 sp)"
+          ]
+        },
+        {
+          "id": "scene-07",
+          "title": "The Prison Chamber",
+          "type": "roleplay",
+          "description": "Where Mira is being held, along with other prisoners from caravan attacks",
+          "keyNPCs": [
+            "Mira Thornwick (kidnapped daughter)",
+            "Dwarf Merchant Thorin (recent captive)",
+            "Halfling Bard Pip (wounded, captured weeks ago)"
+          ],
+          "enemies": [
+            {
+              "name": "Goblin Jailer",
+              "count": 1,
+              "cr": "1/2",
+              "equipment": "Keys, whip, studded leather armor"
+            },
+            {
+              "name": "Goblin",
+              "count": 2,
+              "cr": "1/4",
+              "tactics": "Guard the prisoners, one attempts to use Mira as hostage"
+            }
+          ],
+          "objectives": ["Rescue Mira safely", "Free other prisoners", "Gather information about goblin leadership"],
+          "complications": [
+            "Prisoners are weak and need healing",
+            "Goblin may threaten to kill hostages",
+            "Cell doors are locked (thieves' tools DC 12 or Strength DC 15)"
+          ],
+          "information": [
+            "Chief Snagtooth plans to ransom prisoners to nearby towns",
+            "More goblins live deeper in the caves",
+            "Ancient dwarven treasure room exists somewhere in the complex"
+          ]
+        },
+        {
+          "id": "scene-08",
+          "title": "The Chief's Throne Room",
+          "type": "combat",
+          "description": "Final confrontation with the goblin chief in the deepest chamber of the caves",
+          "enemies": [
+            {
+              "name": "Goblin Boss (Chief Snagtooth)",
+              "count": 1,
+              "cr": "1",
+              "equipment": "Scimitar, chain shirt, shield",
+              "tactics": "Commands other goblins, uses lair actions to collapse ceiling (minor damage)"
+            },
+            {
+              "name": "Goblin",
+              "count": 3,
+              "cr": "1/4",
+              "tactics": "Protect their chief, use pack tactics when possible"
+            },
+            {
+              "name": "Wolf",
+              "count": 1,
+              "cr": "1/4",
+              "note": "Chief's pet, attacks nearest enemy"
+            }
+          ],
+          "terrain": "Large natural cavern with raised stone platform (throne), multiple levels connected by crude ramps",
+          "lair_actions": [
+            "Cause small rocks to fall (DC 13 Dex save or take 1d4 damage)",
+            "Create difficult terrain in 20-foot radius",
+            "Enhance goblin attacks (+2 damage for one round)"
+          ],
+          "treasures": [
+            "Chief's treasure chest: 200 gp, gem of seeing, potion of healing (superior)",
+            "Ancient dwarven warhammer +1",
+            "Maps showing other goblin tribes in the region"
+          ]
+        }
+      ]
+    }
+  ],
+  "npcs": [
+    {
+      "id": "village-elder-aldric",
+      "name": "Aldric Thornwick",
+      "role": "Village Elder",
+      "description": "A weathered human in his 60s with kind eyes but worry lines. He's the village leader and Mira's father.",
+      "personality": ["Concerned parent", "Responsible leader", "Grateful for help"],
+      "motivations": ["Rescue his daughter", "Protect his village", "Maintain peace"],
+      "stats": {
+        "AC": 12,
+        "HP": 22,
+        "Speed": "30 ft",
+        "STR": 10, "DEX": 12, "CON": 13, "INT": 14, "WIS": 16, "CHA": 15
+      },
+      "equipment": ["Simple robes", "Walking staff", "Pouch of gold coins"],
+      "secrets": ["Knows of ancient dwarven treasure in the caves", "Has connections to regional nobility"]
+    },
+    {
+      "id": "mira-thornwick",
+      "name": "Mira Thornwick",
+      "role": "Kidnapped Daughter",
+      "description": "A bright 16-year-old human with brown hair and green eyes. She's brave but untrained in combat.",
+      "personality": ["Brave", "Curious", "Helpful", "Optimistic despite situation"],
+      "motivations": ["Return home safely", "Help other prisoners", "Learn about the wider world"],
+      "stats": {
+        "AC": 10,
+        "HP": 4,
+        "Speed": "30 ft",
+        "STR": 8, "DEX": 12, "CON": 10, "INT": 14, "WIS": 13, "CHA": 16
+      },
+      "skills": ["Medicine", "Nature", "Insight"],
+      "equipment": ["Simple clothes", "Healer's kit", "Small knife"],
+      "abilities": ["Can cast cure wounds once per day (innate ability)"]
+    },
+    {
+      "id": "chief-snagtooth",
+      "name": "Chief Snagtooth",
+      "role": "Goblin Boss",
+      "description": "A large goblin with filed teeth and numerous scars. Cunning and ruthless leader of the Redfang Tribe.",
+      "personality": ["Cunning", "Ruthless", "Pragmatic", "Proud"],
+      "motivations": ["Establish permanent territory", "Gain wealth through raiding", "Prove goblin superiority"],
+      "stats": {
+        "AC": 17,
+        "HP": 21,
+        "Speed": "30 ft",
+        "STR": 10, "DEX": 14, "CON": 10, "INT": 10, "WIS": 8, "CHA": 10
+      },
+      "equipment": ["Scimitar", "Chain shirt", "Shield", "Chief's crown (worthless but symbolic)"],
+      "tactics": ["Commands from the rear", "Uses lair actions", "Fights to the death to maintain honor"]
+    }
+  ],
+  "monsters": [
+    {
+      "name": "Goblin",
+      "type": "Small humanoid (goblinoid)",
+      "cr": "1/4",
+      "ac": 15,
+      "hp": 7,
+      "speed": "30 ft",
+      "stats": {
+        "STR": 8, "DEX": 14, "CON": 10, "INT": 10, "WIS": 8, "CHA": 8
+      },
+      "skills": ["Stealth +6"],
+      "senses": ["Darkvision 60 ft"],
+      "languages": ["Common", "Goblin"],
+      "abilities": ["Nimble Escape"],
+      "actions": [
+        "Scimitar: +4 to hit, 1d6+2 slashing damage",
+        "Shortbow: +4 to hit, range 80/320 ft, 1d6+2 piercing damage"
+      ]
+    },
+    {
+      "name": "Goblin Boss",
+      "type": "Small humanoid (goblinoid)",
+      "cr": "1",
+      "ac": 17,
+      "hp": 21,
+      "speed": "30 ft",
+      "stats": {
+        "STR": 10, "DEX": 14, "CON": 10, "INT": 10, "WIS": 8, "CHA": 10
+      },
+      "skills": ["Stealth +6"],
+      "senses": ["Darkvision 60 ft"],
+      "languages": ["Common", "Goblin"],
+      "abilities": ["Nimble Escape"],
+      "actions": [
+        "Multiattack: Two scimitar attacks",
+        "Scimitar: +4 to hit, 1d6+2 slashing damage",
+        "Redirect Attack: Force attacker to target different creature"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "name": "Scimitar +1",
+      "type": "Weapon (scimitar)",
+      "rarity": "uncommon",
+      "description": "A finely crafted curved blade with dwarven runes etched along the fuller.",
+      "properties": ["Finesse", "Light", "+1 enchantment"],
+      "damage": "1d6+1 slashing",
+      "weight": "3 lb",
+      "value": "500 gp"
+    },
+    {
+      "name": "Gem of Seeing",
+      "type": "Wondrous item",
+      "rarity": "rare",
+      "description": "A crystal that reveals hidden truths when gazed through.",
+      "properties": ["Requires attunement", "See through illusions", "Detect hidden doors"],
+      "charges": "3 per day",
+      "value": "1000 gp"
+    }
+  ],
+  "handouts": [
+    {
+      "id": "cave-map",
+      "title": "Partial Cave Map",
+      "description": "A crude goblin-drawn map showing some cave passages",
+      "image": "cave-map-partial.jpg",
+      "playerVersion": "Shows entrance and first two chambers only",
+      "dmVersion": "Shows complete layout with secret passages marked"
+    },
+    {
+      "id": "miras-letter",
+      "title": "Mira's Hidden Message",
+      "description": "A small note Mira managed to hide for potential rescuers",
+      "content": "Father - I am alive but weak. Chief speaks of selling us to slavers from the east. Three guards, chief has wolf. Be careful of cave-ins in deep chambers. Your loving daughter, M."
+    }
+  ],
+  "rewards": {
+    "experience": [
+      "Forest ambush: 200 XP",
+      "Cave entrance: 100 XP",
+      "Guard post: 300 XP", 
+      "Prison rescue: 400 XP",
+      "Final battle: 600 XP",
+      "Mission completion: 300 XP"
+    ],
+    "treasure": [
+      "Total coins: 262 cp, 15 sp, 200 gp",
+      "Magic items: Scimitar +1, Gem of Seeing",
+      "Consumables: Various healing potions, rations"
+    ],
+    "roleplay": [
+      "Village gratitude and ongoing relationships",
+      "Information about regional goblin activities",
+      "Potential future adventure hooks"
+    ]
+  },
+  "scaling": {
+    "forLevel1": {
+      "adjustments": ["Reduce goblin HP by 2", "Remove goblin boss multiattack", "Add more healing potions"],
+      "partySize": "Designed for 4 players, adjust encounter numbers for different party sizes"
+    },
+    "forLevel3": {
+      "adjustments": ["Add hobgoblin lieutenant", "Include additional treasure", "Add environmental hazards"],
+      "complications": ["Time pressure (Mira gets sicker)", "Additional goblin patrol encounters"]
+    }
+  },
+  "dmTips": [
+    "Emphasize the rescue mission urgency without making it feel rushed",
+    "Use Mira's knowledge of herbs to provide healing outside of spells",
+    "Allow creative problem-solving - goblins can be negotiated with",
+    "The caves can be expanded if the party enjoys dungeon exploration",
+    "Consider having rescued NPCs provide future adventure hooks"
+  ]
+}

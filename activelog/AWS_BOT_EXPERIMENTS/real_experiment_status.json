@@ -1,0 +1,17 @@
+{
+    "experiment": "real_hierarchical_validation", 
+    "status": "running",
+    "start_time": "2025-08-30T15:51:28-08:00",
+    "current_phase": "ml_optimization",
+    "vcpu_usage": "9 of 16 vCPUs",
+    "cost_so_far": "Starting - execute_real_experiment_1.sh.0358/hour for upgrade",
+    "instances": {
+        "upgraded": "i-0b06fd225a4384cff (t3.medium)",
+        "delegation_testers": [
+            "i-0b61812de8ea6e0c1 (vestige - binary delegation)",
+            "i-0e4da12ade3468473 (holographic - variable delegation)", 
+            "i-02f80ff412d819349 (firefly - task-type delegation)",
+            "i-0c3e7c1df714f297c (spatial - random baseline)"
+        ]
+    }
+}

@@ -1,0 +1,284 @@
+# Enhanced Storage Monitor Configuration v2.0
+# Enterprise-grade configuration with advanced features
+
+monitoring:
+  # Core monitoring settings
+  scan_interval_seconds: 30        # Faster scanning for better responsiveness
+  worker_threads: 8                # Number of parallel scanning workers
+  batch_size: 100                  # Files processed per batch
+  enable_async_io: true           # Use async I/O for better performance
+  enable_caching: true            # Enable intelligent caching
+  cache_ttl_seconds: 300          # Cache time-to-live
+  enable_compression: true        # Compress cached data
+  max_memory_usage_mb: 512        # Memory limit per worker
+  
+  # Advanced scanning options
+  use_inotify: true               # Use inotify for real-time file events (Linux)
+  deep_scan_interval_hours: 24    # Full deep scan interval
+  shallow_scan_interval_seconds: 60  # Quick status check interval
+  checksum_verification: true     # Verify file integrity
+  
+thresholds:
+  # More sensitive and configurable thresholds
+  rapid_growth_mb_per_minute: 50  # Rapid growth detection
+  large_file_gb: 0.5              # Large file threshold (500MB)
+  directory_limit_gb: 2.0         # Directory size limit
+  disk_usage_warning: 0.75        # 75% disk usage warning
+  disk_usage_critical: 0.90       # 90% critical threshold
+  cpu_usage_limit: 80             # CPU usage limit for operations
+  memory_usage_limit: 75          # Memory usage limit
+  
+  # ML-based thresholds
+  anomaly_sensitivity: 0.1        # Anomaly detection sensitivity
+  prediction_confidence: 0.8      # Minimum confidence for predictions
+  alert_correlation_window: 300   # Seconds to correlate related alerts
+
+paths:
+  # Enhanced path configuration
+  monitor:
+    - path: "/home/activeloguser/activelog/services"
+      priority: "high"
+      scan_depth: 3
+      enable_real_time: true
+    - path: "/home/activeloguser/activelog/checkpoints"
+      priority: "critical" 
+      scan_depth: 2
+      enable_real_time: true
+    - path: "/home/activeloguser/activelog/backups"
+      priority: "medium"
+      scan_depth: 2
+      enable_real_time: false
+    - path: "/home/activeloguser/activelog/logs"
+      priority: "low"
+      scan_depth: 1
+      enable_real_time: false
+  
+  # Enhanced exclusion patterns with performance impact ratings
+  exclude_patterns:
+    - pattern: "*/node_modules/*"
+      performance_impact: "high"
+    - pattern: "*/__pycache__/*" 
+      performance_impact: "medium"
+    - pattern: "*/dist/*"
+      performance_impact: "medium"
+    - pattern: "*/build/*"
+      performance_impact: "medium"
+    - pattern: "*/.git/*"
+      performance_impact: "high"
+    - pattern: "*/temp/*"
+      performance_impact: "low"
+    - pattern: "*/tmp/*"
+      performance_impact: "low" 
+    - pattern: "*/.cache/*"
+      performance_impact: "medium"
+    - pattern: "*.log.gz"
+      performance_impact: "low"
+    - pattern: "*.tmp"
+      performance_impact: "low"
+  
+  # System directories
+  quarantine_dir: "/home/activeloguser/activelog/services/storage-monitor/quarantine"
+  models_dir: "/home/activeloguser/activelog/services/storage-monitor/models"
+  backup_dir: "/home/activeloguser/activelog/services/storage-monitor/backups"
+
+security:
+  # Enterprise security features
+  enable_auth: true
+  jwt_expiry_hours: 24
+  rate_limit_per_minute: 100
+  allowed_ips:
+    - "127.0.0.1"
+    - "localhost"
+    - "::1"
+  encrypt_sensitive_data: true
+  
+  # Advanced security
+  enable_audit_logging: true
+  session_timeout_minutes: 480
+  max_failed_attempts: 5
+  lockout_duration_minutes: 15
+  
+  # API security
+  cors_origins:
+    - "http://localhost:3000"
+    - "http://localhost:8080"
+  api_key_rotation_days: 30
+
+features:
+  # ML and AI features
+  enable_ml_anomaly_detection: true
+  enable_predictive_analysis: true
+  enable_behavioral_learning: true
+  enable_auto_tuning: true
+  
+  # Automation features  
+  enable_auto_remediation: true
+  enable_smart_scheduling: true
+  enable_adaptive_thresholds: true
+  
+  # Enterprise features
+  enable_real_time_streaming: true
+  enable_distributed_monitoring: false
+  enable_high_availability: false
+  enable_disaster_recovery: true
+
+integrations:
+  # Improvement system integration
+  improvement_system:
+    url: "http://localhost:8500"
+    enabled: true
+    timeout_seconds: 30
+    retry_attempts: 3
+    circuit_breaker_threshold: 5
+    
+  # Observability integrations
+  prometheus:
+    enabled: true
+    port: 8491
+    metrics_interval_seconds: 15
+    
+  # Caching and message queuing  
+  redis:
+    enabled: false
+    url: "redis://localhost:6379"
+    db: 0
+    max_connections: 10
+    
+  # External notifications
+  webhooks:
+    enabled: false
+    endpoints: []
+    # - url: "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+    #   events: ["critical_alert", "remediation_complete"]
+    
+  # APM and logging
+  datadog:
+    enabled: false
+    api_key: ""
+    app_key: ""
+    
+  elastic:
+    enabled: false
+    hosts: ["localhost:9200"]
+    index: "storage-monitor"
+
+remediation:
+  # Enhanced remediation options
+  auto_quarantine_mb: 100
+  auto_compress_days: 1
+  auto_delete_temp_files: true
+  backup_before_action: true
+  max_concurrent_actions: 3
+  action_timeout_minutes: 10
+  
+  # Safety mechanisms
+  require_confirmation_above_gb: 5.0
+  never_auto_delete_extensions:
+    - ".db"
+    - ".sql" 
+    - ".bak"
+    - ".key"
+    - ".pem"
+  
+  # Action priorities
+  action_priorities:
+    compress: 1      # Least disruptive
+    quarantine: 2    # Moderate risk
+    stop_process: 3  # Higher risk
+    delete: 4        # Highest risk
+  
+  # Recovery options
+  enable_undo: true
+  undo_retention_hours: 72
+  quarantine_retention_days: 14
+
+alerts:
+  # Alert configuration
+  enabled: true
+  dedupe_window_seconds: 300
+  escalation_levels:
+    - level: 1
+      delay_minutes: 0
+      channels: ["websocket", "log"]
+    - level: 2  
+      delay_minutes: 15
+      channels: ["websocket", "log", "webhook"]
+    - level: 3
+      delay_minutes: 60  
+      channels: ["websocket", "log", "webhook", "email"]
+  
+  # Alert routing
+  routing_rules:
+    - condition: "severity == 'critical'"
+      immediate: true
+      channels: ["all"]
+    - condition: "path.contains('checkpoints')"
+      urgent: true
+      channels: ["websocket", "improvement_system"]
+
+performance:
+  # Performance optimization
+  enable_profiling: false
+  max_scan_duration_seconds: 300
+  memory_threshold_mb: 1024
+  cpu_threshold_percent: 80
+  
+  # Database optimization
+  db_vacuum_interval_hours: 24
+  db_analyze_interval_hours: 6
+  connection_pool_size: 10
+  statement_timeout_seconds: 30
+  
+  # Caching optimization
+  cache_compression: true
+  cache_encryption: false
+  cache_max_size_mb: 256
+  cache_eviction_policy: "lru"
+
+logging:
+  # Enhanced logging configuration
+  level: "INFO"
+  structured: true
+  include_tracing: true
+  
+  # Log rotation
+  max_file_size_mb: 100
+  backup_count: 10
+  retention_days: 30
+  
+  # Log destinations
+  destinations:
+    - type: "file"
+      path: "logs/storage_monitor.log"
+      level: "INFO"
+    - type: "file" 
+      path: "logs/storage_monitor_debug.log"
+      level: "DEBUG"
+    - type: "console"
+      level: "INFO"
+      
+# Environment-specific overrides
+environments:
+  development:
+    monitoring:
+      scan_interval_seconds: 60
+    logging:
+      level: "DEBUG"
+    features:
+      enable_auto_remediation: false
+      
+  production:
+    monitoring:
+      scan_interval_seconds: 15
+    security:
+      enable_auth: true
+      encrypt_sensitive_data: true
+    features:
+      enable_auto_remediation: true
+      
+  testing:
+    monitoring:
+      scan_interval_seconds: 5
+    features:
+      enable_auto_remediation: false
+      enable_ml_anomaly_detection: false

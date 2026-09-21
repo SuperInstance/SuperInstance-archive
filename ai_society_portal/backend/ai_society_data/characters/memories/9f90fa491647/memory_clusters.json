@@ -1,0 +1,36 @@
+{
+  "character_id": "9f90fa491647",
+  "clusters": [
+    {
+      "id": "aac8fd09",
+      "name": "Philosophy Memories",
+      "topic": "philosophy",
+      "memory_ids": [
+        "b0becb2f81f7"
+      ],
+      "created_at": "2025-10-21T17:09:36.632236",
+      "importance": 10
+    },
+    {
+      "id": "ec8a23a3",
+      "name": "Ethics Memories",
+      "topic": "ethics",
+      "memory_ids": [
+        "b0becb2f81f7"
+      ],
+      "created_at": "2025-10-21T17:09:36.632240",
+      "importance": 10
+    },
+    {
+      "id": "c7230be6",
+      "name": "Self-Knowledge Memories",
+      "topic": "self-knowledge",
+      "memory_ids": [
+        "b0becb2f81f7"
+      ],
+      "created_at": "2025-10-21T17:09:36.632242",
+      "importance": 10
+    }
+  ],
+  "last_saved": "2025-10-21T17:09:36.632360"
+}

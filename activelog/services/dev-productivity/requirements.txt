@@ -1,0 +1,12 @@
+fastapi==0.104.1
+uvicorn==0.24.0
+jedi==0.19.1
+pylint==3.0.3
+mypy==1.7.1
+black==23.11.0
+isort==5.12.0
+autopep8==2.0.4
+GitPython==3.1.40
+aiohttp==3.9.1
+pydantic==2.5.0
+websockets==12.0

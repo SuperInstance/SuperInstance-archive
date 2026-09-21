@@ -1,0 +1,386 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ActiveLog Plugin Manifest",
+  "type": "object",
+  "required": ["name", "version", "description", "main", "runtime", "permissions"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "minLength": 3,
+      "maxLength": 50,
+      "description": "Unique plugin identifier (kebab-case)"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[a-z0-9]+(?:\\.[a-z0-9]+)*)?$",
+      "description": "Semantic version (e.g., 1.0.0, 1.0.0-beta.1)"
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "Human-readable plugin name"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 500,
+      "description": "Brief description of plugin functionality"
+    },
+    "author": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "license": {
+      "type": "string",
+      "description": "SPDX license identifier"
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 30
+      },
+      "maxItems": 10,
+      "uniqueItems": true
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "data-import",
+        "data-export",
+        "analytics",
+        "automation",
+        "integration",
+        "utility",
+        "visualization",
+        "ai-ml",
+        "security",
+        "productivity"
+      ]
+    },
+    "main": {
+      "type": "string",
+      "description": "Entry point file relative to plugin root"
+    },
+    "runtime": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["typescript", "python", "docker", "wasm"]
+        },
+        "version": {
+          "type": "string",
+          "description": "Runtime version constraint"
+        },
+        "environment": {
+          "type": "string",
+          "enum": ["node", "browser", "python3", "docker", "wasm"],
+          "description": "Execution environment"
+        }
+      }
+    },
+    "permissions": {
+      "type": "object",
+      "properties": {
+        "network": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": false
+            },
+            "domains": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "hostname"
+              },
+              "description": "Allowed domains for network access"
+            },
+            "ports": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535
+              },
+              "description": "Allowed ports for network access"
+            }
+          }
+        },
+        "filesystem": {
+          "type": "object",
+          "properties": {
+            "read": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Paths allowed for reading"
+            },
+            "write": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Paths allowed for writing"
+            },
+            "temp": {
+              "type": "boolean",
+              "default": true,
+              "description": "Access to temporary directory"
+            }
+          }
+        },
+        "database": {
+          "type": "object",
+          "properties": {
+            "read": {
+              "type": "boolean",
+              "default": false,
+              "description": "Read access to user data"
+            },
+            "write": {
+              "type": "boolean",
+              "default": false,
+              "description": "Write access to user data"
+            },
+            "tables": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Specific tables accessible"
+            }
+          }
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "auth",
+              "metadata",
+              "file-sync",
+              "ai-orchestrator",
+              "video-pipeline",
+              "analytics",
+              "notifications"
+            ]
+          },
+          "description": "ActiveLog services the plugin can access"
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "properties": {
+        "cpu": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 2.0,
+          "default": 0.5,
+          "description": "CPU cores limit"
+        },
+        "memory": {
+          "type": "string",
+          "pattern": "^\\d+[KMGT]?B$",
+          "default": "256MB",
+          "description": "Memory limit (e.g., 256MB, 1GB)"
+        },
+        "disk": {
+          "type": "string",
+          "pattern": "^\\d+[KMGT]?B$",
+          "default": "100MB",
+          "description": "Disk space limit"
+        },
+        "network": {
+          "type": "string",
+          "pattern": "^\\d+[KMGT]?B$",
+          "default": "10MB",
+          "description": "Network transfer limit per execution"
+        },
+        "timeout": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 300,
+          "default": 60,
+          "description": "Execution timeout in seconds"
+        }
+      }
+    },
+    "triggers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "file-upload",
+              "file-change",
+              "schedule",
+              "webhook",
+              "user-action",
+              "system-event"
+            ]
+          },
+          "config": {
+            "type": "object",
+            "description": "Trigger-specific configuration"
+          }
+        }
+      }
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "type": "object",
+          "description": "JSON Schema for plugin configuration"
+        },
+        "defaults": {
+          "type": "object",
+          "description": "Default configuration values"
+        }
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "properties": {
+        "plugins": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-z][a-z0-9-]*$": {
+              "type": "string",
+              "description": "Required plugin version"
+            }
+          }
+        },
+        "npm": {
+          "type": "object",
+          "description": "NPM dependencies for TypeScript plugins"
+        },
+        "pip": {
+          "type": "object",
+          "description": "Pip dependencies for Python plugins"
+        }
+      }
+    },
+    "ui": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "type": "string",
+          "description": "Path to settings UI component"
+        },
+        "dashboard": {
+          "type": "string",
+          "description": "Path to dashboard widget component"
+        },
+        "icon": {
+          "type": "string",
+          "description": "Path to plugin icon"
+        }
+      }
+    },
+    "api": {
+      "type": "object",
+      "properties": {
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "method"],
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string",
+                "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"]
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "properties": {
+        "activelogVersion": {
+          "type": "string",
+          "description": "Compatible ActiveLog version range"
+        },
+        "os": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["linux", "windows", "macos", "any"]
+          }
+        },
+        "arch": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["x64", "arm64", "any"]
+          }
+        }
+      }
+    },
+    "marketplace": {
+      "type": "object",
+      "properties": {
+        "pricing": {
+          "type": "object",
+          "properties": {
+            "model": {
+              "type": "string",
+              "enum": ["free", "freemium", "paid", "subscription"]
+            },
+            "price": {
+              "type": "number",
+              "minimum": 0
+            },
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            }
+          }
+        },
+        "featured": {
+          "type": "boolean",
+          "default": false
+        },
+        "verified": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  }
+}

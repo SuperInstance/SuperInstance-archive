@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html><head><title>AI-Built Blog</title>
+<style>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:20px}
+.header{text-align:center;margin-bottom:40px}.post{background:#f9f9f9;padding:20px;margin:20px 0;border-radius:8px}
+.form{background:white;padding:20px;margin-bottom:30px;border:1px solid #ddd;border-radius:8px}
+input,textarea{width:100%;padding:10px;margin:10px 0;border:1px solid #ddd;border-radius:4px}
+button{background:#007cba;color:white;padding:10px 20px;border:none;border-radius:4px;cursor:pointer}</style>
+</head><body>
+<div class="header"><h1>🤖 AI-Built Blog</h1></div>
+<div class="form"><h3>Add New Post</h3>
+<input id="title" placeholder="Post title">
+<textarea id="content" placeholder="Post content..." rows="4"></textarea>
+<input id="author" placeholder="Author name">
+<button onclick="addPost()">Publish Post</button></div>
+<div id="posts"></div>
+<script>
+let posts=[];
+async function loadPosts(){const r=await fetch('/api/posts');posts=await r.json();renderPosts();}
+async function addPost(){const title=document.getElementById('title').value;
+const content=document.getElementById('content').value;const author=document.getElementById('author').value;
+if(!title||!content)return;await fetch('/api/posts',{method:'POST',headers:{'Content-Type':'application/json'},
+body:JSON.stringify({title,content,author:author||'Anonymous'})});
+document.getElementById('title').value='';document.getElementById('content').value='';document.getElementById('author').value='';loadPosts();}
+function renderPosts(){document.getElementById('posts').innerHTML=posts.map(p=>`
+<div class="post"><h2>${p.title}</h2><p>${p.content}</p><small>By ${p.author} on ${new Date(p.date).toLocaleDateString()}</small></div>`).join('');}
+loadPosts();
+</script></body></html>

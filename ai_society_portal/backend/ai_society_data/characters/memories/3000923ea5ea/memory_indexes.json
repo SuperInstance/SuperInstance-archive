@@ -1,0 +1,96 @@
+{
+  "topic_index": {
+    "first day": [
+      "848252eddb1f"
+    ],
+    "research": [
+      "3367b56df76a",
+      "848252eddb1f"
+    ],
+    "excitement": [
+      "848252eddb1f"
+    ],
+    "mentorship": [
+      "3367b56df76a",
+      "679cebe8ece8"
+    ],
+    "neural networks": [
+      "3367b56df76a"
+    ],
+    "transformers": [
+      "85733466f12f",
+      "cdc0f64830e7"
+    ],
+    "attention": [
+      "cdc0f64830e7"
+    ],
+    "deep learning": [
+      "cdc0f64830e7"
+    ],
+    "consciousness": [
+      "d388c0c9945e"
+    ],
+    "overwhelm": [
+      "d388c0c9945e"
+    ],
+    "research challenges": [
+      "d388c0c9945e"
+    ],
+    "breakthrough": [
+      "85733466f12f"
+    ],
+    "memory consolidation": [
+      "85733466f12f"
+    ],
+    "progress": [
+      "679cebe8ece8"
+    ],
+    "recognition": [
+      "679cebe8ece8"
+    ],
+    "self-awareness": [
+      "3cfccf13613b"
+    ],
+    "artificial consciousness": [
+      "3cfccf13613b"
+    ],
+    "identity": [
+      "3cfccf13613b"
+    ],
+    "research collaboration": [
+      "f77b1e277d45"
+    ]
+  },
+  "character_index": {
+    "sarah_chen": [
+      "f77b1e277d45",
+      "3367b56df76a",
+      "679cebe8ece8"
+    ]
+  },
+  "type_index": {
+    "experience": [
+      "848252eddb1f"
+    ],
+    "relationship": [
+      "f77b1e277d45",
+      "3367b56df76a",
+      "679cebe8ece8"
+    ],
+    "learning": [
+      "85733466f12f",
+      "cdc0f64830e7"
+    ],
+    "emotional": [
+      "d388c0c9945e"
+    ],
+    "self_reflection": [
+      "26b7d7173d8f",
+      "07c66908f556",
+      "a514e316172a",
+      "8c861799e490",
+      "55b24461905e",
+      "3cfccf13613b"
+    ]
+  }
+}

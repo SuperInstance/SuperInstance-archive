@@ -1,0 +1,12 @@
+{
+  "name": "training-app-0000-0000",
+  "version": "1.0.0",
+  "description": "Functional AI-generated application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

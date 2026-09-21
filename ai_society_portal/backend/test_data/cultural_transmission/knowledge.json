@@ -1,0 +1,23 @@
+{
+  "knowledge": [
+    {
+      "id": "683fbbc3b80f",
+      "content": "Test knowledge",
+      "knowledge_type": "fact",
+      "importance": 5,
+      "origin_character_id": "test_char",
+      "discovered_at": "2025-10-21T17:11:23.499146",
+      "transmission_chain": [],
+      "topics": [],
+      "context": {},
+      "emotional_valence": 0.0,
+      "transmission_difficulty": 0.35,
+      "retention_rate": 0.7,
+      "adaptability": 0.3,
+      "times_used": 0,
+      "last_used": null,
+      "successful_transmissions": 0
+    }
+  ],
+  "last_saved": "2025-10-21T17:11:23.499232"
+}

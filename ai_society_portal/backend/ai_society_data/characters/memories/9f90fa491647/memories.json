@@ -1,0 +1,30 @@
+{
+  "character_id": "9f90fa491647",
+  "memories": [
+    {
+      "id": "b0becb2f81f7",
+      "content": "Discovered new knowledge: The unexamined life is not worth living",
+      "memory_type": "learning",
+      "importance": 10,
+      "timestamp": "2025-10-21T17:09:36.632223",
+      "context": {
+        "source": "knowledge_discovery",
+        "knowledge_id": "8f11b780e245"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "philosophy",
+        "ethics",
+        "self-knowledge"
+      ],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.010000000000000002,
+      "current_strength": 1.0
+    }
+  ],
+  "last_saved": "2025-10-21T17:09:36.632278"
+}

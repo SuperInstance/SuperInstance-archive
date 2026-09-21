@@ -1,0 +1,115 @@
+# Core Analytics and Data Science
+pandas==2.1.4
+numpy==1.24.4
+scipy==1.11.4
+statsmodels==0.14.1
+scikit-learn==1.3.2
+matplotlib==3.8.2
+seaborn==0.13.0
+plotly==5.18.0
+dash==2.16.1
+bokeh==3.3.2
+
+# Time Series Analysis and Forecasting
+prophet==1.1.5
+pmdarima==2.0.4
+seasonal-decompose==1.4.0
+sktime==0.25.0
+tsfresh==0.20.2
+pyflux==0.4.17
+arch==6.3.0
+statsforecast==1.4.0
+
+# Anomaly Detection
+pyod==1.1.3
+isolation-forest==0.0.4
+anomaly-detector==1.0.0
+adtk==0.6.2
+luminol==0.4
+
+# Machine Learning and Predictive Analytics
+xgboost==2.0.3
+lightgbm==4.2.0
+catboost==1.2.2
+tensorflow==2.15.0
+torch==2.1.2
+transformers==4.36.2
+optuna==3.5.0
+shap==0.44.0
+lime==0.2.0.1
+
+# Database Connections
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+pymongo==4.6.0
+redis==5.0.1
+elasticsearch==8.11.0
+clickhouse-driver==0.2.6
+apache-superset==3.0.3
+
+# FastAPI and Web Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.2
+pydantic-settings==2.1.0
+jinja2==3.1.2
+aiofiles==23.2.1
+websockets==12.0
+
+# Time Series Databases
+influxdb-client==1.39.0
+prometheus-client==0.19.0
+
+# Data Visualization and Dashboards
+streamlit==1.29.0
+jupyter==1.0.0
+jupyterlab==4.0.9
+voila==0.5.5
+panel==1.3.6
+
+# Async and Concurrency
+asyncio==3.4.3
+aiohttp==3.9.1
+aiodns==3.1.1
+aioredis==2.0.1
+asyncpg==0.29.0
+
+# Statistical Testing and AB Testing
+scipy==1.11.4
+lifelines==0.27.8
+causal-inference==1.0.0
+experimentation==0.1.0
+
+# Data Export and BI Integration
+openpyxl==3.1.2
+xlsxwriter==3.1.9
+reportlab==4.0.8
+fpdf2==2.7.6
+python-pptx==0.6.23
+
+# Scheduling and Background Tasks
+celery==5.3.4
+redis==5.0.1
+apscheduler==3.10.4
+crontab==1.0.1
+
+# Utilities
+python-dateutil==2.8.2
+pytz==2023.3
+click==8.1.7
+pyyaml==6.0.1
+toml==0.10.2
+python-dotenv==1.0.0
+requests==2.31.0
+
+# Development and Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.1
+
+# Logging and Monitoring
+structlog==23.2.0
+sentry-sdk[fastapi]==1.39.2
+opentelemetry-api==1.21.0

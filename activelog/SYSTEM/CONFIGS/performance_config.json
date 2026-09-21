@@ -1,0 +1,17 @@
+{
+  "hardware_profile": {
+    "cpu_cores": 24,
+    "memory_gb": 15.2,
+    "max_cpu_usage_percent": 60,
+    "max_memory_usage_gb": 6.071932983398438,
+    "thermal_management": true,
+    "battery_optimization": true
+  },
+  "bot_limits": {
+    "max_concurrent_professors": 4,
+    "max_concurrent_committee": 3,
+    "max_concurrent_agents": 8,
+    "iteration_delay_seconds": 20
+  },
+  "last_optimization": "2025-08-29T15:53:04.357142"
+}

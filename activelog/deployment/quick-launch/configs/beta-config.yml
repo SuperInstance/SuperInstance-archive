@@ -1,0 +1,139 @@
+# ActiveLog Beta Environment Configuration
+
+environment:
+  name: beta
+  debug: true
+  log_level: DEBUG
+  
+database:
+  host: localhost
+  port: 5432
+  name: activelog_beta
+  user: activelog_user
+  max_connections: 50
+  connection_timeout: 30
+  
+redis:
+  host: localhost
+  port: 6379
+  db: 1
+  max_memory: 256mb
+  eviction_policy: allkeys-lru
+  
+api:
+  host: 0.0.0.0
+  port: 8080
+  workers: 2
+  timeout: 30
+  cors_enabled: true
+  cors_origins:
+    - "http://localhost:3000"
+    - "https://beta.activelog.dev"
+  
+frontend:
+  port: 3000
+  build_mode: development
+  hot_reload: true
+  source_maps: true
+  
+security:
+  jwt_expiration: 86400  # 24 hours
+  session_timeout: 3600  # 1 hour
+  max_login_attempts: 5
+  lockout_duration: 300  # 5 minutes
+  password_min_length: 8
+  require_2fa: false
+  
+features:
+  beta_features: true
+  feature_flags: true
+  feedback_collection: true
+  analytics: true
+  error_reporting: true
+  user_tracking: false  # Privacy-focused for beta
+  
+beta_management:
+  invite_only: true
+  nda_required: true
+  max_beta_users: 100
+  feedback_required: true
+  session_recording: false  # Privacy consideration
+  
+storage:
+  type: local
+  path: /app/storage/beta
+  max_file_size: 104857600  # 100MB
+  allowed_extensions:
+    - jpg
+    - jpeg
+    - png
+    - gif
+    - pdf
+    - doc
+    - docx
+    - txt
+    - csv
+    - json
+  
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention_days: 7
+  s3_bucket: activelog-beta-backups
+  encryption: true
+  
+monitoring:
+  metrics: true
+  tracing: true
+  health_checks: true
+  error_tracking: true
+  performance_monitoring: true
+  
+logging:
+  level: DEBUG
+  format: json
+  file: /var/log/activelog/beta.log
+  max_size: 100MB
+  backup_count: 5
+  
+rate_limiting:
+  enabled: true
+  requests_per_minute: 100
+  burst_size: 50
+  
+email:
+  provider: smtp
+  test_mode: true
+  from_address: noreply-beta@activelog.dev
+  templates:
+    invite: beta_invite_template
+    nda: beta_nda_template
+    feedback_request: beta_feedback_template
+  
+notifications:
+  enabled: true
+  channels:
+    - email
+    - in_app
+  beta_notifications:
+    - new_feature_announcements
+    - feedback_requests
+    - system_maintenance
+  
+performance:
+  cache_ttl: 300  # 5 minutes
+  static_cache_ttl: 86400  # 24 hours
+  db_query_timeout: 30
+  api_timeout: 30
+  
+development:
+  hot_reload: true
+  debug_toolbar: true
+  profiling: true
+  sql_logging: true
+  
+compliance:
+  gdpr: true
+  data_retention_days: 90  # Shorter for beta
+  anonymization: true
+  audit_logging: true

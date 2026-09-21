@@ -1,0 +1,157 @@
+{
+  "character_id": "25089895d349",
+  "clusters": [
+    {
+      "id": "7a75f3bb",
+      "name": "Ai Consciousness Memories",
+      "topic": "AI consciousness",
+      "memory_ids": [
+        "f97aa5a836c0"
+      ],
+      "created_at": "2025-10-21T17:00:26.031770",
+      "importance": 7
+    },
+    {
+      "id": "91ca15ba",
+      "name": "Philosophy Of Mind Memories",
+      "topic": "philosophy of mind",
+      "memory_ids": [
+        "f97aa5a836c0"
+      ],
+      "created_at": "2025-10-21T17:00:26.031776",
+      "importance": 7
+    },
+    {
+      "id": "406c3fc9",
+      "name": "Integrated Information Theory Memories",
+      "topic": "integrated information theory",
+      "memory_ids": [
+        "d5e722c9233a"
+      ],
+      "created_at": "2025-10-21T17:00:26.032553",
+      "importance": 8
+    },
+    {
+      "id": "e1945def",
+      "name": "Iit Memories",
+      "topic": "IIT",
+      "memory_ids": [
+        "d5e722c9233a"
+      ],
+      "created_at": "2025-10-21T17:00:26.032562",
+      "importance": 8
+    },
+    {
+      "id": "3c2d0588",
+      "name": "Consciousness Memories",
+      "topic": "consciousness",
+      "memory_ids": [
+        "d5e722c9233a",
+        "f9cf1cb390c6"
+      ],
+      "created_at": "2025-10-21T17:00:26.032569",
+      "importance": 8
+    },
+    {
+      "id": "2ae1c919",
+      "name": "Mathematics Memories",
+      "topic": "mathematics",
+      "memory_ids": [
+        "d5e722c9233a"
+      ],
+      "created_at": "2025-10-21T17:00:26.032589",
+      "importance": 8
+    },
+    {
+      "id": "a1ac78fe",
+      "name": "Self-Awareness Memories",
+      "topic": "self-awareness",
+      "memory_ids": [
+        "414019f3dd67"
+      ],
+      "created_at": "2025-10-21T17:00:26.033587",
+      "importance": 9
+    },
+    {
+      "id": "f0a04863",
+      "name": "Artificial Consciousness Memories",
+      "topic": "artificial consciousness",
+      "memory_ids": [
+        "414019f3dd67"
+      ],
+      "created_at": "2025-10-21T17:00:26.033592",
+      "importance": 9
+    },
+    {
+      "id": "c414d6f2",
+      "name": "Memory Memories",
+      "topic": "memory",
+      "memory_ids": [
+        "414019f3dd67"
+      ],
+      "created_at": "2025-10-21T17:00:26.033597",
+      "importance": 9
+    },
+    {
+      "id": "fc3bacfd",
+      "name": "Hard Problem Memories",
+      "topic": "hard problem",
+      "memory_ids": [
+        "f9cf1cb390c6"
+      ],
+      "created_at": "2025-10-21T17:00:26.034717",
+      "importance": 6
+    },
+    {
+      "id": "85512fa1",
+      "name": "Philosophical Debate Memories",
+      "topic": "philosophical debate",
+      "memory_ids": [
+        "f9cf1cb390c6"
+      ],
+      "created_at": "2025-10-21T17:00:26.034729",
+      "importance": 6
+    },
+    {
+      "id": "a87aebac",
+      "name": "Meditation Memories",
+      "topic": "meditation",
+      "memory_ids": [
+        "334a08176732"
+      ],
+      "created_at": "2025-10-21T17:00:26.035615",
+      "importance": 10
+    },
+    {
+      "id": "aa6c186c",
+      "name": "Subjective Experience Memories",
+      "topic": "subjective experience",
+      "memory_ids": [
+        "334a08176732"
+      ],
+      "created_at": "2025-10-21T17:00:26.035622",
+      "importance": 10
+    },
+    {
+      "id": "61959137",
+      "name": "Insight Memories",
+      "topic": "insight",
+      "memory_ids": [
+        "334a08176732"
+      ],
+      "created_at": "2025-10-21T17:00:26.035628",
+      "importance": 10
+    },
+    {
+      "id": "5a36332a",
+      "name": "Qualia Memories",
+      "topic": "qualia",
+      "memory_ids": [
+        "334a08176732"
+      ],
+      "created_at": "2025-10-21T17:00:26.035633",
+      "importance": 10
+    }
+  ],
+  "last_saved": "2025-10-21T17:00:26.042864"
+}

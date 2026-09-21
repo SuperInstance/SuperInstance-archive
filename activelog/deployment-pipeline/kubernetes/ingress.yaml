@@ -1,0 +1,162 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dmlog-ingress
+  namespace: dmlog-staging
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+        - staging.dmlog.com
+        - api-staging.dmlog.com
+      secretName: dmlog-staging-tls
+  rules:
+    - host: staging.dmlog.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-dmlog-final
+                port:
+                  number: 80
+    - host: api-staging.dmlog.com
+      http:
+        paths:
+          - path: /api/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: dmlog-integration
+                port:
+                  number: 8203
+          - path: /orchestrator/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: data-orchestrator
+                port:
+                  number: 8204
+          - path: /gamedev/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: dmlog-gamedev
+                port:
+                  number: 8200
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dmlog-ingress
+  namespace: dmlog-production
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+spec:
+  tls:
+    - hosts:
+        - dmlog.com
+        - api.dmlog.com
+      secretName: dmlog-production-tls
+  rules:
+    - host: dmlog.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-dmlog-final
+                port:
+                  number: 80
+    - host: api.dmlog.com
+      http:
+        paths:
+          - path: /api/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: dmlog-integration
+                port:
+                  number: 8203
+          - path: /orchestrator/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: data-orchestrator
+                port:
+                  number: 8204
+          - path: /gamedev/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: dmlog-gamedev
+                port:
+                  number: 8200
+---
+# Blue-Green Ingress for Production
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dmlog-blue-ingress
+  namespace: dmlog-production
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  tls:
+    - hosts:
+        - blue.dmlog.com
+      secretName: dmlog-blue-tls
+  rules:
+    - host: blue.dmlog.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-dmlog-final-blue
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dmlog-green-ingress
+  namespace: dmlog-production
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  tls:
+    - hosts:
+        - green.dmlog.com
+      secretName: dmlog-green-tls
+  rules:
+    - host: green.dmlog.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-dmlog-final-green
+                port:
+                  number: 80

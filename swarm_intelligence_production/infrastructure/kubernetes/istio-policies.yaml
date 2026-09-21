@@ -1,0 +1,95 @@
+# Circuit Breaker for Core Service
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: swarm-core-circuit-breaker
+  namespace: swarm-intelligence
+spec:
+  host: swarm-core
+  trafficPolicy:
+    outlierDetection:
+      consecutiveGatewayErrors: 5
+      consecutive5xxErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      minHealthPercent: 40
+---
+# Rate Limiting for API
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: swarm-api-jwt
+  namespace: swarm-intelligence
+spec:
+  selector:
+    matchLabels:
+      app: swarm-api
+  jwtRules:
+  - issuer: "https://auth.swarm.example.com"
+    jwksUri: "https://auth.swarm.example.com/.well-known/jwks.json"
+    audiences:
+    - "swarm-api"
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: swarm-api-authz
+  namespace: swarm-intelligence
+spec:
+  selector:
+    matchLabels:
+      app: swarm-api
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["*"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/api/*"]
+    when:
+    - key: request.auth.claims[role]
+      values: ["admin", "user", "bot"]
+---
+# Peer Authentication - mTLS
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default-mtls
+  namespace: swarm-intelligence
+spec:
+  mtls:
+    mode: STRICT
+---
+# Telemetry for metrics collection
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: swarm-telemetry
+  namespace: swarm-intelligence
+spec:
+  metrics:
+  - providers:
+    - name: prometheus
+    dimensions:
+      swarm_id: request.headers["x-swarm-id"]
+      bot_count: request.headers["x-bot-count"]
+      operation_type: request.headers["x-operation-type"]
+  tracing:
+  - providers:
+    - name: jaeger
+    customTags:
+      swarm.id:
+        header:
+          name: x-swarm-id
+      bot.count:
+        header:
+          name: x-bot-count
+    randomSamplingPercentage: 10.0
+  accessLogging:
+  - providers:
+    - name: envoy
+    filter:
+      expression: response.code >= 400

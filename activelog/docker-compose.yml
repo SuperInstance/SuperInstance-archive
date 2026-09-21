@@ -1,0 +1,175 @@
+# ActiveLog Ecosystem - Production Docker Compose
+version: '3.8'
+
+services:
+  # Phase 1: Bot Orchestration Infrastructure
+  bot-orchestrator:
+    build: 
+      context: ./services/bot-orchestrator
+      dockerfile: Dockerfile
+    ports:
+      - "8450:8450"
+    environment:
+      - NODE_ENV=production
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+
+  bot-ecosystem:
+    build: ./services/bot-ecosystem
+    ports:
+      - "8451:8451"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - OLLAMA_HOST=${OLLAMA_HOST}
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+
+  # Phase 2: LucidDreamer Core System
+  luciddreamer-core:
+    build: ./services/luciddreamer-core
+    ports:
+      - "8430:8430"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - QUANTUM_ENGINE_MODE=production
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+
+  dream-simulator:
+    build: ./services/dream-simulator
+    ports:
+      - "8431:8431"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - MAX_SIMULATION_SPEED=100000
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+
+  frontend-luciddreamer:
+    build: ./frontend-luciddreamer
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://luciddreamer-core:8430
+    depends_on:
+      - luciddreamer-core
+    restart: unless-stopped
+
+  # Phase 3: Business Platforms
+  hatchery-manager:
+    build: ./services/hatchery-manager
+    ports:
+      - "8441:8441"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - NSRAA_COMPLIANCE_MODE=strict
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+
+  business-platform:
+    build: ./services/business-platform
+    ports:
+      - "8442:8442"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - FINANCIAL_API_KEY=${FINANCIAL_API_KEY}
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+
+  municipal-platform:
+    build: ./services/municipal-platform
+    ports:
+      - "8443:8443"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - GOVERNMENT_API_ACCESS=enabled
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+
+  # Phase 4: Market Infrastructure
+  dividend-shares:
+    build: ./services/market-infrastructure/dividend-shares
+    ports:
+      - "8444:8444"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - TAX_CALCULATION_MODE=automated
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+
+  paper-trading:
+    build: ./services/market-infrastructure/paper-trading
+    ports:
+      - "8445:8445"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - MARKET_DATA_SOURCE=${MARKET_DATA_SOURCE}
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+
+  # Phase 5: Developer Tools
+  code-director:
+    build: ./services/code-director
+    ports:
+      - "8446:8446"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - AI_CODE_GENERATION=enabled
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+
+  # Infrastructure Services
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: activelog
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    driver: bridge

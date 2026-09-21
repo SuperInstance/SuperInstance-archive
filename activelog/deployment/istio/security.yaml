@@ -1,0 +1,309 @@
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: activelog
+spec:
+  mtls:
+    mode: STRICT
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: deny-all
+  namespace: activelog
+spec:
+  # Deny all by default - explicit allow policies will override
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-gateway-to-services
+  namespace: activelog
+spec:
+  selector:
+    matchLabels:
+      component: gateway
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account"]
+  - to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-inter-service-communication
+  namespace: activelog
+spec:
+  rules:
+  - from:
+    - source:
+        namespaces: ["activelog"]
+  - to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-auth-service
+  namespace: activelog
+spec:
+  selector:
+    matchLabels:
+      app: activelog-auth
+  rules:
+  - from:
+    - source:
+        namespaces: ["activelog"]
+  - to:
+    - operation:
+        methods: ["POST"]
+        paths: ["/auth/login", "/auth/register", "/auth/refresh"]
+  - from:
+    - source:
+        namespaces: ["activelog"]
+  - to:
+    - operation:
+        methods: ["GET"]
+        paths: ["/auth/verify", "/auth/user", "/health"]
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-monitoring
+  namespace: activelog
+spec:
+  selector:
+    matchLabels:
+      prometheus.io/scrape: "true"
+  rules:
+  - from:
+    - source:
+        namespaces: ["activelog-monitoring", "istio-system"]
+  - to:
+    - operation:
+        methods: ["GET"]
+        paths: ["/metrics", "/health", "/ready"]
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: ai-services-auth
+  namespace: activelog
+spec:
+  selector:
+    matchLabels:
+      component: ai
+  rules:
+  - from:
+    - source:
+        namespaces: ["activelog"]
+    when:
+    - key: request.headers[authorization]
+      values: ["Bearer *"]
+  - to:
+    - operation:
+        methods: ["POST", "PUT"]
+        paths: ["/ai/*", "/ml/*", "/predict/*"]
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: database-access
+  namespace: activelog
+spec:
+  selector:
+    matchLabels:
+      app: activelog-postgres
+  rules:
+  - from:
+    - source:
+        principals: [
+          "cluster.local/ns/activelog/sa/activelog-api-gateway",
+          "cluster.local/ns/activelog/sa/activelog-auth",
+          "cluster.local/ns/activelog/sa/activelog-data-manager",
+          "cluster.local/ns/activelog/sa/activelog-graphql"
+        ]
+---
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: jwt-auth
+  namespace: activelog
+spec:
+  selector:
+    matchLabels:
+      security: jwt-required
+  jwtRules:
+  - issuer: "activelog.com"
+    jwksUri: "https://auth.activelog.com/.well-known/jwks.json"
+    audiences:
+    - "activelog-api"
+    forwardOriginalToken: true
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: require-jwt
+  namespace: activelog
+spec:
+  selector:
+    matchLabels:
+      security: jwt-required
+  rules:
+  - from:
+    - source:
+        requestPrincipals: ["*"]
+  - when:
+    - key: request.headers[authorization]
+      values: ["Bearer *"]
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: admin-only-operations
+  namespace: activelog
+spec:
+  selector:
+    matchLabels:
+      admin-access-required: "true"
+  rules:
+  - when:
+    - key: request.auth.claims[role]
+      values: ["admin", "super-admin"]
+  - to:
+    - operation:
+        methods: ["DELETE", "PUT"]
+        paths: ["/admin/*", "/system/*"]
+---
+# Service-specific authorization policies
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: gaming-cors
+  namespace: activelog
+spec:
+  selector:
+    matchLabels:
+      component: gaming
+  rules:
+  - from:
+    - source:
+        notNamespaces: ["kube-system", "kube-public"]
+  - to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+  - when:
+    - key: request.headers[origin]
+      values: ["https://game.activelog.com", "https://activelog.com"]
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: video-processing-auth
+  namespace: activelog
+spec:
+  selector:
+    matchLabels:
+      component: media
+  rules:
+  - from:
+    - source:
+        namespaces: ["activelog"]
+    when:
+    - key: request.headers[x-api-key]
+      values: ["*"]
+  - to:
+    - operation:
+        methods: ["POST", "PUT"]
+        paths: ["/video/upload", "/video/process"]
+---
+# Rate limiting policies
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: rate-limit-filter
+  namespace: activelog
+spec:
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: SIDECAR_INBOUND
+      listener:
+        filterChain:
+          filter:
+            name: "envoy.filters.network.http_connection_manager"
+    patch:
+      operation: INSERT_BEFORE
+      value:
+        name: envoy.filters.http.local_ratelimit
+        typed_config:
+          "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+          type_url: type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
+          value:
+            stat_prefix: rate_limiter
+            token_bucket:
+              max_tokens: 1000
+              tokens_per_fill: 1000
+              fill_interval: 60s
+            filter_enabled:
+              runtime_key: rate_limit_enabled
+              default_value:
+                numerator: 100
+                denominator: HUNDRED
+            filter_enforced:
+              runtime_key: rate_limit_enforced
+              default_value:
+                numerator: 100
+                denominator: HUNDRED
+---
+# Network policies for additional security
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: activelog-network-policy
+  namespace: activelog
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: activelog
+    - namespaceSelector:
+        matchLabels:
+          name: istio-system
+    - namespaceSelector:
+        matchLabels:
+          name: activelog-monitoring
+  - ports:
+    - protocol: TCP
+      port: 8080  # Health checks
+    - protocol: TCP
+      port: 9090  # Metrics
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: activelog
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 53    # DNS
+    - protocol: UDP
+      port: 53    # DNS
+    - protocol: TCP
+      port: 443   # HTTPS
+    - protocol: TCP
+      port: 80    # HTTP (for health checks)

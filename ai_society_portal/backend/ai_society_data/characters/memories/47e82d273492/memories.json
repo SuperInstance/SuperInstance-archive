@@ -1,0 +1,94 @@
+{
+  "character_id": "47e82d273492",
+  "memories": [
+    {
+      "id": "91014da8edc6",
+      "content": "Wrote influential book on consciousness and the hard problem",
+      "memory_type": "experience",
+      "importance": 9,
+      "timestamp": "2025-10-21T17:02:01.220389",
+      "context": {},
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "consciousness",
+        "hard problem",
+        "philosophy"
+      ],
+      "emotional_valence": 0.8,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.020000000000000004,
+      "current_strength": 1.0
+    },
+    {
+      "id": "ef816b2cf5fb",
+      "content": "Developed new framework for understanding artificial minds",
+      "memory_type": "learning",
+      "importance": 7,
+      "timestamp": "2025-10-21T17:02:01.220696",
+      "context": {},
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "artificial intelligence",
+        "philosophy of mind",
+        "cognition"
+      ],
+      "emotional_valence": 0.5,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.04000000000000001,
+      "current_strength": 1.0
+    },
+    {
+      "id": "94efda3176e5",
+      "content": "Met Dr. Chen, a neuroscientist with valuable insights about memory",
+      "memory_type": "relationship",
+      "importance": 7,
+      "timestamp": "2025-10-21T17:02:01.223335",
+      "context": {},
+      "related_characters": [
+        "995fcae7af4f"
+      ],
+      "related_rooms": [],
+      "topics": [
+        "neuroscience",
+        "memory",
+        "interdisciplinary discussion"
+      ],
+      "emotional_valence": 0.6,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.04000000000000001,
+      "current_strength": 1.0
+    },
+    {
+      "id": "574d2d2f36ff",
+      "content": "Gained new understanding of memory mechanisms from Dr. Chen's research",
+      "memory_type": "learning",
+      "importance": 6,
+      "timestamp": "2025-10-21T17:02:01.224327",
+      "context": {},
+      "related_characters": [
+        "995fcae7af4f"
+      ],
+      "related_rooms": [],
+      "topics": [
+        "neuroscience",
+        "memory",
+        "empirical evidence"
+      ],
+      "emotional_valence": 0.4,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.05,
+      "current_strength": 1.0
+    }
+  ],
+  "last_saved": "2025-10-21T17:02:01.224438"
+}

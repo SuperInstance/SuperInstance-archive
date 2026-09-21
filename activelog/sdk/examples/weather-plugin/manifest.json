@@ -1,0 +1,160 @@
+{
+  "name": "weather-data-plugin",
+  "version": "1.0.0",
+  "display_name": "Weather Data Plugin",
+  "description": "Fetch and process weather data from external APIs",
+  "author": {
+    "name": "ActiveLog Team",
+    "email": "plugins@activelog.ai"
+  },
+  "license": "MIT",
+  "keywords": ["weather", "data", "api", "meteorology"],
+  "category": "data-import",
+  "main": "index.js",
+  "runtime": {
+    "type": "typescript",
+    "version": ">=18.0.0",
+    "environment": "node"
+  },
+  "permissions": {
+    "network": {
+      "enabled": true,
+      "domains": ["api.openweathermap.org", "api.weatherapi.com"],
+      "ports": [80, 443]
+    },
+    "filesystem": {
+      "temp": true
+    },
+    "database": {
+      "read": true,
+      "write": true,
+      "tables": ["weather_data", "locations"]
+    },
+    "services": ["metadata", "analytics"]
+  },
+  "resources": {
+    "cpu": 0.5,
+    "memory": "256MB",
+    "disk": "100MB",
+    "network": "50MB",
+    "timeout": 120
+  },
+  "triggers": [
+    {
+      "type": "schedule",
+      "config": {
+        "cron": "0 */6 * * *",
+        "description": "Fetch weather data every 6 hours"
+      }
+    },
+    {
+      "type": "webhook",
+      "config": {
+        "path": "/weather/update",
+        "methods": ["POST"]
+      }
+    }
+  ],
+  "config": {
+    "schema": {
+      "type": "object",
+      "properties": {
+        "api_key": {
+          "type": "string",
+          "description": "Weather API key",
+          "required": true
+        },
+        "provider": {
+          "type": "string",
+          "enum": ["openweathermap", "weatherapi"],
+          "default": "openweathermap",
+          "description": "Weather data provider"
+        },
+        "locations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "lat": { "type": "number" },
+              "lng": { "type": "number" }
+            }
+          },
+          "description": "List of locations to monitor"
+        },
+        "units": {
+          "type": "string",
+          "enum": ["metric", "imperial", "kelvin"],
+          "default": "metric",
+          "description": "Temperature units"
+        },
+        "alert_thresholds": {
+          "type": "object",
+          "properties": {
+            "high_temp": { "type": "number", "default": 35 },
+            "low_temp": { "type": "number", "default": -10 },
+            "high_wind": { "type": "number", "default": 50 }
+          }
+        }
+      },
+      "required": ["api_key", "locations"]
+    },
+    "defaults": {
+      "provider": "openweathermap",
+      "units": "metric",
+      "locations": [],
+      "alert_thresholds": {
+        "high_temp": 35,
+        "low_temp": -10,
+        "high_wind": 50
+      }
+    }
+  },
+  "api": {
+    "endpoints": [
+      {
+        "path": "/current/:location",
+        "method": "GET",
+        "description": "Get current weather for a location"
+      },
+      {
+        "path": "/forecast/:location",
+        "method": "GET",
+        "description": "Get weather forecast for a location"
+      },
+      {
+        "path": "/locations",
+        "method": "GET",
+        "description": "List monitored locations"
+      },
+      {
+        "path": "/locations",
+        "method": "POST",
+        "description": "Add a new location to monitor"
+      }
+    ]
+  },
+  "ui": {
+    "settings": "settings.html",
+    "dashboard": "dashboard.html",
+    "icon": "weather-icon.svg"
+  },
+  "dependencies": {
+    "npm": {
+      "axios": "^1.6.0",
+      "node-cron": "^3.0.3"
+    }
+  },
+  "compatibility": {
+    "activelog_version": ">=2.0.0",
+    "os": ["linux", "macos", "windows"],
+    "arch": ["x64", "arm64"]
+  },
+  "marketplace": {
+    "pricing": {
+      "model": "free"
+    },
+    "featured": false,
+    "verified": true
+  }
+}

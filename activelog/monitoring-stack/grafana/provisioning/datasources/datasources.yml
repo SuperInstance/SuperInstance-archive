@@ -1,0 +1,162 @@
+# Grafana Data Sources Configuration for ActiveLog
+apiVersion: 1
+
+datasources:
+  # Prometheus - Main metrics source
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      timeInterval: "15s"
+      queryTimeout: "60s"
+      httpMethod: "POST"
+    secureJsonData: {}
+
+  # Prometheus Alertmanager
+  - name: Alertmanager
+    type: alertmanager
+    access: proxy
+    url: http://alertmanager:9093
+    editable: true
+    jsonData:
+      implementation: "prometheus"
+
+  # Jaeger - Distributed tracing
+  - name: Jaeger
+    type: jaeger
+    access: proxy
+    url: http://jaeger:16686
+    editable: true
+    jsonData:
+      tracesToMetrics:
+        datasourceUid: "prometheus"
+        queries:
+          - name: "Sample query"
+            query: 'sum(rate(traces_spanmetrics_latency_bucket{$$__tag_keys}[5m]))'
+      nodeGraph:
+        enabled: true
+
+  # Elasticsearch - Logs
+  - name: Elasticsearch
+    type: elasticsearch
+    access: proxy
+    url: http://elasticsearch:9200
+    database: "activelog-logs-*"
+    editable: true
+    jsonData:
+      interval: "Daily"
+      timeField: "@timestamp"
+      esVersion: "7.10.0"
+      maxConcurrentShardRequests: 5
+      logMessageField: "message"
+      logLevelField: "level"
+
+  # PostgreSQL - Business data
+  - name: PostgreSQL
+    type: postgres
+    access: proxy
+    url: postgres:5432
+    database: activelog
+    user: activelog_readonly
+    editable: true
+    secureJsonData:
+      password: "readonly_password"
+    jsonData:
+      sslmode: "disable"
+      maxOpenConns: 5
+      maxIdleConns: 2
+      connMaxLifetime: 14400
+
+  # Redis - Cache metrics
+  - name: Redis
+    type: redis-datasource
+    access: proxy
+    url: redis://redis:6379
+    editable: true
+    jsonData:
+      client: "standalone"
+      poolSize: 5
+      timeout: 10
+      pingInterval: 0
+      pipelineWindow: 0
+
+  # InfluxDB - Time series data
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    database: activelog
+    user: activelog
+    editable: true
+    secureJsonData:
+      password: "influx_password"
+    jsonData:
+      timeInterval: "10s"
+      httpMode: "GET"
+
+  # Loki - Log aggregation
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    editable: true
+    jsonData:
+      maxLines: 1000
+      derivedFields:
+        - datasourceUid: "jaeger"
+          matcherRegex: "traceID=(\\w+)"
+          name: "TraceID"
+          url: "$${__value.raw}"
+
+  # CloudWatch - AWS metrics
+  - name: CloudWatch
+    type: cloudwatch
+    access: proxy
+    editable: true
+    jsonData:
+      authType: "keys"
+      defaultRegion: "us-east-1"
+      customMetricsNamespaces: "ActiveLog,AWS/ECS,AWS/RDS,AWS/ElastiCache"
+    secureJsonData:
+      accessKey: "${AWS_ACCESS_KEY_ID}"
+      secretKey: "${AWS_SECRET_ACCESS_KEY}"
+
+  # Tempo - Distributed tracing (alternative)
+  - name: Tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    editable: true
+    jsonData:
+      tracesToMetrics:
+        datasourceUid: "prometheus"
+        tags:
+          - key: "service.name"
+            value: "service"
+          - key: "job"
+            value: "job"
+        queries:
+          - name: "Sample query"
+            query: 'sum(rate(tempo_spanmetrics_latency_bucket{$$__tag_keys}[5m]))'
+      serviceMap:
+        datasourceUid: "prometheus"
+      nodeGraph:
+        enabled: true
+
+  # Graphite - Legacy metrics (if needed)
+  - name: Graphite
+    type: graphite
+    access: proxy
+    url: http://graphite:8080
+    editable: true
+    jsonData:
+      graphiteVersion: "1.1"
+
+  # TestData - For demo purposes
+  - name: TestData
+    type: testdata
+    access: proxy
+    editable: true

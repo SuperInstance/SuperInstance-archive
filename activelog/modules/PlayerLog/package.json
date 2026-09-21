@@ -1,0 +1,22 @@
+{
+  "name": "player-log",
+  "version": "1.0.0",
+  "description": "Game-specific overlays, opponent analysis, and replay system for gaming activities",
+  "main": "index.js",
+  "dependencies": {
+    "electron": "^25.3.1",
+    "obs-websocket-js": "^5.0.3",
+    "ffmpeg": "^0.0.4",
+    "canvas": "^2.11.2",
+    "node-window-manager": "^2.2.4"
+  },
+  "keywords": [
+    "gaming",
+    "overlay",
+    "analysis",
+    "replay",
+    "esports"
+  ],
+  "author": "ActiveLog",
+  "license": "MIT"
+}

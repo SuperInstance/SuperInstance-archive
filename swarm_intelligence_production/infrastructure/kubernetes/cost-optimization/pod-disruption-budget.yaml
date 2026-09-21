@@ -1,0 +1,59 @@
+# Pod Disruption Budget for Core Service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: swarm-core-pdb
+  namespace: swarm-intelligence
+spec:
+  minAvailable: 70%
+  selector:
+    matchLabels:
+      app: swarm-core
+---
+# PDB for API Service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: swarm-api-pdb
+  namespace: swarm-intelligence
+spec:
+  minAvailable: 80%
+  selector:
+    matchLabels:
+      app: swarm-api
+---
+# PDB for Frontend
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: swarm-frontend-pdb
+  namespace: swarm-intelligence
+spec:
+  minAvailable: 3
+  selector:
+    matchLabels:
+      app: swarm-frontend
+---
+# PDB for PostgreSQL
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: postgres-pdb
+  namespace: swarm-intelligence
+spec:
+  maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: postgres
+---
+# PDB for Redis
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: redis-pdb
+  namespace: swarm-intelligence
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: redis

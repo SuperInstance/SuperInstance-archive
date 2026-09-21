@@ -1,0 +1,23 @@
+{
+  "mode": "thin_client",
+  "local_services": [
+    "auth",
+    "api-gateway"
+  ],
+  "cloud_services": [
+    "ai-orchestrator",
+    "metadata",
+    "backup",
+    "analytics"
+  ],
+  "offload_rules": {
+    "ml_tasks": "always",
+    "large_file_processing": "always",
+    "data_analytics": "if_data_size > 10MB",
+    "image_processing": "if_resolution > 1080p",
+    "video_processing": "always"
+  },
+  "cache_strategy": "aggressive",
+  "bandwidth_optimization": true,
+  "compression": "high"
+}

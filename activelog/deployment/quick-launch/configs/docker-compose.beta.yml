@@ -1,0 +1,194 @@
+# Docker Compose override for Beta environment
+
+version: '3.8'
+
+services:
+  # API Gateway with beta-specific configuration
+  api-gateway:
+    environment:
+      - ENVIRONMENT=beta
+      - DEBUG=true
+      - BETA_FEATURES_ENABLED=true
+      - FEATURE_FLAGS_ENABLED=true
+      - LOG_LEVEL=DEBUG
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./configs/beta-config.yml:/app/config.yml:ro
+      - ./logs/beta:/var/log/activelog
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api-beta.rule=Host(`beta-api.activelog.dev`)"
+      - "traefik.http.services.api-beta.loadbalancer.server.port=8080"
+
+  # Frontend with beta configuration
+  frontend:
+    build:
+      context: ../../../frontend
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=development
+        - REACT_APP_ENVIRONMENT=beta
+        - REACT_APP_API_URL=http://localhost:8080
+        - REACT_APP_BETA_FEATURES=true
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_ENVIRONMENT=beta
+      - REACT_APP_BETA_FEATURES=true
+    volumes:
+      - ../../../frontend/src:/app/src
+      - beta-frontend-node-modules:/app/node_modules
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend-beta.rule=Host(`beta.activelog.dev`)"
+
+  # Database with beta-specific settings
+  postgres:
+    environment:
+      - POSTGRES_DB=activelog_beta
+      - POSTGRES_USER=activelog_user
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db_password
+    volumes:
+      - beta-postgres-data:/var/lib/postgresql/data
+      - ./backups:/backups
+    command: >
+      postgres
+      -c max_connections=50
+      -c shared_buffers=128MB
+      -c effective_cache_size=256MB
+      -c log_statement=all
+      -c log_duration=on
+
+  # Redis with beta configuration
+  redis:
+    command: >
+      redis-server
+      --databases 16
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --save 60 1
+      --loglevel debug
+    volumes:
+      - beta-redis-data:/data
+
+  # Beta User Management Service
+  beta-user-manager:
+    build:
+      context: ../beta-management
+      dockerfile: Dockerfile
+    environment:
+      - ENVIRONMENT=beta
+      - DATABASE_URL=postgresql://activelog_user@postgres:5432/activelog_beta
+      - REDIS_URL=redis://redis:6379/1
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./configs/beta-config.yml:/app/config.yml:ro
+      - ./beta-management/data:/app/data
+
+  # Feature Flags Service
+  feature-flags:
+    build:
+      context: ../configs
+      dockerfile: Dockerfile.feature-flags
+    environment:
+      - ENVIRONMENT=beta
+      - REDIS_URL=redis://redis:6379/1
+    ports:
+      - "8081:8080"
+    depends_on:
+      - redis
+
+  # Feedback Aggregation Service
+  feedback-service:
+    build:
+      context: ../feedback
+      dockerfile: Dockerfile
+    environment:
+      - ENVIRONMENT=beta
+      - DATABASE_URL=postgresql://activelog_user@postgres:5432/activelog_beta
+    ports:
+      - "8082:8080"
+    depends_on:
+      - postgres
+    volumes:
+      - ./feedback/data:/app/data
+
+  # Monitoring Stack for Beta
+  prometheus:
+    image: prom/prometheus:latest
+    command:
+      - '--config.file=/etc/prometheus/prometheus-beta.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus-beta.yml:/etc/prometheus/prometheus-beta.yml:ro
+      - beta-prometheus-data:/prometheus
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-clock-panel
+    ports:
+      - "3001:3000"
+    volumes:
+      - beta-grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+
+  # Log aggregation for beta
+  loki:
+    image: grafana/loki:latest
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - "3100:3100"
+    volumes:
+      - beta-loki-data:/loki
+
+  promtail:
+    image: grafana/promtail:latest
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - ./logs:/var/log/activelog:ro
+      - ./monitoring/promtail-beta.yml:/etc/promtail/config.yml:ro
+
+  # Reverse proxy for beta
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"  # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+volumes:
+  beta-postgres-data:
+    driver: local
+  beta-redis-data:
+    driver: local
+  beta-frontend-node-modules:
+    driver: local
+  beta-prometheus-data:
+    driver: local
+  beta-grafana-data:
+    driver: local
+  beta-loki-data:
+    driver: local
+
+networks:
+  default:
+    name: activelog-beta-network

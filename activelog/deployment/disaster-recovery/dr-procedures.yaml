@@ -1,0 +1,451 @@
+# Disaster Recovery Procedures and Automation
+# Comprehensive DR runbooks and automated recovery processes
+
+# Disaster Recovery Namespace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: activelog-dr
+  labels:
+    name: activelog-dr
+    purpose: disaster-recovery
+---
+# DR Control Plane - Manages disaster recovery operations
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dr-controller
+  namespace: activelog-dr
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dr-controller
+  template:
+    metadata:
+      labels:
+        app: dr-controller
+    spec:
+      serviceAccountName: dr-controller
+      containers:
+      - name: dr-controller
+        image: activelog/dr-controller:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 8081
+          name: metrics
+        env:
+        - name: CLUSTER_NAME
+          value: "activelog-production"
+        - name: DR_REGION
+          value: "us-east-1"  # Secondary region
+        - name: BACKUP_STORAGE
+          value: "s3://activelog-backups"
+        - name: ALERT_WEBHOOK
+          valueFrom:
+            secretKeyRef:
+              name: dr-secrets
+              key: alert-webhook
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 200m
+            memory: 512Mi
+        volumeMounts:
+        - name: dr-config
+          mountPath: /etc/dr-config
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: dr-config
+        configMap:
+          name: dr-config
+---
+# DR Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dr-config
+  namespace: activelog-dr
+data:
+  dr-config.yaml: |
+    disaster_recovery:
+      # Recovery Time Objective (RTO) and Recovery Point Objective (RPO)
+      rto_minutes: 30  # Maximum acceptable downtime
+      rpo_minutes: 15  # Maximum acceptable data loss
+      
+      # Critical services that must be restored first
+      critical_services:
+        - api-gateway
+        - auth
+        - postgres
+        - redis
+        - data-manager
+      
+      # Service dependencies for proper startup order
+      dependencies:
+        api-gateway:
+          - auth
+          - postgres
+          - redis
+        auth:
+          - postgres
+          - redis
+        data-manager:
+          - postgres
+        ai-orchestrator:
+          - postgres
+          - redis
+          - data-manager
+        gaming-platform:
+          - postgres
+          - redis
+          - auth
+      
+      # Backup locations and retention
+      backups:
+        database:
+          location: "s3://activelog-backups/database/"
+          retention_days: 90
+          frequency: "daily"
+        
+        filesystem:
+          location: "s3://activelog-backups/filesystem/"
+          retention_days: 30
+          frequency: "weekly"
+        
+        kubernetes_state:
+          location: "s3://activelog-backups/k8s-state/"
+          retention_days: 14
+          frequency: "daily"
+      
+      # DR scenarios and procedures
+      scenarios:
+        database_corruption:
+          severity: "critical"
+          estimated_rto: 15
+          procedure: "restore_database_from_latest_backup"
+          
+        kubernetes_cluster_failure:
+          severity: "critical"
+          estimated_rto: 45
+          procedure: "provision_new_cluster_and_restore"
+          
+        regional_outage:
+          severity: "critical"
+          estimated_rto: 60
+          procedure: "activate_secondary_region"
+          
+        single_service_failure:
+          severity: "warning"
+          estimated_rto: 5
+          procedure: "restart_service"
+          
+        storage_failure:
+          severity: "critical"
+          estimated_rto: 30
+          procedure: "restore_from_filesystem_backup"
+  
+  procedures.yaml: |
+    procedures:
+      
+      # Database restoration procedure
+      restore_database_from_latest_backup:
+        name: "Database Restoration"
+        description: "Restore database from latest backup"
+        steps:
+          - action: "scale_down_applications"
+            description: "Scale down all application deployments"
+            command: "kubectl scale deployment --replicas=0 -n activelog --all"
+            
+          - action: "verify_database_backup"
+            description: "Verify latest backup exists and is valid"
+            command: "aws s3 ls s3://activelog-backups/database/ | sort | tail -1"
+            
+          - action: "create_restore_job"
+            description: "Create database restore job"
+            template: "postgres-restore-job"
+            
+          - action: "monitor_restore_progress"
+            description: "Monitor database restore job"
+            timeout: 900  # 15 minutes
+            
+          - action: "verify_database_integrity"
+            description: "Verify database integrity after restore"
+            command: "kubectl exec -n activelog postgres-0 -- psql -c 'SELECT COUNT(*) FROM users;'"
+            
+          - action: "scale_up_critical_services"
+            description: "Scale up critical services in dependency order"
+            order: ["postgres", "redis", "auth", "api-gateway"]
+            
+          - action: "run_health_checks"
+            description: "Execute health checks on restored services"
+            timeout: 300
+            
+          - action: "scale_up_remaining_services"
+            description: "Scale up remaining services"
+            
+          - action: "verify_system_health"
+            description: "Comprehensive system health verification"
+            
+          - action: "send_completion_notification"
+            description: "Notify teams of successful restoration"
+      
+      # Cluster failover procedure
+      provision_new_cluster_and_restore:
+        name: "Cluster Failover"
+        description: "Provision new cluster and restore from backups"
+        steps:
+          - action: "create_cluster_infrastructure"
+            description: "Provision new Kubernetes cluster"
+            terraform_module: "cluster"
+            
+          - action: "install_base_components"
+            description: "Install Istio, monitoring, logging"
+            
+          - action: "restore_kubernetes_state"
+            description: "Restore ConfigMaps, Secrets, Services"
+            
+          - action: "restore_persistent_data"
+            description: "Restore database and filesystem data"
+            
+          - action: "deploy_applications"
+            description: "Deploy applications in dependency order"
+            
+          - action: "update_dns_records"
+            description: "Update DNS to point to new cluster"
+            
+          - action: "verify_system_functionality"
+            description: "End-to-end system verification"
+      
+      # Regional failover procedure
+      activate_secondary_region:
+        name: "Regional Failover"
+        description: "Activate secondary region for disaster recovery"
+        steps:
+          - action: "assess_primary_region"
+            description: "Assess if primary region is recoverable"
+            
+          - action: "activate_secondary_cluster"
+            description: "Activate standby cluster in secondary region"
+            
+          - action: "sync_latest_data"
+            description: "Sync latest available data to secondary region"
+            
+          - action: "update_load_balancer"
+            description: "Redirect traffic to secondary region"
+            
+          - action: "update_monitoring_configs"
+            description: "Update monitoring for new active region"
+            
+          - action: "notify_stakeholders"
+            description: "Notify stakeholders of regional failover"
+---
+# DR Monitoring and Alerting Job
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: dr-health-check
+  namespace: activelog-dr
+spec:
+  schedule: "*/5 * * * *"  # Every 5 minutes
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: dr-health-check
+            image: alpine/curl:8.4.0
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              
+              echo "Starting DR health check at $(date)"
+              
+              # Check backup storage accessibility
+              echo "Checking backup storage..."
+              aws s3 ls s3://activelog-backups/database/ > /dev/null || {
+                echo "CRITICAL: Cannot access database backups"
+                exit 1
+              }
+              
+              # Check latest database backup age
+              LATEST_BACKUP=$(aws s3 ls s3://activelog-backups/database/ | sort | tail -1 | awk '{print $4}')
+              BACKUP_DATE=$(echo $LATEST_BACKUP | grep -oE '[0-9]{8}_[0-9]{6}')
+              BACKUP_TIMESTAMP=$(date -d "${BACKUP_DATE:0:4}-${BACKUP_DATE:4:2}-${BACKUP_DATE:6:2} ${BACKUP_DATE:9:2}:${BACKUP_DATE:11:2}:${BACKUP_DATE:13:2}" +%s)
+              CURRENT_TIMESTAMP=$(date +%s)
+              AGE_HOURS=$(( (CURRENT_TIMESTAMP - BACKUP_TIMESTAMP) / 3600 ))
+              
+              if [ $AGE_HOURS -gt 25 ]; then
+                echo "WARNING: Latest database backup is $AGE_HOURS hours old"
+                curl -X POST "${ALERT_WEBHOOK}" -H 'Content-Type: application/json' \
+                  -d "{\"text\": \"⚠️ Database backup is ${AGE_HOURS} hours old\"}"
+              fi
+              
+              # Check secondary region availability (if configured)
+              if [ -n "${DR_REGION}" ]; then
+                echo "Checking secondary region availability..."
+                aws ec2 describe-availability-zones --region ${DR_REGION} > /dev/null || {
+                  echo "WARNING: Secondary region ${DR_REGION} not accessible"
+                  curl -X POST "${ALERT_WEBHOOK}" -H 'Content-Type: application/json' \
+                    -d "{\"text\": \"⚠️ Secondary region ${DR_REGION} not accessible\"}"
+                }
+              fi
+              
+              # Test backup restore capability (monthly)
+              DAY_OF_MONTH=$(date +%d)
+              if [ "$DAY_OF_MONTH" = "15" ] && [ "$(date +%H)" = "03" ]; then
+                echo "Performing monthly backup restore test..."
+                # This would trigger a restore test in a separate environment
+                kubectl create job --from=cronjob/backup-restore-test backup-test-$(date +%Y%m%d) -n activelog-dr
+              fi
+              
+              echo "DR health check completed successfully at $(date)"
+            env:
+            - name: AWS_DEFAULT_REGION
+              value: "us-west-2"
+            - name: DR_REGION
+              value: "us-east-1"
+            - name: ALERT_WEBHOOK
+              valueFrom:
+                secretKeyRef:
+                  name: dr-secrets
+                  key: alert-webhook
+          restartPolicy: OnFailure
+---
+# Backup Restore Test Job Template
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup-restore-test
+  namespace: activelog-dr
+spec:
+  schedule: "0 3 15 * *"  # Monthly on the 15th at 3 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: restore-test
+            image: postgres:15-alpine
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              
+              echo "Starting backup restore test at $(date)"
+              
+              # Create test database
+              createdb -h postgres-test -U postgres activelog_test
+              
+              # Find latest backup
+              LATEST_BACKUP=$(aws s3 ls s3://activelog-backups/database/ | sort | tail -1 | awk '{print $4}')
+              
+              # Download and restore backup to test database
+              aws s3 cp "s3://activelog-backups/database/${LATEST_BACKUP}" /tmp/
+              gunzip -c "/tmp/${LATEST_BACKUP}" | pg_restore -h postgres-test -U postgres -d activelog_test --verbose
+              
+              # Verify restore
+              USER_COUNT=$(psql -h postgres-test -U postgres -d activelog_test -t -c "SELECT COUNT(*) FROM users;" | xargs)
+              
+              if [ "$USER_COUNT" -gt 0 ]; then
+                echo "Backup restore test PASSED: Restored ${USER_COUNT} users"
+                curl -X POST "${ALERT_WEBHOOK}" -H 'Content-Type: application/json' \
+                  -d "{\"text\": \"✅ Monthly backup restore test PASSED (${USER_COUNT} users restored)\"}"
+              else
+                echo "Backup restore test FAILED: No users found"
+                curl -X POST "${ALERT_WEBHOOK}" -H 'Content-Type: application/json' \
+                  -d "{\"text\": \"❌ Monthly backup restore test FAILED\"}"
+                exit 1
+              fi
+              
+              # Cleanup
+              dropdb -h postgres-test -U postgres activelog_test
+              rm -f "/tmp/${LATEST_BACKUP}"
+              
+              echo "Backup restore test completed at $(date)"
+            env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-test-secret
+                  key: password
+            - name: ALERT_WEBHOOK
+              valueFrom:
+                secretKeyRef:
+                  name: dr-secrets
+                  key: alert-webhook
+          restartPolicy: OnFailure
+---
+# Service Account for DR Controller
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dr-controller
+  namespace: activelog-dr
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: dr-controller
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dr-controller
+subjects:
+- kind: ServiceAccount
+  name: dr-controller
+  namespace: activelog-dr
+roleRef:
+  kind: ClusterRole
+  name: dr-controller
+  apiGroup: rbac.authorization.k8s.io
+---
+# DR Secrets (template - fill in actual values)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dr-secrets
+  namespace: activelog-dr
+type: Opaque
+stringData:
+  alert-webhook: "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+  aws-access-key: "YOUR_AWS_ACCESS_KEY"
+  aws-secret-key: "YOUR_AWS_SECRET_KEY"
+---
+# DR Dashboard Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: dr-dashboard
+  namespace: activelog-dr
+spec:
+  selector:
+    app: dr-controller
+  ports:
+  - port: 80
+    targetPort: 8080
+    name: http
+  type: ClusterIP

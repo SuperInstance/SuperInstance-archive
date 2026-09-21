@@ -1,0 +1,15 @@
+{
+  "researcher": "firefly_demo",
+  "start_time": "2025-08-30T10:38:39.127688",
+  "objective": "Build working democratic voting demo",
+  "starting_simple": "3 agents voting on resource allocation",
+  "demo_goal": "Show 70%+ efficiency improvement",
+  "iteration": 1,
+  "status": "starting_simple",
+  "notes": [],
+  "working_versions": [],
+  "failures": [],
+  "next_steps": [
+    "3 agents voting on resource allocation"
+  ]
+}

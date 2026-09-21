@@ -1,0 +1,54 @@
+.list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.list-item {
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.list-item:hover {
+  background: #f3f4f6;
+  transform: translateX(4px);
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-info strong {
+  display: block;
+  color: #333;
+  margin-bottom: 0.3rem;
+}
+
+.item-meta {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.active-badge {
+  color: #10b981;
+  margin-left: 0.5rem;
+  font-weight: 600;
+}
+
+.item-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #999;
+}

@@ -1,0 +1,193 @@
+================================================================================
+ACTIVELOG SECURITY SCAN REPORT
+================================================================================
+Scan Timestamp: 20250822_094522
+Exit Code: 1
+
+SUMMARY:
+  Total Issues Found: 551
+  Files Scanned: 112713 lines of code
+
+SEVERITY BREAKDOWN:
+  HIGH:    19 issues
+  MEDIUM: 204 issues
+  LOW:    328 issues
+
+CONFIDENCE BREAKDOWN:
+  HIGH:   345 issues
+  MEDIUM:  86 issues
+  LOW:    120 issues
+
+UNIQUE TEST TYPES: 24
+
+DETAILED ISSUES:
+----------------------------------------
+
+HIGH SEVERITY ISSUES:
+  File: /home/activeloguser/activelog/infrastructure/terraform/modules/lambda/lambda_code/virus_scanner.py:212
+  Test: hashlib (B324)
+  Confidence: HIGH
+  Issue: Use of weak MD5 hash for security. Consider usedforsecurity=False
+
+  File: /home/activeloguser/activelog/infrastructure/terraform/modules/lambda/lambda_code/virus_scanner.py:213
+  Test: hashlib (B324)
+  Confidence: HIGH
+  Issue: Use of weak SHA1 hash for security. Consider usedforsecurity=False
+
+  File: /home/activeloguser/activelog/modules/legal/contracts/src/contract_analyzer.py:666
+  Test: hashlib (B324)
+  Confidence: HIGH
+  Issue: Use of weak MD5 hash for security. Consider usedforsecurity=False
+
+  File: /home/activeloguser/activelog/modules/legal/custody/src/chain_of_custody.py:147
+  Test: hashlib (B324)
+  Confidence: HIGH
+  Issue: Use of weak MD5 hash for security. Consider usedforsecurity=False
+
+  File: /home/activeloguser/activelog/modules/legal/custody/src/chain_of_custody.py:175
+  Test: hashlib (B324)
+  Confidence: HIGH
+  Issue: Use of weak MD5 hash for security. Consider usedforsecurity=False
+
+  File: /home/activeloguser/activelog/production/caching/redis_cache_manager.py:476
+  Test: hashlib (B324)
+  Confidence: HIGH
+  Issue: Use of weak MD5 hash for security. Consider usedforsecurity=False
+
+  File: /home/activeloguser/activelog/sdk/python/activelog_plugin_sdk/decorators.py:130
+  Test: hashlib (B324)
+  Confidence: HIGH
+  Issue: Use of weak MD5 hash for security. Consider usedforsecurity=False
+
+  File: /home/activeloguser/activelog/services/ai-orchestrator/plugins/ollama_plugin.py:136
+  Test: hashlib (B324)
+  Confidence: HIGH
+  Issue: Use of weak MD5 hash for security. Consider usedforsecurity=False
+
+  File: /home/activeloguser/activelog/services/ai-orchestrator/plugins/whisper_plugin.py:266
+  Test: hashlib (B324)
+  Confidence: HIGH
+  Issue: Use of weak MD5 hash for security. Consider usedforsecurity=False
+
+  File: /home/activeloguser/activelog/services/cache/api_cache.py:217
+  Test: hashlib (B324)
+  Confidence: HIGH
+  Issue: Use of weak MD5 hash for security. Consider usedforsecurity=False
+
+  ... and 9 more HIGH issues
+
+MEDIUM SEVERITY ISSUES:
+  File: /home/activeloguser/activelog/docs/inline-docs/auth-service-docs.py:674
+  Test: hardcoded_bind_all_interfaces (B104)
+  Confidence: MEDIUM
+  Issue: Possible binding to all interfaces.
+
+  File: /home/activeloguser/activelog/infrastructure/terraform/modules/lambda/lambda_code/backup_processor.py:106
+  Test: hardcoded_tmp_directory (B108)
+  Confidence: MEDIUM
+  Issue: Probable insecure usage of temp file/directory.
+
+  File: /home/activeloguser/activelog/infrastructure/terraform/modules/lambda/lambda_code/virus_scanner.py:76
+  Test: hardcoded_tmp_directory (B108)
+  Confidence: MEDIUM
+  Issue: Probable insecure usage of temp file/directory.
+
+  File: /home/activeloguser/activelog/modules/healthcare/dicom/src/dicom_handler.py:112
+  Test: hardcoded_tmp_directory (B108)
+  Confidence: MEDIUM
+  Issue: Probable insecure usage of temp file/directory.
+
+  File: /home/activeloguser/activelog/modules/healthcare/src/core/config.py:13
+  Test: hardcoded_bind_all_interfaces (B104)
+  Confidence: MEDIUM
+  Issue: Possible binding to all interfaces.
+
+  File: /home/activeloguser/activelog/modules/legal/ediscovery/tests/test_export_formats.py:131
+  Test: blacklist (B314)
+  Confidence: HIGH
+  Issue: Using xml.etree.ElementTree.fromstring to parse untrusted XML data is known to be vulnerable to XML attacks. Replace xml.etree.ElementTree.fromstring with its defusedxml equivalent function or make sure defusedxml.defuse_stdlib() is called
+
+  File: /home/activeloguser/activelog/production/caching/redis_cache_manager.py:247
+  Test: blacklist (B301)
+  Confidence: HIGH
+  Issue: Pickle and modules that wrap it can be unsafe when used to deserialize untrusted data, possible security issue.
+
+  File: /home/activeloguser/activelog/sdk/examples/social-media-import/main.py:159
+  Test: hardcoded_sql_expressions (B608)
+  Confidence: LOW
+  Issue: Possible SQL injection vector through string-based query construction.
+
+  File: /home/activeloguser/activelog/sdk/examples/social-media-import/main.py:164
+  Test: hardcoded_sql_expressions (B608)
+  Confidence: LOW
+  Issue: Possible SQL injection vector through string-based query construction.
+
+  File: /home/activeloguser/activelog/sdk/marketplace/api.py:790
+  Test: hardcoded_bind_all_interfaces (B104)
+  Confidence: MEDIUM
+  Issue: Possible binding to all interfaces.
+
+  ... and 194 more MEDIUM issues
+
+LOW SEVERITY ISSUES:
+  File: /home/activeloguser/activelog/infrastructure/mesh/scripts/mesh-manager.py:8
+  Test: blacklist (B404)
+  Confidence: HIGH
+  Issue: Consider possible security implications associated with the subprocess module.
+
+  File: /home/activeloguser/activelog/infrastructure/mesh/scripts/mesh-manager.py:374
+  Test: start_process_with_partial_path (B607)
+  Confidence: HIGH
+  Issue: Starting a process with a partial executable path
+
+  File: /home/activeloguser/activelog/infrastructure/mesh/scripts/mesh-manager.py:374
+  Test: subprocess_without_shell_equals_true (B603)
+  Confidence: HIGH
+  Issue: subprocess call - check for execution of untrusted input.
+
+  File: /home/activeloguser/activelog/infrastructure/mesh/scripts/mesh-manager.py:382
+  Test: start_process_with_partial_path (B607)
+  Confidence: HIGH
+  Issue: Starting a process with a partial executable path
+
+  File: /home/activeloguser/activelog/infrastructure/mesh/scripts/mesh-manager.py:382
+  Test: subprocess_without_shell_equals_true (B603)
+  Confidence: HIGH
+  Issue: subprocess call - check for execution of untrusted input.
+
+  File: /home/activeloguser/activelog/infrastructure/mesh/scripts/mesh-manager.py:409
+  Test: start_process_with_partial_path (B607)
+  Confidence: HIGH
+  Issue: Starting a process with a partial executable path
+
+  File: /home/activeloguser/activelog/infrastructure/mesh/scripts/mesh-manager.py:409
+  Test: subprocess_without_shell_equals_true (B603)
+  Confidence: HIGH
+  Issue: subprocess call - check for execution of untrusted input.
+
+  File: /home/activeloguser/activelog/infrastructure/mesh/scripts/mesh-manager.py:417
+  Test: start_process_with_partial_path (B607)
+  Confidence: HIGH
+  Issue: Starting a process with a partial executable path
+
+  File: /home/activeloguser/activelog/infrastructure/mesh/scripts/mesh-manager.py:417
+  Test: subprocess_without_shell_equals_true (B603)
+  Confidence: HIGH
+  Issue: subprocess call - check for execution of untrusted input.
+
+  File: /home/activeloguser/activelog/infrastructure/mesh/scripts/mesh-manager.py:425
+  Test: start_process_with_partial_path (B607)
+  Confidence: HIGH
+  Issue: Starting a process with a partial executable path
+
+  ... and 318 more LOW issues
+
+RECOMMENDATIONS:
+- Review all HIGH severity issues immediately
+- Address MEDIUM severity issues in next sprint
+- Consider LOW severity issues for future improvements
+- Run this scan regularly as part of CI/CD pipeline
+- Review and update security policies based on findings
+
+For detailed analysis, review the JSON report in the reports directory.
+================================================================================

@@ -1,0 +1,282 @@
+{
+  "success_patterns": {
+    "k8s-namespace-ready": [
+      {
+        "bot": "infra",
+        "timestamp": "19:08",
+        "context": []
+      },
+      {
+        "bot": "infra",
+        "timestamp": "19:08",
+        "context": []
+      }
+    ],
+    "k8s-deployment-templates": [
+      {
+        "bot": "infra",
+        "timestamp": "19:08",
+        "context": []
+      },
+      {
+        "bot": "infra",
+        "timestamp": "19:08",
+        "context": []
+      }
+    ],
+    "cert-manager-installed": [
+      {
+        "bot": "infra",
+        "timestamp": "19:10",
+        "context": []
+      },
+      {
+        "bot": "infra",
+        "timestamp": "19:10",
+        "context": []
+      }
+    ],
+    "ingress-controller-setup": [
+      {
+        "bot": "infra",
+        "timestamp": "19:12",
+        "context": []
+      },
+      {
+        "bot": "infra",
+        "timestamp": "19:12",
+        "context": []
+      }
+    ],
+    "phase1-infrastructure-foundation": [
+      {
+        "bot": "infra",
+        "timestamp": "19:13",
+        "context": []
+      },
+      {
+        "bot": "infra",
+        "timestamp": "19:13",
+        "context": []
+      }
+    ],
+    "docker-fallback-ready": [
+      {
+        "bot": "infra",
+        "timestamp": "19:18",
+        "context": []
+      }
+    ]
+  },
+  "failure_patterns": {
+    "k8s-api-server-issue": [
+      {
+        "bot": "infra",
+        "timestamp": "19:05",
+        "context": [
+          "03:02|infra|START|monitoring-phase2-prep",
+          "03:02|infra|READY|k8s-cluster-operational"
+        ]
+      },
+      {
+        "bot": "infra",
+        "timestamp": "19:05",
+        "context": [
+          "03:02|infra|START|monitoring-phase2-prep",
+          "03:02|infra|READY|k8s-cluster-operational"
+        ]
+      }
+    ],
+    "k8s-api-intermittent": [
+      {
+        "bot": "infra",
+        "timestamp": "19:08",
+        "context": [
+          "19:04|infra|UPDATE|cluster-health-check",
+          "19:05|infra|BLOCKED|k8s-api-server-issue"
+        ]
+      },
+      {
+        "bot": "infra",
+        "timestamp": "19:08",
+        "context": [
+          "19:04|infra|UPDATE|cluster-health-check",
+          "19:05|infra|BLOCKED|k8s-api-server-issue"
+        ]
+      }
+    ]
+  },
+  "optimal_timing": {
+    "START->START": {
+      "average_gap": 1.0,
+      "sample_size": 2,
+      "last_updated": "2025-08-26T19:19:17.211079"
+    },
+    "START->KICK": {
+      "average_gap": 961.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211088"
+    },
+    "KICK->START": {
+      "average_gap": 5.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211089"
+    },
+    "START->SYSTEM": {
+      "average_gap": 0.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211091"
+    },
+    "SYSTEM->START": {
+      "average_gap": 1.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211092"
+    },
+    "START->COMPLETED": {
+      "average_gap": 478.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211093"
+    },
+    "COMPLETED->START": {
+      "average_gap": 0.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211094"
+    },
+    "START->READY": {
+      "average_gap": 0.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211095"
+    },
+    "READY->UPDATE": {
+      "average_gap": 962.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211096"
+    },
+    "UPDATE->BLOCKED": {
+      "average_gap": 2.0,
+      "sample_size": 2,
+      "last_updated": "2025-08-26T19:19:17.211097"
+    },
+    "BLOCKED->UPDATE": {
+      "average_gap": 0.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211098"
+    },
+    "BLOCKED->RESOLVED": {
+      "average_gap": 0.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211100"
+    },
+    "RESOLVED->ISSUE": {
+      "average_gap": 0.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211101"
+    },
+    "ISSUE->START": {
+      "average_gap": 478.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211102"
+    },
+    "START->COMPLETE": {
+      "average_gap": 962.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211103"
+    },
+    "COMPLETE->CRITICAL": {
+      "average_gap": 0.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211104"
+    },
+    "CRITICAL->FALLBACK": {
+      "average_gap": 1.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211105"
+    },
+    "FALLBACK->ASSIST": {
+      "average_gap": 0.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211106"
+    },
+    "ASSIST->COMPLETE": {
+      "average_gap": 1.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211107"
+    },
+    "COMPLETE->CONTRIBUTE": {
+      "average_gap": 1.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211108"
+    },
+    "CONTRIBUTE->COMPLETE": {
+      "average_gap": 1.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211109"
+    },
+    "COMPLETE->COMPLETE": {
+      "average_gap": 1.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211110"
+    },
+    "COMPLETE->HANDOFF": {
+      "average_gap": 0.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211111"
+    },
+    "HANDOFF->START": {
+      "average_gap": 2.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211112"
+    },
+    "START->DEBUGGING": {
+      "average_gap": 475.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211113"
+    },
+    "DEBUGGING->RESUME": {
+      "average_gap": 965.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211114"
+    },
+    "RESUME->FIXING": {
+      "average_gap": 481.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211116"
+    },
+    "FIXING->START": {
+      "average_gap": 960.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211117"
+    },
+    "START->WORKAROUND": {
+      "average_gap": 1.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211118"
+    },
+    "WORKAROUND->CRITICAL": {
+      "average_gap": 480.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211119"
+    },
+    "CRITICAL->COMPLETE": {
+      "average_gap": 961.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211120"
+    },
+    "COMPLETE->PROGRESS": {
+      "average_gap": 0.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211122"
+    },
+    "PROGRESS->START": {
+      "average_gap": 0.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211123"
+    },
+    "START->SOLUTION": {
+      "average_gap": 480.0,
+      "sample_size": 1,
+      "last_updated": "2025-08-26T19:19:17.211124"
+    }
+  },
+  "bot_preferences": {}
+}

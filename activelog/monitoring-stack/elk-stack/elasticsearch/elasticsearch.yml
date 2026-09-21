@@ -1,0 +1,97 @@
+# Elasticsearch configuration for ActiveLog logging
+# Production-ready configuration with clustering and security
+
+# ======================== Elasticsearch Configuration =========================
+
+# ---------------------------------- Cluster -----------------------------------
+cluster.name: activelog-logs
+node.name: elasticsearch-${HOSTNAME}
+node.roles: [ master, data, ingest, ml ]
+
+# ----------------------------------- Paths ------------------------------------
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs
+path.repo: /usr/share/elasticsearch/backups
+
+# ---------------------------------- Network -----------------------------------
+network.host: 0.0.0.0
+http.port: 9200
+transport.port: 9300
+
+# --------------------------------- Discovery ----------------------------------
+discovery.type: single-node
+# For cluster setup, use:
+# discovery.seed_hosts: ["elasticsearch-master-1", "elasticsearch-master-2", "elasticsearch-master-3"]
+# cluster.initial_master_nodes: ["elasticsearch-master-1", "elasticsearch-master-2", "elasticsearch-master-3"]
+
+# ---------------------------------- Gateway -----------------------------------
+gateway.recover_after_nodes: 1
+gateway.expected_nodes: 1
+gateway.recover_after_time: 5m
+
+# ---------------------------------- Memory ------------------------------------
+bootstrap.memory_lock: true
+
+# ---------------------------------- Security ----------------------------------
+xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl.verification_mode: certificate
+xpack.security.transport.ssl.keystore.path: elastic-certificates.p12
+xpack.security.transport.ssl.truststore.path: elastic-certificates.p12
+xpack.security.http.ssl.enabled: true
+xpack.security.http.ssl.keystore.path: elastic-certificates.p12
+
+# ---------------------------------- License -----------------------------------
+xpack.license.self_generated.type: basic
+
+# --------------------------------- Monitoring ---------------------------------
+xpack.monitoring.enabled: true
+xpack.monitoring.collection.enabled: true
+
+# ---------------------------------- Alerting ----------------------------------
+xpack.watcher.enabled: true
+
+# ---------------------------------- Indexing ----------------------------------
+# Index lifecycle management
+xpack.ilm.enabled: true
+
+# ---------------------------------- Threading ---------------------------------
+thread_pool.search.queue_size: 1000
+thread_pool.write.queue_size: 1000
+
+# ---------------------------------- Caching -----------------------------------
+indices.memory.index_buffer_size: 20%
+indices.memory.min_index_buffer_size: 96mb
+
+# ---------------------------------- Snapshots ---------------------------------
+repositories:
+  activelog-backups:
+    type: fs
+    settings:
+      location: /usr/share/elasticsearch/backups
+      compress: true
+      max_snapshot_bytes_per_sec: 50mb
+      max_restore_bytes_per_sec: 50mb
+
+# ---------------------------------- Logging -----------------------------------
+logger.root: INFO
+logger.org.elasticsearch.transport: WARN
+logger.org.elasticsearch.discovery: WARN
+logger.org.elasticsearch.cluster.service: DEBUG
+logger.slowlog: TRACE, index_search_slowlog_file, index_indexing_slowlog_file
+
+# Slow log configuration
+index.search.slowlog.threshold.query.warn: 10s
+index.search.slowlog.threshold.query.info: 5s
+index.search.slowlog.threshold.query.debug: 2s
+index.search.slowlog.threshold.query.trace: 500ms
+
+index.search.slowlog.threshold.fetch.warn: 1s
+index.search.slowlog.threshold.fetch.info: 800ms
+index.search.slowlog.threshold.fetch.debug: 500ms
+index.search.slowlog.threshold.fetch.trace: 200ms
+
+index.indexing.slowlog.threshold.index.warn: 10s
+index.indexing.slowlog.threshold.index.info: 5s
+index.indexing.slowlog.threshold.index.debug: 2s
+index.indexing.slowlog.threshold.index.trace: 500ms

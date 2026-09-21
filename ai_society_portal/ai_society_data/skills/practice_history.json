@@ -1,0 +1,20 @@
+{
+  "c04ae592437e": [
+    {
+      "id": "1e0dd656-f59c-4e6d-a93d-d9f55d780757",
+      "character_id": "c04ae592437e",
+      "skill_type": "data_analysis",
+      "session_start": "2025-10-21T17:15:57.501098",
+      "session_end": "2025-10-21T17:15:57.501135",
+      "duration_minutes": 45,
+      "difficulty": 0.4,
+      "total_xp_gained": 5.478378373493172,
+      "successful_practices": 1,
+      "total_practices": 4,
+      "session_success_rate": 0.25,
+      "xp_per_minute": 8883856.82188082,
+      "breakthrough_achieved": false,
+      "practice_count": 4
+    }
+  ]
+}

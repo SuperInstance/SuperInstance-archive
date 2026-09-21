@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FishingLog - Fishing Layout</title>
+    <link rel="stylesheet" href="styles/marine-common.css">
+    <link rel="stylesheet" href="styles/fishing-layout.css">
+</head>
+<body class="marine-interface fishing-layout">
+    <div class="layout-container">
+        <!-- Main Chart Display with Fishing Overlays -->
+        <div class="chart-main" id="chartMain">
+            <div class="chart-header">
+                <h2>Electronic Chart - Fishing Mode</h2>
+                <div class="chart-controls">
+                    <button class="btn-chart" id="zoomIn">+</button>
+                    <button class="btn-chart" id="zoomOut">-</button>
+                    <button class="btn-chart" id="centerVessel">📍</button>
+                    <button class="btn-chart" id="fishingTools">🎣</button>
+                    <select id="chartType">
+                        <option value="fishing">Fishing Chart</option>
+                        <option value="bathymetric">Bathymetric</option>
+                        <option value="satellite">Satellite</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-display" id="chartCanvas">
+                <div class="vessel-position">
+                    <div class="vessel-icon fishing">🚢</div>
+                    <div class="drift-track"></div>
+                </div>
+                
+                <!-- Fishing Overlays -->
+                <div class="fishing-overlay">
+                    <!-- Fishing Hotspots -->
+                    <div class="fishing-spot active" style="top: 30%; left: 45%;" data-spot="rocky-bottom">
+                        <div class="spot-marker">🐟</div>
+                        <div class="spot-info">Rocky Bottom<br>Stripers, Tautog</div>
+                    </div>
+                    <div class="fishing-spot" style="top: 60%; left: 70%;" data-spot="wreck">
+                        <div class="spot-marker">⚓</div>
+                        <div class="spot-info">Wreck Site<br>Cod, Fluke</div>
+                    </div>
+                    
+                    <!-- Depth Contours -->
+                    <div class="depth-contours fishing">
+                        <div class="contour-line" data-depth="30"></div>
+                        <div class="contour-line" data-depth="60"></div>
+                        <div class="contour-line" data-depth="100"></div>
+                    </div>
+                    
+                    <!-- Fish Tracks -->
+                    <div class="fish-tracks">
+                        <div class="fish-track" data-species="striper">
+                            <div class="track-point" style="top: 32%; left: 47%;"></div>
+                            <div class="track-point" style="top: 35%; left: 49%;"></div>
+                            <div class="track-point" style="top: 38%; left: 51%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-info">
+                <span class="coordinates">LAT: 41°24.123'N LON: 71°51.456'W</span>
+                <span class="fishing-info">Depth: 45ft • Bottom: Rocky • Tide: Rising</span>
+            </div>
+        </div>
+
+        <!-- Fish Finder Display -->
+        <div class="fishfinder-panel" id="fishfinderPanel">
+            <div class="panel-header">
+                <h3>Fish Finder / Sonar</h3>
+                <div class="sonar-controls">
+                    <select id="sonarRange">
+                        <option value="20">20ft</option>
+                        <option value="50" selected>50ft</option>
+                        <option value="100">100ft</option>
+                        <option value="200">200ft</option>
+                    </select>
+                    <button class="btn-sonar" id="sonarGain">GAIN</button>
+                    <button class="btn-sonar" id="fishAlarm">🔔</button>
+                </div>
+            </div>
+            
+            <div class="sonar-display">
+                <!-- Sonar History -->
+                <div class="sonar-history">
+                    <canvas id="sonarCanvas" width="400" height="300"></canvas>
+                </div>
+                
+                <!-- Current Reading -->
+                <div class="current-reading">
+                    <div class="depth-scale">
+                        <div class="scale-mark" data-depth="0">0ft</div>
+                        <div class="scale-mark" data-depth="10">10ft</div>
+                        <div class="scale-mark" data-depth="20">20ft</div>
+                        <div class="scale-mark" data-depth="30">30ft</div>
+                        <div class="scale-mark" data-depth="40">40ft</div>
+                        <div class="scale-mark" data-depth="50">50ft</div>
+                    </div>
+                    
+                    <!-- Fish Arches -->
+                    <div class="fish-arches">
+                        <div class="fish-arch large" style="top: 60%; right: 10%;" data-size="large">🐟</div>
+                        <div class="fish-arch medium" style="top: 45%; right: 25%;" data-size="medium">🐟</div>
+                        <div class="fish-arch small" style="top: 75%; right: 15%;" data-size="small">🐟</div>
+                    </div>
+                    
+                    <!-- Bottom Structure -->
+                    <div class="bottom-structure">
+                        <div class="bottom-line hard"></div>
+                        <div class="structure-feature" style="bottom: 0; right: 30%;" data-type="rock">🪨</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sonar-info">
+                <div class="info-item">
+                    <label>Depth:</label>
+                    <span class="depth-value">45.2 ft</span>
+                </div>
+                <div class="info-item">
+                    <label>Bottom:</label>
+                    <span class="bottom-type">Hard</span>
+                </div>
+                <div class="info-item">
+                    <label>Water Temp:</label>
+                    <span class="temp-value">68°F</span>
+                </div>
+                <div class="info-item">
+                    <label>Fish Count:</label>
+                    <span class="fish-count">3 targets</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Catch Log Panel -->
+        <div class="catch-log-panel" id="catchLogPanel">
+            <div class="panel-header">
+                <h3>Catch Log</h3>
+                <div class="log-controls">
+                    <button class="btn-primary" id="newCatchBtn">+ New Catch</button>
+                    <button class="btn-secondary" id="exportLog">📊 Export</button>
+                </div>
+            </div>
+            
+            <!-- Today's Summary -->
+            <div class="catch-summary">
+                <h4>Today's Fishing</h4>
+                <div class="summary-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">7</div>
+                        <div class="stat-label">Total Caught</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">Keepers</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Released</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">3.2</div>
+                        <div class="stat-label">Avg Weight (lbs)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Catches -->
+            <div class="recent-catches">
+                <h4>Recent Catches</h4>
+                <div class="catch-list">
+                    <div class="catch-item">
+                        <div class="catch-time">14:23</div>
+                        <div class="catch-details">
+                            <div class="species">Striped Bass</div>
+                            <div class="catch-specs">28" • 4.2 lbs</div>
+                            <div class="catch-location">41°24.1'N 71°51.4'W</div>
+                        </div>
+                        <div class="catch-status keeper">Keeper</div>
+                    </div>
+                    
+                    <div class="catch-item">
+                        <div class="catch-time">14:18</div>
+                        <div class="catch-details">
+                            <div class="species">Scup</div>
+                            <div class="catch-specs">12" • 0.8 lbs</div>
+                            <div class="catch-location">41°24.0'N 71°51.3'W</div>
+                        </div>
+                        <div class="catch-status released">Released</div>
+                    </div>
+                    
+                    <div class="catch-item">
+                        <div class="catch-time">13:45</div>
+                        <div class="catch-details">
+                            <div class="species">Fluke</div>
+                            <div class="catch-specs">19" • 2.1 lbs</div>
+                            <div class="catch-location">41°23.8'N 71°51.1'W</div>
+                        </div>
+                        <div class="catch-status keeper">Keeper</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Fishing Conditions -->
+            <div class="fishing-conditions">
+                <h4>Conditions</h4>
+                <div class="condition-item">
+                    <label>Tide:</label>
+                    <span>Rising • +2.1ft</span>
+                </div>
+                <div class="condition-item">
+                    <label>Moon Phase:</label>
+                    <span>First Quarter</span>
+                </div>
+                <div class="condition-item">
+                    <label>Barometer:</label>
+                    <span>30.15" Rising</span>
+                </div>
+                <div class="condition-item">
+                    <label>Wind:</label>
+                    <span>NE 12 kts</span>
+                </div>
+                <div class="condition-item">
+                    <label>Current:</label>
+                    <span>0.8 kts SW</span>
+                </div>
+            </div>
+
+            <!-- Species Guide -->
+            <div class="species-guide">
+                <h4>Species Guide</h4>
+                <div class="species-item">
+                    <div class="species-icon">🐟</div>
+                    <div class="species-info">
+                        <div class="species-name">Striped Bass</div>
+                        <div class="species-regs">Min: 28" • Bag: 1</div>
+                    </div>
+                </div>
+                <div class="species-item">
+                    <div class="species-icon">🐟</div>
+                    <div class="species-info">
+                        <div class="species-name">Fluke</div>
+                        <div class="species-regs">Min: 18" • Bag: 5</div>
+                    </div>
+                </div>
+                <div class="species-item">
+                    <div class="species-icon">🐟</div>
+                    <div class="species-info">
+                        <div class="species-name">Scup</div>
+                        <div class="species-regs">Min: 10" • Bag: 30</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fishing Tools -->
+        <div class="fishing-tools" id="fishingTools">
+            <div class="tool-group">
+                <button class="tool-btn" id="dropMarker">📍 Drop Marker</button>
+                <button class="tool-btn" id="trollingSpeed">🎣 Trolling Speed</button>
+                <button class="tool-btn" id="tideChart">🌊 Tide Chart</button>
+                <button class="tool-btn" id="weatherForecast">🌤️ Weather</button>
+            </div>
+            
+            <div class="active-tool" id="activeTool">
+                <div class="tool-display">
+                    <span class="tool-label">Trolling Speed:</span>
+                    <span class="tool-value">2.4 kts</span>
+                    <div class="tool-indicator optimal">Optimal</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-label">Drift:</span>
+                <span class="status-value">0.3 kts SW</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Depth:</span>
+                <span class="status-value">45.2 ft</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Bottom:</span>
+                <span class="status-value">Hard</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Fish Alarm:</span>
+                <span class="status-value active">ON</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Today:</span>
+                <span class="status-value">7 fish</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Session:</span>
+                <span class="status-value">3h 15m</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Catch Modal -->
+    <div class="modal hidden" id="catchModal">
+        <div class="modal-content">
+            <h3>Log New Catch</h3>
+            <form id="catchForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="catchSpecies">Species:</label>
+                        <select id="catchSpecies" required>
+                            <option value="">Select Species...</option>
+                            <option value="striped_bass">Striped Bass</option>
+                            <option value="fluke">Fluke (Summer Flounder)</option>
+                            <option value="scup">Scup (Porgy)</option>
+                            <option value="tautog">Tautog</option>
+                            <option value="cod">Cod</option>
+                            <option value="other">Other...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="catchLength">Length (inches):</label>
+                        <input type="number" id="catchLength" step="0.1" min="0" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="catchWeight">Weight (lbs):</label>
+                        <input type="number" id="catchWeight" step="0.1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="catchStatus">Status:</label>
+                        <select id="catchStatus" required>
+                            <option value="keeper">Keeper</option>
+                            <option value="released">Released</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="catchBait">Bait/Lure:</label>
+                    <input type="text" id="catchBait" placeholder="e.g., Live eel, Bucktail jig">
+                </div>
+                
+                <div class="form-group">
+                    <label for="catchNotes">Notes:</label>
+                    <textarea id="catchNotes" placeholder="Additional notes about the catch..."></textarea>
+                </div>
+                
+                <div class="catch-conditions">
+                    <h4>Conditions (Auto-filled)</h4>
+                    <div class="condition-grid">
+                        <div class="condition-field">
+                            <label>Position:</label>
+                            <span id="catchPosition">41°24.123'N 71°51.456'W</span>
+                        </div>
+                        <div class="condition-field">
+                            <label>Depth:</label>
+                            <span id="catchDepth">45.2 ft</span>
+                        </div>
+                        <div class="condition-field">
+                            <label>Tide:</label>
+                            <span id="catchTide">Rising +2.1ft</span>
+                        </div>
+                        <div class="condition-field">
+                            <label>Wind:</label>
+                            <span id="catchWind">NE 12 kts</span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            
+            <div class="modal-actions">
+                <button class="btn-primary" id="saveCatch">Save Catch</button>
+                <button class="btn-secondary" id="cancelCatch">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/marine-common.js"></script>
+    <script src="scripts/fishing-layout.js"></script>
+</body>
+</html>

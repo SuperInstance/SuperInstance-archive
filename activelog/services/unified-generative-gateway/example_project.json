@@ -1,0 +1,98 @@
+{
+  "example_construction_projects": [
+    {
+      "project_name": "Smart Office Building",
+      "user_id": "architect_001", 
+      "project_type": "smart_building",
+      "description": "Design a 5-story smart office building with sustainable features, IoT integration, and modern amenities for 200 employees",
+      "requirements": {
+        "floors": 5,
+        "employee_capacity": 200,
+        "sustainability_rating": "LEED Gold",
+        "smart_features": [
+          "automated_lighting",
+          "climate_control",
+          "security_system",
+          "energy_monitoring"
+        ],
+        "accessibility_compliance": "ADA",
+        "parking_spaces": 50
+      },
+      "quality_tier": "professional",
+      "budget_limit": 5000.00,
+      "timeline": "3 months",
+      "deliverables": [
+        "architectural_blueprints",
+        "3d_renderings", 
+        "smart_systems_specifications",
+        "sustainability_report",
+        "cost_estimates"
+      ],
+      "preferences": {
+        "visualization_style": "modern_architectural",
+        "documentation_format": "professional_report",
+        "code_standards": "industry_best_practices"
+      }
+    },
+    {
+      "project_name": "Residential Complex",
+      "user_id": "developer_002",
+      "project_type": "residential_complex", 
+      "description": "Design a mixed-use residential complex with retail spaces, community amenities, and green spaces",
+      "requirements": {
+        "residential_units": 120,
+        "retail_spaces": 8,
+        "community_amenities": [
+          "fitness_center",
+          "community_room",
+          "playground",
+          "dog_park"
+        ],
+        "green_space_percentage": 30,
+        "parking_ratio": "1.5_per_unit"
+      },
+      "quality_tier": "high",
+      "budget_limit": 3500.00,
+      "deliverables": [
+        "site_plan",
+        "unit_layouts",
+        "landscape_design",
+        "amenity_specifications"
+      ]
+    },
+    {
+      "project_name": "Industrial Manufacturing Plant",
+      "user_id": "engineer_003",
+      "project_type": "industrial_facility",
+      "description": "Design an efficient manufacturing facility with automated production lines and quality control systems",
+      "requirements": {
+        "production_area_sqft": 50000,
+        "office_area_sqft": 10000,
+        "automation_level": "high",
+        "safety_standards": "OSHA_compliant",
+        "environmental_controls": "ISO_14001"
+      },
+      "quality_tier": "excellence",
+      "deliverables": [
+        "facility_layout",
+        "production_flow_diagrams",
+        "safety_systems_design",
+        "automation_specifications"
+      ]
+    }
+  ],
+  "api_usage_examples": {
+    "start_project": {
+      "endpoint": "POST /orchestrate",
+      "curl_example": "curl -X POST http://localhost:8610/orchestrate -H 'Content-Type: application/json' -d @example_project.json"
+    },
+    "check_status": {
+      "endpoint": "GET /network-status", 
+      "curl_example": "curl http://localhost:8610/network-status"
+    },
+    "view_services": {
+      "endpoint": "GET /services",
+      "curl_example": "curl http://localhost:8610/services"
+    }
+  }
+}

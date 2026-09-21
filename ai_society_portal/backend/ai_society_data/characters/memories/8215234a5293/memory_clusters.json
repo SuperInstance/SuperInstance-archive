@@ -1,0 +1,127 @@
+{
+  "character_id": "8215234a5293",
+  "clusters": [
+    {
+      "id": "358abd16",
+      "name": "Hippocampus Memories",
+      "topic": "hippocampus",
+      "memory_ids": [
+        "9c3cf21c4539"
+      ],
+      "created_at": "2025-10-21T17:02:45.723304",
+      "importance": 10
+    },
+    {
+      "id": "a11c15a9",
+      "name": "Memory Formation Memories",
+      "topic": "memory formation",
+      "memory_ids": [
+        "9c3cf21c4539"
+      ],
+      "created_at": "2025-10-21T17:02:45.723309",
+      "importance": 10
+    },
+    {
+      "id": "504885d7",
+      "name": "Research Memories",
+      "topic": "research",
+      "memory_ids": [
+        "9c3cf21c4539"
+      ],
+      "created_at": "2025-10-21T17:02:45.723312",
+      "importance": 10
+    },
+    {
+      "id": "65ad7a0c",
+      "name": "Sleep Memories",
+      "topic": "sleep",
+      "memory_ids": [
+        "eab0926181b9"
+      ],
+      "created_at": "2025-10-21T17:02:45.724164",
+      "importance": 8
+    },
+    {
+      "id": "ef5e9b88",
+      "name": "Memory Consolidation Memories",
+      "topic": "memory consolidation",
+      "memory_ids": [
+        "eab0926181b9"
+      ],
+      "created_at": "2025-10-21T17:02:45.724168",
+      "importance": 8
+    },
+    {
+      "id": "58795f3e",
+      "name": "Neuroscience Memories",
+      "topic": "neuroscience",
+      "memory_ids": [
+        "eab0926181b9"
+      ],
+      "created_at": "2025-10-21T17:02:45.724171",
+      "importance": 8
+    },
+    {
+      "id": "6c74aa58",
+      "name": "Consciousness Memories",
+      "topic": "consciousness",
+      "memory_ids": [
+        "94c5dced147c",
+        "e08e33be520c"
+      ],
+      "created_at": "2025-10-21T17:02:45.729137",
+      "importance": 7
+    },
+    {
+      "id": "ca4a4ea8",
+      "name": "Interdisciplinary Discussion Memories",
+      "topic": "interdisciplinary discussion",
+      "memory_ids": [
+        "94c5dced147c"
+      ],
+      "created_at": "2025-10-21T17:02:45.729144",
+      "importance": 7
+    },
+    {
+      "id": "96e2fc07",
+      "name": "Collaboration Memories",
+      "topic": "collaboration",
+      "memory_ids": [
+        "94c5dced147c"
+      ],
+      "created_at": "2025-10-21T17:02:45.729149",
+      "importance": 7
+    },
+    {
+      "id": "de8288fc",
+      "name": "Philosophy Of Mind Memories",
+      "topic": "philosophy of mind",
+      "memory_ids": [
+        "e08e33be520c"
+      ],
+      "created_at": "2025-10-21T17:02:45.731139",
+      "importance": 6
+    },
+    {
+      "id": "eab4e031",
+      "name": "Interdisciplinary Learning Memories",
+      "topic": "interdisciplinary learning",
+      "memory_ids": [
+        "e08e33be520c"
+      ],
+      "created_at": "2025-10-21T17:02:45.731146",
+      "importance": 6
+    },
+    {
+      "id": "dec8d24a",
+      "name": "Seminar Discussion Memories",
+      "topic": "seminar discussion",
+      "memory_ids": [
+        "d923388489ad"
+      ],
+      "created_at": "2025-10-21T17:02:45.740483",
+      "importance": 5
+    }
+  ],
+  "last_saved": "2025-10-21T17:02:45.741175"
+}

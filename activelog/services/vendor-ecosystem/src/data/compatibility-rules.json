@@ -1,0 +1,107 @@
+[
+  {
+    "id": "electrical_voltage",
+    "category": "electrical",
+    "description": "Check voltage compatibility",
+    "priority": "high",
+    "script": "const voltage1 = part1.specifications?.voltage; const voltage2 = part2.specifications?.voltage; if (!voltage1 || !voltage2) return { compatible: true, confidence: 0.5 }; const diff = Math.abs(voltage1 - voltage2) / Math.max(voltage1, voltage2); return { compatible: diff <= 0.05, confidence: diff <= 0.05 ? 0.95 : 0.1, reason: diff > 0.05 ? `Voltage mismatch: ${voltage1}V vs ${voltage2}V` : null };"
+  },
+  {
+    "id": "mechanical_dimensions",
+    "category": "mechanical",
+    "description": "Check dimensional compatibility",
+    "priority": "high",
+    "script": "const dims1 = part1.specifications?.dimensions; const dims2 = part2.specifications?.dimensions; if (!dims1 || !dims2) return { compatible: true, confidence: 0.5 }; const conflicts = []; ['length', 'width', 'height', 'diameter'].forEach(dim => { if (dims1[dim] && dims2[dim]) { const diff = Math.abs(dims1[dim] - dims2[dim]) / Math.max(dims1[dim], dims2[dim]); if (diff > 0.1) { conflicts.push(`${dim}: ${dims1[dim]} vs ${dims2[dim]}`); } } }); return { compatible: conflicts.length === 0, confidence: conflicts.length === 0 ? 0.9 : 0.2, reason: conflicts.length > 0 ? `Dimension conflicts: ${conflicts.join(', ')}` : null };"
+  },
+  {
+    "id": "connector_type",
+    "category": "interface",
+    "description": "Check connector compatibility",
+    "priority": "critical",
+    "script": "const conn1 = part1.specifications?.connector_type; const conn2 = part2.specifications?.connector_type; if (!conn1 || !conn2) return { compatible: true, confidence: 0.6 }; const compatible = conn1.toLowerCase() === conn2.toLowerCase(); return { compatible, confidence: compatible ? 0.95 : 0.1, reason: !compatible ? `Connector mismatch: ${conn1} vs ${conn2}` : null };"
+  },
+  {
+    "id": "power_rating",
+    "category": "electrical",
+    "description": "Check power rating compatibility",
+    "priority": "high",
+    "script": "const power1 = part1.specifications?.power_rating; const power2 = part2.specifications?.power_rating; if (!power1 || !power2) return { compatible: true, confidence: 0.4 }; const ratio = Math.min(power1, power2) / Math.max(power1, power2); return { compatible: ratio >= 0.8, confidence: ratio >= 0.8 ? 0.9 : 0.3, reason: ratio < 0.8 ? `Power rating mismatch: ${power1}W vs ${power2}W` : null };"
+  },
+  {
+    "id": "current_rating",
+    "category": "electrical",
+    "description": "Check current rating compatibility",
+    "priority": "high",
+    "script": "const current1 = part1.specifications?.current_rating; const current2 = part2.specifications?.current_rating; if (!current1 || !current2) return { compatible: true, confidence: 0.4 }; const ratio = Math.min(current1, current2) / Math.max(current1, current2); return { compatible: ratio >= 0.85, confidence: ratio >= 0.85 ? 0.9 : 0.2, reason: ratio < 0.85 ? `Current rating mismatch: ${current1}A vs ${current2}A` : null };"
+  },
+  {
+    "id": "frequency_compatibility",
+    "category": "electrical",
+    "description": "Check frequency compatibility",
+    "priority": "medium",
+    "script": "const freq1 = part1.specifications?.frequency; const freq2 = part2.specifications?.frequency; if (!freq1 || !freq2) return { compatible: true, confidence: 0.6 }; const compatible = Math.abs(freq1 - freq2) <= 1; return { compatible, confidence: compatible ? 0.95 : 0.1, reason: !compatible ? `Frequency mismatch: ${freq1}Hz vs ${freq2}Hz` : null };"
+  },
+  {
+    "id": "temperature_range",
+    "category": "environmental",
+    "description": "Check operating temperature compatibility",
+    "priority": "medium",
+    "script": "const temp1 = part1.specifications?.temperature_range; const temp2 = part2.specifications?.temperature_range; if (!temp1 || !temp2 || !temp1.min || !temp1.max || !temp2.min || !temp2.max) return { compatible: true, confidence: 0.5 }; const overlap = Math.max(0, Math.min(temp1.max, temp2.max) - Math.max(temp1.min, temp2.min)); const range1 = temp1.max - temp1.min; const range2 = temp2.max - temp2.min; const compatibility = overlap / Math.min(range1, range2); return { compatible: compatibility >= 0.8, confidence: compatibility >= 0.8 ? 0.85 : 0.3, reason: compatibility < 0.8 ? `Temperature range incompatible: ${temp1.min}-${temp1.max}°C vs ${temp2.min}-${temp2.max}°C` : null };"
+  },
+  {
+    "id": "ip_rating",
+    "category": "environmental",
+    "description": "Check IP rating compatibility for environmental protection",
+    "priority": "medium",
+    "script": "const ip1 = part1.specifications?.ip_rating; const ip2 = part2.specifications?.ip_rating; if (!ip1 || !ip2) return { compatible: true, confidence: 0.6 }; const parseIP = (ip) => { const match = ip.match(/IP(\\d)(\\d)/); return match ? { solid: parseInt(match[1]), liquid: parseInt(match[2]) } : null; }; const rating1 = parseIP(ip1); const rating2 = parseIP(ip2); if (!rating1 || !rating2) return { compatible: true, confidence: 0.4 }; const minSolid = Math.min(rating1.solid, rating2.solid); const minLiquid = Math.min(rating1.liquid, rating2.liquid); const compatible = minSolid >= 4 && minLiquid >= 4; return { compatible, confidence: compatible ? 0.8 : 0.4, reason: !compatible ? `IP rating incompatibility: ${ip1} vs ${ip2}` : null };"
+  },
+  {
+    "id": "mounting_type",
+    "category": "mechanical",
+    "description": "Check mounting compatibility",
+    "priority": "medium",
+    "script": "const mount1 = part1.specifications?.mounting_type; const mount2 = part2.specifications?.mounting_type; if (!mount1 || !mount2) return { compatible: true, confidence: 0.5 }; const compatible = mount1.toLowerCase() === mount2.toLowerCase(); return { compatible, confidence: compatible ? 0.9 : 0.3, reason: !compatible ? `Mounting type mismatch: ${mount1} vs ${mount2}` : null };"
+  },
+  {
+    "id": "thread_compatibility",
+    "category": "mechanical",
+    "description": "Check thread pitch and type compatibility",
+    "priority": "high",
+    "script": "const thread1 = part1.specifications?.thread; const thread2 = part2.specifications?.thread; if (!thread1 || !thread2) return { compatible: true, confidence: 0.5 }; const compatible = thread1.type === thread2.type && Math.abs(thread1.pitch - thread2.pitch) <= 0.1; return { compatible, confidence: compatible ? 0.95 : 0.1, reason: !compatible ? `Thread incompatible: ${thread1.type}-${thread1.pitch} vs ${thread2.type}-${thread2.pitch}` : null };"
+  },
+  {
+    "id": "chemical_compatibility",
+    "category": "chemical",
+    "description": "Check chemical compatibility for materials",
+    "priority": "high",
+    "script": "const chem1 = part1.specifications?.chemical_resistance || []; const chem2 = part2.specifications?.chemical_exposure || []; if (chem1.length === 0 || chem2.length === 0) return { compatible: true, confidence: 0.6 }; const incompatible = chem2.some(chemical => chem1.includes(`no_${chemical}`) || chem1.includes(`avoid_${chemical}`)); return { compatible: !incompatible, confidence: incompatible ? 0.1 : 0.85, reason: incompatible ? 'Chemical incompatibility detected' : null };"
+  },
+  {
+    "id": "weight_capacity",
+    "category": "mechanical",
+    "description": "Check weight/load capacity compatibility",
+    "priority": "high",
+    "script": "const capacity1 = part1.specifications?.weight_capacity; const load2 = part2.specifications?.weight; if (!capacity1 || !load2) return { compatible: true, confidence: 0.5 }; const safety_factor = 1.5; const compatible = capacity1 >= (load2 * safety_factor); return { compatible, confidence: compatible ? 0.9 : 0.1, reason: !compatible ? `Weight capacity exceeded: ${load2}kg load vs ${capacity1}kg capacity` : null };"
+  },
+  {
+    "id": "signal_compatibility",
+    "category": "signal",
+    "description": "Check signal type and level compatibility",
+    "priority": "critical",
+    "script": "const signal1 = part1.specifications?.signal_type; const signal2 = part2.specifications?.signal_type; if (!signal1 || !signal2) return { compatible: true, confidence: 0.4 }; const level1 = part1.specifications?.signal_level || '0V'; const level2 = part2.specifications?.signal_level || '0V'; const typeMatch = signal1.toLowerCase() === signal2.toLowerCase(); const levelMatch = level1 === level2; return { compatible: typeMatch && levelMatch, confidence: typeMatch && levelMatch ? 0.95 : 0.2, reason: !typeMatch || !levelMatch ? `Signal incompatible: ${signal1}@${level1} vs ${signal2}@${level2}` : null };"
+  },
+  {
+    "id": "protocol_compatibility",
+    "category": "communication",
+    "description": "Check communication protocol compatibility",
+    "priority": "critical",
+    "script": "const proto1 = part1.specifications?.protocol; const proto2 = part2.specifications?.protocol; if (!proto1 || !proto2) return { compatible: true, confidence: 0.4 }; const version1 = part1.specifications?.protocol_version || '1.0'; const version2 = part2.specifications?.protocol_version || '1.0'; const protoMatch = proto1.toLowerCase() === proto2.toLowerCase(); const versionCompat = parseFloat(version1) <= parseFloat(version2) * 1.1 && parseFloat(version2) <= parseFloat(version1) * 1.1; return { compatible: protoMatch && versionCompat, confidence: protoMatch && versionCompat ? 0.9 : 0.1, reason: !protoMatch ? `Protocol mismatch: ${proto1} vs ${proto2}` : !versionCompat ? `Version incompatible: ${version1} vs ${version2}` : null };"
+  },
+  {
+    "id": "interface_speed",
+    "category": "performance",
+    "description": "Check interface speed compatibility",
+    "priority": "medium",
+    "script": "const speed1 = part1.specifications?.interface_speed; const speed2 = part2.specifications?.interface_speed; if (!speed1 || !speed2) return { compatible: true, confidence: 0.5 }; const minSpeed = Math.min(speed1, speed2); const maxSpeed = Math.max(speed1, speed2); const ratio = minSpeed / maxSpeed; return { compatible: ratio >= 0.5, confidence: ratio >= 0.8 ? 0.9 : ratio >= 0.5 ? 0.7 : 0.3, reason: ratio < 0.5 ? `Interface speed mismatch: ${speed1} vs ${speed2}` : null };"
+  }
+]

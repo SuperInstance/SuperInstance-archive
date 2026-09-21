@@ -1,0 +1,41 @@
+{
+  "thresholds": {
+    "rapid_growth_mb": 100,
+    "large_file_gb": 1.0,
+    "directory_limit_gb": 5.0,
+    "disk_usage_warning": 0.8,
+    "disk_usage_critical": 0.95,
+    "scan_interval_seconds": 60,
+    "growth_window_minutes": 5,
+    "alert_cooldown_minutes": 15
+  },
+  "paths_to_monitor": [
+    "/home/activeloguser/activelog/services",
+    "/home/activeloguser/activelog/checkpoints",
+    "/home/activeloguser/activelog/backups",
+    "/home/activeloguser/activelog/logs",
+    "/home/activeloguser/activelog/pids"
+  ],
+  "paths_to_exclude": [
+    "/home/activeloguser/activelog/services/*/node_modules",
+    "/home/activeloguser/activelog/services/*/__pycache__",
+    "/home/activeloguser/activelog/services/*/dist",
+    "/home/activeloguser/activelog/services/*/build",
+    "/home/activeloguser/activelog/services/*/.git"
+  ],
+  "remediation": {
+    "auto_remediate": true,
+    "max_file_size_for_auto_delete_mb": 500,
+    "backup_before_delete": true,
+    "compress_large_files": true,
+    "move_to_quarantine": true,
+    "quarantine_dir": "/home/activeloguser/activelog/services/storage-monitor/quarantine"
+  },
+  "alerts": {
+    "enabled": true,
+    "log_alerts": true,
+    "email_alerts": false,
+    "webhook_alerts": false,
+    "integration_with_improvement_system": true
+  }
+}

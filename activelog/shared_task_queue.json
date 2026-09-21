@@ -1,0 +1,69 @@
+{
+  "priority_queue": [
+    {
+      "id": "k8s-cluster-setup",
+      "title": "Kubernetes Cluster Setup",
+      "assigned_bot": "infrastructure",
+      "status": "in_progress", 
+      "priority": "critical",
+      "dependencies": [],
+      "blocks": ["all-services", "domain-deployments"],
+      "started_at": "2025-08-26T18:45:00Z"
+    },
+    {
+      "id": "ssh-connectivity-issue",
+      "title": "SSH Connection Timeout to 54.212.119.66", 
+      "assigned_bot": "infrastructure",
+      "status": "blocked",
+      "priority": "high",
+      "dependencies": ["instance-boot-complete"],
+      "blocks": ["k8s-cluster-setup"],
+      "details": "Instance running but SSH timeout after 10+ seconds"
+    }
+  ],
+  "waiting_queue": [
+    {
+      "id": "auth-service-deploy",
+      "title": "Authentication Service Kubernetes Deployment",
+      "assigned_bot": "services", 
+      "status": "waiting",
+      "priority": "high",
+      "dependencies": ["k8s-cluster-setup"],
+      "blocks": ["domain-services"]
+    },
+    {
+      "id": "postgres-cluster",
+      "title": "PostgreSQL Cluster Setup",
+      "assigned_bot": "services",
+      "status": "waiting", 
+      "priority": "high",
+      "dependencies": ["k8s-cluster-setup"],
+      "blocks": ["domain-databases"]
+    },
+    {
+      "id": "activelog-fitness-domain",
+      "title": "ActiveLog Fitness Domain (SuperInstance Priority)",
+      "assigned_bot": "domains",
+      "status": "waiting",
+      "priority": "critical",
+      "dependencies": ["auth-service-deploy", "postgres-cluster"],
+      "blocks": ["superinstance-rebranding"]
+    }
+  ],
+  "completed_queue": [
+    {
+      "id": "aws-vpc-setup", 
+      "title": "AWS VPC and Networking",
+      "assigned_bot": "infrastructure",
+      "status": "completed",
+      "completed_at": "2025-08-26T18:37:00Z"
+    },
+    {
+      "id": "ec2-instance-launch",
+      "title": "EC2 t3.large Instance Launch", 
+      "assigned_bot": "infrastructure",
+      "status": "completed",
+      "completed_at": "2025-08-26T18:37:30Z"
+    }
+  ]
+}

@@ -1,0 +1,213 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: activelog-services
+  namespace: monitoring
+  labels:
+    app: activelog
+    monitoring: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: activelog
+  endpoints:
+  - port: metrics
+    interval: 30s
+    path: /metrics
+    scheme: http
+    honorLabels: true
+  - port: health
+    interval: 60s
+    path: /health
+    scheme: http
+  namespaceSelector:
+    matchNames:
+    - default
+    - activelog
+    - activelog-services
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: istio-proxy
+  namespace: monitoring
+  labels:
+    app: istio-proxy
+    monitoring: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: istio-proxy
+  endpoints:
+  - port: http-monitoring
+    interval: 15s
+    path: /stats/prometheus
+    scheme: http
+  namespaceSelector:
+    any: true
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor  
+metadata:
+  name: istio-pilot
+  namespace: monitoring
+  labels:
+    app: istiod
+    monitoring: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: istiod
+  endpoints:
+  - port: http-monitoring
+    interval: 15s
+    path: /metrics
+    scheme: http
+  namespaceSelector:
+    matchNames:
+    - istio-system
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: envoy-stats
+  namespace: monitoring
+  labels:
+    app: envoy-stats
+    monitoring: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: envoy-stats
+  endpoints:
+  - port: admin
+    interval: 30s
+    path: /stats/prometheus
+    scheme: http
+  namespaceSelector:
+    any: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: activelog-metrics-aggregator
+  namespace: monitoring
+  labels:
+    app: activelog-metrics-aggregator
+spec:
+  selector:
+    app: activelog-metrics-aggregator
+  ports:
+  - name: metrics
+    port: 9090
+    targetPort: 9090
+  - name: health
+    port: 8080
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: activelog-metrics-aggregator
+  namespace: monitoring
+  labels:
+    app: activelog-metrics-aggregator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: activelog-metrics-aggregator
+  template:
+    metadata:
+      labels:
+        app: activelog-metrics-aggregator
+    spec:
+      containers:
+      - name: metrics-aggregator
+        image: prom/prometheus:latest
+        ports:
+        - containerPort: 9090
+          name: metrics
+        - containerPort: 8080
+          name: health
+        volumeMounts:
+        - name: config
+          mountPath: /etc/prometheus/
+        - name: storage
+          mountPath: /prometheus/
+        command:
+        - /bin/prometheus
+        - --config.file=/etc/prometheus/prometheus.yml
+        - --storage.tsdb.path=/prometheus/
+        - --web.console.libraries=/etc/prometheus/console_libraries
+        - --web.console.templates=/etc/prometheus/consoles
+        - --storage.tsdb.retention.time=7d
+        - --web.enable-lifecycle
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi" 
+            cpu: "500m"
+      volumes:
+      - name: config
+        configMap:
+          name: aggregator-config
+      - name: storage
+        emptyDir: {}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aggregator-config
+  namespace: monitoring
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      external_labels:
+        cluster: activelog
+        environment: production
+        
+    scrape_configs:
+    - job_name: 'federate'
+      scrape_interval: 15s
+      honor_labels: true
+      metrics_path: '/federate'
+      params:
+        'match[]':
+          - '{job=~"activelog.*"}'
+          - '{job=~"istio.*"}'
+          - '{__name__=~"istio_.*"}'
+          - '{__name__=~"envoy_.*"}'
+          - '{__name__=~"activelog_.*"}'
+      static_configs:
+        - targets:
+          - 'prometheus:9090'
+          
+    - job_name: 'service-mesh-metrics'
+      kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+          - istio-system
+          - default
+          - activelog
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: istio-proxy;http-envoy-prom
+      - source_labels: [__address__, __meta_kubernetes_endpoint_port_number]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_service_label_(.+)
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_service_name]
+        action: replace
+        target_label: kubernetes_name

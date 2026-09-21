@@ -1,0 +1,297 @@
+# Cost Tracking Configuration for ActiveLog
+# Monitors infrastructure costs and provides optimization insights
+
+# Database configuration
+database:
+  host: "${POSTGRES_HOST:localhost}"
+  port: "${POSTGRES_PORT:5432}"
+  user: "${POSTGRES_USER:activelog}"
+  password: "${POSTGRES_PASSWORD}"
+  database: "${POSTGRES_DB:activelog_monitoring}"
+
+# Prometheus configuration
+prometheus:
+  url: "http://prometheus:9090"
+
+# AWS configuration
+aws:
+  enabled: true
+  profile: "default"
+  regions: ["us-east-1", "us-west-2"]
+  cost_allocation_tags: ["Environment", "Component", "Team", "Project"]
+
+# GCP configuration (if applicable)
+gcp:
+  enabled: false
+  project_id: "${GCP_PROJECT_ID}"
+  billing_account: "${GCP_BILLING_ACCOUNT}"
+
+# Azure configuration (if applicable)
+azure:
+  enabled: false
+  subscription_id: "${AZURE_SUBSCRIPTION_ID}"
+  tenant_id: "${AZURE_TENANT_ID}"
+
+# Budget definitions
+budgets:
+  - name: "Monthly Infrastructure"
+    service: "all"
+    amount: 5000.00
+    period: "monthly"
+    alert_thresholds: [50, 75, 90, 95]
+    alerts:
+      - threshold: 50
+        recipients: ["finance@activelog.com"]
+      - threshold: 75
+        recipients: ["finance@activelog.com", "engineering@activelog.com"]
+      - threshold: 90
+        recipients: ["finance@activelog.com", "engineering@activelog.com", "leadership@activelog.com"]
+        urgency: "high"
+
+  - name: "API Service Weekly"
+    service: "activelog-api"
+    amount: 300.00
+    period: "weekly"
+    alert_thresholds: [75, 90]
+    
+  - name: "ML Service Monthly"
+    service: "activelog-ml"
+    amount: 1500.00
+    period: "monthly"
+    alert_thresholds: [60, 80, 95]
+    
+  - name: "Data Pipeline Monthly"
+    service: "activelog-pipeline"
+    amount: 800.00
+    period: "monthly"
+    alert_thresholds: [70, 85, 95]
+    
+  - name: "Storage Monthly"
+    service: "storage"
+    amount: 500.00
+    period: "monthly"
+    alert_thresholds: [80, 95]
+    
+  - name: "Database Monthly"
+    service: "postgresql"
+    amount: 600.00
+    period: "monthly"
+    alert_thresholds: [75, 90, 98]
+
+# Cost allocation rules
+cost_allocation:
+  # Map AWS services to ActiveLog services
+  service_mapping:
+    "Amazon Elastic Compute Cloud - Compute": "compute"
+    "Amazon Simple Storage Service": "storage"
+    "Amazon Relational Database Service": "postgresql"
+    "Amazon ElastiCache": "redis"
+    "Amazon Elastic Load Balancing": "load-balancer"
+    "Amazon CloudFront": "cdn"
+    "Amazon Route 53": "dns"
+    "AWS Lambda": "serverless"
+    "Amazon API Gateway": "api-gateway"
+    "Amazon Elasticsearch Service": "elasticsearch"
+    "Amazon Kinesis": "streaming"
+    "Amazon SQS": "messaging"
+    "Amazon SNS": "notifications"
+    "AWS Key Management Service": "security"
+    "Amazon CloudWatch": "monitoring"
+    
+  # Percentage allocation for shared services
+  shared_services:
+    "monitoring":
+      "activelog-api": 30
+      "activelog-ml": 25
+      "activelog-pipeline": 20
+      "activelog-auth": 15
+      "activelog-notifications": 10
+    "networking":
+      "activelog-api": 40
+      "activelog-ml": 25
+      "activelog-pipeline": 15
+      "activelog-auth": 15
+      "activelog-notifications": 5
+
+# Optimization rules and thresholds
+optimization:
+  # CPU utilization thresholds
+  cpu_utilization:
+    warning_threshold: 20  # Below 20% utilization
+    critical_threshold: 10  # Below 10% utilization
+    
+  # Memory utilization thresholds  
+  memory_utilization:
+    warning_threshold: 50  # Below 50% utilization
+    critical_threshold: 25  # Below 25% utilization
+    
+  # Storage utilization thresholds
+  storage_utilization:
+    warning_threshold: 60  # Below 60% utilization
+    critical_threshold: 40  # Below 40% utilization
+    
+  # Cost increase thresholds
+  cost_increases:
+    daily_increase_threshold: 50  # 50% daily increase
+    weekly_increase_threshold: 30  # 30% weekly increase
+    monthly_increase_threshold: 20  # 20% monthly increase
+    
+  # Reserved instance recommendations
+  reserved_instances:
+    utilization_threshold: 70  # Recommend RI if utilization > 70%
+    lookback_period: 30  # Days to analyze
+    
+  # Rightsizing recommendations
+  rightsizing:
+    cpu_rightsizing_threshold: 25  # Recommend downsizing if CPU < 25%
+    memory_rightsizing_threshold: 40  # Recommend downsizing if memory < 40%
+    minimum_savings_threshold: 50  # Only recommend if savings > $50/month
+
+# Reporting configuration
+reporting:
+  enabled: true
+  formats: ["json", "csv", "pdf"]
+  frequency: "daily"  # daily, weekly, monthly
+  recipients:
+    - "finance@activelog.com"
+    - "engineering-leads@activelog.com"
+  
+  # Dashboard configuration
+  dashboard:
+    enabled: true
+    port: 8082
+    refresh_interval: 300  # 5 minutes
+    
+  # Report types
+  report_types:
+    - name: "Daily Cost Summary"
+      type: "summary"
+      frequency: "daily"
+      include_trends: true
+      include_recommendations: false
+      
+    - name: "Weekly Optimization Report"
+      type: "optimization"
+      frequency: "weekly"
+      include_trends: true
+      include_recommendations: true
+      
+    - name: "Monthly Executive Summary"
+      type: "executive"
+      frequency: "monthly"
+      include_trends: true
+      include_recommendations: true
+      include_forecasts: true
+
+# Alerting configuration
+alerting:
+  enabled: true
+  channels:
+    slack:
+      webhook_url: "${SLACK_COST_WEBHOOK_URL}"
+      channel: "#cost-tracking"
+    email:
+      smtp_server: "smtp.gmail.com:587"
+      from: "cost-tracker@activelog.com"
+      to:
+        - "finance@activelog.com"
+        - "engineering@activelog.com"
+    webhook:
+      url: "http://activelog-dashboard:8080/cost/webhook"
+      
+  # Alert conditions
+  conditions:
+    budget_exceeded:
+      severity: "high"
+      cooldown: 3600  # 1 hour
+    cost_spike:
+      severity: "medium"
+      threshold: 100  # $100 unexpected increase
+      cooldown: 1800  # 30 minutes
+    optimization_opportunity:
+      severity: "low"
+      threshold: 200  # $200 potential monthly savings
+      cooldown: 86400  # 24 hours
+
+# Data retention
+retention:
+  cost_data: "2y"  # Keep cost data for 2 years
+  optimization_recommendations: "6m"  # Keep recommendations for 6 months
+  reports: "3y"  # Keep reports for 3 years
+
+# Integration with other monitoring systems
+integrations:
+  prometheus:
+    push_gateway: "http://pushgateway:9091"
+    metrics_prefix: "activelog_cost_"
+    
+  grafana:
+    dashboard_url: "http://grafana:3000/d/cost-tracking"
+    datasource: "prometheus"
+    
+  elasticsearch:
+    enabled: true
+    host: "elasticsearch:9200"
+    index_pattern: "activelog-costs-*"
+
+# Cost forecasting
+forecasting:
+  enabled: true
+  methods: ["linear", "seasonal", "ml"]
+  forecast_periods: [7, 30, 90]  # days
+  confidence_intervals: [80, 95]
+  
+  # Machine learning model for forecasting
+  ml_model:
+    type: "random_forest"
+    features: ["historical_costs", "resource_usage", "business_metrics"]
+    training_period: 90  # days
+    retrain_frequency: 7  # days
+
+# Custom cost metrics
+custom_metrics:
+  cost_per_user:
+    query: "sum(activelog_cost_total) / sum(activelog_active_users)"
+    unit: "USD"
+    
+  cost_per_request:
+    query: "sum(activelog_cost_total) / sum(rate(http_requests_total[24h]) * 24 * 3600)"
+    unit: "USD"
+    
+  cost_per_ml_prediction:
+    query: "sum(activelog_cost_total{service='activelog-ml'}) / sum(rate(ml_predictions_total[24h]) * 24 * 3600)"
+    unit: "USD"
+    
+  infrastructure_efficiency:
+    query: "(sum(activelog_revenue_total) - sum(activelog_cost_total)) / sum(activelog_cost_total)"
+    unit: "ratio"
+
+# Tagging strategy for cost allocation
+tagging:
+  required_tags:
+    - "Environment"  # prod, staging, dev
+    - "Service"      # activelog-api, activelog-ml, etc.
+    - "Component"    # web, worker, database, etc.
+    - "Team"         # engineering, data-science, etc.
+    - "CostCenter"   # for accounting purposes
+    
+  tag_compliance:
+    check_frequency: "daily"
+    alert_on_missing: true
+    grace_period: 24  # hours before alerting
+
+# Cost optimization automation
+automation:
+  enabled: false  # Start with manual approval
+  rules:
+    - name: "Downsize Underutilized Instances"
+      condition: "cpu_utilization < 10% AND memory_utilization < 25% FOR 7 days"
+      action: "resize_instance"
+      approval_required: true
+      max_savings_threshold: 100  # Only auto-resize if savings < $100/month
+      
+    - name: "Stop Unused Development Instances"
+      condition: "environment = 'development' AND no_activity FOR 3 days"
+      action: "stop_instance"
+      approval_required: false
+      schedule: "weekends_only"

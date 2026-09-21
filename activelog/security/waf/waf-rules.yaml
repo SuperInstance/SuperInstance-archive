@@ -1,0 +1,523 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: waf-rules-config
+  namespace: activelog
+data:
+  modsecurity.conf: |
+    # ActiveLog WAF Configuration with ModSecurity
+    
+    # Basic setup
+    SecRuleEngine On
+    SecRequestBodyAccess On
+    SecRequestBodyLimit 13107200
+    SecRequestBodyNoFilesLimit 131072
+    SecResponseBodyAccess On
+    SecResponseBodyMimeType text/plain text/html text/xml application/json
+    SecResponseBodyLimit 524288
+    SecResponseBodyLimitAction Reject
+    SecTmpDir /tmp/
+    SecDataDir /tmp/
+    
+    # Debug and audit logging
+    SecDebugLog /var/log/modsec/debug.log
+    SecDebugLogLevel 0
+    SecAuditEngine RelevantOnly
+    SecAuditLogRelevantStatus "^(?:5|4(?!04))"
+    SecAuditLogParts ABIJDEFHZ
+    SecAuditLogType Serial
+    SecAuditLog /var/log/modsec/audit.log
+    
+    # Upload limits
+    SecRequestBodyLimitAction Reject
+    SecRule REQUEST_HEADERS:Content-Type "text/xml" \
+         "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
+    SecRule REQUEST_HEADERS:Content-Type "application/xml" \
+         "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
+    SecRule REQUEST_HEADERS:Content-Type "text/json" \
+         "id:'200002',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
+    SecRule REQUEST_HEADERS:Content-Type "application/json" \
+         "id:'200003',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
+    
+    # Include OWASP Core Rule Set
+    Include /etc/modsecurity/owasp-crs/*.conf
+    Include /etc/modsecurity/owasp-crs/rules/*.conf
+    
+    # Custom ActiveLog Rules
+    
+    # SQL Injection Protection
+    SecRule ARGS "@detectSQLi" \
+        "id:1001,\
+        phase:2,\
+        block,\
+        msg:'SQL Injection Attack Detected',\
+        logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}',\
+        tag:'application-multi',\
+        tag:'language-multi',\
+        tag:'platform-multi',\
+        tag:'attack-sqli',\
+        tag:'OWASP_CRS',\
+        tag:'capec/1000/152/248/66',\
+        tag:'PCI/6.5.2',\
+        severity:'CRITICAL',\
+        setvar:'tx.sqli_score=+%{tx.critical_anomaly_score}',\
+        setvar:'tx.anomaly_score_pl2=+%{tx.critical_anomaly_score}'"
+    
+    # XSS Protection
+    SecRule ARGS "@detectXSS" \
+        "id:1002,\
+        phase:2,\
+        block,\
+        msg:'XSS Attack Detected',\
+        logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}',\
+        tag:'application-multi',\
+        tag:'language-multi',\
+        tag:'platform-multi',\
+        tag:'attack-xss',\
+        tag:'OWASP_CRS',\
+        tag:'capec/1000/152/242',\
+        tag:'PCI/6.5.7',\
+        severity:'CRITICAL',\
+        setvar:'tx.xss_score=+%{tx.critical_anomaly_score}',\
+        setvar:'tx.anomaly_score_pl2=+%{tx.critical_anomaly_score}'"
+    
+    # Command Injection Protection
+    SecRule ARGS "@pmFromFile /etc/modsecurity/activelog-command-injection.data" \
+        "id:1003,\
+        phase:2,\
+        block,\
+        msg:'Command Injection Attack Detected',\
+        logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}',\
+        tag:'application-multi',\
+        tag:'language-shell',\
+        tag:'platform-unix',\
+        tag:'attack-injection-command',\
+        severity:'CRITICAL',\
+        setvar:'tx.anomaly_score_pl2=+%{tx.critical_anomaly_score}'"
+    
+    # Path Traversal Protection
+    SecRule REQUEST_FILENAME "@pmFromFile /etc/modsecurity/activelog-path-traversal.data" \
+        "id:1004,\
+        phase:1,\
+        block,\
+        msg:'Path Traversal Attack Detected',\
+        logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}',\
+        tag:'application-multi',\
+        tag:'language-multi',\
+        tag:'platform-multi',\
+        tag:'attack-path-traversal',\
+        severity:'CRITICAL',\
+        setvar:'tx.anomaly_score_pl1=+%{tx.critical_anomaly_score}'"
+    
+    # Rate Limiting per IP
+    SecAction "id:1005,\
+        phase:1,\
+        nolog,\
+        pass,\
+        initcol:ip=%{REMOTE_ADDR},\
+        setvar:ip.requests_per_minute=+1,\
+        expirevar:ip.requests_per_minute=60"
+    
+    SecRule IP:REQUESTS_PER_MINUTE "@gt 100" \
+        "id:1006,\
+        phase:1,\
+        deny,\
+        status:429,\
+        msg:'Rate limit exceeded for IP %{REMOTE_ADDR}',\
+        tag:'application-multi',\
+        tag:'language-multi',\
+        tag:'platform-multi',\
+        tag:'attack-dos',\
+        severity:'WARNING'"
+    
+    # API Endpoint Protection
+    SecRule REQUEST_FILENAME "@beginsWith /api/" \
+        "id:1007,\
+        phase:1,\
+        pass,\
+        nolog,\
+        initcol:ip=%{REMOTE_ADDR},\
+        setvar:ip.api_requests=+1,\
+        expirevar:ip.api_requests=300"
+    
+    SecRule IP:API_REQUESTS "@gt 1000" \
+        "id:1008,\
+        phase:1,\
+        deny,\
+        status:429,\
+        msg:'API rate limit exceeded for IP %{REMOTE_ADDR}',\
+        tag:'api-protection',\
+        severity:'WARNING'"
+    
+    # Admin Panel Protection
+    SecRule REQUEST_FILENAME "@beginsWith /admin" \
+        "id:1009,\
+        phase:1,\
+        pass,\
+        nolog,\
+        initcol:ip=%{REMOTE_ADDR},\
+        setvar:ip.admin_attempts=+1,\
+        expirevar:ip.admin_attempts=3600"
+    
+    SecRule IP:ADMIN_ATTEMPTS "@gt 5" \
+        "id:1010,\
+        phase:1,\
+        deny,\
+        status:403,\
+        msg:'Too many admin access attempts from IP %{REMOTE_ADDR}',\
+        tag:'admin-protection',\
+        severity:'ERROR'"
+    
+    # Authentication Endpoint Protection
+    SecRule REQUEST_FILENAME "@rx /auth/(login|register|reset)" \
+        "id:1011,\
+        phase:1,\
+        pass,\
+        nolog,\
+        initcol:ip=%{REMOTE_ADDR},\
+        setvar:ip.auth_attempts=+1,\
+        expirevar:ip.auth_attempts=900"
+    
+    SecRule IP:AUTH_ATTEMPTS "@gt 20" \
+        "id:1012,\
+        phase:1,\
+        deny,\
+        status:429,\
+        msg:'Too many authentication attempts from IP %{REMOTE_ADDR}',\
+        tag:'auth-protection',\
+        severity:'WARNING'"
+    
+    # File Upload Protection
+    SecRule REQUEST_FILENAME "@endsWith /upload" \
+        "id:1013,\
+        phase:2,\
+        pass,\
+        nolog,\
+        initcol:ip=%{REMOTE_ADDR},\
+        setvar:ip.upload_requests=+1,\
+        expirevar:ip.upload_requests=3600"
+    
+    SecRule IP:UPLOAD_REQUESTS "@gt 50" \
+        "id:1014,\
+        phase:2,\
+        deny,\
+        status:429,\
+        msg:'Too many upload requests from IP %{REMOTE_ADDR}',\
+        tag:'upload-protection',\
+        severity:'WARNING'"
+    
+    # Malicious User-Agent Detection
+    SecRule REQUEST_HEADERS:User-Agent "@pmFromFile /etc/modsecurity/activelog-malicious-ua.data" \
+        "id:1015,\
+        phase:1,\
+        deny,\
+        status:403,\
+        msg:'Malicious User-Agent detected: %{MATCHED_VAR}',\
+        tag:'security-scanner',\
+        severity:'ERROR'"
+    
+    # Suspicious Request Methods
+    SecRule REQUEST_METHOD "!@pm GET POST PUT DELETE PATCH HEAD OPTIONS" \
+        "id:1016,\
+        phase:1,\
+        deny,\
+        status:405,\
+        msg:'Method %{REQUEST_METHOD} not allowed',\
+        tag:'method-policy',\
+        severity:'WARNING'"
+    
+    # Large Request Body Protection
+    SecRule REQUEST_BODY_LENGTH "@gt 10485760" \
+        "id:1017,\
+        phase:2,\
+        deny,\
+        status:413,\
+        msg:'Request body too large: %{REQUEST_BODY_LENGTH} bytes',\
+        tag:'request-limits',\
+        severity:'WARNING'"
+    
+    # Suspicious Request Headers
+    SecRule REQUEST_HEADERS:X-Forwarded-For "@ipMatch 127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16" \
+        "id:1018,\
+        phase:1,\
+        pass,\
+        nolog,\
+        tag:'internal-traffic'"
+    
+    # Block known malicious IPs (placeholder - integrate with threat intelligence)
+    SecRule REMOTE_ADDR "@ipMatchFromFile /etc/modsecurity/activelog-malicious-ips.data" \
+        "id:1019,\
+        phase:1,\
+        deny,\
+        status:403,\
+        msg:'Request from known malicious IP: %{REMOTE_ADDR}',\
+        tag:'threat-intelligence',\
+        severity:'CRITICAL'"
+    
+    # GraphQL Protection
+    SecRule REQUEST_FILENAME "@beginsWith /graphql" \
+        "id:1020,\
+        phase:2,\
+        pass,\
+        nolog,\
+        chain"
+    SecRule REQUEST_BODY "@rx query.*\\{.*\\}" \
+        "id:1021,\
+        phase:2,\
+        pass,\
+        nolog,\
+        initcol:ip=%{REMOTE_ADDR},\
+        setvar:ip.graphql_requests=+1,\
+        expirevar:ip.graphql_requests=60"
+    
+    SecRule IP:GRAPHQL_REQUESTS "@gt 30" \
+        "id:1022,\
+        phase:2,\
+        deny,\
+        status:429,\
+        msg:'GraphQL rate limit exceeded for IP %{REMOTE_ADDR}',\
+        tag:'graphql-protection',\
+        severity:'WARNING'"
+    
+    # Mobile API Protection
+    SecRule REQUEST_FILENAME "@beginsWith /mobile/" \
+        "id:1023,\
+        phase:1,\
+        pass,\
+        nolog,\
+        chain"
+    SecRule REQUEST_HEADERS:User-Agent "!@rx (iOS|Android|Mobile)" \
+        "id:1024,\
+        phase:1,\
+        deny,\
+        status:403,\
+        msg:'Mobile API accessed from non-mobile user agent',\
+        tag:'mobile-api-protection',\
+        severity:'WARNING'"
+
+  command-injection.data: |
+    # Command injection patterns
+    ;
+    &&
+    ||
+    |
+    `
+    $()
+    ${
+    $(
+    &#
+    &
+    ;echo
+    ;cat
+    ;ls
+    ;wget
+    ;curl
+    /bin/
+    /usr/bin/
+    /sbin/
+    /usr/sbin/
+    cmd.exe
+    powershell
+    bash
+    sh
+    zsh
+    fish
+
+  path-traversal.data: |
+    # Path traversal patterns
+    ../
+    ..\\
+    ....//
+    ....\\\\
+    %2e%2e%2f
+    %2e%2e%5c
+    ..%2f
+    ..%5c
+    %252e%252e%252f
+    %252e%252e%255c
+    ..%252f
+    ..%255c
+    /%2e%2e/
+    \\%2e%2e\\
+    /.%2e/
+    \\.%2e\\
+
+  malicious-ua.data: |
+    # Malicious User-Agent patterns
+    sqlmap
+    nikto
+    nessus
+    openvas
+    w3af
+    paros
+    burp
+    webscarab
+    nmap
+    masscan
+    zap
+    arachni
+    acunetix
+    appscan
+    netsparker
+    grabber
+    skipfish
+    wpscan
+    dirb
+    dirbuster
+    gobuster
+    wfuzz
+    ffuf
+    x-scan
+    security
+    scanner
+    bot
+    crawler
+    spider
+    scraper
+
+  nginx-waf.conf: |
+    # Nginx WAF Configuration
+    
+    # Rate limiting zones
+    limit_req_zone $binary_remote_addr zone=api:10m rate=100r/m;
+    limit_req_zone $binary_remote_addr zone=auth:10m rate=20r/m;
+    limit_req_zone $binary_remote_addr zone=upload:10m rate=10r/m;
+    limit_req_zone $binary_remote_addr zone=admin:10m rate=5r/m;
+    limit_req_zone $binary_remote_addr zone=graphql:10m rate=30r/m;
+    
+    # Connection limiting
+    limit_conn_zone $binary_remote_addr zone=conn_limit_per_ip:10m;
+    limit_conn_zone $server_name zone=conn_limit_per_server:10m;
+    
+    # Map for blocking malicious IPs
+    map $remote_addr $blocked_ip {
+        default 0;
+        include /etc/nginx/blocked-ips.conf;
+    }
+    
+    # Map for detecting bots
+    map $http_user_agent $bot_detection {
+        default 0;
+        ~*bot 1;
+        ~*spider 1;
+        ~*crawler 1;
+        ~*scanner 1;
+        ~*sqlmap 1;
+        ~*nikto 1;
+        ~*nessus 1;
+    }
+    
+    # Map for country blocking (example)
+    map $geoip_country_code $blocked_country {
+        default 0;
+        ~*(CN|RU|KP) 1;  # Block China, Russia, North Korea
+    }
+    
+    server {
+        listen 80;
+        server_name api.activelog.com;
+        
+        # Block malicious IPs
+        if ($blocked_ip) {
+            return 403;
+        }
+        
+        # Block bots
+        if ($bot_detection) {
+            return 403;
+        }
+        
+        # Block countries
+        if ($blocked_country) {
+            return 403;
+        }
+        
+        # Connection limits
+        limit_conn conn_limit_per_ip 20;
+        limit_conn conn_limit_per_server 1000;
+        
+        # Security headers
+        include /etc/nginx/security-headers.conf;
+        
+        # API endpoints
+        location /api/ {
+            limit_req zone=api burst=50 nodelay;
+            include /etc/nginx/proxy-security.conf;
+            proxy_pass http://api-gateway;
+        }
+        
+        # Authentication endpoints
+        location /auth/ {
+            limit_req zone=auth burst=10 nodelay;
+            include /etc/nginx/proxy-security.conf;
+            proxy_pass http://auth-service;
+        }
+        
+        # File upload endpoints
+        location /files/upload {
+            limit_req zone=upload burst=5 nodelay;
+            client_max_body_size 100M;
+            include /etc/nginx/proxy-security.conf;
+            proxy_pass http://file-processor;
+        }
+        
+        # Admin endpoints
+        location /admin/ {
+            limit_req zone=admin burst=2 nodelay;
+            allow 10.0.0.0/8;
+            allow 172.16.0.0/12;
+            allow 192.168.0.0/16;
+            deny all;
+            include /etc/nginx/proxy-security.conf;
+            proxy_pass http://api-gateway;
+        }
+        
+        # GraphQL endpoint
+        location /graphql {
+            limit_req zone=graphql burst=15 nodelay;
+            include /etc/nginx/proxy-security.conf;
+            proxy_pass http://graphql-service;
+        }
+        
+        # Block common attack paths
+        location ~* \.(php|asp|aspx|jsp|cgi)$ {
+            return 404;
+        }
+        
+        location ~* /\.(ht|svn|git) {
+            return 404;
+        }
+        
+        location ~* /(wp-admin|phpmyadmin|adminer) {
+            return 404;
+        }
+    }
+
+  proxy-security.conf: |
+    # Proxy security configuration
+    
+    # Remove server tokens
+    proxy_hide_header X-Powered-By;
+    proxy_hide_header Server;
+    
+    # Add security headers
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Host $host;
+    
+    # Timeout settings
+    proxy_connect_timeout 5s;
+    proxy_send_timeout 60s;
+    proxy_read_timeout 60s;
+    
+    # Buffer settings
+    proxy_buffer_size 4k;
+    proxy_buffers 8 4k;
+    proxy_busy_buffers_size 8k;
+    
+    # Don't proxy certain headers
+    proxy_set_header Accept-Encoding "";
+    
+    # Add request ID for tracing
+    proxy_set_header X-Request-ID $request_id;

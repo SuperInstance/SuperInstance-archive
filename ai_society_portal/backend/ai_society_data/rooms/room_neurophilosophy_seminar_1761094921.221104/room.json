@@ -1,0 +1,60 @@
+{
+  "id": "room_neurophilosophy_seminar_1761094921.221104",
+  "name": "Neurophilosophy Seminar",
+  "room_type": "debate_hall",
+  "created_at": "2025-10-21T17:02:01.221147",
+  "atmosphere": {
+    "room_type": "debate_hall",
+    "description": "A formal debate hall with podiums and judges. Ideas are challenged and defended. Arguments are structured and evidence-based.",
+    "ambient_sounds": [
+      "formal speeches",
+      "rebuttals",
+      "timer",
+      "applause"
+    ],
+    "visual_elements": [
+      "podiums",
+      "judge's bench",
+      "audience seating",
+      "timer",
+      "scoreboard"
+    ],
+    "mood_tags": [
+      "adversarial",
+      "rigorous",
+      "competitive",
+      "structured",
+      "formal"
+    ],
+    "temperature": 0.3,
+    "pace": "fast",
+    "formality": 0.9,
+    "collaboration_level": 0.4,
+    "cognitive_effects": {
+      "critical_thinking": 0.5,
+      "argumentative": 0.4,
+      "competitive": 0.3
+    },
+    "turn_taking": "structured",
+    "speaking_style": "formal_argument",
+    "content_focus": [
+      "arguments",
+      "evidence",
+      "rebuttals",
+      "logical reasoning"
+    ],
+    "discouraged_topics": []
+  },
+  "objects_in_room": [],
+  "background_media": [],
+  "current_session": null,
+  "characters_present": [
+    "995fcae7af4f",
+    "47e82d273492"
+  ],
+  "max_characters": 10,
+  "conversation_pace_seconds": 2.0,
+  "purpose": "A space for deep discussions about consciousness, memory, and the mind",
+  "expected_outputs": [],
+  "past_sessions": []
+}

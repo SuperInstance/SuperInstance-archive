@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FishingLog - Navigation Layout</title>
+    <link rel="stylesheet" href="styles/marine-common.css">
+    <link rel="stylesheet" href="styles/navigation-layout.css">
+</head>
+<body class="marine-interface navigation-layout">
+    <div class="layout-container">
+        <!-- Main Chart Display with Route Planning -->
+        <div class="chart-main" id="chartMain">
+            <div class="chart-header">
+                <h2>Electronic Chart - Navigation Planning</h2>
+                <div class="chart-controls">
+                    <button class="btn-chart" id="zoomIn">+</button>
+                    <button class="btn-chart" id="zoomOut">-</button>
+                    <button class="btn-chart" id="centerVessel">📍</button>
+                    <button class="btn-chart" id="measureTool">📏</button>
+                    <select id="chartType">
+                        <option value="nautical">Nautical Chart</option>
+                        <option value="satellite">Satellite</option>
+                        <option value="weather">Weather Overlay</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-display" id="chartCanvas">
+                <div class="vessel-position">
+                    <div class="vessel-icon">🚢</div>
+                    <div class="course-line active"></div>
+                </div>
+                
+                <!-- Route Planning -->
+                <div class="route-overlay">
+                    <div class="waypoint" data-waypoint="1" style="top: 25%; left: 30%;">
+                        <div class="waypoint-marker">1</div>
+                        <div class="waypoint-info">WPT1<br>41°25.5'N 71°52.1'W</div>
+                    </div>
+                    <div class="waypoint" data-waypoint="2" style="top: 45%; left: 60%;">
+                        <div class="waypoint-marker">2</div>
+                        <div class="waypoint-info">WPT2<br>41°23.2'N 71°48.7'W</div>
+                    </div>
+                    <div class="route-line" data-route="1-2"></div>
+                </div>
+                
+                <!-- Weather Overlay -->
+                <div class="weather-overlay" id="weatherOverlay">
+                    <div class="wind-barbs">
+                        <div class="wind-barb" style="top: 20%; left: 40%;" data-wind="15,NE">🏹</div>
+                        <div class="wind-barb" style="top: 60%; left: 70%;" data-wind="12,E">🏹</div>
+                    </div>
+                    <div class="weather-fronts">
+                        <div class="cold-front"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-info">
+                <span class="coordinates">LAT: 41°24.123'N LON: 71°51.456'W</span>
+                <span class="route-info">Route: 8.4nm • ETA: 15:45 • DTW: 3.2nm</span>
+            </div>
+        </div>
+
+        <!-- Route Management Panel -->
+        <div class="route-panel" id="routePanel">
+            <div class="panel-header">
+                <h3>Route Management</h3>
+                <button class="panel-toggle" id="toggleRoute">📍</button>
+            </div>
+            
+            <div class="route-list">
+                <div class="active-route">
+                    <div class="route-header">
+                        <h4>Active Route: Harbor to Fishing Grounds</h4>
+                        <div class="route-actions">
+                            <button class="btn-small" id="editRoute">✏️</button>
+                            <button class="btn-small" id="reverseRoute">🔄</button>
+                        </div>
+                    </div>
+                    
+                    <div class="waypoints-table">
+                        <div class="waypoint-row header">
+                            <span>WPT</span>
+                            <span>Position</span>
+                            <span>BRG</span>
+                            <span>DIST</span>
+                            <span>ETA</span>
+                        </div>
+                        <div class="waypoint-row active">
+                            <span>WPT1</span>
+                            <span>41°25.5'N 71°52.1'W</span>
+                            <span>045°</span>
+                            <span>3.2nm</span>
+                            <span>14:35</span>
+                        </div>
+                        <div class="waypoint-row">
+                            <span>WPT2</span>
+                            <span>41°23.2'N 71°48.7'W</span>
+                            <span>125°</span>
+                            <span>5.2nm</span>
+                            <span>15:15</span>
+                        </div>
+                        <div class="waypoint-row">
+                            <span>DEST</span>
+                            <span>41°21.8'N 71°45.3'W</span>
+                            <span>135°</span>
+                            <span>2.8nm</span>
+                            <span>15:45</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="route-totals">
+                    <div class="total-item">
+                        <label>Total Distance:</label>
+                        <span>11.2 nm</span>
+                    </div>
+                    <div class="total-item">
+                        <label>Total Time:</label>
+                        <span>1h 32m</span>
+                    </div>
+                    <div class="total-item">
+                        <label>Fuel Required:</label>
+                        <span>8.5 gal</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="route-planning-tools">
+                <h4>Planning Tools</h4>
+                <button class="tool-btn" id="createRoute">📍 New Route</button>
+                <button class="tool-btn" id="loadRoute">📂 Load Route</button>
+                <button class="tool-btn" id="saveRoute">💾 Save Route</button>
+                <button class="tool-btn" id="optimizeRoute">⚡ Optimize</button>
+            </div>
+
+            <div class="navigation-aids">
+                <h4>Navigation Aids</h4>
+                <div class="aid-item">
+                    <input type="checkbox" id="showBuoys" checked>
+                    <label for="showBuoys">Buoys & Beacons</label>
+                </div>
+                <div class="aid-item">
+                    <input type="checkbox" id="showLights" checked>
+                    <label for="showLights">Lights</label>
+                </div>
+                <div class="aid-item">
+                    <input type="checkbox" id="showDepthContours" checked>
+                    <label for="showDepthContours">Depth Contours</label>
+                </div>
+                <div class="aid-item">
+                    <input type="checkbox" id="showRestrictions">
+                    <label for="showRestrictions">Restricted Areas</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weather Panel -->
+        <div class="weather-panel" id="weatherPanel">
+            <div class="panel-header">
+                <h3>Weather Conditions</h3>
+                <div class="weather-controls">
+                    <button class="btn-small" id="refreshWeather">🔄</button>
+                    <button class="btn-small" id="weatherSettings">⚙️</button>
+                </div>
+            </div>
+            
+            <div class="current-conditions">
+                <div class="condition-group">
+                    <div class="condition-item">
+                        <div class="condition-icon">🌤️</div>
+                        <div class="condition-details">
+                            <div class="condition-primary">Partly Cloudy</div>
+                            <div class="condition-secondary">Visibility: 10+ nm</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="weather-data">
+                    <div class="data-item">
+                        <label>Wind:</label>
+                        <span>NE 12-15 kts</span>
+                        <div class="trend">↗️</div>
+                    </div>
+                    <div class="data-item">
+                        <label>Waves:</label>
+                        <span>2-3 ft</span>
+                        <div class="direction">NE</div>
+                    </div>
+                    <div class="data-item">
+                        <label>Barometer:</label>
+                        <span>30.15 in</span>
+                        <div class="trend">↗️</div>
+                    </div>
+                    <div class="data-item">
+                        <label>Air Temp:</label>
+                        <span>72°F</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="weather-forecast">
+                <h4>6-Hour Forecast</h4>
+                <div class="forecast-timeline">
+                    <div class="forecast-hour">
+                        <div class="hour">15:00</div>
+                        <div class="icon">🌤️</div>
+                        <div class="wind">NE 12</div>
+                        <div class="wave">2-3ft</div>
+                    </div>
+                    <div class="forecast-hour">
+                        <div class="hour">18:00</div>
+                        <div class="icon">⛅</div>
+                        <div class="wind">E 10</div>
+                        <div class="wave">2ft</div>
+                    </div>
+                    <div class="forecast-hour">
+                        <div class="hour">21:00</div>
+                        <div class="icon">🌙</div>
+                        <div class="wind">E 8</div>
+                        <div class="wave">1-2ft</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="weather-alerts">
+                <div class="alert-item info">
+                    <div class="alert-icon">ℹ️</div>
+                    <div class="alert-text">
+                        <strong>Small Craft Advisory</strong><br>
+                        Winds NE 15-20 kts until 18:00
+                    </div>
+                </div>
+            </div>
+
+            <div class="weather-routing">
+                <h4>Weather Routing</h4>
+                <button class="tool-btn" id="routeOptimal">🌊 Optimal Route</button>
+                <button class="tool-btn" id="routeFastest">⚡ Fastest Route</button>
+                <button class="tool-btn" id="routeComfort">😌 Comfort Route</button>
+            </div>
+        </div>
+
+        <!-- Navigation Tools -->
+        <div class="nav-tools" id="navTools">
+            <div class="tool-group">
+                <button class="nav-btn" id="bearingTool">🧭 Bearing</button>
+                <button class="nav-btn" id="distanceTool">📏 Distance</button>
+                <button class="nav-btn" id="parallelRule">📐 Parallel</button>
+            </div>
+            <div class="measurement-display" id="measurementDisplay">
+                <span id="measurementResult">Distance: 3.2 nm • Bearing: 045°T</span>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-label">COG:</span>
+                <span class="status-value">045°T</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">SOG:</span>
+                <span class="status-value">8.2 kts</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">XTE:</span>
+                <span class="status-value good">0.02nm Port</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">DTW:</span>
+                <span class="status-value">3.2nm</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">ETA:</span>
+                <span class="status-value">15:45</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Fuel:</span>
+                <span class="status-value">75% (180nm)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Route Planning Modal -->
+    <div class="modal hidden" id="routeModal">
+        <div class="modal-content large">
+            <h3 id="routeModalTitle">Create New Route</h3>
+            <div class="route-form">
+                <div class="form-group">
+                    <label for="routeName">Route Name:</label>
+                    <input type="text" id="routeName" placeholder="e.g., Harbor to Fishing Grounds">
+                </div>
+                <div class="form-group">
+                    <label for="routeDescription">Description:</label>
+                    <textarea id="routeDescription" placeholder="Route notes and waypoint details"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Waypoints:</label>
+                    <div class="waypoint-inputs" id="waypointInputs">
+                        <div class="waypoint-input">
+                            <input type="text" placeholder="Name" class="wp-name">
+                            <input type="text" placeholder="Latitude" class="wp-lat">
+                            <input type="text" placeholder="Longitude" class="wp-lon">
+                            <button class="btn-remove">❌</button>
+                        </div>
+                    </div>
+                    <button class="btn-secondary" id="addWaypoint">+ Add Waypoint</button>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-primary" id="saveNewRoute">Create Route</button>
+                <button class="btn-secondary" id="cancelRoute">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/marine-common.js"></script>
+    <script src="scripts/navigation-layout.js"></script>
+</body>
+</html>

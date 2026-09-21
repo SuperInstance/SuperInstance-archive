@@ -1,0 +1,44 @@
+# Core FastAPI and web server
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+websockets==12.0
+python-multipart==0.0.6
+
+# Redis for message bus
+redis==5.0.1
+
+# AI Provider APIs
+anthropic==0.7.8
+openai==1.3.0
+groq==0.4.0
+
+# Ollama for local LLMs (optional)
+ollama==0.1.0
+
+# LoRA and model fine-tuning
+peft==0.7.0
+transformers==4.35.2
+torch==2.1.1
+accelerate==0.25.0
+
+# Vector database and knowledge base
+chromadb==0.4.18
+langchain==0.0.340
+langchain-community==0.0.1
+
+# Database
+sqlalchemy==2.0.23
+
+# Data validation
+pydantic==2.5.0
+
+# File operations
+aiofiles==23.2.1
+watchfiles==0.21.0
+
+# Configuration
+pyyaml==6.0.1
+
+# Utilities
+python-dotenv==1.0.0
+aiolimiter==1.1.0

@@ -1,0 +1,27 @@
+{
+  "name": "activelog-base-template",
+  "version": "1.0.0",
+  "description": "Base template for all ActiveLog.ai applications",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "http-server dist -p 3000",
+    "build:app": "node ../build/app-builder.js"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {
+    "lucide": "^0.263.1",
+    "@tanstack/virtual-core": "^3.0.0",
+    "recharts": "^2.10.0",
+    "sortablejs": "^1.15.0",
+    "fuse.js": "^7.0.0",
+    "pdf-lib": "^1.17.1",
+    "file-saver": "^2.0.5",
+    "canvas-confetti": "^1.9.2"
+  }
+}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SuperInstance Pattern Browser</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .pattern { border: 1px solid #ccc; margin: 10px 0; padding: 15px; border-radius: 5px; }
+        .pattern-title { font-size: 18px; font-weight: bold; color: #2c3e50; }
+        .pattern-meta { color: #7f8c8d; font-size: 12px; margin: 5px 0; }
+        .pattern-description { margin: 10px 0; }
+        .tag { background: #3498db; color: white; padding: 2px 8px; margin: 2px; border-radius: 3px; font-size: 11px; }
+        .search-box { width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🧩 SuperInstance Pattern Browser</h1>
+    <p>Searchable library of all patterns discovered by the bot learning system.</p>
+    
+    <input type="text" class="search-box" placeholder="Search patterns..." id="searchBox" onkeyup="filterPatterns()">
+    
+    <div id="patterns-container">
+        <!-- Patterns will be loaded here via JavaScript -->
+        <p>Loading patterns from search_index.json...</p>
+    </div>
+    
+    <script>
+        async function loadPatterns() {
+            try {
+                const response = await fetch('search_index.json');
+                const data = await response.json();
+                displayPatterns(data.patterns);
+            } catch (error) {
+                console.error('Error loading patterns:', error);
+            }
+        }
+        
+        function displayPatterns(patterns) {
+            const container = document.getElementById('patterns-container');
+            container.innerHTML = patterns.map(pattern => `
+                <div class="pattern">
+                    <div class="pattern-title">${pattern.title}</div>
+                    <div class="pattern-meta">Type: ${pattern.type} | Reusability: ${pattern.reusability} | Educational Value: ${pattern.educational_value}</div>
+                    <div class="pattern-description">${pattern.description}</div>
+                    <div>${pattern.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
+                </div>
+            `).join('');
+        }
+        
+        function filterPatterns() {
+            // Implement search functionality
+            const query = document.getElementById('searchBox').value.toLowerCase();
+            // Filter and display matching patterns
+        }
+        
+        loadPatterns();
+    </script>
+</body>
+</html>

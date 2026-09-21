@@ -1,0 +1,253 @@
+{
+  "name": "PlayerLog.ai",
+  "version": "1.0.0",
+  "title": "PlayerLog.ai - Game Analysis & Recording",
+  "description": "Screen recording and game analysis for competitive players",
+  "favicon": "/assets/playerlog/favicon.ico",
+  "domain": "playerlog.ai",
+  "devPort": 3006,
+  "theme": "gaming",
+  "layout": "gaming-dashboard",
+  "monetization": {
+    "type": "freemium",
+    "tiers": ["free", "pro", "esports"],
+    "trialPeriod": "14d"
+  },
+  "features": {
+    "screenRecording": true,
+    "gameplayAnalysis": true,
+    "performanceMetrics": true,
+    "highlightReels": true,
+    "matchTracking": true,
+    "teamCollaboration": true,
+    "coaching": true,
+    "streaming": true,
+    "statisticsTracking": true,
+    "replayReview": true,
+    "socialSharing": true,
+    "tournamentTracking": true
+  },
+  "modules": [
+    {
+      "name": "recorder",
+      "component": "ScreenRecorderModule",
+      "props": {
+        "enableHighFramerate": true,
+        "enableHDR": true,
+        "enableAudioCapture": true,
+        "enableMicrophoneCapture": true,
+        "enableWebcamOverlay": true,
+        "qualityPresets": ["720p60", "1080p60", "1440p60", "4K60"],
+        "enableInstantReplay": true
+      }
+    },
+    {
+      "name": "analyzer",
+      "component": "GameplayAnalyzerModule",
+      "props": {
+        "enablePerformanceMetrics": true,
+        "enableHeatmaps": true,
+        "enablePatternRecognition": true,
+        "enableComparisonTools": true,
+        "supportedGames": ["valorant", "csgo", "lol", "dota2", "overwatch", "apex"]
+      }
+    },
+    {
+      "name": "highlights",
+      "component": "HighlightGeneratorModule",
+      "props": {
+        "enableAutoDetection": true,
+        "enableCustomClips": true,
+        "enableMontageCreation": true,
+        "enableMusicSync": true,
+        "enableEffects": true,
+        "exportFormats": ["mp4", "gif", "webm"]
+      }
+    },
+    {
+      "name": "stats",
+      "component": "StatisticsModule",
+      "props": {
+        "enableMatchHistory": true,
+        "enablePerformanceTrends": true,
+        "enableSkillProgression": true,
+        "enableComparisons": true,
+        "enableLeaderboards": true,
+        "trackingMetrics": ["kda", "accuracy", "apm", "winrate", "rank"]
+      }
+    },
+    {
+      "name": "coaching",
+      "component": "CoachingModule",
+      "props": {
+        "enableReplayAnalysis": true,
+        "enableAnnotations": true,
+        "enableVoiceNotes": true,
+        "enableSharedSessions": true,
+        "enableProgressTracking": true,
+        "enableSkillAssessment": true
+      }
+    },
+    {
+      "name": "streaming",
+      "component": "StreamingModule",
+      "props": {
+        "enableLiveStreaming": true,
+        "enableOverlays": true,
+        "enableChatIntegration": true,
+        "enableAlerts": true,
+        "platforms": ["twitch", "youtube", "facebook", "discord"],
+        "enableMultistream": true
+      }
+    },
+    {
+      "name": "team",
+      "component": "TeamCollaborationModule",
+      "props": {
+        "enableTeamChannels": true,
+        "enableSharedAnalysis": true,
+        "enableStrategyBoard": true,
+        "enableVoiceChat": true,
+        "enableCalendar": true,
+        "enableTournamentManagement": true
+      }
+    }
+  ],
+  "aiModels": [
+    {
+      "name": "gameplay-analyzer",
+      "type": "video-analysis",
+      "endpoint": "/ai/gameplay-analysis",
+      "features": ["action-detection", "skill-assessment", "mistake-identification"]
+    },
+    {
+      "name": "highlight-detector",
+      "type": "event-detection",
+      "endpoint": "/ai/highlight-detection",
+      "features": ["kill-detection", "clutch-moments", "skill-shots"]
+    },
+    {
+      "name": "performance-predictor",
+      "type": "prediction",
+      "endpoint": "/ai/performance-prediction",
+      "features": ["rank-prediction", "improvement-suggestions", "training-recommendations"]
+    },
+    {
+      "name": "strategy-recommender",
+      "type": "recommendation",
+      "endpoint": "/ai/strategy-recommendation",
+      "features": ["meta-analysis", "counter-strategies", "team-composition"]
+    }
+  ],
+  "auth": {
+    "providers": ["email", "steam", "discord", "google"],
+    "requireEmailVerification": false,
+    "enableTwoFactor": true,
+    "sessionDuration": "30d",
+    "rememberDevice": true,
+    "enableGamingIntegrations": true
+  },
+  "dataSync": {
+    "enabled": true,
+    "cloudProvider": "activelog-cloud-gaming",
+    "encryption": "standard",
+    "conflictResolution": "latest-wins",
+    "syncFrequency": "realtime",
+    "offlineSupport": true,
+    "enableVideoBackup": true
+  },
+  "settings": {
+    "privacy": {
+      "defaultVisibility": "private",
+      "enableStreamPrivacy": true,
+      "enableDataExport": true,
+      "enableDataDeletion": true,
+      "showDataUsage": true
+    },
+    "notifications": {
+      "enablePush": true,
+      "enableDiscord": true,
+      "enableEmail": false,
+      "enableMatchAlerts": true,
+      "enableFriendActivity": true,
+      "enableStreamNotifications": true
+    },
+    "appearance": {
+      "defaultTheme": "dark",
+      "enableCustomization": true,
+      "enableGamingThemes": true,
+      "enableOverlayCustomization": true
+    },
+    "recording": {
+      "autoRecord": false,
+      "recordMicrophone": true,
+      "recordSystemAudio": true,
+      "bufferLength": "30s",
+      "storageLocation": "cloud"
+    }
+  },
+  "customModules": [
+    {
+      "name": "tournament-tracker",
+      "path": "/modules/playerlog/TournamentTracker.js"
+    },
+    {
+      "name": "esports-analytics",
+      "path": "/modules/playerlog/EsportsAnalytics.js"
+    },
+    {
+      "name": "stream-tools",
+      "path": "/modules/playerlog/StreamTools.js"
+    }
+  ],
+  "integrations": [
+    {
+      "name": "steam",
+      "enabled": true,
+      "gameLibrarySync": true
+    },
+    {
+      "name": "discord",
+      "enabled": true,
+      "richPresence": true
+    },
+    {
+      "name": "twitch",
+      "enabled": true,
+      "streamIntegration": true
+    },
+    {
+      "name": "obs-studio",
+      "enabled": true,
+      "sceneControl": true
+    },
+    {
+      "name": "nvidia-shadowplay",
+      "enabled": true,
+      "hardwareAcceleration": true
+    },
+    {
+      "name": "amd-relive",
+      "enabled": true,
+      "hardwareAcceleration": true
+    }
+  ],
+  "analytics": {
+    "provider": "gaming-focused",
+    "enableUserTracking": true,
+    "enablePerformanceTracking": true,
+    "enableGameplayTracking": true,
+    "enableStreamAnalytics": true,
+    "respectDoNotTrack": true
+  },
+  "hardware": {
+    "enableHardwareAcceleration": true,
+    "supportedGPUs": ["nvidia", "amd", "intel"],
+    "enableNVENC": true,
+    "enableAMDVCE": true,
+    "enableIntelQuickSync": true,
+    "minimumRAM": "8GB",
+    "recommendedRAM": "16GB",
+    "storageRequirements": "SSD recommended for recording"
+  }
+}

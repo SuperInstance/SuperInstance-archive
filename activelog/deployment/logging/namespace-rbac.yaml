@@ -1,0 +1,299 @@
+# Logging Namespace and RBAC Configuration
+
+# Create dedicated logging namespace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: activelog-logging
+  labels:
+    name: activelog-logging
+    purpose: centralized-logging
+---
+# Storage Classes for logging infrastructure
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast-ssd
+  namespace: activelog-logging
+provisioner: kubernetes.io/aws-ebs  # Change based on your cloud provider
+parameters:
+  type: gp3
+  iops: "3000"
+  throughput: "125"
+  fsType: ext4
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain
+---
+# Secrets for logging services
+apiVersion: v1
+kind: Secret
+metadata:
+  name: logging-secrets
+  namespace: activelog-logging
+type: Opaque
+data:
+  # Base64 encoded values
+  elastic-password: YWN0aXZlbG9nLWVsYXN0aWM=  # activelog-elastic
+  kibana-password: YWN0aXZlbG9nLWtpYmFuYQ==    # activelog-kibana
+  alert-webhook-url: ""  # Add your webhook URL here (base64 encoded)
+---
+# ConfigMap for logging configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logging-config
+  namespace: activelog-logging
+data:
+  retention.json: |
+    {
+      "application_logs": {
+        "retention_days": 90,
+        "hot_phase_days": 7,
+        "warm_phase_days": 30
+      },
+      "error_logs": {
+        "retention_days": 180,
+        "hot_phase_days": 7,
+        "warm_phase_days": 60
+      },
+      "security_logs": {
+        "retention_days": 365,
+        "hot_phase_days": 30,
+        "warm_phase_days": 90
+      },
+      "performance_logs": {
+        "retention_days": 30,
+        "hot_phase_days": 3,
+        "warm_phase_days": 7
+      }
+    }
+  
+  log-levels.yaml: |
+    # Log level configuration for different services
+    services:
+      api-gateway:
+        level: info
+        debug_endpoints: ["/debug", "/health"]
+      
+      ai-orchestrator:
+        level: info
+        model_logging: true
+        performance_logging: true
+      
+      gaming-platform:
+        level: info
+        player_events: true
+        session_logging: true
+      
+      auth:
+        level: warn
+        security_events: true
+        failed_attempts: true
+      
+      data-manager:
+        level: info
+        query_logging: false
+        batch_processing: true
+    
+    global:
+      emergency: true
+      alert: true
+      critical: true
+      error: true
+      warning: true
+      notice: false
+      info: false
+      debug: false
+---
+# RBAC for logging services
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: activelog-logging
+  name: logging-manager
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "endpoints", "persistentvolumeclaims", "events", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "daemonsets", "replicasets", "statefulsets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["batch"]
+  resources: ["jobs", "cronjobs"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: logging-manager-binding
+  namespace: activelog-logging
+subjects:
+- kind: ServiceAccount
+  name: elasticsearch
+  namespace: activelog-logging
+- kind: ServiceAccount
+  name: kibana
+  namespace: activelog-logging
+- kind: ServiceAccount
+  name: logstash
+  namespace: activelog-logging
+roleRef:
+  kind: Role
+  name: logging-manager
+  apiGroup: rbac.authorization.k8s.io
+---
+# Service Accounts for logging components
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: elasticsearch
+  namespace: activelog-logging
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kibana
+  namespace: activelog-logging
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: logstash
+  namespace: activelog-logging
+---
+# Network Policies for logging security
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: logging-network-policy
+  namespace: activelog-logging
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow traffic from activelog namespace
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: activelog
+  # Allow internal logging communication
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: activelog-logging
+  # Allow monitoring access
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: activelog-monitoring
+    ports:
+    - protocol: TCP
+      port: 9200  # Elasticsearch
+    - protocol: TCP
+      port: 5601  # Kibana
+  egress:
+  # Allow DNS resolution
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+  # Allow internal communication
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: activelog-logging
+  # Allow external storage access (S3, etc.)
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 80
+---
+# Pod Security Policy for logging services
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: logging-psp
+  namespace: activelog-logging
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  requiredDropCapabilities:
+    - ALL
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    - 'persistentVolumeClaim'
+    - 'hostPath'
+  allowedHostPaths:
+    - pathPrefix: "/var/log"
+      readOnly: true
+    - pathPrefix: "/var/lib/docker/containers"
+      readOnly: true
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: 'MustRunAsNonRoot'
+  supplementalGroups:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1
+        max: 65535
+  fsGroup:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1
+        max: 65535
+  seLinux:
+    rule: 'RunAsAny'
+---
+# Resource Quotas for logging namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: logging-quota
+  namespace: activelog-logging
+spec:
+  hard:
+    requests.cpu: "20"
+    requests.memory: 40Gi
+    limits.cpu: "40"
+    limits.memory: 80Gi
+    persistentvolumeclaims: "20"
+    pods: "50"
+    services: "20"
+---
+# Limit Ranges for logging resources
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: logging-limits
+  namespace: activelog-logging
+spec:
+  limits:
+  - default:
+      cpu: 2
+      memory: 4Gi
+    defaultRequest:
+      cpu: 500m
+      memory: 1Gi
+    type: Container
+  - max:
+      cpu: 8
+      memory: 16Gi
+    min:
+      cpu: 100m
+      memory: 128Mi
+    type: Container
+  - max:
+      storage: 500Gi
+    type: PersistentVolumeClaim

@@ -1,0 +1,292 @@
+# ActiveLog AI Tools - App Store Metadata
+# Professional AI toolkit for content creation and automation
+
+app_info:
+  name: "ActiveLog AI"
+  bundle_id: "com.activelog.ai"
+  category: "Graphics & Design"
+  subcategory: "Productivity"
+  content_rating: "12+"
+  
+  # Version information
+  version: "1.0.0"
+  build_number: "1"
+  minimum_os_version:
+    ios: "16.0"
+    android: "8.0"
+  
+  # Pricing
+  pricing_model: "freemium"
+  base_price: "free"
+  in_app_purchases: true
+
+# App Store descriptions
+descriptions:
+  short_description: "Professional AI toolkit for image generation, text creation, voice synthesis, and video production with cutting-edge models."
+  
+  full_description: |
+    ActiveLog AI is the most comprehensive AI toolkit for professionals, creators, and businesses. Access the latest AI models for image generation, text creation, voice synthesis, and video production - all in one powerful app.
+
+    🎨 IMAGE GENERATION
+    • DALL-E 3, Midjourney, and Stable Diffusion
+    • Custom LoRA model training
+    • Style transfer and image editing
+    • Batch generation for efficiency
+    • High-resolution outputs up to 4K
+    • Commercial licensing included
+
+    ✍️ TEXT GENERATION
+    • GPT-4, Claude 3, and Llama models
+    • Intelligent model routing for best results
+    • Custom writing styles and tones
+    • Multi-language support (50+ languages)
+    • Code generation and debugging
+    • Academic and technical writing
+
+    🎤 VOICE SYNTHESIS
+    • Natural-sounding voice generation
+    • Voice cloning from audio samples
+    • Multiple languages and accents
+    • Emotional tone control
+    • Batch audio processing
+    • Professional voice-over quality
+
+    🎬 VIDEO CREATION
+    • Text-to-video generation
+    • Image-to-video animation
+    • Style transfer for videos
+    • Custom frame rates and resolutions
+    • Background music integration
+    • Professional video effects
+
+    🧠 SMART AI FEATURES
+    • Cost optimization across providers
+    • Local vs cloud processing
+    • Result caching to save money
+    • Batch processing for efficiency
+    • Custom model marketplace
+    • API integration support
+
+    💰 TRANSPARENT PRICING
+    • Pay-per-use with Compute Credits (CC)
+    • No hidden fees or subscriptions
+    • Real-time cost estimation
+    • Bulk discounts available
+    • Free tier with generous limits
+    • Enterprise pricing available
+
+    🛡️ PRIVACY & SECURITY
+    • Local processing when possible
+    • Encrypted cloud storage
+    • No data retention policies
+    • GDPR and CCPA compliant
+    • Business-grade security
+    • API key management
+
+    ⚡ PERFORMANCE
+    • GPU acceleration support
+    • Optimized for mobile devices
+    • Background processing
+    • Progressive downloads
+    • Offline capability for local models
+    • Real-time progress tracking
+
+    🔧 INTEGRATIONS
+    • Adobe Creative Suite plugins
+    • Figma and Sketch integration
+    • Slack and Discord bots
+    • API for custom applications
+    • Webhook notifications
+    • Cloud storage sync
+
+    Perfect for:
+    • Graphic designers and artists
+    • Content creators and marketers
+    • Video producers and editors
+    • Writers and copywriters
+    • Developers and programmers
+    • Social media managers
+    • Agencies and studios
+    • Entrepreneurs and startups
+
+    Supported AI Providers:
+    • OpenAI (GPT-4, DALL-E 3)
+    • Anthropic (Claude 3)
+    • Stability AI (Stable Diffusion)
+    • Midjourney (via API)
+    • ElevenLabs (Voice)
+    • RunwayML (Video)
+    • Local models (Llama, etc.)
+
+    Start creating with AI today!
+
+  whats_new: |
+    🎉 ActiveLog AI 1.0 Launch!
+
+    🆕 Revolutionary Features:
+    • Multi-provider AI model access
+    • Real-time cost optimization
+    • Professional-grade outputs
+    • Local model support
+    • Custom LoRA training
+    • Voice cloning technology
+
+    🎨 Image Generation:
+    • DALL-E 3 integration
+    • Stable Diffusion XL support
+    • Custom style training
+    • Batch processing capabilities
+
+    ✨ Text & Voice:
+    • GPT-4 and Claude 3 access
+    • Natural voice synthesis
+    • Voice cloning from samples
+    • Multi-language support
+
+    💰 Smart Pricing:
+    • Transparent cost tracking
+    • Automatic provider optimization
+    • Bulk processing discounts
+    • Free tier included
+
+    Welcome to the future of AI-powered creativity!
+
+# Keywords for app store search
+keywords:
+  primary: ["AI", "artificial intelligence", "image generation", "text generation", "voice synthesis"]
+  secondary: ["DALL-E", "GPT", "Stable Diffusion", "machine learning", "content creation"]
+  long_tail: ["AI image generator", "AI text writer", "voice cloning app", "professional AI tools", "AI content creation"]
+
+# App Store Connect metadata
+app_store_connect:
+  developer_name: "ActiveLog Technologies"
+  support_url: "https://activelog.com/ai-support"
+  marketing_url: "https://activelog.com/ai"
+  privacy_policy_url: "https://activelog.com/ai-privacy"
+  copyright: "© 2024 ActiveLog Technologies. All rights reserved."
+  
+  # Age rating - 12+ due to AI-generated content
+  age_rating:
+    rating: "12+"
+    reasons: ["Unrestricted Web Access", "User Generated Content"]
+  
+  # Localization
+  locales:
+    - language: "en-US"
+      territory: "US"
+    - language: "es-ES" 
+      territory: "ES"
+    - language: "fr-FR"
+      territory: "FR"
+    - language: "de-DE"
+      territory: "DE"
+    - language: "ja-JP"
+      territory: "JP"
+    - language: "ko-KR"
+      territory: "KR"
+    - language: "zh-CN"
+      territory: "CN"
+
+# Google Play Store specific
+google_play:
+  developer_name: "ActiveLog Technologies"
+  contact_email: "ai-support@activelog.com"
+  contact_phone: "+1-555-ACTIVEAI"
+  website: "https://activelog.com/ai"
+  privacy_policy: "https://activelog.com/ai-privacy"
+  
+  # Content rating - Teen due to AI content
+  content_rating:
+    violence: "none"
+    blood: "none"
+    sexual_content: "mild_suggestive"
+    profanity: "none"
+    drugs_alcohol: "none"
+    gambling: "none"
+    horror: "none"
+    user_generated_content: true
+    
+# Screenshots configuration
+screenshots:
+  required_sizes:
+    ios:
+      - "6.7_inch_display"  # iPhone 14 Pro Max
+      - "6.1_inch_display"  # iPhone 14 Pro
+      - "5.5_inch_display"  # iPhone 8 Plus
+      - "12.9_inch_display" # iPad Pro 12.9"
+      - "11_inch_display"   # iPad Pro 11"
+    android:
+      - "phone_portrait"
+      - "phone_landscape" 
+      - "7_inch_tablet"
+      - "10_inch_tablet"
+  
+  scenes:
+    - name: "ai_dashboard"
+      title: "AI Command Center"
+      description: "Access all AI models from one powerful interface"
+      
+    - name: "image_generation"
+      title: "Create Stunning Images"
+      description: "Generate professional artwork with DALL-E 3 and Stable Diffusion"
+      
+    - name: "text_generation"
+      title: "AI Writing Assistant"
+      description: "Write with GPT-4 and Claude 3 for any purpose"
+      
+    - name: "voice_synthesis"
+      title: "Natural Voice Creation"
+      description: "Generate speech and clone voices with professional quality"
+      
+    - name: "cost_optimization"
+      title: "Smart Cost Control"
+      description: "Transparent pricing with automatic optimization"
+      
+    - name: "model_marketplace"
+      title: "Custom AI Models"
+      description: "Train and share your own AI models"
+
+# App review guidelines compliance
+compliance:
+  data_collection:
+    ai_inputs: true
+    usage_analytics: true
+    crash_reports: true
+    ai_outputs: true
+    
+  permissions_required:
+    camera: "Image input for AI processing"
+    microphone: "Voice recording for synthesis and cloning"
+    photos: "Image library access for AI enhancement"
+    storage: "Local AI model storage"
+    network: "AI API access and cloud processing"
+    
+  age_rating:
+    ios: "12+"
+    android: "Teen"
+    
+  ai_content_disclosure:
+    generated_content: true
+    user_responsibility: true
+    content_filtering: true
+    
+# Marketing assets
+marketing:
+  app_icon_variants:
+    - "standard"
+    - "gradient"
+    - "dark_mode"
+    - "neon"
+  
+  promotional_text: "Unleash your creativity with professional AI tools for image, text, voice, and video generation."
+  
+  feature_graphic_text: "Professional AI Tools • Multiple Providers • Transparent Pricing • Local Processing"
+  
+  # AI-specific marketing points
+  ai_highlights:
+    - "Access to latest AI models"
+    - "Professional-grade outputs"
+    - "Transparent cost optimization"
+    - "Local and cloud processing"
+    - "Custom model training"
+    - "Enterprise-ready security"

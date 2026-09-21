@@ -1,0 +1,10 @@
+total 44
+drwxrwxr-x  3 activeloguser activeloguser 4096 Aug 21 22:21 .
+drwxrwxr-x 33 activeloguser activeloguser 4096 Aug 22 22:25 ..
+-rw-rw-r--  1 activeloguser activeloguser 1174 Aug 21 20:48 Dockerfile
+-rw-rw-r--  1 activeloguser activeloguser 8584 Aug 21 16:17 app.html
+-rw-rw-r--  1 activeloguser activeloguser 1049 Aug 21 19:08 index.html
+-rw-rw-r--  1 activeloguser activeloguser 2376 Aug 21 20:48 nginx.conf
+-rw-rw-r--  1 activeloguser activeloguser  608 Aug 21 22:21 package.json
+drwxrwxr-x  5 activeloguser activeloguser 4096 Aug 21 19:10 src
+-rw-rw-r--  1 activeloguser activeloguser  472 Aug 21 19:01 vite.config.js

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DMLog - D&D Companion{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom CSS for fantasy theme -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+        
+        .fantasy-bg {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            animation: subtleShift 20s ease-in-out infinite;
+        }
+        
+        @keyframes subtleShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .fantasy-text { font-family: 'Cinzel', serif; }
+        .fantasy-body { font-family: 'Crimson Text', serif; }
+        
+        .glowing-border {
+            border: 2px solid transparent;
+            background: linear-gradient(45deg, #4f46e5, #7c3aed, #ec4899) padding-box,
+                        linear-gradient(45deg, #4f46e5, #7c3aed, #ec4899) border-box;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 10px #4f46e5; }
+            to { box-shadow: 0 0 30px #ec4899, 0 0 60px #7c3aed; }
+        }
+        
+        .dice-animation {
+            transition: transform 0.3s ease;
+        }
+        
+        .dice-animation:hover {
+            transform: rotate(360deg) scale(1.1);
+        }
+        
+        .ml-indicator {
+            position: relative;
+        }
+        
+    </style>
+</head>
+<body class="fantasy-bg min-h-screen fantasy-body text-white">
+    {% block content %}{% endblock %}
+    
+    <!-- ML Tracking Script -->
+    <script>
+        // ML User Experience Tracking
+        class MLTracker {
+            constructor() {
+                this.sessionStartTime = Date.now();
+                this.interactions = [];
+                this.setupTracking();
+            }
+            
+            setupTracking() {
+                // Track scroll behavior
+                window.addEventListener('scroll', this.throttle(() => {
+                    this.trackInteraction('scroll', {
+                        scrollY: window.scrollY,
+                        documentHeight: document.body.scrollHeight
+                    });
+                }, 1000));
+                
+                // Track click patterns
+                document.addEventListener('click', (e) => {
+                    this.trackInteraction('click', {
+                        element: e.target.tagName,
+                        className: e.target.className,
+                        id: e.target.id,
+                        coordinates: { x: e.clientX, y: e.clientY }
+                    });
+                });
+                
+                // Track time spent on page
+                window.addEventListener('beforeunload', () => {
+                    const timeSpent = Date.now() - this.sessionStartTime;
+                    this.trackInteraction('session_end', {
+                        duration_ms: timeSpent,
+                        interactions_count: this.interactions.length
+                    });
+                });
+                
+                // Track window/tab focus
+                document.addEventListener('visibilitychange', () => {
+                    this.trackInteraction('focus_change', {
+                        hidden: document.hidden,
+                        timestamp: Date.now()
+                    });
+                });
+            }
+            
+            trackInteraction(type, context) {
+                const interaction = {
+                    type: type,
+                    context: context,
+                    timestamp: new Date().toISOString(),
+                    page: window.location.pathname
+                };
+                
+                this.interactions.push(interaction);
+                
+                // Send to ML engine
+                fetch('/api/track_interaction', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(interaction)
+                }).then(response => response.json())
+                  .then(data => {
+                      if (data.ml_recommendations) {
+                          this.applyMLRecommendations(data.ml_recommendations);
+                      }
+                  }).catch(console.error);
+            }
+            
+            applyMLRecommendations(recommendations) {
+                // Apply theme changes
+                if (recommendations.theme) {
+                    document.body.setAttribute('data-theme', recommendations.theme);
+                }
+                
+                // Apply layout density
+                if (recommendations.layout_density) {
+                    document.body.setAttribute('data-density', recommendations.layout_density);
+                }
+                
+                // Show subtle optimization indicator
+                this.showOptimization();
+            }
+            
+            showOptimization() {
+                const indicator = document.createElement('div');
+                indicator.className = 'fixed top-4 right-4 bg-purple-600 text-white px-3 py-1 rounded-full text-xs z-50';
+                indicator.innerHTML = '✨ Optimizing...';
+                document.body.appendChild(indicator);
+                
+                setTimeout(() => {
+                    indicator.style.opacity = '0';
+                    setTimeout(() => indicator.remove(), 500);
+                }, 2000);
+            }
+            
+            throttle(func, limit) {
+                let inThrottle;
+                return function() {
+                    const args = arguments;
+                    const context = this;
+                    if (!inThrottle) {
+                        func.apply(context, args);
+                        inThrottle = true;
+                        setTimeout(() => inThrottle = false, limit);
+                    }
+                }
+            }
+        }
+        
+        // Initialize ML tracking
+        const mlTracker = new MLTracker();
+        
+        // Utility functions for gaming interface
+        function enterFullscreen() {
+            mlTracker.trackInteraction('fullscreen_request', {
+                screen: {
+                    width: screen.width,
+                    height: screen.height
+                }
+            });
+            
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+            
+            // Redirect to fullscreen interface
+            setTimeout(() => {
+                window.location.href = '/fullscreen?screen_size=' + screen.width + 'x' + screen.height;
+            }, 500);
+        }
+        
+        // Enhanced dice rolling with ML
+        async function rollDice(diceType = 'd20', modifier = 0, advantage = false) {
+            mlTracker.trackInteraction('dice_roll_request', {
+                dice_type: diceType,
+                modifier: modifier,
+                advantage: advantage
+            });
+            
+            const response = await fetch('/api/dice_roll', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    dice: diceType,
+                    modifier: modifier,
+                    advantage: advantage
+                })
+            });
+            
+            const result = await response.json();
+            return result;
+        }
+        
+        // Adaptive UI based on ML
+        async function getMLInsights() {
+            const response = await fetch('/api/get_ml_insights');
+            const data = await response.json();
+            return data;
+        }
+        
+        // Periodic ML optimization updates
+        setInterval(async () => {
+            const insights = await getMLInsights();
+            if (insights.ui_config) {
+                mlTracker.applyMLRecommendations(insights.ui_config);
+            }
+        }, 30000); // Every 30 seconds
+    </script>
+</body>
+</html>

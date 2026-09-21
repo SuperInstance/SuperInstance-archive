@@ -1,0 +1,346 @@
+# Cloud Infrastructure Configuration
+# Enterprise-grade configuration for EC2 provisioning, billing, and scaling
+
+aws:
+  # AWS Configuration
+  region: "us-west-2"
+  availability_zones:
+    - "us-west-2a"
+    - "us-west-2b"
+    - "us-west-2c"
+  
+  # Default VPC Configuration
+  default_vpc_cidr: "10.0.0.0/16"
+  subnet_mask: 24
+  
+  # Instance Configuration
+  default_instance_type: "t3.medium"
+  default_image_id: "ami-0c02fb55956c7d316"  # Amazon Linux 2
+  
+  # Security
+  default_security_groups:
+    - "sg-default-web"
+    - "sg-default-ssh"
+  
+  # Resource Limits
+  max_instances_per_user: 20
+  max_storage_per_user_gb: 1000
+  
+provisioning:
+  # Instance Provisioning Settings
+  provisioning_timeout_minutes: 10
+  health_check_interval_seconds: 30
+  health_check_timeout_seconds: 5
+  max_provisioning_retries: 3
+  
+  # Instance Templates
+  templates:
+    web_server:
+      instance_type: "t3.medium"
+      root_volume_size: 20
+      security_groups: ["sg-web", "sg-ssh"]
+      user_data_script: "scripts/web-server-init.sh"
+    
+    database:
+      instance_type: "r5.large"
+      root_volume_size: 50
+      security_groups: ["sg-database"]
+      user_data_script: "scripts/database-init.sh"
+    
+    game_server:
+      instance_type: "c5.xlarge"
+      root_volume_size: 30
+      security_groups: ["sg-game", "sg-ssh"]
+      user_data_script: "scripts/game-server-init.sh"
+    
+    worker:
+      instance_type: "t3.small"
+      root_volume_size: 10
+      security_groups: ["sg-worker"]
+      user_data_script: "scripts/worker-init.sh"
+  
+  # Auto-tagging
+  default_tags:
+    Environment: "production"
+    ManagedBy: "cloud-infrastructure-system"
+    BillingEnabled: "true"
+    
+billing:
+  # Per-minute Billing Configuration
+  billing_precision: "per_minute"
+  currency: "USD"
+  timezone: "UTC"
+  
+  # Pricing Tiers (per minute)
+  pricing:
+    compute:
+      t3.nano: 0.0009
+      t3.micro: 0.0017
+      t3.small: 0.0035
+      t3.medium: 0.0067
+      t3.large: 0.0133
+      t3.xlarge: 0.0267
+      t3.2xlarge: 0.0533
+      
+      c5.large: 0.0142
+      c5.xlarge: 0.0283
+      c5.2xlarge: 0.0567
+      c5.4xlarge: 0.1133
+      
+      r5.large: 0.0208
+      r5.xlarge: 0.0417
+      r5.2xlarge: 0.0833
+      
+      # Game night premium instances
+      c5.4xlarge_game: 0.1417  # 25% premium for game workloads
+      c5.9xlarge_game: 0.2833
+    
+    storage:
+      ebs_gp3: 0.000014  # per GB per minute
+      ebs_io2: 0.000021  # per GB per minute
+      snapshot: 0.000008  # per GB per minute
+    
+    network:
+      data_transfer_out: 0.000015  # per GB
+      data_transfer_in: 0.0        # Free
+    
+    premium_features:
+      monitoring_detailed: 0.0005   # per instance per minute
+      backup_automated: 0.0003     # per instance per minute
+      security_enhanced: 0.0008    # per instance per minute
+  
+  # Billing Cycles
+  billing_cycle_days: 30
+  invoice_generation_day: 1
+  payment_due_days: 15
+  
+  # Discounts and Promotions
+  volume_discounts:
+    tier1: # >1000 minutes/month
+      threshold_minutes: 1000
+      discount_percent: 5
+    tier2: # >5000 minutes/month
+      threshold_minutes: 5000
+      discount_percent: 10
+    tier3: # >10000 minutes/month
+      threshold_minutes: 10000
+      discount_percent: 15
+  
+  # Game night special pricing
+  event_pricing:
+    game_night:
+      multiplier: 1.0  # No premium during events
+      volume_bonus: 0.8  # 20% discount for auto-scaling
+      duration_bonus: # Additional discounts for longer events
+        2_hours: 0.95
+        4_hours: 0.90
+        6_hours: 0.85
+
+scaling:
+  # Auto-scaling Configuration
+  scaling_enabled: true
+  scaling_interval_seconds: 60
+  cooldown_period_seconds: 300
+  
+  # Scaling Metrics
+  cpu_scale_up_threshold: 70
+  cpu_scale_down_threshold: 30
+  memory_scale_up_threshold: 80
+  memory_scale_down_threshold: 40
+  
+  # Scaling Policies
+  scale_up_adjustment: 2    # Add 2 instances
+  scale_down_adjustment: 1  # Remove 1 instance
+  max_scale_up_instances: 10
+  min_instances: 1
+  max_instances: 50
+  
+  # Predictive Scaling
+  enable_predictive_scaling: true
+  prediction_horizon_minutes: 60
+  prediction_confidence_threshold: 0.8
+  
+  # Game Night Scaling
+  game_night:
+    enable_event_scaling: true
+    pre_scale_minutes: 30  # Scale up 30 min before event
+    post_scale_minutes: 60  # Scale down 60 min after event
+    scale_multiplier: 3.0   # 3x normal capacity
+    
+    # Event patterns (cron-like)
+    scheduled_events:
+      friday_night:
+        pattern: "0 19 * * 5"  # Every Friday at 7 PM
+        duration_hours: 4
+        expected_load_multiplier: 2.5
+      
+      saturday_tournament:
+        pattern: "0 14 * * 6"  # Every Saturday at 2 PM
+        duration_hours: 6
+        expected_load_multiplier: 4.0
+      
+      weekend_marathon:
+        pattern: "0 10 * * 0"  # Every Sunday at 10 AM
+        duration_hours: 8
+        expected_load_multiplier: 3.5
+
+isolation:
+  # User Data Isolation
+  enable_strict_isolation: true
+  isolation_level: "vpc"  # vpc, subnet, or security_group
+  
+  # Network Isolation
+  user_vpc_cidr_base: "172.16.0.0/12"  # Gives ~16M IPs for user VPCs
+  vpc_cidr_mask: 16  # Each user VPC gets /16 (65K IPs)
+  
+  # Encryption
+  encryption_at_rest: true
+  encryption_in_transit: true
+  encryption_algorithm: "AES-256"
+  key_rotation_days: 90
+  
+  # Access Control
+  enable_rbac: true
+  default_user_permissions:
+    - "ec2:DescribeInstances"
+    - "ec2:StartInstances"
+    - "ec2:StopInstances"
+    - "ec2:RebootInstances"
+  
+  admin_permissions:
+    - "*"
+  
+  # Audit Logging
+  audit_log_retention_days: 90
+  log_all_api_calls: true
+  log_data_access: true
+  compliance_mode: "SOC2"
+
+api:
+  # API Gateway Configuration
+  host: "0.0.0.0"
+  port: 8600
+  workers: 4
+  
+  # Security
+  enable_authentication: true
+  enable_rate_limiting: true
+  enable_cors: true
+  
+  # Rate Limiting (per user per minute)
+  rate_limits:
+    anonymous: 10
+    authenticated: 100
+    premium: 1000
+    admin: 10000
+  
+  # API Versioning
+  current_version: "v1"
+  supported_versions: ["v1"]
+  deprecation_notice_days: 90
+  
+  # Documentation
+  enable_swagger: true
+  swagger_path: "/docs"
+  redoc_path: "/redoc"
+
+monitoring:
+  # System Monitoring
+  enable_monitoring: true
+  metrics_interval_seconds: 30
+  
+  # Prometheus Integration
+  prometheus:
+    enabled: true
+    port: 9090
+    scrape_interval: "15s"
+  
+  # Alerting
+  alerts:
+    high_cpu_usage:
+      threshold: 90
+      duration: "5m"
+      severity: "warning"
+    
+    high_memory_usage:
+      threshold: 95
+      duration: "3m"
+      severity: "critical"
+    
+    billing_anomaly:
+      cost_increase_threshold: 200  # 200% increase
+      duration: "1h"
+      severity: "warning"
+    
+    scaling_failure:
+      failed_scaling_events: 3
+      duration: "10m"
+      severity: "critical"
+
+security:
+  # Security Configuration
+  enable_security_scanning: true
+  security_scan_interval_hours: 24
+  
+  # Network Security
+  default_ingress_rules:
+    ssh:
+      protocol: "tcp"
+      port: 22
+      cidr: "0.0.0.0/0"  # Restrict in production
+    http:
+      protocol: "tcp"
+      port: 80
+      cidr: "0.0.0.0/0"
+    https:
+      protocol: "tcp"
+      port: 443
+      cidr: "0.0.0.0/0"
+  
+  # Instance Security
+  required_security_groups:
+    - "sg-baseline-security"
+  
+  # Compliance
+  compliance_frameworks:
+    - "SOC2"
+    - "GDPR"
+    - "HIPAA"
+  
+  # Incident Response
+  incident_response_enabled: true
+  auto_quarantine_suspicious_instances: true
+  security_notification_webhook: ""
+
+# Environment-specific overrides
+environments:
+  development:
+    aws:
+      region: "us-west-2"
+    billing:
+      pricing:
+        compute:
+          t3.medium: 0.0034  # 50% discount for dev
+    scaling:
+      max_instances: 5
+    security:
+      enable_security_scanning: false
+    
+  staging:
+    aws:
+      region: "us-west-2"
+    billing:
+      pricing:
+        compute:
+          t3.medium: 0.0050  # 25% discount for staging
+    scaling:
+      max_instances: 10
+    
+  production:
+    aws:
+      region: "us-west-2"
+    isolation:
+      enable_strict_isolation: true
+    security:
+      enable_security_scanning: true
+      auto_quarantine_suspicious_instances: true

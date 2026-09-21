@@ -1,0 +1,183 @@
+version: '3.8'
+
+services:
+  # DMLog Game Development Service
+  dmlog-gamedev:
+    build:
+      context: ../services/dmlog-gamedev
+      dockerfile: ../deployment-pipeline/docker/dmlog-gamedev.Dockerfile
+    ports:
+      - "8200:8200"
+    environment:
+      - NODE_ENV=development
+      - PORT=8200
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+    networks:
+      - dmlog-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8200/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # DMLog Integration Service
+  dmlog-integration:
+    build:
+      context: ../services/dmlog-integration
+      dockerfile: ../deployment-pipeline/docker/dmlog-integration.Dockerfile
+    ports:
+      - "8203:8203"
+    environment:
+      - PORT=8203
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://dmlog:dmlog@postgres:5432/dmlog
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - dmlog-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8203/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend Service
+  frontend-dmlog-final:
+    build:
+      context: ../frontend-dmlog-final
+      dockerfile: ../deployment-pipeline/docker/frontend-dmlog-final.Dockerfile
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_URL=http://dmlog-integration:8203
+    depends_on:
+      - dmlog-integration
+    networks:
+      - dmlog-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Data Orchestrator Service
+  data-orchestrator:
+    build:
+      context: ../services/data-orchestrator
+      dockerfile: ../deployment-pipeline/docker/data-orchestrator.Dockerfile
+    ports:
+      - "8204:8204"
+      - "9204:9204"
+    environment:
+      - PORT=8204
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://dmlog:dmlog@postgres:5432/dmlog
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - dmlog-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8204/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - dmlog-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=dmlog
+      - POSTGRES_USER=dmlog
+      - POSTGRES_PASSWORD=dmlog_password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - dmlog-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dmlog"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Nginx Load Balancer
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend-dmlog-final
+      - dmlog-integration
+      - data-orchestrator
+    networks:
+      - dmlog-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Monitoring - Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    networks:
+      - dmlog-network
+
+  # Monitoring - Grafana
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - dmlog-network
+
+volumes:
+  redis-data:
+  postgres-data:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  dmlog-network:
+    driver: bridge

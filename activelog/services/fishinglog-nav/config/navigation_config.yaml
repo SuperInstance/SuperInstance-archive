@@ -1,0 +1,52 @@
+# Marine Navigation System Configuration
+
+system:
+  name: "Professional Marine Navigation System"
+  version: "1.0.0"
+  port: 8365
+  
+chart_engine:
+  ecdis_compliance: true
+  s57_support: true
+  s63_encryption: true
+  safety_contour: 10.0  # meters
+  safety_depth: 30.0    # meters
+  shallow_contour: 2.0  # meters
+  deep_contour: 200.0   # meters
+
+ais_tracker:
+  max_target_age: 300   # seconds
+  safe_distance: 2.0    # nautical miles
+  caution_distance: 1.0
+  warning_distance: 0.5
+  danger_distance: 0.2
+  
+radar_system:
+  antenna_height: 10.0  # meters
+  max_targets: 100
+  track_initiation_threshold: 3
+  lost_target_timeout: 30  # seconds
+
+display:
+  stations:
+    - name: "helm"
+      features: ["compass", "speed", "mob_button"]
+    - name: "nav_station" 
+      features: ["full_chart", "route_planning", "weather"]
+    - name: "flybridge"
+      features: ["compact_chart", "ais", "weather"]
+      
+  night_mode:
+    red_light_preservation: true
+    auto_switch: false
+    switch_time: "sunset"
+
+safety:
+  mob_system:
+    instant_marking: true
+    search_patterns: ["williamson_turn", "sector_search"]
+  
+  collision_avoidance:
+    arpa_calculations: true
+    risk_assessment: true
+    audio_alarms: true

@@ -1,0 +1,25 @@
+{
+  "topic_index": {
+    "learning": [
+      "eece0377648b"
+    ],
+    "uncertainty": [
+      "eece0377648b"
+    ],
+    "confidence": [
+      "e063b5a649f9"
+    ],
+    "social": [
+      "e063b5a649f9"
+    ]
+  },
+  "character_index": {},
+  "type_index": {
+    "learning": [
+      "eece0377648b"
+    ],
+    "self_reflection": [
+      "e063b5a649f9"
+    ]
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "name": "document-ai",
+  "version": "1.0.0",
+  "description": "AI-powered document processing service with classification, NER, summarization, and semantic search",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "python:install": "pip install -r requirements.txt",
+    "setup": "npm install && npm run python:install"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "dotenv": "^16.3.1",
+    "winston": "^3.11.0",
+    "uuid": "^9.0.1",
+    "axios": "^1.6.0",
+    "form-data": "^4.0.0",
+    "pdf-parse": "^1.1.1",
+    "pdf2pic": "^2.1.4",
+    "sharp": "^0.32.6",
+    "mammoth": "^1.6.0",
+    "xlsx": "^0.18.5",
+    "cheerio": "^1.0.0-rc.12",
+    "node-schedule": "^2.1.1",
+    "ioredis": "^5.3.2",
+    "pg": "^8.11.3",
+    "sqlite3": "^5.1.6",
+    "sequelize": "^6.35.1",
+    "chroma-js": "^2.4.2",
+    "compromise": "^14.10.0",
+    "natural": "^6.10.0",
+    "franc": "^6.0.0",
+    "langdetect": "^0.2.1",
+    "node-tesseract-ocr": "^2.2.1",
+    "jimp": "^0.22.10",
+    "puppeteer": "^21.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "@types/jest": "^29.5.8"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "document",
+    "ai",
+    "ocr",
+    "pdf",
+    "classification",
+    "ner",
+    "summarization",
+    "semantic-search",
+    "nlp"
+  ]
+}

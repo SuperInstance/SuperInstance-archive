@@ -1,0 +1,282 @@
+{
+  "name": "Capitaine.ai",
+  "version": "1.0.0",
+  "title": "Capitaine.ai - Advanced Marine Navigation",
+  "description": "Professional marine navigation system for commercial and advanced recreational vessels",
+  "favicon": "/assets/capitaine/favicon.ico",
+  "domain": "capitaine.ai",
+  "devPort": 3009,
+  "theme": "nautical-professional",
+  "layout": "advanced-marine",
+  "monetization": {
+    "type": "subscription",
+    "tiers": ["professional", "commercial", "fleet"],
+    "trialPeriod": "30d"
+  },
+  "features": {
+    "advancedNavigation": true,
+    "radarIntegration": true,
+    "aisTracking": true,
+    "electronicCharts": true,
+    "routePlanning": true,
+    "weatherRouting": true,
+    "fleetManagement": true,
+    "complianceTracking": true,
+    "performanceMonitoring": true,
+    "emergencyResponse": true,
+    "crewManagement": true,
+    "documentManagement": true
+  },
+  "modules": [
+    {
+      "name": "ecdis",
+      "component": "ECDISModule",
+      "props": {
+        "enableS57Charts": true,
+        "enableS63Encryption": true,
+        "enableRouteMonitoring": true,
+        "enableAlarmsManagement": true,
+        "enableBackupSystems": true,
+        "certificationLevel": "IMO",
+        "enableRecording": true
+      }
+    },
+    {
+      "name": "radar",
+      "component": "RadarIntegrationModule",
+      "props": {
+        "enableARPATracking": true,
+        "enableCollisionAvoidance": true,
+        "enableTargetTracking": true,
+        "enableWeatherOverlay": true,
+        "enableRecording": true,
+        "radarBrands": ["furuno", "simrad", "jrc", "sperry"]
+      }
+    },
+    {
+      "name": "ais",
+      "component": "AISModule",
+      "props": {
+        "enableClassATracking": true,
+        "enableClassBTracking": true,
+        "enableSARTDetection": true,
+        "enableAtoNTracking": true,
+        "enableStaticData": true,
+        "enableVoyageData": true,
+        "enableSafetyMessages": true
+      }
+    },
+    {
+      "name": "routePlanning",
+      "component": "AdvancedRoutePlanningModule",
+      "props": {
+        "enableWeatherRouting": true,
+        "enableCurrentRouting": true,
+        "enableOptimization": true,
+        "enableSafetyChecks": true,
+        "enableAlternativeRoutes": true,
+        "enableTimeScheduling": true
+      }
+    },
+    {
+      "name": "weather",
+      "component": "ProfessionalWeatherModule",
+      "props": {
+        "enableGRIBData": true,
+        "enableSatelliteImagery": true,
+        "enableModelComparison": true,
+        "enableCustomModels": true,
+        "enableAlarmManagement": true,
+        "updateFrequency": "6h",
+        "forecastRange": "10d"
+      }
+    },
+    {
+      "name": "fleet",
+      "component": "FleetManagementModule",
+      "props": {
+        "enableVesselTracking": true,
+        "enablePerformanceMonitoring": true,
+        "enableFuelOptimization": true,
+        "enableMaintenanceScheduling": true,
+        "enableCrewManagement": true,
+        "enableComplianceReporting": true
+      }
+    },
+    {
+      "name": "compliance",
+      "component": "ComplianceModule",
+      "props": {
+        "enableSOLAS": true,
+        "enableSTCW": true,
+        "enableMARPOL": true,
+        "enablePortStateControl": true,
+        "enableVettingInspections": true,
+        "enableCertificateTracking": true
+      }
+    },
+    {
+      "name": "emergency",
+      "component": "EmergencyResponseModule",
+      "props": {
+        "enableDSCMonitoring": true,
+        "enableEPIRBIntegration": true,
+        "enableSARProcedures": true,
+        "enableEmergencyContacts": true,
+        "enableMusterLists": true,
+        "enableDrillManagement": true
+      }
+    }
+  ],
+  "aiModels": [
+    {
+      "name": "collision-predictor",
+      "type": "safety-analysis",
+      "endpoint": "/ai/collision-prediction",
+      "features": ["traffic-analysis", "risk-assessment", "evasive-recommendations"]
+    },
+    {
+      "name": "weather-router",
+      "type": "optimization",
+      "endpoint": "/ai/weather-routing",
+      "features": ["fuel-optimization", "time-optimization", "safety-optimization"]
+    },
+    {
+      "name": "performance-analyzer",
+      "type": "analytics",
+      "endpoint": "/ai/performance-analysis",
+      "features": ["fuel-efficiency", "speed-optimization", "maintenance-prediction"]
+    },
+    {
+      "name": "anomaly-detector",
+      "type": "monitoring",
+      "endpoint": "/ai/anomaly-detection",
+      "features": ["equipment-monitoring", "behavior-analysis", "predictive-maintenance"]
+    }
+  ],
+  "auth": {
+    "providers": ["email", "ldap", "saml", "maritime-sso"],
+    "requireEmailVerification": true,
+    "enableTwoFactor": true,
+    "sessionDuration": "12h",
+    "rememberDevice": false,
+    "enableRoleBasedAccess": true,
+    "requireCertification": true
+  },
+  "dataSync": {
+    "enabled": true,
+    "cloudProvider": "activelog-cloud-maritime",
+    "encryption": "maritime-grade",
+    "conflictResolution": "manual-review",
+    "syncFrequency": "realtime",
+    "offlineSupport": true,
+    "enableAuditTrail": true,
+    "enableRedundancy": true
+  },
+  "settings": {
+    "privacy": {
+      "enableIMOCompliance": true,
+      "enableDataRetention": true,
+      "enableAuditLogging": true,
+      "enableEncryption": true,
+      "dataRetentionPeriod": "25y"
+    },
+    "notifications": {
+      "enablePush": true,
+      "enableEmail": true,
+      "enableSMS": true,
+      "enableSatellite": true,
+      "enableAlarmIntegration": true,
+      "enableBridgeAlerts": true
+    },
+    "appearance": {
+      "defaultTheme": "professional",
+      "enableNightMode": true,
+      "enableRedLighting": true,
+      "enableWeatherOverlays": true
+    },
+    "units": {
+      "distance": "nautical-miles",
+      "depth": "meters",
+      "speed": "knots",
+      "wind": "beaufort",
+      "temperature": "celsius",
+      "pressure": "hPa"
+    }
+  },
+  "customModules": [
+    {
+      "name": "voyage-planning",
+      "path": "/modules/capitaine/VoyagePlanning.js"
+    },
+    {
+      "name": "cargo-management",
+      "path": "/modules/capitaine/CargoManagement.js"
+    },
+    {
+      "name": "bridge-resource",
+      "path": "/modules/capitaine/BridgeResourceManagement.js"
+    }
+  ],
+  "integrations": [
+    {
+      "name": "admiralty",
+      "enabled": true,
+      "chartUpdates": true
+    },
+    {
+      "name": "noaa",
+      "enabled": true,
+      "chartUpdates": true
+    },
+    {
+      "name": "inmarsat",
+      "enabled": true,
+      "satelliteCommunication": true
+    },
+    {
+      "name": "iridium",
+      "enabled": true,
+      "satelliteCommunication": true
+    },
+    {
+      "name": "furuno",
+      "enabled": true,
+      "equipmentIntegration": true
+    },
+    {
+      "name": "simrad",
+      "enabled": true,
+      "equipmentIntegration": true
+    },
+    {
+      "name": "jrc",
+      "enabled": true,
+      "equipmentIntegration": true
+    }
+  ],
+  "analytics": {
+    "provider": "maritime-professional",
+    "enableVoyageAnalytics": true,
+    "enablePerformanceTracking": true,
+    "enableComplianceTracking": true,
+    "enableSafetyMetrics": true,
+    "respectDoNotTrack": false
+  },
+  "hardware": {
+    "enableNMEA0183": true,
+    "enableNMEA2000": true,
+    "enableSerialPorts": true,
+    "enableEthernet": true,
+    "enableRedundancy": true,
+    "supportedEquipment": ["furuno", "simrad", "jrc", "sperry", "kelvin-hughes"],
+    "certificationRequirements": ["IEC", "IMO", "wheelmark"]
+  },
+  "certification": {
+    "enableTypeApproval": true,
+    "enableWheelmark": true,
+    "enableIMOCompliance": true,
+    "enableSOLASCompliance": true,
+    "certificationBodies": ["DNV", "Lloyds", "ABS", "BV"]
+  }
+}

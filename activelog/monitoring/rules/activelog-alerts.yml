@@ -1,0 +1,234 @@
+# ActiveLog Prometheus alerting rules
+
+groups:
+  - name: activelog.application
+    rules:
+      # Service availability alerts
+      - alert: ServiceDown
+        expr: up{job=~"api-gateway|auth-service|metadata-service|file-processor-service|ai-orchestrator-service|notification-service"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "ActiveLog service {{ $labels.job }} is down"
+          description: "Service {{ $labels.job }} on instance {{ $labels.instance }} has been down for more than 1 minute."
+
+      # High response time alerts
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High response time for {{ $labels.job }}"
+          description: "95th percentile response time for {{ $labels.job }} is {{ $value }}s for more than 5 minutes."
+
+      # High error rate alerts
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 3m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High error rate for {{ $labels.job }}"
+          description: "Error rate for {{ $labels.job }} is {{ $value | humanizePercentage }} for more than 3 minutes."
+
+      # High CPU usage
+      - alert: HighCPUUsage
+        expr: rate(container_cpu_usage_seconds_total[5m]) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High CPU usage for {{ $labels.name }}"
+          description: "Container {{ $labels.name }} CPU usage is {{ $value }}% for more than 10 minutes."
+
+      # High memory usage
+      - alert: HighMemoryUsage
+        expr: (container_memory_usage_bytes / container_spec_memory_limit_bytes) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High memory usage for {{ $labels.name }}"
+          description: "Container {{ $labels.name }} memory usage is {{ $value }}% for more than 5 minutes."
+
+      # Database connection issues
+      - alert: DatabaseConnectionIssues
+        expr: increase(database_connection_errors_total[5m]) > 5
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Database connection issues"
+          description: "{{ $value }} database connection errors in the last 5 minutes."
+
+      # Redis connection issues
+      - alert: RedisConnectionIssues
+        expr: increase(redis_connection_errors_total[5m]) > 5
+        for: 2m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Redis connection issues"
+          description: "{{ $value }} Redis connection errors in the last 5 minutes."
+
+      # File processing queue backup
+      - alert: FileProcessingQueueBackup
+        expr: file_processing_queue_size > 100
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "File processing queue backup"
+          description: "File processing queue has {{ $value }} items pending for more than 10 minutes."
+
+      # AI request failures
+      - alert: AIRequestFailures
+        expr: increase(ai_request_failures_total[5m]) > 10
+        for: 3m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High AI request failure rate"
+          description: "{{ $value }} AI request failures in the last 5 minutes."
+
+  - name: activelog.infrastructure
+    rules:
+      # PostgreSQL alerts
+      - alert: PostgreSQLDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: infrastructure
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "PostgreSQL database has been down for more than 1 minute."
+
+      - alert: PostgreSQLHighConnections
+        expr: pg_stat_database_numbackends / pg_settings_max_connections * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "PostgreSQL high connection usage"
+          description: "PostgreSQL connection usage is {{ $value }}% for more than 5 minutes."
+
+      - alert: PostgreSQLSlowQueries
+        expr: rate(pg_stat_user_tables_seq_scan[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "PostgreSQL slow queries detected"
+          description: "High rate of sequential scans detected: {{ $value }} per second."
+
+      # Redis alerts
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: infrastructure
+        annotations:
+          summary: "Redis is down"
+          description: "Redis cache has been down for more than 1 minute."
+
+      - alert: RedisHighMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "Redis high memory usage"
+          description: "Redis memory usage is {{ $value }}% for more than 5 minutes."
+
+      # System resource alerts
+      - alert: HighDiskUsage
+        expr: (node_filesystem_size_bytes - node_filesystem_avail_bytes) / node_filesystem_size_bytes * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "High disk usage on {{ $labels.instance }}"
+          description: "Disk usage is {{ $value }}% on {{ $labels.instance }} for more than 5 minutes."
+
+      - alert: SystemLoadHigh
+        expr: node_load1 > 2
+        for: 10m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "High system load on {{ $labels.instance }}"
+          description: "System load is {{ $value }} on {{ $labels.instance }} for more than 10 minutes."
+
+      - alert: OutOfMemory
+        expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 10
+        for: 5m
+        labels:
+          severity: critical
+          team: infrastructure
+        annotations:
+          summary: "System running out of memory"
+          description: "Available memory is {{ $value }}% on {{ $labels.instance }}."
+
+  - name: activelog.business
+    rules:
+      # User activity alerts
+      - alert: LowUserActivity
+        expr: rate(user_requests_total[1h]) < 0.1
+        for: 30m
+        labels:
+          severity: warning
+          team: product
+        annotations:
+          summary: "Low user activity detected"
+          description: "User request rate is {{ $value }} requests/second for the last hour."
+
+      # File upload failures
+      - alert: FileUploadFailures
+        expr: rate(file_upload_failures_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          team: product
+        annotations:
+          summary: "High file upload failure rate"
+          description: "File upload failure rate is {{ $value }} failures/second."
+
+      # Search performance
+      - alert: SlowSearchQueries
+        expr: histogram_quantile(0.95, rate(search_duration_seconds_bucket[5m])) > 5
+        for: 5m
+        labels:
+          severity: warning
+          team: product
+        annotations:
+          summary: "Slow search queries"
+          description: "95th percentile search query time is {{ $value }} seconds."
+
+      # Storage quota alerts
+      - alert: UserStorageQuotaExceeded
+        expr: user_storage_usage_bytes > user_storage_quota_bytes
+        for: 1m
+        labels:
+          severity: warning
+          team: product
+        annotations:
+          summary: "User storage quota exceeded"
+          description: "User {{ $labels.user_id }} has exceeded storage quota."

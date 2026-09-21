@@ -1,0 +1,39 @@
+{
+  "load_balancing": {
+    "high_load_bots": [],
+    "available_capacity": {
+      "infrastructure": 70,
+      "services": 85,
+      "domains": 60
+    },
+    "task_redistribution_suggestions": []
+  },
+  "knowledge_sharing": {
+    "recent_learnings": [
+      {
+        "topic": "docker_fallback_patterns",
+        "source_bot": "infrastructure",
+        "applicable_to": [
+          "services"
+        ],
+        "knowledge_file": "docker_fallback_templates.yml"
+      }
+    ],
+    "skill_requests": [],
+    "teaching_opportunities": []
+  },
+  "emergency_assistance": {
+    "critical_issues": [],
+    "all_hands_situations": [],
+    "emergency_skill_requests": []
+  },
+  "optimization_opportunities": {
+    "parallel_work_opportunities": [
+      "services_can_prepare_schemas_while_infrastructure_fixes_k8s"
+    ],
+    "redundant_work_elimination": [],
+    "efficiency_improvements": [
+      "use_pheromone_trails_for_similar_tasks"
+    ]
+  }
+}

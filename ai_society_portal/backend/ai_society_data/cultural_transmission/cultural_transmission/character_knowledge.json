@@ -1,0 +1,51 @@
+{
+  "character_knowledge": {
+    "82b11eb1e0ec": [
+      "568f96b4ee8c",
+      "d1add7c2a415"
+    ],
+    "b221f050744d": [
+      "b66c738b498c"
+    ],
+    "70e6fd88ecdf": [
+      "d1add7c2a415",
+      "568f96b4ee8c"
+    ],
+    "f4819bcf3e38": [
+      "d1add7c2a415"
+    ],
+    "da354fa12096": [
+      "236f760b0669",
+      "d1add7c2a415"
+    ]
+  },
+  "character_skills": {
+    "b221f050744d": [
+      "b66c738b498c"
+    ]
+  },
+  "transmission_network": {
+    "70e6fd88ecdf": [
+      "82b11eb1e0ec"
+    ],
+    "f4819bcf3e38": [
+      "82b11eb1e0ec"
+    ],
+    "da354fa12096": [
+      "f4819bcf3e38",
+      "82b11eb1e0ec"
+    ],
+    "82b11eb1e0ec": [
+      "70e6fd88ecdf"
+    ]
+  },
+  "teaching_relationships": {
+    "f4819bcf3e38": [
+      "da354fa12096"
+    ],
+    "82b11eb1e0ec": [
+      "da354fa12096"
+    ]
+  },
+  "last_saved": "2025-10-21T17:10:13.848039"
+}

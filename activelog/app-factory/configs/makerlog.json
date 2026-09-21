@@ -1,0 +1,255 @@
+{
+  "name": "MakerLog.ai",
+  "version": "1.0.0",
+  "title": "MakerLog.ai - Design & Manufacturing Hub",
+  "description": "Design, manufacturing, and logistics tracking for makers and manufacturers",
+  "favicon": "/assets/makerlog/favicon.ico",
+  "domain": "makerlog.ai",
+  "devPort": 3007,
+  "theme": "industrial",
+  "layout": "maker-dashboard",
+  "monetization": {
+    "type": "freemium",
+    "tiers": ["hobbyist", "professional", "enterprise"],
+    "trialPeriod": "21d"
+  },
+  "features": {
+    "projectManagement": true,
+    "designTracking": true,
+    "manufacturingPlanning": true,
+    "inventoryManagement": true,
+    "qualityControl": true,
+    "supplyChain": true,
+    "costTracking": true,
+    "collaboration": true,
+    "documentation": true,
+    "prototyping": true,
+    "testing": true,
+    "compliance": true
+  },
+  "modules": [
+    {
+      "name": "design",
+      "component": "DesignTrackingModule",
+      "props": {
+        "enableVersionControl": true,
+        "enableCADIntegration": true,
+        "enableCollaboration": true,
+        "enableAnnotations": true,
+        "supportedFormats": ["step", "iges", "stl", "obj", "dwg", "dxf"],
+        "enable3DViewer": true
+      }
+    },
+    {
+      "name": "manufacturing",
+      "component": "ManufacturingPlanningModule",
+      "props": {
+        "enableWorkflowDesign": true,
+        "enableResourcePlanning": true,
+        "enableScheduling": true,
+        "enableQualityPlanning": true,
+        "enableCostEstimation": true,
+        "enableCapacityPlanning": true
+      }
+    },
+    {
+      "name": "inventory",
+      "component": "InventoryManagementModule",
+      "props": {
+        "enableBarcodeScanning": true,
+        "enableRFIDTracking": true,
+        "enableLotTracking": true,
+        "enableExpirationTracking": true,
+        "enableSupplierManagement": true,
+        "enableReorderAlerts": true
+      }
+    },
+    {
+      "name": "quality",
+      "component": "QualityControlModule",
+      "props": {
+        "enableInspectionPlans": true,
+        "enableTestResults": true,
+        "enableNonConformanceTracking": true,
+        "enableCorrectiveActions": true,
+        "enableCertificates": true,
+        "enableStatisticalAnalysis": true
+      }
+    },
+    {
+      "name": "supply",
+      "component": "SupplyChainModule",
+      "props": {
+        "enableSupplierTracking": true,
+        "enablePurchaseOrders": true,
+        "enableReceiving": true,
+        "enableVendorEvaluation": true,
+        "enableDeliveryTracking": true,
+        "enableCostAnalysis": true
+      }
+    },
+    {
+      "name": "documentation",
+      "component": "DocumentationModule",
+      "props": {
+        "enableBOMManagement": true,
+        "enableSOPs": true,
+        "enableWorkInstructions": true,
+        "enableDrawings": true,
+        "enableSpecifications": true,
+        "enableChangeControl": true
+      }
+    },
+    {
+      "name": "prototyping",
+      "component": "PrototypingModule",
+      "props": {
+        "enable3DPrintingIntegration": true,
+        "enableCNCIntegration": true,
+        "enableLaserCuttingIntegration": true,
+        "enableMaterialSelection": true,
+        "enableCostEstimation": true,
+        "enableIterationTracking": true
+      }
+    }
+  ],
+  "aiModels": [
+    {
+      "name": "design-optimizer",
+      "type": "optimization",
+      "endpoint": "/ai/design-optimization",
+      "features": ["weight-reduction", "cost-optimization", "strength-analysis"]
+    },
+    {
+      "name": "defect-detector",
+      "type": "image-classification",
+      "endpoint": "/ai/defect-detection",
+      "features": ["visual-inspection", "anomaly-detection", "quality-scoring"]
+    },
+    {
+      "name": "demand-forecaster",
+      "type": "time-series",
+      "endpoint": "/ai/demand-forecasting",
+      "features": ["sales-prediction", "inventory-optimization", "production-planning"]
+    },
+    {
+      "name": "cost-estimator",
+      "type": "regression",
+      "endpoint": "/ai/cost-estimation",
+      "features": ["material-cost", "labor-cost", "overhead-allocation"]
+    }
+  ],
+  "auth": {
+    "providers": ["email", "google", "microsoft", "okta"],
+    "requireEmailVerification": true,
+    "enableTwoFactor": true,
+    "sessionDuration": "8h",
+    "rememberDevice": true,
+    "enableTeamAccounts": true
+  },
+  "dataSync": {
+    "enabled": true,
+    "cloudProvider": "activelog-cloud-manufacturing",
+    "encryption": "enterprise-grade",
+    "conflictResolution": "manual-review",
+    "syncFrequency": "realtime",
+    "offlineSupport": true,
+    "enableVersioning": true
+  },
+  "settings": {
+    "privacy": {
+      "enableIPProtection": true,
+      "enableNDACompliance": true,
+      "enableDataExport": true,
+      "enableDataDeletion": false,
+      "showDataUsage": true
+    },
+    "notifications": {
+      "enablePush": true,
+      "enableEmail": true,
+      "enableSlack": true,
+      "enableQualityAlerts": true,
+      "enableInventoryAlerts": true,
+      "enableProductionAlerts": true
+    },
+    "appearance": {
+      "defaultTheme": "industrial",
+      "enableCustomization": true,
+      "enableBranding": true,
+      "enableDashboardLayouts": true
+    },
+    "units": {
+      "length": "metric",
+      "weight": "metric",
+      "temperature": "celsius",
+      "currency": "USD",
+      "time": "24h"
+    }
+  },
+  "customModules": [
+    {
+      "name": "lean-manufacturing",
+      "path": "/modules/makerlog/LeanManufacturing.js"
+    },
+    {
+      "name": "compliance-tracker",
+      "path": "/modules/makerlog/ComplianceTracker.js"
+    },
+    {
+      "name": "equipment-maintenance",
+      "path": "/modules/makerlog/EquipmentMaintenance.js"
+    }
+  ],
+  "integrations": [
+    {
+      "name": "solidworks",
+      "enabled": true,
+      "fileSync": true
+    },
+    {
+      "name": "autodesk-fusion",
+      "enabled": true,
+      "cloudSync": true
+    },
+    {
+      "name": "onshape",
+      "enabled": true,
+      "apiIntegration": true
+    },
+    {
+      "name": "prusa-slicer",
+      "enabled": true,
+      "printJobTracking": true
+    },
+    {
+      "name": "octoprint",
+      "enabled": true,
+      "printerMonitoring": true
+    },
+    {
+      "name": "quickbooks",
+      "enabled": true,
+      "costAccounting": true
+    },
+    {
+      "name": "slack",
+      "enabled": true,
+      "teamNotifications": true
+    }
+  ],
+  "analytics": {
+    "provider": "manufacturing-focused",
+    "enableProductionMetrics": true,
+    "enableQualityMetrics": true,
+    "enableCostTracking": true,
+    "enableEfficiencyTracking": true,
+    "respectDoNotTrack": false
+  },
+  "hardware": {
+    "enableIoTIntegration": true,
+    "enableSensorMonitoring": true,
+    "enableBarcodeScanning": true,
+    "enableRFIDReading": true,
+    "supportedProtocols": ["modbus", "opc-ua", "mqtt", "http"]
+  }
+}

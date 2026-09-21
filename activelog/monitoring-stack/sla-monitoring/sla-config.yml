@@ -1,0 +1,279 @@
+# SLA Monitor Configuration for ActiveLog Services
+# Defines Service Level Agreement targets and monitoring settings
+
+# Monitoring configuration
+monitoring_interval: 300  # 5 minutes
+report_generation_interval: 3600  # 1 hour
+
+# Database connection
+database:
+  host: "${POSTGRES_HOST:localhost}"
+  port: "${POSTGRES_PORT:5432}"
+  user: "${POSTGRES_USER:activelog}"
+  password: "${POSTGRES_PASSWORD}"
+  database: "${POSTGRES_DB:activelog_monitoring}"
+
+# Prometheus connection
+prometheus:
+  url: "http://prometheus:9090"
+
+# SLA Targets
+sla_targets:
+  # Core API Service SLAs
+  - name: "API Availability"
+    service: "activelog-api"
+    metric_type: "availability"
+    target_value: 99.9  # 99.9% uptime
+    measurement_window: "30d"
+    alert_threshold: 0.95  # Alert when below 95% of target
+
+  - name: "API Response Time P99"
+    service: "activelog-api"
+    metric_type: "latency"
+    target_value: 200  # 200ms p99 latency
+    measurement_window: "1h"
+    alert_threshold: 0.8  # Alert when above 80% of target
+
+  - name: "API Error Rate"
+    service: "activelog-api"
+    metric_type: "error_rate"
+    target_value: 0.1  # 0.1% error rate
+    measurement_window: "1h"
+    alert_threshold: 0.8
+
+  # Authentication Service SLAs
+  - name: "Auth Service Availability"
+    service: "activelog-auth"
+    metric_type: "availability"
+    target_value: 99.95  # Higher availability requirement
+    measurement_window: "30d"
+    alert_threshold: 0.98
+
+  - name: "Auth Response Time P99"
+    service: "activelog-auth"
+    metric_type: "latency"
+    target_value: 100  # 100ms p99 latency
+    measurement_window: "1h"
+    alert_threshold: 0.8
+
+  - name: "Auth Error Rate"
+    service: "activelog-auth"
+    metric_type: "error_rate"
+    target_value: 0.05  # 0.05% error rate
+    measurement_window: "1h"
+    alert_threshold: 0.8
+
+  # ML Service SLAs
+  - name: "ML Service Availability"
+    service: "activelog-ml"
+    metric_type: "availability"
+    target_value: 99.5  # 99.5% uptime
+    measurement_window: "30d"
+    alert_threshold: 0.9
+
+  - name: "ML Inference Latency P99"
+    service: "activelog-ml"
+    metric_type: "latency"
+    target_value: 1000  # 1 second p99 latency
+    measurement_window: "1h"
+    alert_threshold: 0.8
+
+  - name: "ML Model Accuracy"
+    service: "activelog-ml"
+    metric_type: "custom"  # Custom metric handled separately
+    target_value: 95.0  # 95% accuracy
+    measurement_window: "24h"
+    alert_threshold: 0.9
+
+  # Data Pipeline SLAs
+  - name: "Data Pipeline Availability"
+    service: "activelog-pipeline"
+    metric_type: "availability"
+    target_value: 99.0  # 99% uptime
+    measurement_window: "30d"
+    alert_threshold: 0.9
+
+  - name: "Data Processing Latency"
+    service: "activelog-pipeline"
+    metric_type: "latency"
+    target_value: 5000  # 5 seconds processing time
+    measurement_window: "1h"
+    alert_threshold: 0.8
+
+  # Notification Service SLAs
+  - name: "Notification Service Availability"
+    service: "activelog-notifications"
+    metric_type: "availability"
+    target_value: 99.8  # 99.8% uptime
+    measurement_window: "30d"
+    alert_threshold: 0.95
+
+  - name: "Notification Delivery Rate"
+    service: "activelog-notifications"
+    metric_type: "custom"
+    target_value: 99.5  # 99.5% delivery success rate
+    measurement_window: "24h"
+    alert_threshold: 0.9
+
+  # Database SLAs
+  - name: "Primary DB Availability"
+    service: "postgresql-primary"
+    metric_type: "availability"
+    target_value: 99.99  # 99.99% uptime
+    measurement_window: "30d"
+    alert_threshold: 0.99
+
+  - name: "DB Query Performance P99"
+    service: "postgresql-primary"
+    metric_type: "latency"
+    target_value: 50  # 50ms p99 query time
+    measurement_window: "1h"
+    alert_threshold: 0.8
+
+  # Cache Service SLAs
+  - name: "Redis Cache Availability"
+    service: "redis-cache"
+    metric_type: "availability"
+    target_value: 99.9  # 99.9% uptime
+    measurement_window: "30d"
+    alert_threshold: 0.95
+
+  - name: "Cache Hit Rate"
+    service: "redis-cache"
+    metric_type: "custom"
+    target_value: 90.0  # 90% cache hit rate
+    measurement_window: "24h"
+    alert_threshold: 0.9
+
+  # Business SLAs
+  - name: "User Registration Success Rate"
+    service: "activelog-api"
+    metric_type: "custom"
+    target_value: 99.0  # 99% successful registrations
+    measurement_window: "24h"
+    alert_threshold: 0.95
+
+  - name: "Payment Processing Success Rate"
+    service: "activelog-payments"
+    metric_type: "custom"
+    target_value: 99.8  # 99.8% payment success
+    measurement_window: "24h"
+    alert_threshold: 0.98
+
+  - name: "Email Delivery Success Rate"
+    service: "activelog-notifications"
+    metric_type: "custom"
+    target_value: 98.0  # 98% email delivery success
+    measurement_window: "24h"
+    alert_threshold: 0.9
+
+# SLA Violation Severity Levels
+violation_severity:
+  critical:
+    threshold: 10  # Less than 10% error budget remaining
+    escalation_time: 300  # 5 minutes
+  high:
+    threshold: 25  # Less than 25% error budget remaining
+    escalation_time: 900  # 15 minutes
+  medium:
+    threshold: 50  # Less than 50% error budget remaining
+    escalation_time: 1800  # 30 minutes
+  low:
+    threshold: 75  # Less than 75% error budget remaining
+    escalation_time: 3600  # 1 hour
+
+# Error Budget Policies
+error_budget_policies:
+  - name: "Fast Burn"
+    description: "Alert when error budget is being consumed quickly"
+    lookback_window: "1h"
+    consumption_rate: 10  # 10% of monthly budget consumed in 1 hour
+    actions:
+      - alert_pagerduty
+      - alert_slack
+      
+  - name: "Slow Burn"  
+    description: "Alert when error budget is slowly but steadily being consumed"
+    lookback_window: "24h"
+    consumption_rate: 25  # 25% of monthly budget consumed in 24 hours
+    actions:
+      - alert_slack
+      - create_ticket
+
+# Reporting configuration
+reporting:
+  enabled: true
+  formats: ["json", "html", "pdf"]
+  recipients:
+    - "sre@activelog.com"
+    - "engineering@activelog.com"
+    - "leadership@activelog.com"
+  schedule:
+    daily: "08:00"  # Daily reports at 8 AM
+    weekly: "monday:09:00"  # Weekly reports Monday at 9 AM
+    monthly: "1:10:00"  # Monthly reports 1st day at 10 AM
+
+# Alert destinations
+alerting:
+  enabled: true
+  channels:
+    slack:
+      webhook_url: "${SLACK_SLA_WEBHOOK_URL}"
+      channel: "#sla-monitoring"
+    pagerduty:
+      integration_key: "${PAGERDUTY_SLA_INTEGRATION_KEY}"
+    email:
+      smtp_server: "smtp.gmail.com:587"
+      from: "sla-monitor@activelog.com"
+      to:
+        - "sre@activelog.com"
+        - "oncall@activelog.com"
+
+# Custom metric queries for non-standard SLA targets
+custom_metrics:
+  ml_model_accuracy:
+    query: 'avg_over_time(model_accuracy{model_name="recommendation_model"}[24h])'
+    
+  notification_delivery_rate:
+    query: |
+      (
+        sum(rate(notifications_delivered_total[24h])) /
+        sum(rate(notifications_sent_total[24h]))
+      ) * 100
+      
+  cache_hit_rate:
+    query: |
+      (
+        sum(rate(redis_keyspace_hits_total[24h])) /
+        (sum(rate(redis_keyspace_hits_total[24h])) + sum(rate(redis_keyspace_misses_total[24h])))
+      ) * 100
+      
+  user_registration_success_rate:
+    query: |
+      (
+        sum(rate(user_registrations_total{status="success"}[24h])) /
+        sum(rate(user_registrations_total[24h]))
+      ) * 100
+      
+  payment_processing_success_rate:
+    query: |
+      (
+        sum(rate(payments_processed_total{status="success"}[24h])) /
+        sum(rate(payments_processed_total[24h]))
+      ) * 100
+      
+  email_delivery_success_rate:
+    query: |
+      (
+        sum(rate(emails_delivered_total[24h])) /
+        sum(rate(emails_sent_total[24h]))
+      ) * 100
+
+# Time zones for reporting
+timezone: "UTC"
+
+# Retention policies
+retention:
+  measurements: "90d"  # Keep SLA measurements for 90 days
+  violations: "1y"     # Keep violation records for 1 year
+  reports: "2y"        # Keep reports for 2 years

@@ -1,0 +1,57 @@
+# Resource Quota for Swarm Intelligence Namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: swarm-intelligence-quota
+  namespace: swarm-intelligence
+spec:
+  hard:
+    requests.cpu: "1000"
+    requests.memory: 2000Gi
+    limits.cpu: "2000"
+    limits.memory: 4000Gi
+    persistentvolumeclaims: "50"
+    requests.storage: 10Ti
+    count/pods: "2000"
+    count/services: "100"
+    count/secrets: "100"
+    count/configmaps: "100"
+---
+# Limit Range for Default Resource Limits
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: swarm-intelligence-limits
+  namespace: swarm-intelligence
+spec:
+  limits:
+  # Container limits
+  - type: Container
+    max:
+      cpu: "16"
+      memory: 64Gi
+    min:
+      cpu: 100m
+      memory: 128Mi
+    default:
+      cpu: 1000m
+      memory: 2Gi
+    defaultRequest:
+      cpu: 500m
+      memory: 1Gi
+    maxLimitRequestRatio:
+      cpu: "4"
+      memory: "4"
+
+  # Pod limits
+  - type: Pod
+    max:
+      cpu: "32"
+      memory: 128Gi
+
+  # PVC limits
+  - type: PersistentVolumeClaim
+    max:
+      storage: 1Ti
+    min:
+      storage: 1Gi

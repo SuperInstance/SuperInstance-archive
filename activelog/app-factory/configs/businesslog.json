@@ -1,0 +1,244 @@
+{
+  "name": "BusinessLog.ai",
+  "version": "1.0.0",
+  "title": "BusinessLog.ai - Professional Business Management",
+  "description": "Inventory, payroll, tax receipt scanning for businesses",
+  "favicon": "/assets/businesslog/favicon.ico",
+  "domain": "businesslog.ai",
+  "devPort": 3002,
+  "theme": "professional",
+  "layout": "dashboard",
+  "monetization": {
+    "type": "subscription",
+    "tiers": ["starter", "professional", "enterprise"],
+    "trialPeriod": "14d"
+  },
+  "features": {
+    "inventory": true,
+    "payroll": true,
+    "receipts": true,
+    "invoicing": true,
+    "reporting": true,
+    "compliance": true,
+    "multiLocation": true,
+    "teamManagement": true,
+    "documentScanning": true,
+    "expenseTracking": true,
+    "timeTracking": true,
+    "clientManagement": true
+  },
+  "modules": [
+    {
+      "name": "inventory",
+      "component": "InventoryModule",
+      "props": {
+        "enableBarcodeScanning": true,
+        "enableLowStockAlerts": true,
+        "enableAutomaticReordering": true,
+        "enableMultiLocation": true,
+        "enableSerialNumbers": true
+      }
+    },
+    {
+      "name": "payroll",
+      "component": "PayrollModule",
+      "props": {
+        "enableTimeTracking": true,
+        "enableBenefitsManagement": true,
+        "enableTaxCalculation": true,
+        "enableDirectDeposit": true,
+        "compliance": ["federal", "state", "local"]
+      }
+    },
+    {
+      "name": "receipts",
+      "component": "ReceiptScanningModule",
+      "props": {
+        "enableOCR": true,
+        "enableCategorization": true,
+        "enableTaxCategoryDetection": true,
+        "enableDuplicateDetection": true,
+        "supportedFormats": ["pdf", "jpg", "png", "heic"]
+      }
+    },
+    {
+      "name": "invoicing",
+      "component": "InvoicingModule",
+      "props": {
+        "enableTemplates": true,
+        "enableRecurring": true,
+        "enablePaymentLinks": true,
+        "enableMultiCurrency": true,
+        "paymentMethods": ["stripe", "paypal", "bank-transfer"]
+      }
+    },
+    {
+      "name": "reporting",
+      "component": "ReportingModule",
+      "props": {
+        "enableProfitLoss": true,
+        "enableBalanceSheet": true,
+        "enableCashFlow": true,
+        "enableTaxReports": true,
+        "enableCustomReports": true,
+        "exportFormats": ["pdf", "excel", "csv"]
+      }
+    },
+    {
+      "name": "compliance",
+      "component": "ComplianceModule",
+      "props": {
+        "enableAuditTrail": true,
+        "enableDocumentRetention": true,
+        "enableRoleBasedAccess": true,
+        "standards": ["SOX", "GAAP", "IFRS"]
+      }
+    },
+    {
+      "name": "dashboard",
+      "component": "BusinessDashboardModule",
+      "props": {
+        "enableRealTimeMetrics": true,
+        "enableCustomWidgets": true,
+        "enableAlerts": true,
+        "refreshInterval": "5m"
+      }
+    }
+  ],
+  "aiModels": [
+    {
+      "name": "receipt-ocr",
+      "type": "document-processing",
+      "endpoint": "/ai/receipt-ocr",
+      "features": ["text-extraction", "field-detection", "categorization"]
+    },
+    {
+      "name": "expense-categorizer",
+      "type": "classification",
+      "endpoint": "/ai/expense-categorization",
+      "features": ["category-prediction", "tax-classification", "duplicate-detection"]
+    },
+    {
+      "name": "inventory-forecaster",
+      "type": "time-series",
+      "endpoint": "/ai/inventory-forecasting",
+      "features": ["demand-prediction", "seasonal-analysis", "trend-detection"]
+    },
+    {
+      "name": "financial-analyzer",
+      "type": "analytics",
+      "endpoint": "/ai/financial-analysis",
+      "features": ["trend-analysis", "anomaly-detection", "recommendations"]
+    }
+  ],
+  "auth": {
+    "providers": ["email", "sso", "active-directory"],
+    "requireEmailVerification": true,
+    "enableTwoFactor": true,
+    "sessionDuration": "8h",
+    "rememberDevice": false,
+    "enableSSO": true,
+    "roleBasedAccess": true
+  },
+  "dataSync": {
+    "enabled": true,
+    "cloudProvider": "activelog-cloud-business",
+    "encryption": "enterprise-grade",
+    "conflictResolution": "manual-review",
+    "syncFrequency": "realtime",
+    "offlineSupport": true,
+    "auditLogging": true
+  },
+  "settings": {
+    "privacy": {
+      "dataRetentionPeriod": "7y",
+      "enableDataExport": true,
+      "enableDataDeletion": false,
+      "showDataUsage": true,
+      "complianceMode": "strict"
+    },
+    "notifications": {
+      "enablePush": true,
+      "enableEmail": true,
+      "enableSMS": true,
+      "enableSlack": true,
+      "alertThresholds": true,
+      "escalationRules": true
+    },
+    "appearance": {
+      "defaultTheme": "light",
+      "enableCustomization": false,
+      "brandingCustomization": true,
+      "companyLogo": true
+    },
+    "accessibility": {
+      "enableHighContrast": true,
+      "enableLargeText": true,
+      "enableScreenReader": true,
+      "enableKeyboardNavigation": true
+    }
+  },
+  "customModules": [
+    {
+      "name": "tax-compliance",
+      "path": "/modules/businesslog/TaxCompliance.js"
+    },
+    {
+      "name": "multi-location",
+      "path": "/modules/businesslog/MultiLocation.js"
+    },
+    {
+      "name": "advanced-reporting",
+      "path": "/modules/businesslog/AdvancedReporting.js"
+    }
+  ],
+  "integrations": [
+    {
+      "name": "quickbooks",
+      "enabled": true,
+      "syncEnabled": true
+    },
+    {
+      "name": "stripe",
+      "enabled": true,
+      "webhooksEnabled": true
+    },
+    {
+      "name": "paypal",
+      "enabled": true,
+      "recurringBilling": true
+    },
+    {
+      "name": "salesforce",
+      "enabled": false,
+      "contactSync": true
+    },
+    {
+      "name": "slack",
+      "enabled": true,
+      "notificationsEnabled": true
+    },
+    {
+      "name": "microsoft-365",
+      "enabled": true,
+      "emailIntegration": true
+    }
+  ],
+  "analytics": {
+    "provider": "business-intelligence",
+    "enableUserTracking": true,
+    "enablePerformanceTracking": true,
+    "enableErrorTracking": true,
+    "enableSecurityTracking": true,
+    "respectDoNotTrack": false
+  },
+  "security": {
+    "enableEncryption": true,
+    "enableAuditLogs": true,
+    "enableIPWhitelisting": true,
+    "enableSessionTimeout": true,
+    "enablePasswordPolicy": true,
+    "backupFrequency": "daily",
+    "enableDisasterRecovery": true
+  }
+}

@@ -1,0 +1,210 @@
+# ActiveLog Alerting Rules for Prometheus
+groups:
+  - name: activelog.critical
+    rules:
+      # High Error Rate Alert
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status=~"5.."}[5m])) by (service) /
+            sum(rate(http_requests_total[5m])) by (service)
+          ) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "High error rate detected for {{ $labels.service }}"
+          description: "Service {{ $labels.service }} has error rate of {{ $value | humanizePercentage }} for more than 2 minutes"
+          runbook: "https://docs.activelog.com/runbooks/high-error-rate"
+
+      # Service Down Alert
+      - alert: ServiceDown
+        expr: up{job=~"activelog-.*"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "ActiveLog service {{ $labels.job }} is down"
+          description: "Service {{ $labels.job }} has been down for more than 1 minute"
+          runbook: "https://docs.activelog.com/runbooks/service-down"
+
+      # High Response Time
+      - alert: HighResponseTime
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket[5m])) by (service, le)
+          ) > 2
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High response time for {{ $labels.service }}"
+          description: "95th percentile response time is {{ $value }}s for service {{ $labels.service }}"
+
+      # Database Connection Issues
+      - alert: DatabaseConnectionHigh
+        expr: |
+          (
+            sum(postgresql_stat_database_numbackends) by (instance) /
+            sum(postgresql_settings_max_connections) by (instance)
+          ) > 0.8
+        for: 2m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High database connection usage"
+          description: "Database {{ $labels.instance }} is using {{ $value | humanizePercentage }} of available connections"
+
+      # Memory Usage Alert
+      - alert: HighMemoryUsage
+        expr: |
+          (
+            (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) /
+            node_memory_MemTotal_bytes
+          ) > 0.9
+        for: 5m
+        labels:
+          severity: critical
+          team: infrastructure
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is {{ $value | humanizePercentage }} on {{ $labels.instance }}"
+
+      # Disk Space Alert
+      - alert: DiskSpaceRunningOut
+        expr: |
+          (
+            (node_filesystem_size_bytes - node_filesystem_free_bytes) /
+            node_filesystem_size_bytes
+          ) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "Disk space running out on {{ $labels.instance }}"
+          description: "Disk {{ $labels.mountpoint }} is {{ $value | humanizePercentage }} full"
+
+  - name: activelog.business
+    rules:
+      # User Registration Rate Drop
+      - alert: UserRegistrationDrop
+        expr: |
+          (
+            rate(activelog_user_registrations_total[1h]) <
+            rate(activelog_user_registrations_total[1h] offset 24h) * 0.7
+          )
+        for: 30m
+        labels:
+          severity: warning
+          team: growth
+        annotations:
+          summary: "User registration rate has dropped significantly"
+          description: "Current registration rate is 30% lower than 24 hours ago"
+
+      # Revenue Impact Alert
+      - alert: RevenueImpact
+        expr: |
+          rate(activelog_revenue_total[1h]) <
+          rate(activelog_revenue_total[1h] offset 24h) * 0.8
+        for: 15m
+        labels:
+          severity: critical
+          team: business
+        annotations:
+          summary: "Revenue impact detected"
+          description: "Revenue rate is 20% lower than the same time yesterday"
+
+      # API Rate Limiting Triggered
+      - alert: APIRateLimitingHigh
+        expr: |
+          sum(rate(activelog_api_rate_limit_exceeded_total[5m])) by (endpoint) > 10
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High rate limiting on API endpoint {{ $labels.endpoint }}"
+          description: "API endpoint {{ $labels.endpoint }} is being rate limited frequently"
+
+  - name: activelog.ml
+    rules:
+      # ML Model Performance Degradation
+      - alert: MLModelPerformanceDrop
+        expr: |
+          activelog_ml_model_accuracy < 0.85
+        for: 10m
+        labels:
+          severity: warning
+          team: ml
+        annotations:
+          summary: "ML model {{ $labels.model_name }} accuracy dropped"
+          description: "Model accuracy is {{ $value | humanizePercentage }}, below 85% threshold"
+
+      # ML Pipeline Failure
+      - alert: MLPipelineFailure
+        expr: |
+          increase(activelog_ml_pipeline_failures_total[30m]) > 0
+        for: 0s
+        labels:
+          severity: critical
+          team: ml
+        annotations:
+          summary: "ML pipeline {{ $labels.pipeline }} failed"
+          description: "ML pipeline {{ $labels.pipeline }} has failed {{ $value }} times in the last 30 minutes"
+
+  - name: activelog.security
+    rules:
+      # Failed Authentication Attempts
+      - alert: HighFailedAuthAttempts
+        expr: |
+          sum(rate(activelog_auth_failed_attempts_total[5m])) > 50
+        for: 2m
+        labels:
+          severity: warning
+          team: security
+        annotations:
+          summary: "High number of failed authentication attempts"
+          description: "{{ $value }} failed authentication attempts per second"
+
+      # Suspicious API Activity
+      - alert: SuspiciousAPIActivity
+        expr: |
+          sum(rate(http_requests_total{status="401"}[5m])) by (client_ip) > 20
+        for: 5m
+        labels:
+          severity: warning
+          team: security
+        annotations:
+          summary: "Suspicious API activity from {{ $labels.client_ip }}"
+          description: "High number of 401 responses from IP {{ $labels.client_ip }}"
+
+  - name: activelog.cost
+    rules:
+      # High Cloud Costs
+      - alert: HighCloudCosts
+        expr: |
+          increase(activelog_cloud_cost_total[1h]) > 100
+        for: 0s
+        labels:
+          severity: warning
+          team: finops
+        annotations:
+          summary: "High cloud costs detected"
+          description: "Cloud costs increased by ${{ $value }} in the last hour"
+
+      # Cost Budget Exceeded
+      - alert: CostBudgetExceeded
+        expr: |
+          activelog_monthly_cost_total > activelog_monthly_budget * 0.9
+        for: 0s
+        labels:
+          severity: critical
+          team: finops
+        annotations:
+          summary: "Monthly cost budget 90% exceeded"
+          description: "Monthly costs are at {{ $value | humanize }}% of budget"

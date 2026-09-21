@@ -1,0 +1,58 @@
+# FishingLog Crew Management Service Dependencies
+
+# Core FastAPI and ASGI
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.4.0
+
+# WebSocket support
+websockets>=11.0.3
+
+# Email support for invitations
+aiosmtplib>=3.0.0
+email-validator>=2.1.0
+
+# Database support (SQLite for development, PostgreSQL for production)
+sqlalchemy>=2.0.23
+aiosqlite>=0.19.0
+asyncpg>=0.29.0
+alembic>=1.12.1
+
+# Security and authentication
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+python-multipart>=0.0.6
+
+# HTTP client for service communication
+httpx>=0.25.2
+aiohttp>=3.9.0
+
+# Scheduling and async tasks
+asyncio-mqtt>=0.16.1
+celery>=5.3.4
+redis>=5.0.1
+
+# Data processing and calculation
+numpy>=1.25.2
+pandas>=2.1.4
+decimal
+
+# Logging and monitoring
+structlog>=23.2.0
+prometheus-client>=0.19.0
+
+# Configuration management
+pydantic-settings>=2.0.3
+python-dotenv>=1.0.0
+
+# Development dependencies
+pytest>=7.4.3
+pytest-asyncio>=0.21.1
+pytest-cov>=4.1.0
+black>=23.11.0
+flake8>=6.1.0
+mypy>=1.7.1
+
+# Documentation
+mkdocs>=1.5.3
+mkdocs-material>=9.4.8

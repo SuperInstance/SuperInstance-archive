@@ -1,0 +1,185 @@
+databases:
+  elasticsearch:
+    container: activelog-elasticsearch
+    health_check: curl -f http://localhost:9200/_health
+    port: 9200
+  postgres:
+    backup_command: pg_dump -h localhost -U activelog -d activelog
+    container: activelog-postgres
+    health_check: pg_isready -h localhost -p 5432
+    port: 5432
+  redis:
+    container: activelog-redis
+    health_check: redis-cli -p 6379 ping
+    port: 6379
+development:
+  auto_reload: true
+  debug_mode: true
+  hot_reload_paths:
+  - api_gateway
+  - services
+  - shared
+  log_level: DEBUG
+docker:
+  compose_files:
+    development: docker-compose.dev.yml
+    production: docker-compose.yml
+    testing: docker-compose.test.yml
+  registry: registry.activelog.com
+environment:
+  common:
+    ENVIRONMENT: development
+    LOG_LEVEL: INFO
+    PYTHONPATH: .
+  database:
+    DATABASE_URL: postgresql://activelog:password@localhost:5432/activelog
+    ELASTICSEARCH_URL: http://localhost:9200
+    REDIS_URL: redis://localhost:6379/0
+  security:
+    ENCRYPTION_KEY: dev-encryption-key
+    JWT_SECRET_KEY: dev-secret-key
+external_services:
+  grafana:
+    container: activelog-grafana
+    port: 3000
+  nginx:
+    container: activelog-nginx
+    port: 80
+  prometheus:
+    container: activelog-prometheus
+    port: 9090
+formatting:
+  javascript:
+  - config: .prettierrc
+    tool: prettier
+  - config: .eslintrc.js
+    tool: eslint
+  python:
+  - config: pyproject.toml
+    tool: black
+  - config: .isort.cfg
+    tool: isort
+  - config: .flake8
+    tool: flake8
+logging:
+  levels:
+  - DEBUG
+  - INFO
+  - WARNING
+  - ERROR
+  - CRITICAL
+  log_directories:
+  - logs
+  - /var/log/activelog
+  - /tmp/activelog-logs
+  log_patterns:
+  - '*.log'
+  - '*.out'
+  - '*.err'
+  retention_days: 30
+monitoring:
+  alert_thresholds:
+    cpu_usage_percent: 80
+    error_rate_percent: 5
+    memory_usage_percent: 85
+    response_time_ms: 1000
+  metrics_endpoints:
+  - /metrics
+  - /health
+  - /status
+profiling:
+  default_duration: 30
+  output_formats:
+  - html
+  - json
+  - text
+  tools:
+  - py-spy
+  - cProfile
+  - memory_profiler
+services:
+  ai_orchestrator:
+    dependencies:
+    - postgres
+    - redis
+    description: AI Processing Orchestrator
+    health_endpoint: /health
+    path: services/ai_orchestrator
+    port: 8003
+  analytics_service:
+    dependencies:
+    - postgres
+    - redis
+    - elasticsearch
+    description: Analytics and Reporting Service
+    health_endpoint: /health
+    path: services/analytics
+    port: 8005
+  api_gateway:
+    dependencies:
+    - auth_service
+    - file_sync
+    - ai_orchestrator
+    description: Main API Gateway
+    health_endpoint: /health
+    path: api_gateway
+    port: 8000
+  auth_service:
+    dependencies:
+    - postgres
+    - redis
+    description: Authentication and Authorization Service
+    health_endpoint: /health
+    path: services/auth
+    port: 8001
+  file_sync:
+    dependencies:
+    - postgres
+    - redis
+    - elasticsearch
+    description: File Synchronization Service
+    health_endpoint: /health
+    path: services/file_sync
+    port: 8002
+  fitness_tracker:
+    dependencies:
+    - postgres
+    description: null
+    health_endpoint: /health
+    path: services/fitness_tracker
+    port: 8500
+  hatchery_management:
+    dependencies:
+    - postgres
+    description: Business incubation pipeline and startup hatchery management system
+    health_endpoint: /health
+    path: services/hatchery_management
+    port: 8441
+  home_power_sharing:
+    dependencies:
+    - postgres
+    description: Distributed computing power sharing and resource allocation system
+    health_endpoint: /health
+    path: services/home_power_sharing
+    port: 8440
+  metadata_service:
+    dependencies:
+    - postgres
+    - elasticsearch
+    description: File Metadata Service
+    health_endpoint: /health
+    path: services/metadata
+    port: 8004
+templates:
+  default_ports:
+    start_from: 8010
+  service_types:
+  - fastapi
+  - flask
+  - grpc
+  - celery_worker
+testing:
+  coverage_threshold: 80
+  test_data_size: small
+  test_database: activelog_test
+  test_redis_db: 1

@@ -1,0 +1,65 @@
+{
+  "name": "activelog-testing",
+  "version": "1.0.0",
+  "description": "Comprehensive testing infrastructure for ActiveLog services",
+  "scripts": {
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "jest --config=jest.unit.config.js",
+    "test:integration": "jest --config=jest.integration.config.js",
+    "test:e2e": "playwright test",
+    "test:contract": "pact-broker can-i-deploy && npm run test:contract:provider && npm run test:contract:consumer",
+    "test:contract:provider": "jest --config=jest.contract.provider.config.js",
+    "test:contract:consumer": "jest --config=jest.contract.consumer.config.js",
+    "test:load": "k6 run load/scenarios/*.js",
+    "test:chaos": "node chaos/runner.js",
+    "test:security": "npm run test:security:zap && npm run test:security:snyk",
+    "test:security:zap": "node security/zap-runner.js",
+    "test:security:snyk": "snyk test",
+    "test:regression": "jest --config=jest.regression.config.js",
+    "test:smoke": "jest --config=jest.smoke.config.js",
+    "test:all": "npm run test:smoke && npm run test:unit && npm run test:integration && npm run test:contract && npm run test:e2e",
+    "test:ci": "npm run test:smoke && npm run test:unit && npm run test:integration && npm run test:contract",
+    "test:nightly": "npm run test:all && npm run test:load && npm run test:security && npm run test:chaos",
+    "generate:reports": "node utils/report-generator.js",
+    "setup:test-data": "node fixtures/data-generator.js"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.40.0",
+    "@pact-foundation/pact": "^12.1.0",
+    "axios": "^1.6.0",
+    "faker": "^6.6.6",
+    "k6": "^0.47.0",
+    "ws": "^8.14.2",
+    "mongodb": "^6.2.0",
+    "redis": "^4.6.0",
+    "mysql2": "^3.6.0",
+    "express": "^4.18.0",
+    "jsonwebtoken": "^9.0.0",
+    "bcrypt": "^5.1.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.0",
+    "testcontainers": "^10.2.0",
+    "@types/jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "newman": "^6.0.0",
+    "snyk": "^1.1244.0",
+    "lighthouse": "^11.2.0",
+    "puppeteer": "^21.5.0",
+    "artillery": "^2.0.0",
+    "chaos-monkey": "^1.0.0",
+    "nodemon": "^3.0.0",
+    "cross-env": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverage": true,
+    "coverageDirectory": "reports/coverage",
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ]
+  }
+}

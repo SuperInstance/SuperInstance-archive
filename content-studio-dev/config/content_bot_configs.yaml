@@ -1,0 +1,173 @@
+# Content Creation Bot Configuration
+# Adapted for Loopless/SuperInstance Content Studio
+
+bots:
+  # Story & Script Bots (2+ for parallel work)
+  - id: script_writer_1
+    type: script_writer
+    model: llama3.2:3b
+    always_running: false
+    specialty: "Adapt stories to video scripts with scene descriptions"
+    max_tokens: 4096
+    temperature: 0.7
+
+  - id: script_writer_2
+    type: script_writer
+    model: llama3.2:3b
+    always_running: false
+    specialty: "Podcast script adaptation with narration"
+    max_tokens: 4096
+    temperature: 0.7
+
+  # Visual Content Bots
+  - id: image_prompter_1
+    type: image_prompt
+    model: llama3.2:3b
+    always_running: false
+    specialty: "Generate detailed prompts for character/background images"
+    max_tokens: 2048
+    temperature: 0.8
+
+  - id: scene_designer_1
+    type: scene_design
+    model: llama3.2:3b
+    always_running: false
+    specialty: "Scene composition and visual continuity"
+    max_tokens: 3072
+    temperature: 0.7
+
+  # Audio Content Bots
+  - id: dialogue_formatter_1
+    type: dialogue
+    model: llama3.2:1b
+    always_running: false
+    specialty: "Format dialogue for voice synthesis with emotion tags"
+    max_tokens: 2048
+    temperature: 0.6
+
+  - id: sound_designer_1
+    type: sound_design
+    model: llama3.2:1b
+    always_running: false
+    specialty: "Sound effect and music cues"
+    max_tokens: 1024
+    temperature: 0.7
+
+  # Production Bots
+  - id: sequence_editor_1
+    type: editing
+    model: llama3.2:3b
+    always_running: false
+    specialty: "Video sequence planning and timing"
+    max_tokens: 3072
+    temperature: 0.5
+
+  - id: metadata_gen_1
+    type: metadata
+    model: llama3.2:1b
+    always_running: false
+    specialty: "Generate titles, descriptions, tags for YouTube/podcast"
+    max_tokens: 1024
+    temperature: 0.8
+
+  # Quality & Review Bots
+  - id: qa_content_1
+    type: quality_assurance
+    model: llama3.2:3b
+    always_running: false
+    specialty: "Check consistency, pacing, story accuracy"
+    max_tokens: 3072
+    temperature: 0.3
+
+  - id: social_clipper_1
+    type: social_media
+    model: llama3.2:1b
+    always_running: false
+    specialty: "Extract highlight clips for social media"
+    max_tokens: 1024
+    temperature: 0.7
+
+  # Always-Running Bots (Background Tasks)
+  - id: story_indexer_1
+    type: story_indexer
+    model: llama3.2:1b
+    always_running: true
+    specialty: "Maintain searchable index of all story files"
+    max_tokens: 2048
+    temperature: 0.5
+    scan_interval: 300  # 5 minutes
+
+  - id: asset_monitor_1
+    type: asset_monitor
+    model: llama3.2:1b
+    always_running: true
+    specialty: "Track generated assets and cache status"
+    max_tokens: 1024
+    temperature: 0.3
+
+  - id: progress_tracker_1
+    type: progress
+    model: llama3.2:1b
+    always_running: true
+    specialty: "Track episode production progress"
+    max_tokens: 1024
+    temperature: 0.5
+
+  - id: cost_monitor_1
+    type: cost_tracking
+    model: llama3.2:1b
+    always_running: true
+    specialty: "Monitor API costs and GPU usage"
+    max_tokens: 512
+    temperature: 0.3
+
+# System Configuration
+system:
+  max_parallel_bots: 6  # Adjust based on ProArt GPU memory
+  task_queue_size: 50
+  retry_attempts: 2
+  help_timeout_seconds: 30
+
+  # GPU Management
+  gpu_memory_reserve_gb: 4  # Reserve for SDXL
+  prioritize_local: true
+
+  # Story Library
+  story_source_path: "/home/activeloguser"
+  story_pattern: "Story_*_v3.md"
+
+  # Asset Paths
+  assets_base: "./data/assets"
+  characters_path: "./data/assets/characters"
+  backgrounds_path: "./data/assets/backgrounds"
+  audio_path: "./data/assets/audio"
+  video_path: "./data/assets/video"
+
+  # Output Paths
+  output_base: "./data/output"
+  youtube_path: "./data/output/youtube"
+  podcast_path: "./data/output/podcast"
+  social_path: "./data/output/social"
+
+# Integration with Existing Systems
+integrations:
+  # Existing image generator
+  image_generator:
+    enabled: true
+    module_path: "/home/activeloguser/activelog/services/ai-tools/services/image/image_generator.py"
+    providers:
+      - local  # Stable Diffusion XL on RTX 5090
+      - openai # DALL-E 3 for final quality
+      - replicate # Backup
+
+  # Voice synthesis
+  voice_synthesis:
+    enabled: true
+    provider: elevenlabs
+    fallback: coqui_tts  # Local TTS
+
+  # Video processing
+  video_processing:
+    editor: davinci_resolve
+    fallback: ffmpeg
+    gpu_acceleration: true

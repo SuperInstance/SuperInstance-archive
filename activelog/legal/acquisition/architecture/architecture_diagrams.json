@@ -1,0 +1,182 @@
+{
+  "metadata": {
+    "generated_at": "2025-08-23 23:36:08",
+    "version": "2.4",
+    "company": "ActiveLog Technologies, Inc."
+  },
+  "high_level_architecture": {
+    "title": "ActiveLog Technologies - High-Level System Architecture",
+    "mermaid": "\ngraph TB\n    subgraph \"Client Layer\"\n        WEB[Web Application]\n        MOBILE[Mobile Apps]\n        API_CLIENT[Third-party APIs]\n    end\n    \n    subgraph \"Edge Layer\"\n        CDN[CloudFront CDN]\n        WAF[Web Application Firewall]\n        LB[Application Load Balancer]\n    end\n    \n    subgraph \"API Gateway Layer\"\n        GATEWAY[Kong API Gateway]\n        AUTH[Authentication Service]\n        RATE[Rate Limiting]\n    end\n    \n    subgraph \"Microservices Mesh\"\n        CORE[Core Services]\n        AI[AI/ML Services] \n        INFRA[Infrastructure Services]\n        ISTIO[Istio Service Mesh]\n    end\n    \n    subgraph \"Data Layer\"\n        POSTGRES[(PostgreSQL)]\n        REDIS[(Redis Cache)]\n        ELASTIC[(Elasticsearch)]\n        S3[(S3 Storage)]\n    end\n    \n    subgraph \"External Services\"\n        TWILIO[Twilio]\n        STRIPE[Stripe]\n        AWS_AI[AWS AI Services]\n        THIRD_PARTY[Third-party APIs]\n    end\n    \n    WEB --> CDN\n    MOBILE --> LB\n    API_CLIENT --> GATEWAY\n    \n    CDN --> WAF\n    WAF --> LB\n    LB --> GATEWAY\n    \n    GATEWAY --> AUTH\n    GATEWAY --> RATE\n    GATEWAY --> ISTIO\n    \n    ISTIO --> CORE\n    ISTIO --> AI\n    ISTIO --> INFRA\n    \n    CORE --> POSTGRES\n    CORE --> REDIS\n    AI --> ELASTIC\n    INFRA --> S3\n    \n    AI --> AWS_AI\n    CORE --> TWILIO\n    CORE --> STRIPE\n    ISTIO --> THIRD_PARTY\n",
+    "components": {
+      "client_layer": [
+        "Web App (React/Next.js)",
+        "Mobile Apps (React Native)",
+        "API Clients"
+      ],
+      "edge_layer": [
+        "CloudFront CDN",
+        "AWS WAF",
+        "Application Load Balancer"
+      ],
+      "gateway_layer": [
+        "Kong API Gateway",
+        "OAuth 2.0 Auth",
+        "Rate Limiting"
+      ],
+      "services_layer": [
+        "12 Core Services",
+        "8 AI/ML Services",
+        "6 Infrastructure Services"
+      ],
+      "data_layer": [
+        "PostgreSQL Clusters",
+        "Redis Cache",
+        "Elasticsearch",
+        "S3 Storage"
+      ],
+      "external_services": [
+        "Twilio VoIP",
+        "Stripe Billing",
+        "AWS AI/ML",
+        "Partner APIs"
+      ]
+    }
+  },
+  "microservices_architecture": {
+    "title": "ActiveLog Technologies - Microservices Architecture",
+    "mermaid": "\ngraph LR\n    subgraph \"Core Business Services\"\n        AUTH[Auth Service]\n        USER[User Management]\n        RECEPT[AI Receptionist]\n        PHONE[Phone System]\n        APPT[Appointment Service]\n        DOC[Document AI]\n        BILLING[Billing Service]\n        NOTIF[Notification Service]\n    end\n    \n    subgraph \"AI/ML Services\"\n        NLP[NLP Engine]\n        SPEECH[Speech Processing]\n        SENTIMENT[Sentiment Analysis]\n        PREDICT[Predictive Analytics]\n        RECOMMEND[Recommendation Engine]\n        MODEL_MGT[Model Management]\n    end\n    \n    subgraph \"Infrastructure Services\"\n        LOGGING[Logging Service]\n        METRICS[Metrics Collector]\n        HEALTH[Health Checker]\n        CONFIG[Configuration Mgmt]\n        BACKUP[Backup Service]\n        SECURITY[Security Scanner]\n    end\n    \n    subgraph \"Data Stores\"\n        DB_USER[(User Database)]\n        DB_CONV[(Conversation DB)]\n        DB_AI[(AI Training DB)]\n        CACHE[(Redis Cache)]\n        SEARCH[(Search Index)]\n        FILES[(File Storage)]\n    end\n    \n    AUTH --> DB_USER\n    USER --> DB_USER\n    RECEPT --> DB_CONV\n    PHONE --> DB_CONV\n    APPT --> DB_USER\n    DOC --> FILES\n    BILLING --> DB_USER\n    \n    NLP --> DB_AI\n    SPEECH --> DB_AI\n    SENTIMENT --> DB_CONV\n    PREDICT --> DB_AI\n    RECOMMEND --> DB_USER\n    MODEL_MGT --> DB_AI\n    \n    LOGGING --> SEARCH\n    METRICS --> DB_AI\n    HEALTH --> CACHE\n    CONFIG --> CACHE\n    BACKUP --> FILES\n    SECURITY --> SEARCH\n",
+    "service_details": {
+      "auth_service": {
+        "tech_stack": "Python/FastAPI",
+        "database": "PostgreSQL",
+        "cache": "Redis",
+        "features": [
+          "OAuth 2.0",
+          "JWT Tokens",
+          "MFA",
+          "Session Management"
+        ]
+      },
+      "ai_receptionist": {
+        "tech_stack": "Python/FastAPI + TensorFlow",
+        "database": "PostgreSQL + Elasticsearch",
+        "features": [
+          "NLP Processing",
+          "Intent Recognition",
+          "Response Generation",
+          "Context Management"
+        ]
+      },
+      "phone_system": {
+        "tech_stack": "Node.js + WebRTC",
+        "integrations": "Twilio, FreeSWITCH",
+        "features": [
+          "VoIP Calling",
+          "Call Routing",
+          "IVR",
+          "Recording"
+        ]
+      }
+    }
+  },
+  "data_architecture": {
+    "title": "ActiveLog Technologies - Data Architecture",
+    "mermaid": "\ngraph TB\n    subgraph \"Data Sources\"\n        APPS[Applications]\n        APIS[External APIs]\n        FILES[File Uploads]\n        VOICE[Voice Data]\n    end\n    \n    subgraph \"Data Ingestion\"\n        KAFKA[Apache Kafka]\n        ETL[ETL Pipelines]\n        STREAM[Stream Processing]\n        BATCH[Batch Processing]\n    end\n    \n    subgraph \"Data Storage\"\n        OLTP[(OLTP Database)]\n        OLAP[(Data Warehouse)]\n        CACHE[(Cache Layer)]\n        LAKE[(Data Lake)]\n        SEARCH[(Search Index)]\n    end\n    \n    subgraph \"Data Processing\"\n        ML_PIPELINE[ML Pipelines]\n        ANALYTICS[Analytics Engine]\n        REPORTS[Report Generator]\n        AI_TRAINING[AI Training]\n    end\n    \n    subgraph \"Data Access\"\n        API_LAYER[Data APIs]\n        DASHBOARD[Analytics Dashboard]\n        BI_TOOLS[BI Tools]\n        ML_SERVE[ML Model Serving]\n    end\n    \n    APPS --> KAFKA\n    APIS --> ETL\n    FILES --> BATCH\n    VOICE --> STREAM\n    \n    KAFKA --> OLTP\n    ETL --> OLAP\n    STREAM --> CACHE\n    BATCH --> LAKE\n    \n    OLTP --> SEARCH\n    OLAP --> ANALYTICS\n    CACHE --> ML_PIPELINE\n    LAKE --> AI_TRAINING\n    \n    ML_PIPELINE --> ML_SERVE\n    ANALYTICS --> REPORTS\n    REPORTS --> DASHBOARD\n    AI_TRAINING --> ML_SERVE\n    \n    API_LAYER --> OLTP\n    DASHBOARD --> OLAP\n    BI_TOOLS --> OLAP\n    ML_SERVE --> API_LAYER\n",
+    "data_flows": {
+      "real_time": [
+        "User interactions",
+        "Voice processing",
+        "Chat messages"
+      ],
+      "batch": [
+        "Log processing",
+        "Model training",
+        "Report generation"
+      ],
+      "streaming": [
+        "Event processing",
+        "Metrics collection",
+        "Alert generation"
+      ]
+    }
+  },
+  "security_architecture": {
+    "title": "ActiveLog Technologies - Security Architecture",
+    "mermaid": "\ngraph TB\n    subgraph \"Perimeter Security\"\n        WAF[Web Application Firewall]\n        DDoS[DDoS Protection]\n        VPN[VPN Gateway]\n    end\n    \n    subgraph \"Network Security\"\n        VPC[Virtual Private Cloud]\n        PRIVATE[Private Subnets]\n        PUBLIC[Public Subnets]\n        NAT[NAT Gateway]\n        SG[Security Groups]\n    end\n    \n    subgraph \"Application Security\"\n        OAUTH[OAuth 2.0]\n        JWT[JWT Tokens]\n        MFA[Multi-Factor Auth]\n        RBAC[Role-Based Access]\n        ENCRYPT[Encryption Layer]\n    end\n    \n    subgraph \"Data Security\"\n        FIELD_ENCRYPT[Field-Level Encryption]\n        TDE[Transparent Data Encryption]\n        KMS[Key Management Service]\n        HSM[Hardware Security Module]\n    end\n    \n    subgraph \"Infrastructure Security\"\n        IAM[Identity & Access Management]\n        SECRETS[Secrets Manager]\n        AUDIT[Audit Logging]\n        MONITOR[Security Monitoring]\n        SCAN[Vulnerability Scanning]\n    end\n    \n    subgraph \"Compliance & Governance\"\n        SOC2[SOC 2 Type II]\n        GDPR[GDPR Compliance]\n        HIPAA[HIPAA Ready]\n        PCI[PCI DSS Level 1]\n    end\n    \n    WAF --> VPC\n    DDoS --> PUBLIC\n    VPN --> PRIVATE\n    \n    PUBLIC --> SG\n    PRIVATE --> NAT\n    SG --> OAUTH\n    \n    OAUTH --> JWT\n    JWT --> MFA\n    MFA --> RBAC\n    RBAC --> ENCRYPT\n    \n    ENCRYPT --> FIELD_ENCRYPT\n    FIELD_ENCRYPT --> TDE\n    TDE --> KMS\n    KMS --> HSM\n    \n    IAM --> SECRETS\n    SECRETS --> AUDIT\n    AUDIT --> MONITOR\n    MONITOR --> SCAN\n    \n    OAUTH --> SOC2\n    ENCRYPT --> GDPR\n    FIELD_ENCRYPT --> HIPAA\n    TDE --> PCI\n",
+    "security_layers": {
+      "network": [
+        "VPC isolation",
+        "Security groups",
+        "NACLs",
+        "Private subnets"
+      ],
+      "application": [
+        "OAuth 2.0",
+        "JWT tokens",
+        "MFA",
+        "RBAC",
+        "Input validation"
+      ],
+      "data": [
+        "Field encryption",
+        "TDE",
+        "KMS",
+        "Backup encryption"
+      ],
+      "infrastructure": [
+        "IAM",
+        "Secrets management",
+        "Audit trails",
+        "Monitoring"
+      ]
+    }
+  },
+  "deployment_architecture": {
+    "title": "ActiveLog Technologies - Deployment Architecture",
+    "mermaid": "\ngraph TB\n    subgraph \"Production Environment\"\n        subgraph \"US-East-1 (Primary)\"\n            EKS1[EKS Cluster Primary]\n            RDS1[(RDS Multi-AZ)]\n            REDIS1[(ElastiCache Cluster)]\n            S31[(S3 Primary)]\n        end\n        \n        subgraph \"US-West-2 (DR)\"\n            EKS2[EKS Cluster DR]\n            RDS2[(RDS Read Replica)]\n            REDIS2[(ElastiCache Replica)]\n            S32[(S3 Cross-Region)]\n        end\n    end\n    \n    subgraph \"Staging Environment\"\n        EKS_STAGE[EKS Staging]\n        RDS_STAGE[(RDS Staging)]\n        REDIS_STAGE[(ElastiCache Staging)]\n    end\n    \n    subgraph \"Development Environment\"\n        LOCAL[Local Development]\n        DOCKER[Docker Compose]\n        K8S_DEV[Minikube/Kind]\n    end\n    \n    subgraph \"CI/CD Pipeline\"\n        GITHUB[GitHub Repository]\n        ACTIONS[GitHub Actions]\n        REGISTRY[Container Registry]\n        HELM[Helm Charts]\n        ARGO[ArgoCD]\n    end\n    \n    subgraph \"Monitoring & Observability\"\n        PROMETHEUS[Prometheus]\n        GRAFANA[Grafana]\n        JAEGER[Jaeger Tracing]\n        ELK[ELK Stack]\n        ALERTS[AlertManager]\n    end\n    \n    GITHUB --> ACTIONS\n    ACTIONS --> REGISTRY\n    REGISTRY --> HELM\n    HELM --> ARGO\n    \n    ARGO --> EKS_STAGE\n    ARGO --> EKS1\n    ARGO --> EKS2\n    \n    EKS1 --> RDS1\n    EKS1 --> REDIS1\n    EKS1 --> S31\n    \n    EKS2 --> RDS2\n    EKS2 --> REDIS2\n    EKS2 --> S32\n    \n    RDS1 --> RDS2\n    REDIS1 --> REDIS2\n    S31 --> S32\n    \n    EKS1 --> PROMETHEUS\n    PROMETHEUS --> GRAFANA\n    EKS1 --> JAEGER\n    EKS1 --> ELK\n    PROMETHEUS --> ALERTS\n",
+    "environments": {
+      "production": {
+        "clusters": 2,
+        "regions": [
+          "us-east-1",
+          "us-west-2"
+        ],
+        "nodes": "10-50 auto-scaling",
+        "databases": "Multi-AZ with read replicas",
+        "uptime_sla": "99.9%"
+      },
+      "staging": {
+        "purpose": "Pre-production testing",
+        "resources": "50% of production",
+        "data": "Sanitized production data"
+      },
+      "development": {
+        "local": "Docker compose",
+        "shared": "Kubernetes dev cluster",
+        "data": "Synthetic test data"
+      }
+    }
+  },
+  "integration_architecture": {
+    "title": "ActiveLog Technologies - Integration Architecture",
+    "mermaid": "\ngraph LR\n    subgraph \"ActiveLog Platform\"\n        API_GW[API Gateway]\n        WEBHOOK[Webhook Handler]\n        QUEUE[Message Queue]\n        INTEGRATOR[Integration Service]\n    end\n    \n    subgraph \"CRM Systems\"\n        SALESFORCE[Salesforce]\n        HUBSPOT[HubSpot]\n        PIPEDRIVE[Pipedrive]\n    end\n    \n    subgraph \"Communication\"\n        TWILIO[Twilio]\n        SLACK[Slack]\n        TEAMS[Microsoft Teams]\n        ZOOM[Zoom]\n    end\n    \n    subgraph \"Business Tools\"\n        GOOGLE[Google Workspace]\n        OFFICE365[Office 365]\n        CALENDAR[Calendar APIs]\n    end\n    \n    subgraph \"Payment & Billing\"\n        STRIPE[Stripe]\n        PAYPAL[PayPal]\n        CHARGEBEE[Chargebee]\n    end\n    \n    subgraph \"AI & Analytics\"\n        OPENAI[OpenAI]\n        AWS_AI[AWS AI Services]\n        ANALYTICS[Analytics APIs]\n    end\n    \n    API_GW <--> SALESFORCE\n    API_GW <--> HUBSPOT\n    API_GW <--> PIPEDRIVE\n    \n    WEBHOOK <--> TWILIO\n    WEBHOOK <--> SLACK\n    WEBHOOK <--> TEAMS\n    WEBHOOK <--> ZOOM\n    \n    INTEGRATOR <--> GOOGLE\n    INTEGRATOR <--> OFFICE365\n    INTEGRATOR <--> CALENDAR\n    \n    QUEUE --> STRIPE\n    QUEUE --> PAYPAL\n    QUEUE --> CHARGEBEE\n    \n    API_GW --> OPENAI\n    API_GW --> AWS_AI\n    INTEGRATOR --> ANALYTICS\n",
+    "integration_patterns": {
+      "real_time": [
+        "Webhooks",
+        "WebSockets",
+        "Server-sent events"
+      ],
+      "batch": [
+        "Scheduled jobs",
+        "Bulk API calls",
+        "File transfers"
+      ],
+      "event_driven": [
+        "Message queues",
+        "Event streaming",
+        "Pub/sub"
+      ]
+    }
+  },
+  "ascii_overview": "\n\u256d\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256e\n\u2502                    ActiveLog Technologies Platform                          \u2502\n\u2502                          System Architecture                               \u2502\n\u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256f\n\n\u250c\u2500 Client Layer \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502  [Web App]  [Mobile Apps]  [API Clients]  [Third-party Integrations]     \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n                         \u2502\n\u250c\u2500 Edge & Gateway \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u25bc\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502  [CloudFront CDN] \u2192 [WAF] \u2192 [Load Balancer] \u2192 [Kong API Gateway]          \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n                         \u2502\n\u250c\u2500 Microservices Mesh \u2500\u2500\u2500\u25bc\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502  \u250c\u2500 Core Services \u2500\u2500\u2500\u2500\u2510  \u250c\u2500 AI/ML Services \u2500\u2500\u2510  \u250c\u2500 Infrastructure \u2500\u2500\u2500\u2500\u2510    \u2502\n\u2502  \u2502 \u2022 Auth Service     \u2502  \u2502 \u2022 NLP Engine       \u2502  \u2502 \u2022 Logging Service   \u2502    \u2502\n\u2502  \u2502 \u2022 User Management  \u2502  \u2502 \u2022 Speech Processing\u2502  \u2502 \u2022 Metrics Collector \u2502    \u2502\n\u2502  \u2502 \u2022 AI Receptionist  \u2502  \u2502 \u2022 Sentiment Analysis\u2502 \u2502 \u2022 Health Checker    \u2502    \u2502\n\u2502  \u2502 \u2022 Phone System     \u2502  \u2502 \u2022 Predictive AI    \u2502  \u2502 \u2022 Config Management \u2502    \u2502\n\u2502  \u2502 \u2022 Appointments     \u2502  \u2502 \u2022 Recommendation   \u2502  \u2502 \u2022 Backup Service    \u2502    \u2502\n\u2502  \u2502 \u2022 Document AI      \u2502  \u2502 \u2022 Model Management \u2502  \u2502 \u2022 Security Scanner  \u2502    \u2502\n\u2502  \u2502 \u2022 Analytics        \u2502  \u2502                    \u2502  \u2502                     \u2502    \u2502\n\u2502  \u2502 \u2022 Notifications    \u2502  \u2502                    \u2502  \u2502                     \u2502    \u2502\n\u2502  \u2502 \u2022 File Processing  \u2502  \u2502                    \u2502  \u2502                     \u2502    \u2502\n\u2502  \u2502 \u2022 Integration Hub  \u2502  \u2502                    \u2502  \u2502                     \u2502    \u2502\n\u2502  \u2502 \u2022 Billing Service  \u2502  \u2502                    \u2502  \u2502                     \u2502    \u2502\n\u2502  \u2502 \u2022 Admin Portal     \u2502  \u2502                    \u2502  \u2502                     \u2502    \u2502\n\u2502  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518    \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n                         \u2502\n\u250c\u2500 Data Layer \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u25bc\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502  [PostgreSQL]  [Redis Cache]  [Elasticsearch]  [S3 Storage]              \u2502\n\u2502       \u2502             \u2502              \u2502               \u2502                       \u2502\n\u2502   User Data    Session Cache   Search Index    File Storage               \u2502\n\u2502  Conversations    API Cache     Log Analysis    Documents                  \u2502\n\u2502   AI Training    Real-time      Metrics        Backups                     \u2502\n\u2502                   Data                                                     \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\n\u250c\u2500 External Services \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502  [Twilio VoIP]  [Stripe Billing]  [AWS AI/ML]  [Partner APIs]            \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\nKey Metrics:\n\u2022 47 Microservices          \u2022 99.97% Uptime\n\u2022 1.2M Requests/Day         \u2022 <200ms P95 Response Time  \n\u2022 127 Database Tables       \u2022 94.2% Cache Hit Rate\n\u2022 2.4TB Production Data     \u2022 87.3% Code Coverage\n\nSecurity: SOC 2 Type II | GDPR | HIPAA Ready | PCI DSS Level 1\nInfrastructure: AWS Multi-AZ | Kubernetes | Auto-scaling | Blue-green Deployment\n"
+}

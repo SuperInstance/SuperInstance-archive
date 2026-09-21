@@ -1,0 +1,15 @@
+{
+  "researcher": "spatial_demo",
+  "start_time": "2025-08-30T10:38:39.128099",
+  "objective": "Build working semantic navigation demo",
+  "starting_simple": "Folder structure that organizes itself",
+  "demo_goal": "Show intelligent information organization",
+  "iteration": 1,
+  "status": "starting_simple",
+  "notes": [],
+  "working_versions": [],
+  "failures": [],
+  "next_steps": [
+    "Folder structure that organizes itself"
+  ]
+}

@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D Game Setup AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            gap: 20px;
+            height: 100vh;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .context-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .voice-interface {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .voice-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .record-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .record-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .record-button.recording {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+        }
+
+        .voice-status {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .status-text {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .transcription-preview {
+            font-size: 0.9rem;
+            color: #718096;
+            font-style: italic;
+        }
+
+        .setup-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            border-left: 4px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .step-card.active {
+            border-left-color: #667eea;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        .step-card.completed {
+            border-left-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .step-card.predicted {
+            border-left-color: #ed8936;
+            background: #fffaf0;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            margin-bottom: 15px;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: #2d3748;
+            flex: 1;
+        }
+
+        .step-status {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #bee3f8;
+            color: #2b6cb0;
+        }
+
+        .status-completed {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+
+        .status-predicted {
+            background: #fed7aa;
+            color: #c05621;
+        }
+
+        .form-field {
+            margin-bottom: 20px;
+        }
+
+        .form-field label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-field input,
+        .form-field select,
+        .form-field textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-field input:focus,
+        .form-field select:focus,
+        .form-field textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-field.predicted input {
+            background: #fffaf0;
+            border-color: #ed8936;
+        }
+
+        .prediction-confidence {
+            font-size: 0.8rem;
+            color: #ed8936;
+            font-style: italic;
+            margin-top: 4px;
+        }
+
+        .parallel-content {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0fff4;
+            border-radius: 8px;
+            border: 1px solid #9ae6b4;
+        }
+
+        .parallel-content h4 {
+            color: #2f855a;
+            margin-bottom: 10px;
+        }
+
+        .generated-item {
+            background: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 6px;
+            border-left: 3px solid #48bb78;
+        }
+
+        .context-section {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .context-section h3 {
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .knowledge-graph {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .graph-node {
+            display: inline-block;
+            background: #bee3f8;
+            color: #2b6cb0;
+            padding: 4px 8px;
+            border-radius: 12px;
+            margin: 2px;
+            font-size: 0.8rem;
+        }
+
+        .plot-thread {
+            background: #fef5e7;
+            border-left: 3px solid #ed8936;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+
+        .plot-thread.active {
+            border-left-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .voice-preview {
+            background: #edf2f7;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .npc-voice-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+        }
+
+        .npc-voice-card h4 {
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .voice-traits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .trait-tag {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: #4a5568;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 250px 1fr;
+            }
+            .context-panel {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                padding: 10px;
+            }
+            .sidebar {
+                order: 2;
+                max-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar - Setup Steps -->
+        <div class="sidebar">
+            <h2 style="margin-bottom: 20px; color: #4a5568;">Setup Progress</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 10%;"></div>
+            </div>
+            <div id="setupStepsList">
+                <!-- Setup steps will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="header">
+                <h1>D&D Game Setup AI</h1>
+                <p style="color: #718096;">Voice-powered campaign creation with intelligent assistance</p>
+            </div>
+
+            <!-- Voice Interface -->
+            <div class="voice-interface">
+                <div class="voice-controls">
+                    <button class="record-button" id="recordButton">
+                        🎤
+                    </button>
+                    <div class="voice-status">
+                        <div class="status-text" id="voiceStatus">Ready to listen...</div>
+                        <div class="transcription-preview" id="transcriptionPreview"></div>
+                    </div>
+                </div>
+                <div class="voice-preview" id="voicePreview" style="display: none;">
+                    <!-- Real-time transcription preview -->
+                </div>
+            </div>
+
+            <!-- Current Setup Step -->
+            <div id="currentStepContent">
+                <!-- Current step form will be populated here -->
+            </div>
+
+            <!-- Parallel Content Generation -->
+            <div id="parallelContent" style="display: none;">
+                <!-- Auto-generated content will appear here -->
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="prevButton">Previous Step</button>
+                <button class="btn btn-primary" id="nextButton">Next Step</button>
+                <button class="btn btn-secondary" id="exportButton">Export Setup</button>
+            </div>
+        </div>
+
+        <!-- Context Panel -->
+        <div class="context-panel">
+            <!-- Knowledge Graph Visualization -->
+            <div class="context-section">
+                <h3>📊 Knowledge Graph</h3>
+                <div class="knowledge-graph" id="knowledgeGraph">
+                    <!-- Nodes will be populated here -->
+                </div>
+            </div>
+
+            <!-- Plot Threads -->
+            <div class="context-section">
+                <h3>📖 Story Threads</h3>
+                <div id="plotThreads">
+                    <!-- Plot threads will be populated here -->
+                </div>
+            </div>
+
+            <!-- NPC Voices -->
+            <div class="context-section">
+                <h3>🎭 Character Voices</h3>
+                <div id="npcVoices">
+                    <!-- NPC voice profiles will be populated here -->
+                </div>
+            </div>
+
+            <!-- Context Summary -->
+            <div class="context-section">
+                <h3>💡 Key Insights</h3>
+                <div id="contextSummary">
+                    <!-- AI-extracted key points will be shown here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class GameSetupInterface {
+            constructor() {
+                this.sessionId = null;
+                this.websocket = null;
+                this.isRecording = false;
+                this.mediaRecorder = null;
+                this.audioStream = null;
+                this.currentStep = 'initial_setup';
+                this.setupSteps = [
+                    { id: 'initial_setup', name: 'Campaign Overview', status: 'active' },
+                    { id: 'world_setting', name: 'World & Setting', status: 'pending' },
+                    { id: 'character_creation', name: 'Character Setup', status: 'pending' },
+                    { id: 'npc_creation', name: 'NPC Development', status: 'pending' },
+                    { id: 'location_design', name: 'Locations & Maps', status: 'pending' },
+                    { id: 'encounter_design', name: 'Encounters & Combat', status: 'pending' },
+                    { id: 'plot_hooks', name: 'Story & Plot Hooks', status: 'pending' },
+                    { id: 'final_review', name: 'Final Review', status: 'pending' }
+                ];
+
+                this.initializeInterface();
+                this.setupEventListeners();
+                this.createSession();
+            }
+
+            async initializeInterface() {
+                this.renderSetupSteps();
+                this.renderCurrentStep();
+                this.updateProgress();
+            }
+
+            setupEventListeners() {
+                document.getElementById('recordButton').addEventListener('click', () => this.toggleRecording());
+                document.getElementById('nextButton').addEventListener('click', () => this.nextStep());
+                document.getElementById('prevButton').addEventListener('click', () => this.previousStep());
+                document.getElementById('exportButton').addEventListener('click', () => this.exportSetup());
+            }
+
+            async createSession() {
+                try {
+                    const response = await fetch('/api/sessions/create', { method: 'POST' });
+                    const data = await response.json();
+                    this.sessionId = data.session_id;
+                    this.connectWebSocket();
+                } catch (error) {
+                    console.error('Error creating session:', error);
+                }
+            }
+
+            connectWebSocket() {
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = `${protocol}//${window.location.host}/ws/${this.sessionId}`;
+                
+                this.websocket = new WebSocket(wsUrl);
+                
+                this.websocket.onopen = () => {
+                    console.log('WebSocket connected');
+                };
+
+                this.websocket.onmessage = (event) => {
+                    const message = JSON.parse(event.data);
+                    this.handleWebSocketMessage(message);
+                };
+
+                this.websocket.onclose = () => {
+                    console.log('WebSocket disconnected');
+                    // Attempt to reconnect after 3 seconds
+                    setTimeout(() => this.connectWebSocket(), 3000);
+                };
+            }
+
+            handleWebSocketMessage(message) {
+                switch (message.type) {
+                    case 'voice_processed':
+                        this.handleVoiceProcessed(message);
+                        break;
+                    case 'step_updated':
+                        this.handleStepUpdated(message);
+                        break;
+                    case 'predictions_updated':
+                        this.handlePredictionsUpdated(message);
+                        break;
+                }
+            }
+
+            handleVoiceProcessed(message) {
+                document.getElementById('transcriptionPreview').textContent = message.transcription;
+                
+                if (message.parallel_creations && Object.keys(message.parallel_creations).length > 0) {
+                    this.displayParallelContent(message.parallel_creations);
+                }
+
+                if (message.extracted_context) {
+                    this.updateContextPanel(message.extracted_context);
+                }
+
+                if (message.voice_characteristics) {
+                    this.updateVoiceCharacteristics(message.voice_characteristics);
+                }
+            }
+
+            handleStepUpdated(message) {
+                if (message.predictions) {
+                    this.displayStepPredictions(message.predictions);
+                }
+
+                if (message.pre_populated) {
+                    this.prePopulateFields(message.pre_populated);
+                }
+            }
+
+            handlePredictionsUpdated(message) {
+                if (message.next_step) {
+                    this.highlightPredictedStep(message.next_step);
+                }
+
+                if (message.relevant_options) {
+                    this.displayRelevantOptions(message.relevant_options);
+                }
+            }
+
+            async toggleRecording() {
+                if (this.isRecording) {
+                    this.stopRecording();
+                } else {
+                    await this.startRecording();
+                }
+            }
+
+            async startRecording() {
+                try {
+                    this.audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    this.mediaRecorder = new MediaRecorder(this.audioStream);
+                    
+                    const audioChunks = [];
+                    this.mediaRecorder.ondataavailable = (event) => {
+                        audioChunks.push(event.data);
+                    };
+
+                    this.mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const audioArrayBuffer = await audioBlob.arrayBuffer();
+                        const audioBase64 = btoa(String.fromCharCode(...new Uint8Array(audioArrayBuffer)));
+                        
+                        this.sendVoiceInput(audioBase64);
+                    };
+
+                    this.mediaRecorder.start();
+                    this.isRecording = true;
+                    
+                    const recordButton = document.getElementById('recordButton');
+                    recordButton.classList.add('recording');
+                    recordButton.textContent = '⏹️';
+                    
+                    document.getElementById('voiceStatus').textContent = 'Recording... Click to stop';
+                } catch (error) {
+                    console.error('Error starting recording:', error);
+                    alert('Error accessing microphone. Please check permissions.');
+                }
+            }
+
+            stopRecording() {
+                if (this.mediaRecorder) {
+                    this.mediaRecorder.stop();
+                }
+                if (this.audioStream) {
+                    this.audioStream.getTracks().forEach(track => track.stop());
+                }
+
+                this.isRecording = false;
+                
+                const recordButton = document.getElementById('recordButton');
+                recordButton.classList.remove('recording');
+                recordButton.textContent = '🎤';
+                
+                document.getElementById('voiceStatus').textContent = 'Processing...';
+            }
+
+            sendVoiceInput(audioBase64) {
+                if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                    const message = {
+                        type: 'voice_input',
+                        data: {
+                            audio: audioBase64,
+                            context: this.currentStep
+                        }
+                    };
+                    
+                    this.websocket.send(JSON.stringify(message));
+                }
+            }
+
+            renderSetupSteps() {
+                const stepsList = document.getElementById('setupStepsList');
+                stepsList.innerHTML = '';
+
+                this.setupSteps.forEach((step, index) => {
+                    const stepElement = document.createElement('div');
+                    stepElement.className = `step-card ${step.status}`;
+                    stepElement.innerHTML = `
+                        <div class="step-header">
+                            <div class="step-title">${step.name}</div>
+                            <div class="step-status status-${step.status}">${step.status}</div>
+                        </div>
+                    `;
+                    
+                    stepElement.addEventListener('click', () => this.selectStep(step.id));
+                    stepsList.appendChild(stepElement);
+                });
+            }
+
+            renderCurrentStep() {
+                const currentStepContent = document.getElementById('currentStepContent');
+                const step = this.setupSteps.find(s => s.id === this.currentStep);
+                
+                if (!step) return;
+
+                // Generate form based on current step
+                let formHTML = `<h2>${step.name}</h2>`;
+                
+                switch (this.currentStep) {
+                    case 'initial_setup':
+                        formHTML += this.generateInitialSetupForm();
+                        break;
+                    case 'world_setting':
+                        formHTML += this.generateWorldSettingForm();
+                        break;
+                    case 'character_creation':
+                        formHTML += this.generateCharacterCreationForm();
+                        break;
+                    case 'npc_creation':
+                        formHTML += this.generateNPCCreationForm();
+                        break;
+                    default:
+                        formHTML += `<p>Setup for ${step.name} - Use voice input to describe your requirements.</p>`;
+                }
+
+                currentStepContent.innerHTML = formHTML;
+            }
+
+            generateInitialSetupForm() {
+                return `
+                    <div class="form-field">
+                        <label for="campaignName">Campaign Name</label>
+                        <input type="text" id="campaignName" placeholder="Enter your campaign name">
+                    </div>
+                    <div class="form-field">
+                        <label for="settingGenre">Setting Genre</label>
+                        <select id="settingGenre">
+                            <option value="">Select genre...</option>
+                            <option value="high_fantasy">High Fantasy</option>
+                            <option value="urban_fantasy">Urban Fantasy</option>
+                            <option value="horror">Horror</option>
+                            <option value="sci_fi">Science Fiction</option>
+                            <option value="steampunk">Steampunk</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label for="playerCount">Number of Players</label>
+                        <input type="number" id="playerCount" min="1" max="8" placeholder="3-6 recommended">
+                    </div>
+                `;
+            }
+
+            generateWorldSettingForm() {
+                return `
+                    <div class="form-field">
+                        <label for="worldName">World Name</label>
+                        <input type="text" id="worldName" placeholder="Name your world">
+                    </div>
+                    <div class="form-field">
+                        <label for="startingLocation">Starting Location</label>
+                        <input type="text" id="startingLocation" placeholder="Where does the adventure begin?">
+                    </div>
+                    <div class="form-field">
+                        <label for="worldDescription">World Description</label>
+                        <textarea id="worldDescription" rows="4" placeholder="Describe the world, its tone, and key features..."></textarea>
+                    </div>
+                `;
+            }
+
+            generateCharacterCreationForm() {
+                return `
+                    <div class="form-field">
+                        <label for="startingLevel">Starting Level</label>
+                        <input type="number" id="startingLevel" min="1" max="20" value="1">
+                    </div>
+                    <div class="form-field">
+                        <label for="characterCreationMethod">Character Creation Method</label>
+                        <select id="characterCreationMethod">
+                            <option value="point_buy">Point Buy</option>
+                            <option value="standard_array">Standard Array</option>
+                            <option value="roll_stats">Roll for Stats</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label for="partyComposition">Expected Party Composition</label>
+                        <textarea id="partyComposition" rows="3" placeholder="Describe the expected classes, roles, or party dynamics..."></textarea>
+                    </div>
+                `;
+            }
+
+            generateNPCCreationForm() {
+                return `
+                    <div class="form-field">
+                        <label for="keyNPCs">Key NPCs</label>
+                        <textarea id="keyNPCs" rows="4" placeholder="Describe important NPCs, their roles, and personalities..."></textarea>
+                    </div>
+                    <div class="form-field">
+                        <label>Voice Acting</label>
+                        <p style="font-size: 0.9rem; color: #718096; margin: 10px 0;">
+                            Use the microphone to practice NPC voices. The AI will analyze your voice characteristics 
+                            and create voice profiles for text-to-speech generation.
+                        </p>
+                    </div>
+                `;
+            }
+
+            displayParallelContent(parallelCreations) {
+                const parallelContent = document.getElementById('parallelContent');
+                parallelContent.style.display = 'block';
+                
+                let contentHTML = '<h3>✨ Auto-Generated Content</h3>';
+                
+                if (parallelCreations.npcs && parallelCreations.npcs.length > 0) {
+                    contentHTML += '<div class="parallel-content"><h4>🧙 Characters Generated</h4>';
+                    parallelCreations.npcs.forEach(npc => {
+                        contentHTML += `
+                            <div class="generated-item">
+                                <strong>${npc.name}</strong> - ${npc.role}<br>
+                                <small>${npc.description}</small>
+                            </div>
+                        `;
+                    });
+                    contentHTML += '</div>';
+                }
+
+                if (parallelCreations.locations && parallelCreations.locations.length > 0) {
+                    contentHTML += '<div class="parallel-content"><h4>🏰 Locations Generated</h4>';
+                    parallelCreations.locations.forEach(location => {
+                        contentHTML += `
+                            <div class="generated-item">
+                                <strong>${location.name}</strong> - ${location.type}<br>
+                                <small>${location.description}</small>
+                            </div>
+                        `;
+                    });
+                    contentHTML += '</div>';
+                }
+
+                parallelContent.innerHTML = contentHTML;
+            }
+
+            updateContextPanel(extractedContext) {
+                // Update knowledge graph
+                if (extractedContext.characters_mentioned || extractedContext.locations_mentioned) {
+                    this.updateKnowledgeGraph(extractedContext);
+                }
+
+                // Update plot threads
+                if (extractedContext.plot_elements) {
+                    this.updatePlotThreads(extractedContext.plot_elements);
+                }
+
+                // Update key insights
+                if (extractedContext.key_points) {
+                    this.updateKeyInsights(extractedContext.key_points);
+                }
+            }
+
+            updateKnowledgeGraph(context) {
+                const knowledgeGraph = document.getElementById('knowledgeGraph');
+                let graphHTML = '';
+
+                if (context.characters_mentioned) {
+                    context.characters_mentioned.forEach(char => {
+                        graphHTML += `<span class="graph-node">👤 ${char.name}</span>`;
+                    });
+                }
+
+                if (context.locations_mentioned) {
+                    context.locations_mentioned.forEach(loc => {
+                        graphHTML += `<span class="graph-node">🗺️ ${loc.name}</span>`;
+                    });
+                }
+
+                knowledgeGraph.innerHTML = graphHTML;
+            }
+
+            updatePlotThreads(plotElements) {
+                const plotThreads = document.getElementById('plotThreads');
+                let threadsHTML = '';
+
+                plotElements.forEach(element => {
+                    const statusClass = element.type === 'quest' ? 'active' : '';
+                    threadsHTML += `
+                        <div class="plot-thread ${statusClass}">
+                            <strong>${element.type.toUpperCase()}</strong><br>
+                            ${element.content}
+                        </div>
+                    `;
+                });
+
+                plotThreads.innerHTML = threadsHTML;
+            }
+
+            updateKeyInsights(keyPoints) {
+                const contextSummary = document.getElementById('contextSummary');
+                let summaryHTML = '<ul>';
+
+                keyPoints.forEach(point => {
+                    summaryHTML += `<li>${point}</li>`;
+                });
+
+                summaryHTML += '</ul>';
+                contextSummary.innerHTML = summaryHTML;
+            }
+
+            updateVoiceCharacteristics(voiceCharacteristics) {
+                const npcVoices = document.getElementById('npcVoices');
+                
+                const voiceCard = document.createElement('div');
+                voiceCard.className = 'npc-voice-card';
+                voiceCard.innerHTML = `
+                    <h4>🎭 Latest Voice Sample</h4>
+                    <p><strong>Quality:</strong> ${voiceCharacteristics.voice_quality}</p>
+                    <p><strong>Pitch:</strong> ${Math.round(voiceCharacteristics.pitch_mean)}Hz</p>
+                    <p><strong>Energy:</strong> ${(voiceCharacteristics.energy_mean * 100).toFixed(1)}%</p>
+                    <div class="voice-traits">
+                        ${Object.keys(voiceCharacteristics.emotional_markers).map(emotion => 
+                            `<span class="trait-tag">${emotion}</span>`
+                        ).join('')}
+                    </div>
+                `;
+
+                npcVoices.insertBefore(voiceCard, npcVoices.firstChild);
+                
+                // Keep only the 3 most recent voice cards
+                while (npcVoices.children.length > 3) {
+                    npcVoices.removeChild(npcVoices.lastChild);
+                }
+            }
+
+            prePopulateFields(fieldPredictions) {
+                Object.entries(fieldPredictions).forEach(([fieldName, prediction]) => {
+                    const field = document.getElementById(fieldName);
+                    if (field && !field.value) {
+                        field.value = prediction.predicted_value;
+                        field.classList.add('predicted');
+                        
+                        // Add confidence indicator
+                        const confidenceElement = document.createElement('div');
+                        confidenceElement.className = 'prediction-confidence';
+                        confidenceElement.textContent = `AI suggested (${(prediction.confidence * 100).toFixed(0)}% confidence)`;
+                        field.parentNode.appendChild(confidenceElement);
+                    }
+                });
+            }
+
+            nextStep() {
+                const currentIndex = this.setupSteps.findIndex(s => s.id === this.currentStep);
+                if (currentIndex < this.setupSteps.length - 1) {
+                    // Mark current step as completed
+                    this.setupSteps[currentIndex].status = 'completed';
+                    
+                    // Move to next step
+                    const nextIndex = currentIndex + 1;
+                    this.setupSteps[nextIndex].status = 'active';
+                    this.currentStep = this.setupSteps[nextIndex].id;
+                    
+                    this.renderSetupSteps();
+                    this.renderCurrentStep();
+                    this.updateProgress();
+                    
+                    // Send step update to server
+                    this.sendStepUpdate();
+                }
+            }
+
+            previousStep() {
+                const currentIndex = this.setupSteps.findIndex(s => s.id === this.currentStep);
+                if (currentIndex > 0) {
+                    // Mark current step as pending
+                    this.setupSteps[currentIndex].status = 'pending';
+                    
+                    // Move to previous step
+                    const prevIndex = currentIndex - 1;
+                    this.setupSteps[prevIndex].status = 'active';
+                    this.currentStep = this.setupSteps[prevIndex].id;
+                    
+                    this.renderSetupSteps();
+                    this.renderCurrentStep();
+                    this.updateProgress();
+                    
+                    // Send step update to server
+                    this.sendStepUpdate();
+                }
+            }
+
+            sendStepUpdate() {
+                if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                    const message = {
+                        type: 'setup_step',
+                        data: {
+                            step_id: this.currentStep,
+                            step_type: this.currentStep,
+                            form_data: this.collectFormData()
+                        }
+                    };
+                    
+                    this.websocket.send(JSON.stringify(message));
+                }
+            }
+
+            collectFormData() {
+                const formData = {};
+                const form = document.getElementById('currentStepContent');
+                const inputs = form.querySelectorAll('input, select, textarea');
+                
+                inputs.forEach(input => {
+                    if (input.id) {
+                        formData[input.id] = input.value;
+                    }
+                });
+                
+                return formData;
+            }
+
+            updateProgress() {
+                const completedSteps = this.setupSteps.filter(s => s.status === 'completed').length;
+                const totalSteps = this.setupSteps.length;
+                const progressPercentage = (completedSteps / totalSteps) * 100;
+                
+                document.getElementById('progressFill').style.width = `${progressPercentage}%`;
+            }
+
+            async exportSetup() {
+                try {
+                    const response = await fetch(`/api/sessions/${this.sessionId}/export`);
+                    const data = await response.json();
+                    
+                    // Create download link
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `campaign_setup_${this.sessionId}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                } catch (error) {
+                    console.error('Error exporting setup:', error);
+                    alert('Error exporting setup data');
+                }
+            }
+
+            selectStep(stepId) {
+                // Mark current step as pending if not completed
+                const currentIndex = this.setupSteps.findIndex(s => s.id === this.currentStep);
+                if (this.setupSteps[currentIndex].status === 'active') {
+                    this.setupSteps[currentIndex].status = 'pending';
+                }
+                
+                // Activate selected step
+                const selectedIndex = this.setupSteps.findIndex(s => s.id === stepId);
+                this.setupSteps[selectedIndex].status = 'active';
+                this.currentStep = stepId;
+                
+                this.renderSetupSteps();
+                this.renderCurrentStep();
+                this.sendStepUpdate();
+            }
+        }
+
+        // Initialize the interface when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new GameSetupInterface();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,563 @@
+# Multi-Region Global Deployment with Load Balancing
+# AWS CloudFormation template for global ActiveLog infrastructure
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Global multi-region deployment for ActiveLog with global load balancing'
+
+Parameters:
+  PrimaryRegion:
+    Type: String
+    Description: Primary AWS region
+    Default: us-east-1
+  
+  SecondaryRegions:
+    Type: CommaDelimitedList
+    Description: Secondary AWS regions for multi-region deployment
+    Default: "us-west-2,eu-west-1,ap-southeast-1"
+  
+  DomainName:
+    Type: String
+    Description: Root domain name for ActiveLog
+    Default: activelog.ai
+  
+  SSLCertificateArn:
+    Type: String
+    Description: SSL certificate ARN for CloudFront
+  
+  EnvironmentType:
+    Type: String
+    Description: Environment type
+    Default: production
+    AllowedValues:
+      - development
+      - staging
+      - production
+
+Resources:
+  # Route 53 Hosted Zone
+  ActiveLogHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Ref DomainName
+      HostedZoneConfig:
+        Comment: !Sub "ActiveLog ${EnvironmentType} hosted zone"
+
+  # CloudFront Distribution for Global Load Balancing
+  GlobalCloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - !Ref DomainName
+          - !Sub "*.${DomainName}"
+        Comment: !Sub "ActiveLog Global CDN - ${EnvironmentType}"
+        DefaultCacheBehavior:
+          TargetOriginId: ActiveLogPrimaryOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad  # CachingDisabled
+          OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf  # CORS-S3Origin
+          Compress: true
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - POST
+            - PATCH
+            - DELETE
+        
+        CacheBehaviors:
+          # API routing
+          - PathPattern: "/api/*"
+            TargetOriginId: ActiveLogAPIOrigin
+            ViewerProtocolPolicy: https-only
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - POST
+              - PATCH
+              - DELETE
+          
+          # Static assets caching
+          - PathPattern: "/static/*"
+            TargetOriginId: ActiveLogStaticOrigin
+            ViewerProtocolPolicy: https-only
+            CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6  # CachingOptimized
+            AllowedMethods:
+              - GET
+              - HEAD
+          
+          # Domain-specific routing
+          - PathPattern: "/personallog/*"
+            TargetOriginId: PersonalLogOrigin
+            ViewerProtocolPolicy: https-only
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+          
+          - PathPattern: "/makerlog/*"
+            TargetOriginId: MakerLogOrigin
+            ViewerProtocolPolicy: https-only
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+          
+          - PathPattern: "/businesslog/*"
+            TargetOriginId: BusinessLogOrigin
+            ViewerProtocolPolicy: https-only
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+
+        Origins:
+          # Primary origin (API Gateway)
+          - Id: ActiveLogPrimaryOrigin
+            DomainName: !Sub "${PrimaryRegion}-api.${DomainName}"
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols:
+                - TLSv1.2
+          
+          # API origin
+          - Id: ActiveLogAPIOrigin
+            DomainName: !Sub "api.${DomainName}"
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+          
+          # Static assets origin
+          - Id: ActiveLogStaticOrigin
+            DomainName: !Sub "static.${DomainName}"
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+          
+          # Domain-specific origins
+          - Id: PersonalLogOrigin
+            DomainName: !Sub "personallog.${DomainName}"
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+          
+          - Id: MakerLogOrigin
+            DomainName: !Sub "makerlog.${DomainName}"
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+          
+          - Id: BusinessLogOrigin
+            DomainName: !Sub "businesslog.${DomainName}"
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+
+        Enabled: true
+        HttpVersion: http2
+        IPV6Enabled: true
+        PriceClass: PriceClass_All
+        ViewerCertificate:
+          AcmCertificateArn: !Ref SSLCertificateArn
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
+        
+        WebACLId: !Ref CloudFrontWebACL
+        
+        CustomErrorResponses:
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 300
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 300
+
+  # WAF for CloudFront protection
+  CloudFrontWebACL:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      Name: !Sub "ActiveLog-CloudFront-WAF-${EnvironmentType}"
+      Scope: CLOUDFRONT
+      DefaultAction:
+        Allow: {}
+      Rules:
+        # Rate limiting rule
+        - Name: RateLimitRule
+          Priority: 1
+          Statement:
+            RateBasedStatement:
+              Limit: 2000
+              AggregateKeyType: IP
+          Action:
+            Block: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: RateLimitRule
+        
+        # AWS Managed Rules - Core Rule Set
+        - Name: AWS-AWSManagedRulesCommonRuleSet
+          Priority: 2
+          OverrideAction:
+            None: {}
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesCommonRuleSet
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: CommonRuleSetMetric
+        
+        # AWS Managed Rules - Known Bad Inputs
+        - Name: AWS-AWSManagedRulesKnownBadInputsRuleSet
+          Priority: 3
+          OverrideAction:
+            None: {}
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesKnownBadInputsRuleSet
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: KnownBadInputsMetric
+
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: !Sub "ActiveLog-WAF-${EnvironmentType}"
+
+  # Global DynamoDB Tables for cross-region replication
+  UserDataGlobalTable:
+    Type: AWS::DynamoDB::GlobalTable
+    Properties:
+      TableName: !Sub "ActiveLog-UserData-${EnvironmentType}"
+      AttributeDefinitions:
+        - AttributeName: user_id
+          AttributeType: S
+        - AttributeName: domain
+          AttributeType: S
+      KeySchema:
+        - AttributeName: user_id
+          KeyType: HASH
+        - AttributeName: domain
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      SSESpecification:
+        SSEEnabled: true
+      PointInTimeRecoveryEnabled: true
+      Replicas:
+        - Region: !Ref PrimaryRegion
+          GlobalSecondaryIndexes:
+            - IndexName: domain-index
+              KeySchema:
+                - AttributeName: domain
+                  KeyType: HASH
+              Projection:
+                ProjectionType: ALL
+        - Region: us-west-2
+        - Region: eu-west-1
+        - Region: ap-southeast-1
+
+  SessionDataGlobalTable:
+    Type: AWS::DynamoDB::GlobalTable
+    Properties:
+      TableName: !Sub "ActiveLog-Sessions-${EnvironmentType}"
+      AttributeDefinitions:
+        - AttributeName: session_id
+          AttributeType: S
+        - AttributeName: user_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: session_id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      TimeToLiveSpecification:
+        AttributeName: expires_at
+        Enabled: true
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      SSESpecification:
+        SSEEnabled: true
+      Replicas:
+        - Region: !Ref PrimaryRegion
+        - Region: us-west-2
+        - Region: eu-west-1
+        - Region: ap-southeast-1
+
+  # ElastiCache Global Replication Group for caching
+  RedisGlobalReplicationGroup:
+    Type: AWS::ElastiCache::GlobalReplicationGroup
+    Properties:
+      GlobalReplicationGroupIdSuffix: !Sub "activelog-${EnvironmentType}"
+      GlobalReplicationGroupDescription: !Sub "ActiveLog Global Redis Cache - ${EnvironmentType}"
+      Members:
+        - Role: PRIMARY
+          ReplicationGroupId: !Ref PrimaryRedisReplicationGroup
+          ReplicationGroupRegion: !Ref PrimaryRegion
+        - Role: SECONDARY
+          ReplicationGroupId: !Sub "${AWS::StackName}-redis-us-west-2"
+          ReplicationGroupRegion: us-west-2
+        - Role: SECONDARY
+          ReplicationGroupId: !Sub "${AWS::StackName}-redis-eu-west-1"
+          ReplicationGroupRegion: eu-west-1
+      CacheNodeType: cache.r6g.large
+      Engine: redis
+      EngineVersion: 6.2
+      NumNodeGroups: 3
+      ReplicasPerNodeGroup: 2
+      AtRestEncryptionEnabled: true
+      TransitEncryptionEnabled: true
+      AutomaticFailoverEnabled: true
+
+  PrimaryRedisReplicationGroup:
+    Type: AWS::ElastiCache::ReplicationGroup
+    Properties:
+      ReplicationGroupId: !Sub "${AWS::StackName}-redis-primary"
+      ReplicationGroupDescription: !Sub "Primary Redis cluster for ${EnvironmentType}"
+      CacheNodeType: cache.r6g.large
+      Engine: redis
+      EngineVersion: 6.2
+      NumCacheClusters: 3
+      Port: 6379
+      SecurityGroupIds:
+        - !Ref RedisSecurityGroup
+      SubnetGroupName: !Ref RedisSubnetGroup
+      AtRestEncryptionEnabled: true
+      TransitEncryptionEnabled: true
+      MultiAZEnabled: true
+      AutomaticFailoverEnabled: true
+      SnapshotRetentionLimit: 7
+      PreferredMaintenanceWindow: "sun:05:00-sun:06:00"
+      PreferredCacheClusterAZs:
+        - !Sub "${AWS::Region}a"
+        - !Sub "${AWS::Region}b"
+        - !Sub "${AWS::Region}c"
+
+  RedisSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Redis clusters
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 6379
+          ToPort: 6379
+          SourceSecurityGroupId: !Ref ApplicationSecurityGroup
+
+  RedisSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: Subnet group for Redis clusters
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+        - !Ref PrivateSubnet3
+
+  # VPC and networking
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub "ActiveLog-VPC-${EnvironmentType}"
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Sub "${AWS::Region}a"
+      MapPublicIpOnLaunch: true
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: !Sub "${AWS::Region}b"
+      MapPublicIpOnLaunch: true
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.10.0/24
+      AvailabilityZone: !Sub "${AWS::Region}a"
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.11.0/24
+      AvailabilityZone: !Sub "${AWS::Region}b"
+
+  PrivateSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.12.0/24
+      AvailabilityZone: !Sub "${AWS::Region}c"
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref PublicRouteTable
+
+  ApplicationSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for application servers
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8000
+          ToPort: 9000
+          CidrIp: 10.0.0.0/16
+
+  # Health checks for global load balancing
+  GlobalHealthCheck:
+    Type: AWS::Route53::HealthCheck
+    Properties:
+      Type: HTTPS
+      ResourcePath: /health
+      FullyQualifiedDomainName: !Sub "api.${DomainName}"
+      Port: 443
+      RequestInterval: 30
+      FailureThreshold: 3
+      Tags:
+        - Key: Name
+          Value: !Sub "ActiveLog-Global-Health-${EnvironmentType}"
+
+  # CloudWatch Dashboard for global monitoring
+  GlobalMonitoringDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub "ActiveLog-Global-${EnvironmentType}"
+      DashboardBody: !Sub |
+        {
+          "widgets": [
+            {
+              "type": "metric",
+              "x": 0,
+              "y": 0,
+              "width": 12,
+              "height": 6,
+              "properties": {
+                "metrics": [
+                  ["AWS/CloudFront", "Requests", "DistributionId", "${GlobalCloudFrontDistribution}"],
+                  [".", "BytesDownloaded", ".", "."],
+                  [".", "BytesUploaded", ".", "."]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-east-1",
+                "title": "CloudFront Global Traffic",
+                "period": 300
+              }
+            },
+            {
+              "type": "metric",
+              "x": 12,
+              "y": 0,
+              "width": 12,
+              "height": 6,
+              "properties": {
+                "metrics": [
+                  ["AWS/DynamoDB", "ConsumedReadCapacityUnits", "TableName", "${UserDataGlobalTable}"],
+                  [".", "ConsumedWriteCapacityUnits", ".", "."],
+                  [".", "ThrottledRequests", ".", "."]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "title": "DynamoDB Global Table Performance",
+                "period": 300
+              }
+            }
+          ]
+        }
+
+Outputs:
+  CloudFrontDistributionId:
+    Description: CloudFront distribution ID
+    Value: !Ref GlobalCloudFrontDistribution
+    Export:
+      Name: !Sub "${AWS::StackName}-CloudFront-Distribution"
+
+  CloudFrontDomainName:
+    Description: CloudFront distribution domain name
+    Value: !GetAtt GlobalCloudFrontDistribution.DomainName
+    Export:
+      Name: !Sub "${AWS::StackName}-CloudFront-Domain"
+
+  HostedZoneId:
+    Description: Route 53 hosted zone ID
+    Value: !Ref ActiveLogHostedZone
+    Export:
+      Name: !Sub "${AWS::StackName}-HostedZone-ID"
+
+  GlobalTableName:
+    Description: DynamoDB global table name
+    Value: !Ref UserDataGlobalTable
+    Export:
+      Name: !Sub "${AWS::StackName}-GlobalTable"
+
+  RedisGlobalReplicationGroupId:
+    Description: ElastiCache global replication group ID
+    Value: !Ref RedisGlobalReplicationGroup
+    Export:
+      Name: !Sub "${AWS::StackName}-Redis-Global"
+
+  WebACLId:
+    Description: WAF Web ACL ID
+    Value: !Ref CloudFrontWebACL
+    Export:
+      Name: !Sub "${AWS::StackName}-WebACL"

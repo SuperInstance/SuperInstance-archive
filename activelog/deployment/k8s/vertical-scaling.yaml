@@ -1,0 +1,255 @@
+# Vertical Pod Autoscaling Configuration for Resource-Intensive Services
+# VPA provides resource recommendations and can automatically adjust CPU/Memory requests
+
+# VPA for AI/ML Services (require dynamic resource adjustment)
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: ai-orchestrator-vpa
+  namespace: activelog
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ai-orchestrator
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: ai-orchestrator
+      maxAllowed:
+        cpu: 4
+        memory: 8Gi
+      minAllowed:
+        cpu: 100m
+        memory: 128Mi
+      controlledResources: ["cpu", "memory"]
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: ml-pipeline-vpa
+  namespace: activelog
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ml-pipeline
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: ml-pipeline
+      maxAllowed:
+        cpu: 4
+        memory: 16Gi
+      minAllowed:
+        cpu: 200m
+        memory: 512Mi
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: predictive-ai-vpa
+  namespace: activelog
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: predictive-ai
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: predictive-ai
+      maxAllowed:
+        cpu: 6
+        memory: 12Gi
+      minAllowed:
+        cpu: 200m
+        memory: 512Mi
+
+# VPA for Media Processing Services
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: video-pipeline-vpa
+  namespace: activelog
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: video-pipeline
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: video-pipeline
+      maxAllowed:
+        cpu: 8
+        memory: 32Gi
+      minAllowed:
+        cpu: 500m
+        memory: 1Gi
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: video-processor-vpa
+  namespace: activelog
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: video-processor
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: video-processor
+      maxAllowed:
+        cpu: 8
+        memory: 16Gi
+      minAllowed:
+        cpu: 500m
+        memory: 1Gi
+
+# VPA for Gaming Services (variable resource needs)
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: gaming-platform-vpa
+  namespace: activelog
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: gaming-platform
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: gaming-platform
+      maxAllowed:
+        cpu: 4
+        memory: 8Gi
+      minAllowed:
+        cpu: 200m
+        memory: 512Mi
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: dmlog-core-vpa
+  namespace: activelog
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: dmlog-core
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: dmlog-core
+      maxAllowed:
+        cpu: 2
+        memory: 4Gi
+      minAllowed:
+        cpu: 100m
+        memory: 256Mi
+
+# VPA for High-Load Core Services
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: api-gateway-vpa
+  namespace: activelog
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-gateway
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: api-gateway
+      maxAllowed:
+        cpu: 2
+        memory: 2Gi
+      minAllowed:
+        cpu: 100m
+        memory: 128Mi
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: sync-engine-vpa
+  namespace: activelog
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: sync-engine
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: sync-engine
+      maxAllowed:
+        cpu: 2
+        memory: 4Gi
+      minAllowed:
+        cpu: 100m
+        memory: 256Mi
+
+# VPA for Data Processing Services
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: data-manager-vpa
+  namespace: activelog
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: data-manager
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: data-manager
+      maxAllowed:
+        cpu: 4
+        memory: 8Gi
+      minAllowed:
+        cpu: 200m
+        memory: 512Mi
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: file-processor-vpa
+  namespace: activelog
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: file-processor
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: file-processor
+      maxAllowed:
+        cpu: 4
+        memory: 8Gi
+      minAllowed:
+        cpu: 200m
+        memory: 512Mi

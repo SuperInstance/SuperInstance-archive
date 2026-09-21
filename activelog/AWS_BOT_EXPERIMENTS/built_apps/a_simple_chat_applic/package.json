@@ -1,0 +1,20 @@
+{
+  "name": "a-simple-chat-applic",
+  "version": "1.0.0",
+  "description": "AI-generated chat_app application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "socket.io": "^4.7.2"
+  },
+  "keywords": [
+    "ai-generated",
+    "chat_app"
+  ],
+  "author": "Local AI Builder"
+}

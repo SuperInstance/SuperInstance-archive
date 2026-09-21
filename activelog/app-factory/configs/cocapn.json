@@ -1,0 +1,249 @@
+{
+  "name": "CoCapn.ai",
+  "version": "1.0.0",
+  "title": "CoCapn.ai - Simple Marine Navigation",
+  "description": "Simplified marine navigation for recreational boaters",
+  "favicon": "/assets/cocapn/favicon.ico",
+  "domain": "cocapn.ai",
+  "devPort": 3008,
+  "theme": "nautical-simple",
+  "layout": "simple-marine",
+  "monetization": {
+    "type": "freemium",
+    "tiers": ["free", "navigator", "captain"],
+    "trialPeriod": "14d"
+  },
+  "features": {
+    "basicNavigation": true,
+    "gpsTracking": true,
+    "weatherInfo": true,
+    "anchorage": true,
+    "marina": true,
+    "safety": true,
+    "logbook": true,
+    "fuelTracking": true,
+    "maintenance": true,
+    "emergency": true,
+    "social": true,
+    "offline": true
+  },
+  "modules": [
+    {
+      "name": "navigation",
+      "component": "SimpleNavigationModule",
+      "props": {
+        "enableGPS": true,
+        "enableWaypoints": true,
+        "enableRoutes": true,
+        "enableAnchorWatch": true,
+        "chartTypes": ["nautical", "satellite"],
+        "enableCompass": true,
+        "enableSpeed": true
+      }
+    },
+    {
+      "name": "weather",
+      "component": "SimpleWeatherModule",
+      "props": {
+        "enableCurrentConditions": true,
+        "enableForecast": true,
+        "enableTides": true,
+        "enableWind": true,
+        "enableWaves": true,
+        "enableAlerts": true,
+        "updateFrequency": "30m"
+      }
+    },
+    {
+      "name": "anchorage",
+      "component": "AnchorageModule",
+      "props": {
+        "enableAnchorageSearch": true,
+        "enableReviews": true,
+        "enableBooking": false,
+        "enablePhotos": true,
+        "enableFacilities": true,
+        "enableDepthInfo": true
+      }
+    },
+    {
+      "name": "marina",
+      "component": "MarinaModule",
+      "props": {
+        "enableMarinaSearch": true,
+        "enableServices": true,
+        "enablePricing": true,
+        "enableReservations": false,
+        "enableReviews": true,
+        "enableContacts": true
+      }
+    },
+    {
+      "name": "logbook",
+      "component": "SimpleLogbookModule",
+      "props": {
+        "enableQuickEntry": true,
+        "enableAutoLogging": true,
+        "enablePhotos": true,
+        "enableNotes": true,
+        "enableWeatherLogging": true,
+        "enableFuelLogging": true
+      }
+    },
+    {
+      "name": "safety",
+      "component": "SafetyModule",
+      "props": {
+        "enableEmergencyContacts": true,
+        "enableSOSButton": true,
+        "enableManOverboard": true,
+        "enableSafetyChecklist": true,
+        "enableWeatherAlerts": true,
+        "enableLocationSharing": true
+      }
+    },
+    {
+      "name": "maintenance",
+      "component": "MaintenanceModule",
+      "props": {
+        "enableScheduling": true,
+        "enableReminders": true,
+        "enableServiceRecords": true,
+        "enablePartTracking": true,
+        "enableCostTracking": true,
+        "enableDocuments": true
+      }
+    }
+  ],
+  "aiModels": [
+    {
+      "name": "route-optimizer",
+      "type": "pathfinding",
+      "endpoint": "/ai/route-optimization",
+      "features": ["fuel-efficiency", "weather-avoidance", "time-optimization"]
+    },
+    {
+      "name": "weather-advisor",
+      "type": "advisory",
+      "endpoint": "/ai/weather-advisory",
+      "features": ["departure-timing", "route-safety", "condition-warnings"]
+    },
+    {
+      "name": "anchorage-recommender",
+      "type": "recommendation",
+      "endpoint": "/ai/anchorage-recommendation",
+      "features": ["weather-protection", "depth-suitability", "facilities-matching"]
+    }
+  ],
+  "auth": {
+    "providers": ["email", "google", "apple"],
+    "requireEmailVerification": false,
+    "enableTwoFactor": false,
+    "sessionDuration": "30d",
+    "rememberDevice": true,
+    "enableGuestMode": true
+  },
+  "dataSync": {
+    "enabled": true,
+    "cloudProvider": "activelog-cloud",
+    "encryption": "standard",
+    "conflictResolution": "latest-wins",
+    "syncFrequency": "when-online",
+    "offlineSupport": true,
+    "enableBackup": true
+  },
+  "settings": {
+    "privacy": {
+      "enableLocationSharing": false,
+      "enableEmergencySharing": true,
+      "enableDataExport": true,
+      "enableDataDeletion": true,
+      "showDataUsage": true
+    },
+    "notifications": {
+      "enablePush": true,
+      "enableEmail": false,
+      "enableSMS": false,
+      "enableWeatherAlerts": true,
+      "enableMaintenanceReminders": true,
+      "enableSafetyAlerts": true
+    },
+    "appearance": {
+      "defaultTheme": "nautical",
+      "enableNightMode": true,
+      "enableSimpleMode": true,
+      "enableLargeText": true
+    },
+    "units": {
+      "distance": "nautical-miles",
+      "depth": "feet",
+      "speed": "knots",
+      "wind": "knots",
+      "temperature": "fahrenheit"
+    }
+  },
+  "customModules": [
+    {
+      "name": "tide-calculator",
+      "path": "/modules/cocapn/TideCalculator.js"
+    },
+    {
+      "name": "fuel-calculator",
+      "path": "/modules/cocapn/FuelCalculator.js"
+    },
+    {
+      "name": "emergency-procedures",
+      "path": "/modules/cocapn/EmergencyProcedures.js"
+    }
+  ],
+  "integrations": [
+    {
+      "name": "noaa-weather",
+      "enabled": true,
+      "marineForecasts": true
+    },
+    {
+      "name": "activecaptain",
+      "enabled": true,
+      "communityData": true
+    },
+    {
+      "name": "dockwa",
+      "enabled": false,
+      "reservations": false
+    },
+    {
+      "name": "boat-us",
+      "enabled": true,
+      "emergencyServices": true
+    },
+    {
+      "name": "coast-guard",
+      "enabled": true,
+      "emergencyContacts": true
+    }
+  ],
+  "analytics": {
+    "provider": "privacy-focused",
+    "enableUserTracking": false,
+    "enableLocationTracking": false,
+    "enablePerformanceTracking": true,
+    "enableErrorTracking": true,
+    "respectDoNotTrack": true
+  },
+  "hardware": {
+    "enableGPS": true,
+    "enableCompass": true,
+    "enableCamera": true,
+    "enableBluetooth": true,
+    "enableOfflineMaps": true,
+    "supportedDevices": ["generic-nmea", "garmin"]
+  },
+  "accessibility": {
+    "enableLargeText": true,
+    "enableHighContrast": true,
+    "enableVoiceCommands": true,
+    "enableSimpleInterface": true,
+    "enableEmergencyMode": true
+  }
+}

@@ -1,0 +1,245 @@
+version: '3.8'
+
+services:
+  # Test database
+  postgres-test:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: activelog_test
+      POSTGRES_USER: activelog_test
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U activelog_test -d activelog_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - test-network
+
+  # Test Redis
+  redis-test:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - test-network
+
+  # Mock external services
+  mock-services:
+    build:
+      context: .
+      dockerfile: tests/docker/Dockerfile.mock-services
+    ports:
+      - "9000:9000"  # Mock OpenAI API
+      - "9001:9001"  # Mock S3 API
+    environment:
+      - MOCK_OPENAI_PORT=9000
+      - MOCK_S3_PORT=9001
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - test-network
+
+  # Test API Gateway
+  api-gateway-test:
+    build:
+      context: .
+      dockerfile: services/api_gateway/Dockerfile
+    ports:
+      - "8100:8000"
+    environment:
+      - DATABASE_URL=postgresql://activelog_test:test_password@postgres-test:5432/activelog_test
+      - REDIS_URL=redis://redis-test:6379/0
+      - AUTH_SERVICE_URL=http://auth-test:8001
+      - METADATA_SERVICE_URL=http://metadata-test:8002
+      - FILE_PROCESSOR_SERVICE_URL=http://file-processor-test:8003
+      - AI_ORCHESTRATOR_SERVICE_URL=http://ai-orchestrator-test:8004
+      - NOTIFICATION_SERVICE_URL=http://notification-test:8005
+      - OPENAI_API_BASE_URL=http://mock-services:9000
+      - S3_ENDPOINT_URL=http://mock-services:9001
+      - ENVIRONMENT=test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      mock-services:
+        condition: service_healthy
+    networks:
+      - test-network
+
+  # Test Auth Service
+  auth-test:
+    build:
+      context: .
+      dockerfile: services/auth/Dockerfile
+    ports:
+      - "8101:8001"
+    environment:
+      - DATABASE_URL=postgresql://activelog_test:test_password@postgres-test:5432/activelog_test
+      - REDIS_URL=redis://redis-test:6379/1
+      - JWT_SECRET_KEY=test_jwt_secret_key_12345
+      - ENVIRONMENT=test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+    networks:
+      - test-network
+
+  # Test Metadata Service
+  metadata-test:
+    build:
+      context: .
+      dockerfile: services/metadata/Dockerfile
+    ports:
+      - "8102:8002"
+    environment:
+      - DATABASE_URL=postgresql://activelog_test:test_password@postgres-test:5432/activelog_test
+      - REDIS_URL=redis://redis-test:6379/2
+      - ENVIRONMENT=test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+    networks:
+      - test-network
+
+  # Test File Processor Service
+  file-processor-test:
+    build:
+      context: .
+      dockerfile: services/file_processor/Dockerfile
+    ports:
+      - "8103:8003"
+    environment:
+      - DATABASE_URL=postgresql://activelog_test:test_password@postgres-test:5432/activelog_test
+      - REDIS_URL=redis://redis-test:6379/3
+      - S3_ENDPOINT_URL=http://mock-services:9001
+      - ENVIRONMENT=test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      mock-services:
+        condition: service_healthy
+    networks:
+      - test-network
+
+  # Test AI Orchestrator Service
+  ai-orchestrator-test:
+    build:
+      context: .
+      dockerfile: services/ai_orchestrator/Dockerfile
+    ports:
+      - "8104:8004"
+    environment:
+      - DATABASE_URL=postgresql://activelog_test:test_password@postgres-test:5432/activelog_test
+      - REDIS_URL=redis://redis-test:6379/4
+      - OPENAI_API_BASE_URL=http://mock-services:9000
+      - ENVIRONMENT=test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      mock-services:
+        condition: service_healthy
+    networks:
+      - test-network
+
+  # Test Notification Service
+  notification-test:
+    build:
+      context: .
+      dockerfile: services/notification/Dockerfile
+    ports:
+      - "8105:8005"
+    environment:
+      - DATABASE_URL=postgresql://activelog_test:test_password@postgres-test:5432/activelog_test
+      - REDIS_URL=redis://redis-test:6379/5
+      - ENVIRONMENT=test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+    networks:
+      - test-network
+
+  # Test runner
+  test-runner:
+    build:
+      context: .
+      dockerfile: tests/docker/Dockerfile.test-runner
+    volumes:
+      - .:/app
+      - test_results:/app/test_results
+    environment:
+      - DATABASE_URL=postgresql://activelog_test:test_password@postgres-test:5432/activelog_test
+      - REDIS_URL=redis://redis-test:6379/0
+      - API_BASE_URL=http://api-gateway-test:8000
+      - AUTH_SERVICE_URL=http://auth-test:8001
+      - METADATA_SERVICE_URL=http://metadata-test:8002
+      - FILE_PROCESSOR_SERVICE_URL=http://file-processor-test:8003
+      - AI_ORCHESTRATOR_SERVICE_URL=http://ai-orchestrator-test:8004
+      - NOTIFICATION_SERVICE_URL=http://notification-test:8005
+      - OPENAI_API_BASE_URL=http://mock-services:9000
+      - S3_ENDPOINT_URL=http://mock-services:9001
+      - ENVIRONMENT=test
+      - PYTHONPATH=/app
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      api-gateway-test:
+        condition: service_started
+      auth-test:
+        condition: service_started
+      metadata-test:
+        condition: service_started
+      file-processor-test:
+        condition: service_started
+      ai-orchestrator-test:
+        condition: service_started
+      notification-test:
+        condition: service_started
+    command: >
+      bash -c "
+        echo 'Waiting for services to be ready...' &&
+        sleep 30 &&
+        echo 'Running tests...' &&
+        pytest tests/unit/ -v --cov=services --cov-report=html --cov-report=xml &&
+        pytest tests/integration/ -v &&
+        pytest tests/load/ -v --tb=short &&
+        echo 'All tests completed!'
+      "
+    networks:
+      - test-network
+
+volumes:
+  postgres_test_data:
+  test_results:
+
+networks:
+  test-network:
+    driver: bridge

@@ -1,0 +1,27 @@
+{
+  "report_timestamp": "2025-08-26T02:19:28.275890",
+  "current_status": {
+    "cpu_usage": 8.4,
+    "memory_usage": 32.8,
+    "response_time_ms": 2.5587081909179688,
+    "estimated_monthly_cost": 14238.43200683594,
+    "total_revenue": 0.0
+  },
+  "24h_trends": {
+    "avg_cpu_usage": 8.733333333333334,
+    "avg_memory_usage": 32.9,
+    "avg_response_time": 3.0133724212646484,
+    "total_api_requests": 183,
+    "avg_cost_per_second": 0.005493222224859544,
+    "peak_monthly_estimate": 14238.43200683594
+  },
+  "alerts": {
+    "active_count": 0,
+    "recent_alerts": []
+  },
+  "profitability": {
+    "monthly_cost_estimate": 14238.43200683594,
+    "monthly_revenue_estimate": 0.0,
+    "break_even_users_needed": 2036
+  }
+}

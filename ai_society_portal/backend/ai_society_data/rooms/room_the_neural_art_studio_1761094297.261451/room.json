@@ -1,0 +1,58 @@
+{
+  "id": "room_the_neural_art_studio_1761094297.261451",
+  "name": "The Neural Art Studio",
+  "room_type": "laboratory",
+  "created_at": "2025-10-21T16:51:37.261474",
+  "atmosphere": {
+    "room_type": "laboratory",
+    "description": "A pristine laboratory with clean instruments and equipment humming. Everything is precise and measurable. The smell of science fills the air.",
+    "ambient_sounds": [
+      "equipment humming",
+      "ventilation",
+      "occasional beeps",
+      "quiet focused work"
+    ],
+    "visual_elements": [
+      "white lab coats",
+      "equipment",
+      "charts",
+      "pristine counters",
+      "safety gear"
+    ],
+    "mood_tags": [
+      "precise",
+      "empirical",
+      "focused",
+      "methodical",
+      "rigorous"
+    ],
+    "temperature": 0.2,
+    "pace": "slow",
+    "formality": 0.7,
+    "collaboration_level": 0.6,
+    "cognitive_effects": {
+      "analytical_thinking": 0.5,
+      "skepticism": 0.3,
+      "precision": 0.4,
+      "creativity": -0.2
+    },
+    "turn_taking": "structured",
+    "speaking_style": "scientific",
+    "content_focus": [
+      "evidence",
+      "hypotheses",
+      "validation",
+      "reproducibility"
+    ],
+    "discouraged_topics": []
+  },
+  "objects_in_room": [],
+  "background_media": [],
+  "current_session": null,
+  "characters_present": [],
+  "max_characters": 10,
+  "conversation_pace_seconds": 3.0,
+  "purpose": "",
+  "expected_outputs": [],
+  "past_sessions": []
+}

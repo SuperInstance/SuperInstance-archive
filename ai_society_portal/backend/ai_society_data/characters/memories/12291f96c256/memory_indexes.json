@@ -1,0 +1,31 @@
+{
+  "topic_index": {
+    "consciousness": [
+      "ff96a25be558"
+    ],
+    "hard problem": [
+      "ff96a25be558"
+    ],
+    "philosophy": [
+      "ff96a25be558"
+    ],
+    "artificial intelligence": [
+      "283d996f8246"
+    ],
+    "philosophy of mind": [
+      "283d996f8246"
+    ],
+    "cognition": [
+      "283d996f8246"
+    ]
+  },
+  "character_index": {},
+  "type_index": {
+    "experience": [
+      "ff96a25be558"
+    ],
+    "learning": [
+      "283d996f8246"
+    ]
+  }
+}

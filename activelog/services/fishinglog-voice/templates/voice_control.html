@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Bridge Control</title>
+    <link rel="stylesheet" href="/static/css/voice.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div id="voice-container">
+        <div id="main-panel">
+            <div id="voice-status">
+                <div class="status-indicator" id="listening-indicator">
+                    <div class="indicator-light"></div>
+                    <span>Voice Control</span>
+                </div>
+                <div class="status-indicator" id="confirmation-indicator">
+                    <div class="indicator-light"></div>
+                    <span>Confirmation</span>
+                </div>
+            </div>
+
+            <div id="voice-display">
+                <div id="command-input">
+                    <h3>Voice Input</h3>
+                    <div id="current-command"></div>
+                    <div id="confidence-meter">
+                        <div class="confidence-bar"></div>
+                    </div>
+                </div>
+
+                <div id="confirmation-panel" class="hidden">
+                    <h3>Confirm Command</h3>
+                    <div id="confirmation-text"></div>
+                    <div id="confirmation-buttons">
+                        <button id="confirm-btn" class="confirm-button">CONFIRM</button>
+                        <button id="cancel-btn" class="cancel-button">CANCEL</button>
+                    </div>
+                </div>
+
+                <div id="voice-response">
+                    <h3>System Response</h3>
+                    <div id="response-text"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="control-panel">
+            <div class="panel-section">
+                <h3>Voice Settings</h3>
+                <div class="control-group">
+                    <label>Voice Control:</label>
+                    <button id="voice-toggle" class="toggle-btn">Enable</button>
+                </div>
+                <div class="control-group">
+                    <label>Language:</label>
+                    <select id="language-select">
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Sensitivity:</label>
+                    <input type="range" id="sensitivity-slider" min="0" max="1" step="0.1" value="0.7">
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>System Status</h3>
+                <div id="system-status">
+                    <div class="status-item">
+                        <span>Autopilot:</span>
+                        <span id="autopilot-status">Standby</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Follow Mode:</span>
+                        <span id="follow-status">Disabled</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Noise Level:</span>
+                        <span id="noise-level">Normal</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>Quick Commands</h3>
+                <div id="quick-commands">
+                    <button class="quick-cmd-btn" data-cmd="autopilot status">Autopilot Status</button>
+                    <button class="quick-cmd-btn" data-cmd="show ais layer">Show AIS</button>
+                    <button class="quick-cmd-btn" data-cmd="zoom in">Zoom In</button>
+                    <button class="quick-cmd-btn" data-cmd="night mode on">Night Mode</button>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>Emergency</h3>
+                <button id="emergency-mob" class="emergency-btn">MOB</button>
+                <button id="test-voice" class="test-btn">Test Voice</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="command-log">
+        <h3>Command Log</h3>
+        <div id="log-entries"></div>
+    </div>
+
+    <script src="/static/js/voice.js"></script>
+</body>
+</html>

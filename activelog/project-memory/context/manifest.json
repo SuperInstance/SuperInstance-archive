@@ -1,0 +1,83 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-08-26T12:00:00Z",
+  "concepts": {
+    "CORE-001": {
+      "type": "architecture",
+      "complexity": "medium",
+      "token_count": 450,
+      "dependencies": [],
+      "dependents": ["CORE-002", "CORE-003", "CORE-004", "SVC-001", "AUTH-001"],
+      "tags": ["core", "architecture", "overview"],
+      "priority": "high",
+      "views": {
+        "simple": 50,
+        "advanced": 200,
+        "full": 450
+      }
+    },
+    "AUTH-001": {
+      "type": "service",
+      "complexity": "high", 
+      "token_count": 800,
+      "dependencies": ["CORE-001", "SEC-001"],
+      "dependents": ["AUTH-002", "AUTH-003", "AUTH-004"],
+      "tags": ["auth", "security", "service", "jwt"],
+      "priority": "high",
+      "views": {
+        "simple": 50,
+        "advanced": 200,
+        "full": 800
+      }
+    },
+    "SVC-001": {
+      "type": "pattern",
+      "complexity": "medium",
+      "token_count": 300,
+      "dependencies": ["CORE-001"],
+      "dependents": ["SVC-002", "SVC-003", "SVC-004"],
+      "tags": ["service", "pattern", "template"],
+      "priority": "medium",
+      "views": {
+        "simple": 40,
+        "advanced": 150,
+        "full": 300
+      }
+    }
+  },
+  "aliases": {
+    "STD-AUTH": "AUTH-001",
+    "CORE-ARCH": "CORE-001",
+    "SVC-TEMPLATE": "SVC-001",
+    "JWT-FLOW": "AUTH-002"
+  },
+  "patterns": {
+    "fastapi-service": {
+      "template": "SVC-001",
+      "examples": ["auth", "api-gateway", "metadata"],
+      "token_cost": 100
+    },
+    "react-frontend": {
+      "template": "FE-001", 
+      "examples": ["frontend", "frontend-dmlog"],
+      "token_cost": 80
+    },
+    "database-service": {
+      "template": "DB-001",
+      "examples": ["sqlite", "postgresql"],
+      "token_cost": 60
+    }
+  },
+  "optimization": {
+    "max_context_tokens": 8000,
+    "target_utilization": 0.7,
+    "compression_ratio": 0.8,
+    "cache_hit_rate": 0.85
+  },
+  "usage_stats": {
+    "queries_today": 0,
+    "cache_hits": 0,
+    "cache_misses": 0,
+    "avg_tokens_per_query": 0
+  }
+}

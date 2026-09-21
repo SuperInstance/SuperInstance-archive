@@ -1,0 +1,313 @@
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: default
+  namespace: activelog
+spec:
+  metrics:
+  - providers:
+    - name: prometheus
+  - overrides:
+    - match:
+        metric: ALL_METRICS
+      tagOverrides:
+        request_protocol:
+          operation: UPSERT
+          value: "%{REQUEST_PROTOCOL}"
+        response_code:
+          operation: UPSERT
+          value: "%{RESPONSE_CODE}"
+        source_service:
+          operation: UPSERT
+          value: "%{SOURCE_SERVICE_NAME}"
+        destination_service:
+          operation: UPSERT
+          value: "%{DESTINATION_SERVICE_NAME}"
+        request_id:
+          operation: UPSERT
+          value: "%{REQUEST_ID}"
+---
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: activelog-tracing
+  namespace: activelog
+spec:
+  tracing:
+  - providers:
+    - name: jaeger
+  - customTags:
+      user_id:
+        header:
+          name: x-user-id
+        defaultValue: "anonymous"
+      service_version:
+        environment:
+          name: SERVICE_VERSION
+        defaultValue: "unknown"
+      request_id:
+        header:
+          name: x-request-id
+      correlation_id:
+        header:
+          name: x-correlation-id
+      session_id:
+        header:
+          name: x-session-id
+---
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: activelog-access-logs
+  namespace: activelog
+spec:
+  accessLogging:
+  - providers:
+    - name: otel
+  - format: |
+      {
+        "timestamp": "%START_TIME%",
+        "method": "%REQ(:METHOD)%",
+        "url": "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%",
+        "protocol": "%PROTOCOL%",
+        "response_code": "%RESPONSE_CODE%",
+        "response_flags": "%RESPONSE_FLAGS%",
+        "bytes_received": "%BYTES_RECEIVED%",
+        "bytes_sent": "%BYTES_SENT%",
+        "duration": "%DURATION%",
+        "upstream_service_time": "%RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%",
+        "x_forwarded_for": "%REQ(X-FORWARDED-FOR)%",
+        "user_agent": "%REQ(USER-AGENT)%",
+        "request_id": "%REQ(X-REQUEST-ID)%",
+        "authority": "%REQ(:AUTHORITY)%",
+        "upstream_host": "%UPSTREAM_HOST%",
+        "upstream_cluster": "%UPSTREAM_CLUSTER%",
+        "upstream_local_address": "%UPSTREAM_LOCAL_ADDRESS%",
+        "downstream_local_address": "%DOWNSTREAM_LOCAL_ADDRESS%",
+        "downstream_remote_address": "%DOWNSTREAM_REMOTE_ADDRESS%",
+        "requested_server_name": "%REQUESTED_SERVER_NAME%",
+        "route_name": "%ROUTE_NAME%",
+        "source_service": "%{SOURCE_SERVICE_NAME}%",
+        "destination_service": "%{DESTINATION_SERVICE_NAME}%",
+        "source_version": "%{SOURCE_SERVICE_VERSION}%",
+        "destination_version": "%{DESTINATION_SERVICE_VERSION}%"
+      }
+---
+# Custom metrics for ActiveLog services
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: activelog-custom-metrics
+  namespace: activelog
+spec:
+  metrics:
+  - providers:
+    - name: prometheus
+  - overrides:
+    # Request duration histogram with custom buckets
+    - match:
+        metric: requests_duration
+      operation: MERGE
+      value:
+        buckets: [0.5, 1.0, 2.5, 5.0, 10.0, 25.0, 50.0, 100.0]
+        dimensions:
+          source_service: source.workload.name | "unknown"
+          destination_service: destination.service.name | "unknown"
+          request_protocol: request.protocol | "unknown"
+          response_code: response.code | 200
+          method: request.method | "unknown"
+    # Request count with additional dimensions
+    - match:
+        metric: requests_total
+      operation: MERGE
+      value:
+        dimensions:
+          source_service: source.workload.name | "unknown"
+          destination_service: destination.service.name | "unknown"
+          source_version: source.labels["version"] | "unknown"
+          destination_version: destination.labels["version"] | "unknown"
+          request_protocol: request.protocol | "unknown"
+          response_code: response.code | 200
+          method: request.method | "unknown"
+          user_type: request.headers["x-user-type"] | "anonymous"
+  # Custom metrics for AI services
+  - providers:
+    - name: prometheus
+  - overrides:
+    - match:
+        mode: CLIENT
+        metric: requests_duration
+      operation: MERGE
+      value:
+        dimensions:
+          ai_model: request.headers["x-ai-model"] | "unknown"
+          processing_type: request.headers["x-processing-type"] | "unknown"
+        buckets: [1.0, 5.0, 10.0, 30.0, 60.0, 120.0, 300.0]
+      disabled: false
+      tags:
+        ai_service: "true"
+  # Custom metrics for gaming services
+  - providers:
+    - name: prometheus
+  - overrides:
+    - match:
+        mode: CLIENT
+        metric: requests_total
+      operation: MERGE
+      value:
+        dimensions:
+          game_session: request.headers["x-game-session"] | "unknown"
+          game_mode: request.headers["x-game-mode"] | "unknown"
+          player_count: request.headers["x-player-count"] | "1"
+      disabled: false
+      tags:
+        gaming_service: "true"
+---
+# Distributed tracing sampling
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: istio-tracing-config
+  namespace: istio-system
+data:
+  mesh: |
+    defaultConfig:
+      proxyStatsMatcher:
+        inclusionRegexps:
+        - ".*circuit_breakers.*"
+        - ".*upstream_rq_retry.*"
+        - ".*upstream_rq_pending.*"
+        - ".*_cx_.*"
+        exclusionRegexps:
+        - ".*osconfig.*"
+      tracing:
+        sampling: 1.0  # 100% sampling for development, reduce for production
+        custom_tags:
+          user_id:
+            header:
+              name: x-user-id
+              default_value: "anonymous"
+          service_version:
+            environment:
+              name: SERVICE_VERSION
+              default_value: "v1"
+          request_id:
+            header:
+              name: x-request-id
+          trace_id:
+            header:
+              name: x-trace-id
+---
+# Workload-specific telemetry
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: ai-services-telemetry
+  namespace: activelog
+spec:
+  selector:
+    matchLabels:
+      component: ai
+  metrics:
+  - providers:
+    - name: prometheus
+  - overrides:
+    - match:
+        metric: requests_duration
+      operation: MERGE
+      value:
+        buckets: [0.1, 0.5, 1.0, 5.0, 10.0, 30.0, 60.0, 120.0, 300.0]
+        dimensions:
+          ai_model_type: request.headers["x-model-type"] | "unknown"
+          processing_complexity: request.headers["x-complexity"] | "medium"
+          gpu_usage: request.headers["x-gpu-used"] | "false"
+          batch_size: request.headers["x-batch-size"] | "1"
+---
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: database-telemetry
+  namespace: activelog
+spec:
+  selector:
+    matchLabels:
+      app: activelog-postgres
+  metrics:
+  - providers:
+    - name: prometheus
+  - overrides:
+    - match:
+        metric: tcp_connections
+      operation: MERGE
+      value:
+        dimensions:
+          connection_pool: "postgres"
+          database_name: "activelog"
+    - match:
+        metric: requests_duration
+      operation: MERGE
+      value:
+        buckets: [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0]
+        dimensions:
+          query_type: request.headers["x-query-type"] | "unknown"
+          table_name: request.headers["x-table"] | "unknown"
+---
+# Error tracking and alerting telemetry
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: error-tracking
+  namespace: activelog
+spec:
+  metrics:
+  - providers:
+    - name: prometheus
+  - overrides:
+    - match:
+        metric: requests_total
+      operation: MERGE
+      value:
+        dimensions:
+          error_type: |
+            has(response.code) && response.code >= 400 ?
+              (response.code >= 500 ? "server_error" : "client_error") : "success"
+          error_category: |
+            has(response.code) && response.code >= 400 ?
+              (response.code == 404 ? "not_found" :
+               response.code == 401 ? "unauthorized" :
+               response.code == 403 ? "forbidden" :
+               response.code == 429 ? "rate_limited" :
+               response.code >= 500 ? "internal_error" : "client_error") : "success"
+          service_tier: destination.labels["tier"] | "unknown"
+---
+# Performance monitoring telemetry
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: performance-monitoring
+  namespace: activelog
+spec:
+  metrics:
+  - providers:
+    - name: prometheus
+  - overrides:
+    - match:
+        metric: requests_duration
+      operation: MERGE
+      value:
+        buckets: [0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]
+        dimensions:
+          endpoint_category: |
+            has(request.url_path) ?
+              (request.url_path | regexMatch("^/api/v1/(auth|user).*") ? "auth" :
+               request.url_path | regexMatch("^/api/v1/(ai|ml).*") ? "ai" :
+               request.url_path | regexMatch("^/api/v1/(video|media).*") ? "media" :
+               request.url_path | regexMatch("^/api/v1/(gaming|game).*") ? "gaming" :
+               request.url_path | regexMatch("^/api/v1/(data|file).*") ? "data" :
+               request.url_path | regexMatch("^/api/v1/(sync|p2p).*") ? "sync" :
+               "other") : "unknown"
+          performance_tier: |
+            has(response.duration) ?
+              (response.duration < 100 ? "fast" :
+               response.duration < 1000 ? "normal" :
+               response.duration < 5000 ? "slow" : "very_slow") : "unknown"

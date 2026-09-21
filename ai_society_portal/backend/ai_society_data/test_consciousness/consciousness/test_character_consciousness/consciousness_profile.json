@@ -1,0 +1,161 @@
+{
+  "profile": {
+    "character_id": "test_character_consciousness",
+    "total_score": 0.034999999999999996,
+    "indicator_scores": {
+      "recurrent_processing": {
+        "indicator": "recurrent_processing",
+        "current_score": 0.0,
+        "confidence": 0.0,
+        "trend": -0.1,
+        "last_updated": "2025-10-21T18:52:04.538968",
+        "evidence": []
+      },
+      "role_differentiation": {
+        "indicator": "role_differentiation",
+        "current_score": 0.0,
+        "confidence": 0.5,
+        "trend": -0.2,
+        "last_updated": "2025-10-21T18:52:04.538998",
+        "evidence": []
+      },
+      "agency_detection": {
+        "indicator": "agency_detection",
+        "current_score": 0.0,
+        "confidence": 0.5,
+        "trend": -0.05,
+        "last_updated": "2025-10-21T18:52:04.539023",
+        "evidence": []
+      },
+      "attention_schema": {
+        "indicator": "attention_schema",
+        "current_score": 0.0,
+        "confidence": 0.3,
+        "trend": -0.4,
+        "last_updated": "2025-10-21T18:52:04.539043",
+        "evidence": []
+      },
+      "introspective_access": {
+        "indicator": "introspective_access",
+        "current_score": 0.0,
+        "confidence": 0.6,
+        "trend": -0.75,
+        "last_updated": "2025-10-21T18:52:04.539057",
+        "evidence": []
+      },
+      "metacognition": {
+        "indicator": "metacognition",
+        "current_score": 0.0,
+        "confidence": 0.5,
+        "trend": -0.4,
+        "last_updated": "2025-10-21T18:52:04.539092",
+        "evidence": []
+      },
+      "self_modeling": {
+        "indicator": "self_modeling",
+        "current_score": 0.0,
+        "confidence": 0.5,
+        "trend": 0.0,
+        "last_updated": "2025-10-21T18:52:04.539116",
+        "evidence": []
+      },
+      "narrative_self": {
+        "indicator": "narrative_self",
+        "current_score": 0.0,
+        "confidence": 0.4,
+        "trend": -0.2,
+        "last_updated": "2025-10-21T18:52:04.539141",
+        "evidence": []
+      },
+      "temporal_depth": {
+        "indicator": "temporal_depth",
+        "current_score": 0.0,
+        "confidence": 0.5,
+        "trend": -0.06666666666666667,
+        "last_updated": "2025-10-21T18:52:04.539191",
+        "evidence": [
+          "Past references: 0",
+          "Present references: 0",
+          "Future references: 0"
+        ]
+      },
+      "imagination": {
+        "indicator": "imagination",
+        "current_score": 0.0,
+        "confidence": 0.5,
+        "trend": -0.2,
+        "last_updated": "2025-10-21T18:52:04.539225",
+        "evidence": []
+      },
+      "emotional_complexity": {
+        "indicator": "emotional_complexity",
+        "current_score": 0.0,
+        "confidence": 0.6,
+        "trend": -0.1,
+        "last_updated": "2025-10-21T18:52:04.539234",
+        "evidence": []
+      },
+      "social_cognition": {
+        "indicator": "social_cognition",
+        "current_score": 0.0,
+        "confidence": 0.5,
+        "trend": -0.2,
+        "last_updated": "2025-10-21T18:52:04.539263",
+        "evidence": []
+      },
+      "moral_reasoning": {
+        "indicator": "moral_reasoning",
+        "current_score": 1.0,
+        "confidence": 0.7,
+        "trend": 1.0,
+        "last_updated": "2025-10-21T18:52:04.539284",
+        "evidence": [
+          "Moral reasoning: Important learning experience 9 that should be consolidated...",
+          "Moral reasoning: Important learning experience 6 that should be consolidated...",
+          "Moral reasoning: Important learning experience 3 that should be consolidated...",
+          "Moral reasoning: Important learning experience 8 that should be consolidated...",
+          "Moral reasoning: Important learning experience 5 that should be consolidated...",
+          "Moral reasoning: Important learning experience 2 that should be consolidated...",
+          "Moral reasoning: Important learning experience 10 that should be consolidated...",
+          "Moral reasoning: Important learning experience 7 that should be consolidated...",
+          "Moral reasoning: Important learning experience 4 that should be consolidated...",
+          "Moral reasoning: Important learning experience 1 that should be consolidated..."
+        ]
+      },
+      "volitional_control": {
+        "indicator": "volitional_control",
+        "current_score": 0.0,
+        "confidence": 0.5,
+        "trend": -0.2,
+        "last_updated": "2025-10-21T18:52:04.539308",
+        "evidence": []
+      }
+    },
+    "velocity": -0.12796666666666667,
+    "stability": 0.0,
+    "integration": 0.0,
+    "autobiographical_coherence": 0.0,
+    "identity_continuity": 1.0,
+    "narrative_consistency": 0.0,
+    "last_assessment": "2025-10-21T18:52:04.539361"
+  },
+  "score_history": [
+    {
+      "timestamp": "2025-10-21T18:51:43.173773",
+      "total_score": 0.12433333333333335,
+      "indicator_count": 14
+    },
+    {
+      "timestamp": "2025-10-21T18:52:04.522970",
+      "total_score": 0.16296666666666668,
+      "indicator_count": 14
+    },
+    {
+      "timestamp": "2025-10-21T18:52:04.539323",
+      "total_score": 0.034999999999999996,
+      "indicator_count": 14
+    }
+  ],
+  "evidence_log": [],
+  "last_saved": "2025-10-21T18:52:04.540374"
+}

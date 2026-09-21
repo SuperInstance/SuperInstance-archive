@@ -1,0 +1,96 @@
+[
+  {
+    "role_id": "system_admin",
+    "name": "System Administrator",
+    "description": "Full system access with all permissions",
+    "permissions": [
+      {
+        "resource_type": "*",
+        "permission_level": "owner",
+        "conditions": {}
+      }
+    ],
+    "inherits_from": [],
+    "restrictions": {
+      "requires_mfa": true,
+      "session_timeout": 3600
+    },
+    "created_by": "system",
+    "created_at": "2025-08-24 20:24:47.725022+00:00",
+    "is_system_role": true
+  },
+  {
+    "role_id": "user_admin",
+    "name": "User Administrator",
+    "description": "Manage users and basic permissions",
+    "permissions": [
+      {
+        "resource_type": "user",
+        "permission_level": "admin",
+        "conditions": {}
+      },
+      {
+        "resource_type": "role",
+        "permission_level": "write",
+        "conditions": {}
+      }
+    ],
+    "inherits_from": [],
+    "restrictions": {
+      "requires_approval": true
+    },
+    "created_by": "system",
+    "created_at": "2025-08-24 20:24:47.725031+00:00",
+    "is_system_role": true
+  },
+  {
+    "role_id": "standard_user",
+    "name": "Standard User",
+    "description": "Basic user with limited permissions",
+    "permissions": [
+      {
+        "resource_type": "file",
+        "permission_level": "read",
+        "conditions": {
+          "own_files_only": true
+        }
+      },
+      {
+        "resource_type": "application",
+        "permission_level": "read",
+        "conditions": {
+          "approved_apps_only": true
+        }
+      }
+    ],
+    "inherits_from": [],
+    "restrictions": {
+      "session_timeout": 7200
+    },
+    "created_by": "system",
+    "created_at": "2025-08-24 20:24:47.725032+00:00",
+    "is_system_role": true
+  },
+  {
+    "role_id": "guest",
+    "name": "Guest User",
+    "description": "Minimal access guest account",
+    "permissions": [
+      {
+        "resource_type": "application",
+        "permission_level": "read",
+        "conditions": {
+          "public_apps_only": true
+        }
+      }
+    ],
+    "inherits_from": [],
+    "restrictions": {
+      "session_timeout": 1800,
+      "requires_supervision": true
+    },
+    "created_by": "system",
+    "created_at": "2025-08-24 20:24:47.725033+00:00",
+    "is_system_role": true
+  }
+]

@@ -1,0 +1,114 @@
+{
+  "cli": {
+    "version": ">= 3.13.3"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "resourceClass": "m-medium"
+      },
+      "android": {
+        "resourceClass": "medium"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "ios": {
+        "resourceClass": "m-medium",
+        "simulator": true
+      },
+      "android": {
+        "resourceClass": "medium",
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "ios": {
+        "resourceClass": "m-medium"
+      },
+      "android": {
+        "resourceClass": "medium"
+      }
+    },
+    "personal-log": {
+      "extends": "production",
+      "env": {
+        "APP_VARIANT": "personal-log",
+        "APP_NAME": "PersonalLog",
+        "APP_BUNDLE_ID": "com.activelog.personal",
+        "APP_PACKAGE_NAME": "com.activelog.personal"
+      }
+    },
+    "business-log": {
+      "extends": "production", 
+      "env": {
+        "APP_VARIANT": "business-log",
+        "APP_NAME": "BusinessLog",
+        "APP_BUNDLE_ID": "com.activelog.business",
+        "APP_PACKAGE_NAME": "com.activelog.business"
+      }
+    },
+    "family-log": {
+      "extends": "production",
+      "env": {
+        "APP_VARIANT": "family-log", 
+        "APP_NAME": "FamilyLog",
+        "APP_BUNDLE_ID": "com.activelog.family",
+        "APP_PACKAGE_NAME": "com.activelog.family"
+      }
+    },
+    "fitness-log": {
+      "extends": "production",
+      "env": {
+        "APP_VARIANT": "fitness-log",
+        "APP_NAME": "FitnessLog", 
+        "APP_BUNDLE_ID": "com.activelog.fitness",
+        "APP_PACKAGE_NAME": "com.activelog.fitness"
+      }
+    },
+    "travel-log": {
+      "extends": "production",
+      "env": {
+        "APP_VARIANT": "travel-log",
+        "APP_NAME": "TravelLog",
+        "APP_BUNDLE_ID": "com.activelog.travel",
+        "APP_PACKAGE_NAME": "com.activelog.travel"
+      }
+    },
+    "education-log": {
+      "extends": "production",
+      "env": {
+        "APP_VARIANT": "education-log",
+        "APP_NAME": "EducationLog",
+        "APP_BUNDLE_ID": "com.activelog.education", 
+        "APP_PACKAGE_NAME": "com.activelog.education"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "your-apple-id@example.com",
+        "ascAppId": "1234567890",
+        "appleTeamId": "ABCDEFGHIJ"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./android-service-account-key.json",
+        "track": "production"
+      }
+    },
+    "preview": {
+      "ios": {
+        "appleId": "your-apple-id@example.com",
+        "ascAppId": "1234567890",
+        "appleTeamId": "ABCDEFGHIJ"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./android-service-account-key.json",
+        "track": "internal"
+      }
+    }
+  }
+}

@@ -1,0 +1,360 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway-blue
+  namespace: activelog
+  labels:
+    app: api-gateway
+    version: blue
+    deployment: blue-green
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api-gateway
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+        version: blue
+      annotations:
+        consul.hashicorp.com/connect-inject: "true"
+        consul.hashicorp.com/service-meta-version: "blue"
+        consul.hashicorp.com/service-tags: "activelog,gateway,api,blue"
+    spec:
+      containers:
+      - name: api-gateway
+        image: activelog/api-gateway:v1.0.0
+        ports:
+        - containerPort: 8000
+          name: http
+        - containerPort: 8081
+          name: metrics
+        env:
+        - name: DEPLOYMENT_COLOR
+          value: "blue"
+        - name: VERSION
+          value: "v1.0.0"
+        - name: CONSUL_HOST
+          value: "consul-server"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway-green
+  namespace: activelog
+  labels:
+    app: api-gateway
+    version: green
+    deployment: blue-green
+spec:
+  replicas: 0  # Start with 0 replicas, scale up during deployment
+  selector:
+    matchLabels:
+      app: api-gateway
+      version: green
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+        version: green
+      annotations:
+        consul.hashicorp.com/connect-inject: "true"
+        consul.hashicorp.com/service-meta-version: "green"
+        consul.hashicorp.com/service-tags: "activelog,gateway,api,green"
+    spec:
+      containers:
+      - name: api-gateway
+        image: activelog/api-gateway:v1.1.0
+        ports:
+        - containerPort: 8000
+          name: http
+        - containerPort: 8081
+          name: metrics
+        env:
+        - name: DEPLOYMENT_COLOR
+          value: "green"
+        - name: VERSION
+          value: "v1.1.0"
+        - name: CONSUL_HOST
+          value: "consul-server"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway-blue
+  namespace: activelog
+  labels:
+    app: api-gateway
+    version: blue
+spec:
+  selector:
+    app: api-gateway
+    version: blue
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+  - name: metrics
+    port: 8081
+    targetPort: 8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway-green
+  namespace: activelog
+  labels:
+    app: api-gateway
+    version: green
+spec:
+  selector:
+    app: api-gateway
+    version: green
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+  - name: metrics
+    port: 8081
+    targetPort: 8081
+---
+# Main service for load balancing between blue and green
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+  namespace: activelog
+  labels:
+    app: api-gateway
+  annotations:
+    consul.hashicorp.com/service-name: "api-gateway"
+    consul.hashicorp.com/service-port: "8000"
+    external-dns.alpha.kubernetes.io/hostname: api-gateway.activelog.local
+spec:
+  selector:
+    app: api-gateway
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+  - name: metrics
+    port: 8081
+    targetPort: 8081
+---
+# Auth Service Blue-Green Deployments
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service-blue
+  namespace: activelog
+  labels:
+    app: auth-service
+    version: blue
+    deployment: blue-green
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: auth-service
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: auth-service
+        version: blue
+      annotations:
+        consul.hashicorp.com/connect-inject: "true"
+        consul.hashicorp.com/service-meta-version: "blue"
+        consul.hashicorp.com/service-tags: "activelog,auth,security,blue"
+    spec:
+      containers:
+      - name: auth-service
+        image: activelog/auth-service:v1.0.0
+        ports:
+        - containerPort: 8001
+          name: http
+        - containerPort: 8081
+          name: metrics
+        env:
+        - name: DEPLOYMENT_COLOR
+          value: "blue"
+        - name: VERSION
+          value: "v1.0.0"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "125m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 20
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service-green
+  namespace: activelog
+  labels:
+    app: auth-service
+    version: green
+    deployment: blue-green
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: auth-service
+      version: green
+  template:
+    metadata:
+      labels:
+        app: auth-service
+        version: green
+      annotations:
+        consul.hashicorp.com/connect-inject: "true"
+        consul.hashicorp.com/service-meta-version: "green"
+        consul.hashicorp.com/service-tags: "activelog,auth,security,green"
+    spec:
+      containers:
+      - name: auth-service
+        image: activelog/auth-service:v1.1.0
+        ports:
+        - containerPort: 8001
+          name: http
+        - containerPort: 8081
+          name: metrics
+        env:
+        - name: DEPLOYMENT_COLOR
+          value: "green"
+        - name: VERSION
+          value: "v1.1.0"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "125m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 20
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service-blue
+  namespace: activelog
+  labels:
+    app: auth-service
+    version: blue
+spec:
+  selector:
+    app: auth-service
+    version: blue
+  ports:
+  - name: http
+    port: 8001
+    targetPort: 8001
+  - name: metrics
+    port: 8081
+    targetPort: 8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service-green
+  namespace: activelog
+  labels:
+    app: auth-service
+    version: green
+spec:
+  selector:
+    app: auth-service
+    version: green
+  ports:
+  - name: http
+    port: 8001
+    targetPort: 8001
+  - name: metrics
+    port: 8081
+    targetPort: 8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: activelog
+  labels:
+    app: auth-service
+  annotations:
+    consul.hashicorp.com/service-name: "auth-service"
+    consul.hashicorp.com/service-port: "8001"
+spec:
+  selector:
+    app: auth-service
+  ports:
+  - name: http
+    port: 8001
+    targetPort: 8001
+  - name: metrics
+    port: 8081
+    targetPort: 8081

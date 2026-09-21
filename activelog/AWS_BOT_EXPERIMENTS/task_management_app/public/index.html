@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hierarchical Task Manager</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .auth-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 400px;
+            margin: 0 auto 30px;
+        }
+        
+        .app-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .task-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .task-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .task-column {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 400px;
+        }
+        
+        .task-column h3 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+        
+        .task-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .task-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .task-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .task-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .task-meta {
+            font-size: 12px;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .priority-high { border-left-color: #ff4757; }
+        .priority-medium { border-left-color: #ffa502; }
+        .priority-low { border-left-color: #2ed573; }
+        
+        .real-time-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2ed573;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .real-time-indicator.disconnected {
+            background: #ff4757;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Hierarchical Task Manager</h1>
+            <p>Real-time collaborative task management powered by hierarchical decomposition</p>
+        </div>
+        
+        <!-- Authentication -->
+        <div class="auth-container" id="authContainer">
+            <div class="form-group">
+                <label>Username:</label>
+                <input type="text" id="username" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="password" placeholder="Enter password">
+            </div>
+            <div class="form-group">
+                <label>Email (for registration):</label>
+                <input type="email" id="email" placeholder="Enter email (optional for login)">
+            </div>
+            <button onclick="login()" style="margin-right: 10px;">Login</button>
+            <button onclick="register()">Register</button>
+        </div>
+        
+        <!-- Main App -->
+        <div class="app-container" id="appContainer">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalTasks">0</div>
+                    <div class="stat-label">Total Tasks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completedTasks">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="inProgressTasks">0</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="todoTasks">0</div>
+                    <div class="stat-label">To Do</div>
+                </div>
+            </div>
+            
+            <div class="task-form">
+                <h3>🚀 Create New Task</h3>
+                <div class="form-group">
+                    <label>Task Title:</label>
+                    <input type="text" id="taskTitle" placeholder="What needs to be done?">
+                </div>
+                <div class="form-group">
+                    <label>Description:</label>
+                    <textarea id="taskDescription" placeholder="Task details..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Priority:</label>
+                    <select id="taskPriority">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <button onclick="createTask()">Create Task</button>
+            </div>
+            
+            <div class="task-grid">
+                <div class="task-column">
+                    <h3>📋 To Do</h3>
+                    <div id="todoColumn"></div>
+                </div>
+                <div class="task-column">
+                    <h3>⚡ In Progress</h3>
+                    <div id="inProgressColumn"></div>
+                </div>
+                <div class="task-column">
+                    <h3>✅ Completed</h3>
+                    <div id="completedColumn"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="real-time-indicator" id="connectionStatus">🟢 Connected</div>
+    </div>
+
+    <script>
+        let socket;
+        let currentUser = null;
+        let authToken = null;
+        let tasks = [];
+
+        // Initialize socket connection
+        function initSocket() {
+            socket = io();
+            
+            socket.on('connect', () => {
+                document.getElementById('connectionStatus').innerHTML = '🟢 Connected';
+                document.getElementById('connectionStatus').classList.remove('disconnected');
+            });
+            
+            socket.on('disconnect', () => {
+                document.getElementById('connectionStatus').innerHTML = '🔴 Disconnected';
+                document.getElementById('connectionStatus').classList.add('disconnected');
+            });
+            
+            socket.on('taskCreated', (task) => {
+                tasks.push(task);
+                renderTasks();
+                updateStats();
+            });
+            
+            socket.on('taskUpdated', (updatedTask) => {
+                const index = tasks.findIndex(t => t.id === updatedTask.id);
+                if (index !== -1) {
+                    tasks[index] = { ...tasks[index], ...updatedTask };
+                    renderTasks();
+                    updateStats();
+                }
+            });
+            
+            socket.on('taskDeleted', (data) => {
+                tasks = tasks.filter(t => t.id !== data.id);
+                renderTasks();
+                updateStats();
+            });
+        }
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentUser = data.user;
+                    authToken = data.token;
+                    showApp();
+                    loadTasks();
+                } else {
+                    alert(data.error);
+                }
+            } catch (error) {
+                alert('Login failed');
+            }
+        }
+
+        async function register() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value;
+            
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, email })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentUser = data.user;
+                    authToken = data.token;
+                    showApp();
+                    loadTasks();
+                } else {
+                    alert(data.error);
+                }
+            } catch (error) {
+                alert('Registration failed');
+            }
+        }
+
+        function showApp() {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+        }
+
+        async function loadTasks() {
+            try {
+                const response = await fetch('/api/tasks', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                tasks = await response.json();
+                renderTasks();
+                updateStats();
+            } catch (error) {
+                console.error('Failed to load tasks');
+            }
+        }
+
+        async function createTask() {
+            const title = document.getElementById('taskTitle').value;
+            const description = document.getElementById('taskDescription').value;
+            const priority = document.getElementById('taskPriority').value;
+            
+            if (!title.trim()) {
+                alert('Task title is required');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/tasks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ title, description, priority })
+                });
+                
+                if (response.ok) {
+                    document.getElementById('taskTitle').value = '';
+                    document.getElementById('taskDescription').value = '';
+                    document.getElementById('taskPriority').value = 'medium';
+                } else {
+                    alert('Failed to create task');
+                }
+            } catch (error) {
+                alert('Failed to create task');
+            }
+        }
+
+        async function updateTaskStatus(taskId, newStatus) {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+            
+            try {
+                await fetch(`/api/tasks/${taskId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ ...task, status: newStatus })
+                });
+            } catch (error) {
+                console.error('Failed to update task');
+            }
+        }
+
+        function renderTasks() {
+            const todoColumn = document.getElementById('todoColumn');
+            const inProgressColumn = document.getElementById('inProgressColumn');
+            const completedColumn = document.getElementById('completedColumn');
+            
+            todoColumn.innerHTML = '';
+            inProgressColumn.innerHTML = '';
+            completedColumn.innerHTML = '';
+            
+            tasks.forEach(task => {
+                const taskElement = createTaskElement(task);
+                
+                switch (task.status) {
+                    case 'todo':
+                        todoColumn.appendChild(taskElement);
+                        break;
+                    case 'in_progress':
+                        inProgressColumn.appendChild(taskElement);
+                        break;
+                    case 'completed':
+                        completedColumn.appendChild(taskElement);
+                        break;
+                }
+            });
+        }
+
+        function createTaskElement(task) {
+            const div = document.createElement('div');
+            div.className = `task-card priority-${task.priority}`;
+            div.innerHTML = `
+                <div class="task-title">${task.title}</div>
+                <div class="task-description">${task.description || ''}</div>
+                <div class="task-meta">
+                    <span>Priority: ${task.priority}</span>
+                    <span>${task.assignee_name || 'Unassigned'}</span>
+                </div>
+            `;
+            
+            div.onclick = () => {
+                const newStatus = getNextStatus(task.status);
+                updateTaskStatus(task.id, newStatus);
+            };
+            
+            return div;
+        }
+
+        function getNextStatus(currentStatus) {
+            switch (currentStatus) {
+                case 'todo': return 'in_progress';
+                case 'in_progress': return 'completed';
+                case 'completed': return 'todo';
+                default: return 'todo';
+            }
+        }
+
+        function updateStats() {
+            const total = tasks.length;
+            const completed = tasks.filter(t => t.status === 'completed').length;
+            const inProgress = tasks.filter(t => t.status === 'in_progress').length;
+            const todo = tasks.filter(t => t.status === 'todo').length;
+            
+            document.getElementById('totalTasks').textContent = total;
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('inProgressTasks').textContent = inProgress;
+            document.getElementById('todoTasks').textContent = todo;
+        }
+
+        // Initialize app
+        initSocket();
+    </script>
+</body>
+</html>

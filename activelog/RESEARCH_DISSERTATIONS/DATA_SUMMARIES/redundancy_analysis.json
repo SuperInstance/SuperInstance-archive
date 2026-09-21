@@ -1,0 +1,120 @@
+{
+  "redundancies": [
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/FIREFLY_DEMOCRACY_WHITE_PAPER.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/DR_FIREFLY_RESEARCH_NOTES.md",
+      "similarity_score": 0.8626311188811189,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/FIREFLY_DEMOCRACY_WHITE_PAPER.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/HIERARCHICAL_NEURON_MODULES/HIERARCHICAL_ORGANIZATION_MASTER_DOCUMENT.md",
+      "similarity_score": 0.84272921108742,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/FIREFLY_DEMOCRACY_WHITE_PAPER.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/QUANTUM_FIREFLIES/QUANTUM_FIREFLY_ENTANGLEMENT_DISSERTATION_OUTLINE.md",
+      "similarity_score": 0.9198950007835761,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/FIREFLY_NEURAL_DEMOCRACY_DISSERTATION.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/DR_FIREFLY_RESEARCH_NOTES.md",
+      "similarity_score": 0.8259515570934255,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/FIREFLY_NEURAL_DEMOCRACY_DISSERTATION.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/JSON_NEURAL_NETWORKS/MASTER_DISSERTATION_OUTLINE.md",
+      "similarity_score": 0.8261874803397296,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/FIREFLY_NEURAL_DEMOCRACY_DISSERTATION.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/JSON_NEURAL_NETWORKS/SPARK_AGENTS_FRAMEWORK.md",
+      "similarity_score": 0.8720368239355581,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/DR_FIREFLY_RESEARCH_NOTES.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/HIERARCHICAL_NEURON_MODULES/HIERARCHICAL_ORGANIZATION_MASTER_DOCUMENT.md",
+      "similarity_score": 0.8459415584415584,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/DR_FIREFLY_RESEARCH_NOTES.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/QUANTUM_FIREFLIES/QUANTUM_FIREFLY_ENTANGLEMENT_DISSERTATION_OUTLINE.md",
+      "similarity_score": 0.8012612387612387,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/ROBOTICS_SWARMS/ROBOTIC_FIREFLY_DISSERTATION_OUTLINE.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/CYBERSECURITY_SWARMS/SECURITY_FIREFLY_DISSERTATION_OUTLINE.md",
+      "similarity_score": 0.8061200211491011,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/CYBERSECURITY_SWARMS/SECURITY_FIREFLY_DISSERTATION_OUTLINE.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/QUANTUM_FIREFLIES/QUANTUM_FIREFLY_ENTANGLEMENT_DISSERTATION_OUTLINE.md",
+      "similarity_score": 0.8448320589841616,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/JSON_NEURAL_NETWORKS/BASH_COMMUNICATION_SYSTEM.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/HIERARCHICAL_NEURON_MODULES/RESOLUTION_BASED_PROCESSING.md",
+      "similarity_score": 0.9788597053171044,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/JSON_NEURAL_NETWORKS/DISSERTATION_OUTLINE.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/JSON_NEURAL_NETWORKS/BACONS_LAW_FRAMEWORK.md",
+      "similarity_score": 0.8208493466564181,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/JSON_NEURAL_NETWORKS/KEY_FILENAME_TENSOR_SYSTEM.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/HIERARCHICAL_NEURON_MODULES/ADAPTIVE_TENSOR_POSITIONING.md",
+      "similarity_score": 0.863458110516934,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/JSON_NEURAL_NETWORKS/BACONS_LAW_FRAMEWORK.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/HIERARCHICAL_NEURON_MODULES/ADAPTIVE_TENSOR_POSITIONING.md",
+      "similarity_score": 0.8411987522281639,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/HIERARCHICAL_NEURON_MODULES/CONCEPT_RESOLUTION_TREE_FRAMEWORK.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/HIERARCHICAL_NEURON_MODULES/INTEGRATED_NAVIGATION_SYSTEM.md",
+      "similarity_score": 0.808531746031746,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/HIERARCHICAL_NEURON_MODULES/CONCEPT_RESOLUTION_TREE_FRAMEWORK.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/HIERARCHICAL_NEURON_MODULES/HIERARCHICAL_ORGANIZATION_MASTER_DOCUMENT.md",
+      "similarity_score": 0.9210952500208698,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/HIERARCHICAL_NEURON_MODULES/HIERARCHICAL_ORGANIZATION_MASTER_DOCUMENT.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/HIERARCHICAL_NEURON_MODULES/PROMPT_AS_FOLDERNAME_SYSTEM.md",
+      "similarity_score": 0.8681498240321769,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/HOLOGRAPHIC_INTELLIGENCE/cross_dissertation_integration_summary.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/HOLOGRAPHIC_INTELLIGENCE/holographic_integration_framework.md",
+      "similarity_score": 0.927067153951576,
+      "recommendation": "Consider merging or removing duplicate content"
+    },
+    {
+      "file1": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/SHIPYARD_ECONOMICS/shipyard_integration_summary.md",
+      "file2": "/home/activeloguser/activelog/RESEARCH_DISSERTATIONS/SHIPYARD_ECONOMICS/research_integration_framework.md",
+      "similarity_score": 0.9402684563758389,
+      "recommendation": "Consider merging or removing duplicate content"
+    }
+  ],
+  "analysis_timestamp": "2025-08-30T08:16:30.796667",
+  "threshold_used": 0.8
+}

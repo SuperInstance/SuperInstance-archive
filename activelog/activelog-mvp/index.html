@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PersonalLog Beta</title>
+    <style>
+        body { font-family: Arial; max-width: 600px; margin: 40px auto; padding: 20px; }
+        .container { background: #f0f0f0; padding: 30px; border-radius: 10px; }
+        textarea { width: 100%; padding: 10px; font-size: 16px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; }
+        .entry { background: white; padding: 10px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PersonalLog Beta</h1>
+        <textarea id="entryText" rows="4" placeholder="Write your thoughts..."></textarea>
+        <button onclick="saveEntry()">Save Entry</button>
+        <div id="entries"></div>
+    </div>
+    <script>
+        async function saveEntry() {
+            const text = document.getElementById('entryText').value;
+            await fetch('http://34.223.235.20:8000/api/entry', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({text: text})
+            });
+            document.getElementById('entryText').value = '';
+            loadEntries();
+        }
+        
+        async function loadEntries() {
+            const response = await fetch('http://34.223.235.20:8000/api/entries');
+            const entries = await response.json();
+            document.getElementById('entries').innerHTML = entries.reverse().map(e => 
+                '<div class="entry">' + e.text + '<br><small>' + e.timestamp + '</small></div>'
+            ).join('');
+        }
+        loadEntries();
+    </script>
+</body>
+</html>

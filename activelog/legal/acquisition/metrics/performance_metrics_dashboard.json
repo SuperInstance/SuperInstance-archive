@@ -1,0 +1,484 @@
+{
+  "performance_metrics_overview": {
+    "company": "ActiveLog Technologies, Inc.",
+    "reporting_period": "2024-01-01 to 2024-09-15",
+    "dashboard_version": "3.4",
+    "last_updated": "2024-09-15T10:30:00Z",
+    "kpi_categories": 8,
+    "total_metrics_tracked": 127,
+    "automated_collection": "89%",
+    "real_time_metrics": 67,
+    "data_sources": ["Application telemetry", "Database analytics", "Infrastructure monitoring", "Business systems"]
+  },
+  "business_performance_metrics": {
+    "revenue_metrics": {
+      "annual_recurring_revenue": {
+        "current_arr": 47200000,
+        "growth_rate_yoy": 124.3,
+        "target_arr_2024": 52000000,
+        "projected_achievement": "91%",
+        "trend": "Strong upward trend"
+      },
+      "monthly_recurring_revenue": {
+        "current_mrr": 3933333,
+        "growth_rate_mom": 8.7,
+        "mrr_growth_target": 9.5,
+        "churn_adjusted_growth": 6.2
+      },
+      "average_contract_value": {
+        "enterprise_acv": 206742,
+        "mid_market_acv": 63248,
+        "smb_acv": 15152,
+        "overall_acv": 37859,
+        "acv_growth_yoy": 34.2
+      },
+      "customer_lifetime_value": {
+        "enterprise_ltv": 1456789,
+        "mid_market_ltv": 347823,
+        "smb_ltv": 89456,
+        "overall_ltv": 287456,
+        "ltv_cac_ratio": 4.2
+      }
+    },
+    "customer_metrics": {
+      "total_customers": {
+        "active_customers": 1247,
+        "new_customers_ytd": 456,
+        "customer_growth_rate": 57.8,
+        "target_customers_2024": 1500,
+        "projected_achievement": "83%"
+      },
+      "customer_acquisition": {
+        "customer_acquisition_cost": 2847,
+        "cac_by_channel": {
+          "inbound_marketing": 1245,
+          "outbound_sales": 4567,
+          "referrals": 567,
+          "partnerships": 2134
+        },
+        "cac_payback_period": 8.3,
+        "magic_number": 1.4
+      },
+      "customer_retention": {
+        "gross_retention_rate": 94.2,
+        "net_retention_rate": 127.8,
+        "churn_rate_annual": 5.8,
+        "expansion_rate": 27.8,
+        "contraction_rate": 3.2
+      },
+      "customer_satisfaction": {
+        "net_promoter_score": 67,
+        "customer_satisfaction_score": 4.2,
+        "customer_effort_score": 2.1,
+        "support_satisfaction": 4.4,
+        "product_satisfaction": 4.3
+      }
+    },
+    "sales_performance": {
+      "sales_metrics": {
+        "pipeline_value": 23400000,
+        "win_rate": 23.4,
+        "average_deal_size": 67890,
+        "sales_cycle_length": 67,
+        "quota_attainment": 89.7
+      },
+      "lead_generation": {
+        "total_leads_ytd": 12456,
+        "qualified_leads": 4567,
+        "lead_conversion_rate": 36.7,
+        "cost_per_lead": 89,
+        "lead_velocity": 234
+      },
+      "sales_team_performance": {
+        "total_sales_reps": 23,
+        "reps_at_quota": 17,
+        "top_performer_achievement": 167,
+        "average_ramp_time": 5.2,
+        "rep_productivity": 2.1
+      }
+    }
+  },
+  "operational_performance_metrics": {
+    "product_usage": {
+      "daily_active_users": 8934,
+      "monthly_active_users": 45678,
+      "user_engagement_score": 7.8,
+      "feature_adoption_rate": 67.3,
+      "time_to_first_value": 12.4,
+      "product_stickiness": 19.6
+    },
+    "customer_support": {
+      "support_ticket_volume": {
+        "total_tickets_ytd": 23456,
+        "average_monthly_tickets": 2605,
+        "tickets_by_priority": {
+          "critical": 234,
+          "high": 1456,
+          "medium": 8934,
+          "low": 12832
+        }
+      },
+      "support_performance": {
+        "first_response_time": 2.4,
+        "resolution_time": 18.7,
+        "first_contact_resolution": 78.9,
+        "escalation_rate": 12.3,
+        "support_satisfaction": 4.2
+      },
+      "knowledge_base": {
+        "articles_created": 234,
+        "article_views": 156789,
+        "self_service_rate": 67.8,
+        "article_helpfulness": 4.1,
+        "deflection_rate": 23.4
+      }
+    },
+    "development_velocity": {
+      "feature_delivery": {
+        "features_shipped_ytd": 167,
+        "average_development_time": 23.4,
+        "bug_fix_time": 3.2,
+        "code_review_time": 1.8,
+        "deployment_frequency": 14.2
+      },
+      "code_quality": {
+        "code_coverage": 87.3,
+        "technical_debt_hours": 345,
+        "code_complexity": 3.2,
+        "security_vulnerabilities": 12,
+        "performance_regression_rate": 2.1
+      },
+      "team_productivity": {
+        "story_points_completed": 2456,
+        "velocity_trend": "Stable",
+        "sprint_completion_rate": 89.7,
+        "bug_escape_rate": 5.6,
+        "developer_satisfaction": 4.1
+      }
+    }
+  },
+  "technical_performance_metrics": {
+    "system_performance": {
+      "application_performance": {
+        "average_response_time": 145,
+        "p95_response_time": 289,
+        "p99_response_time": 567,
+        "throughput_rps": 1247,
+        "error_rate": 0.032
+      },
+      "uptime_availability": {
+        "system_uptime": 99.97,
+        "planned_downtime": 2.3,
+        "unplanned_downtime": 0.8,
+        "mttr_minutes": 23.4,
+        "mtbf_hours": 2847
+      },
+      "database_performance": {
+        "query_response_time": 45.6,
+        "database_cpu_usage": 67.8,
+        "database_memory_usage": 72.4,
+        "connection_pool_usage": 45.3,
+        "slow_query_count": 23
+      },
+      "cache_performance": {
+        "cache_hit_ratio": 94.2,
+        "cache_miss_ratio": 5.8,
+        "cache_eviction_rate": 12.3,
+        "average_cache_response": 2.1,
+        "cache_memory_usage": 78.9
+      }
+    },
+    "infrastructure_metrics": {
+      "compute_resources": {
+        "cpu_utilization": 67.3,
+        "memory_utilization": 71.8,
+        "disk_utilization": 45.6,
+        "network_io": 234.5,
+        "auto_scaling_events": 89
+      },
+      "storage_metrics": {
+        "total_storage_used": 2.4,
+        "storage_growth_rate": 23.4,
+        "backup_success_rate": 99.8,
+        "backup_duration": 45.7,
+        "recovery_time_tested": 3.2
+      },
+      "network_performance": {
+        "bandwidth_utilization": 34.5,
+        "network_latency": 12.3,
+        "packet_loss_rate": 0.01,
+        "cdn_hit_ratio": 89.7,
+        "data_transfer_cost": 2340
+      }
+    },
+    "security_metrics": {
+      "security_incidents": {
+        "total_incidents_ytd": 12,
+        "critical_incidents": 0,
+        "high_incidents": 2,
+        "medium_incidents": 6,
+        "low_incidents": 4,
+        "mean_time_to_resolve": 4.2
+      },
+      "vulnerability_management": {
+        "vulnerabilities_discovered": 67,
+        "vulnerabilities_patched": 64,
+        "critical_vulnerabilities": 0,
+        "average_patch_time": 2.3,
+        "security_scan_coverage": 98.7
+      },
+      "access_management": {
+        "failed_login_attempts": 2345,
+        "successful_mfa_authentications": 98.9,
+        "privileged_access_reviews": 12,
+        "access_violations": 3,
+        "password_policy_compliance": 97.8
+      }
+    }
+  },
+  "financial_performance_metrics": {
+    "profitability": {
+      "gross_margin": 78.9,
+      "operating_margin": 12.3,
+      "ebitda_margin": 15.7,
+      "net_margin": 8.9,
+      "contribution_margin": 67.8
+    },
+    "cash_flow": {
+      "operating_cash_flow": 5678000,
+      "free_cash_flow": 4567000,
+      "cash_burn_rate": 234000,
+      "runway_months": 67.8,
+      "cash_conversion_cycle": 23.4
+    },
+    "unit_economics": {
+      "customer_acquisition_cost": 2847,
+      "lifetime_value": 287456,
+      "ltv_cac_ratio": 4.2,
+      "payback_period": 8.3,
+      "gross_margin_per_customer": 28456
+    },
+    "operational_efficiency": {
+      "revenue_per_employee": 704478,
+      "cost_per_customer": 234.56,
+      "support_cost_per_ticket": 45.67,
+      "infrastructure_cost_ratio": 12.3,
+      "sales_efficiency": 2.4
+    }
+  },
+  "employee_performance_metrics": {
+    "workforce_analytics": {
+      "total_employees": 67,
+      "employee_growth_rate": 34.5,
+      "employee_turnover_rate": 8.9,
+      "time_to_fill_positions": 34.5,
+      "employee_satisfaction": 4.2
+    },
+    "productivity_metrics": {
+      "revenue_per_employee": 704478,
+      "profit_per_employee": 62678,
+      "utilization_rate": 78.9,
+      "overtime_hours": 234,
+      "training_hours_per_employee": 45.6
+    },
+    "talent_management": {
+      "internal_promotion_rate": 23.4,
+      "performance_rating_distribution": {
+        "exceptional": 5,
+        "high_performing": 20,
+        "meeting_expectations": 65,
+        "developing": 10,
+        "not_meeting": 0
+      },
+      "skill_gap_assessment": 12.3,
+      "succession_planning_coverage": 78.9
+    }
+  },
+  "marketing_performance_metrics": {
+    "lead_generation": {
+      "marketing_qualified_leads": 4567,
+      "cost_per_lead": 89.45,
+      "lead_conversion_rate": 23.4,
+      "organic_traffic": 234567,
+      "paid_traffic": 89456
+    },
+    "brand_awareness": {
+      "brand_mention_volume": 2345,
+      "sentiment_score": 7.8,
+      "share_of_voice": 12.3,
+      "brand_recognition": 34.5,
+      "thought_leadership_metrics": 4.2
+    },
+    "content_performance": {
+      "blog_traffic": 156789,
+      "content_engagement_rate": 6.7,
+      "email_open_rate": 23.4,
+      "email_click_rate": 4.5,
+      "social_media_engagement": 8.9
+    },
+    "campaign_roi": {
+      "marketing_roi": 4.2,
+      "campaign_attribution": 78.9,
+      "cost_per_acquisition": 2847,
+      "marketing_contribution_to_pipeline": 67.8,
+      "influenced_revenue": 12300000
+    }
+  },
+  "competitive_performance_metrics": {
+    "market_position": {
+      "market_share": 8.9,
+      "competitive_win_rate": 67.8,
+      "competitive_loss_analysis": {
+        "price": 23.4,
+        "features": 34.5,
+        "implementation": 12.3,
+        "support": 8.9,
+        "other": 20.9
+      }
+    },
+    "product_differentiation": {
+      "unique_feature_count": 23,
+      "feature_parity_score": 78.9,
+      "innovation_index": 7.8,
+      "patent_applications": 4,
+      "r_and_d_investment": 2340000
+    }
+  },
+  "trending_and_forecasting": {
+    "growth_trends": {
+      "revenue_growth_trajectory": "Accelerating",
+      "customer_growth_trend": "Strong positive",
+      "market_expansion_rate": 45.6,
+      "product_adoption_curve": "Early majority phase",
+      "seasonality_impact": 12.3
+    },
+    "predictive_metrics": {
+      "revenue_forecast_accuracy": 94.2,
+      "churn_prediction_accuracy": 87.6,
+      "upsell_probability_model": 78.9,
+      "market_demand_prediction": 82.3,
+      "capacity_planning_accuracy": 91.4
+    }
+  },
+  "benchmark_comparisons": {
+    "industry_benchmarks": {
+      "saas_growth_rate": {
+        "activelog_rate": 124.3,
+        "industry_median": 45.6,
+        "industry_top_quartile": 89.7,
+        "percentile_ranking": 95
+      },
+      "customer_retention": {
+        "activelog_rate": 94.2,
+        "industry_median": 87.3,
+        "industry_top_quartile": 92.1,
+        "percentile_ranking": 78
+      },
+      "unit_economics": {
+        "ltv_cac_ratio": {
+          "activelog": 4.2,
+          "industry_benchmark": 3.1,
+          "top_performers": 5.8
+        }
+      }
+    }
+  },
+  "alerts_and_thresholds": {
+    "performance_alerts": [
+      {
+        "metric": "System uptime",
+        "threshold": 99.9,
+        "current_value": 99.97,
+        "status": "Healthy"
+      },
+      {
+        "metric": "Customer churn rate",
+        "threshold": 8.0,
+        "current_value": 5.8,
+        "status": "Healthy"
+      },
+      {
+        "metric": "Response time P95",
+        "threshold": 500,
+        "current_value": 289,
+        "status": "Healthy"
+      },
+      {
+        "metric": "Error rate",
+        "threshold": 0.1,
+        "current_value": 0.032,
+        "status": "Healthy"
+      }
+    ],
+    "business_alerts": [
+      {
+        "metric": "Monthly recurring revenue growth",
+        "threshold": 5.0,
+        "current_value": 8.7,
+        "status": "Healthy"
+      },
+      {
+        "metric": "Customer acquisition cost",
+        "threshold": 4000,
+        "current_value": 2847,
+        "status": "Healthy"
+      }
+    ]
+  },
+  "data_quality_metrics": {
+    "data_completeness": 96.8,
+    "data_accuracy": 98.2,
+    "data_freshness": 99.1,
+    "metric_reliability_score": 94.7,
+    "automated_data_validation": 89.3
+  },
+  "executive_summary_kpis": {
+    "revenue_health": {
+      "status": "Strong",
+      "arr_growth": "124.3% YoY",
+      "trend": "Accelerating"
+    },
+    "customer_health": {
+      "status": "Strong", 
+      "retention_rate": "94.2%",
+      "nps_score": 67
+    },
+    "product_health": {
+      "status": "Good",
+      "uptime": "99.97%",
+      "performance": "Sub-300ms P95"
+    },
+    "team_health": {
+      "status": "Good",
+      "employee_satisfaction": "4.2/5",
+      "turnover": "8.9%"
+    },
+    "financial_health": {
+      "status": "Strong",
+      "gross_margin": "78.9%",
+      "cash_runway": "67.8 months"
+    }
+  },
+  "reporting_configuration": {
+    "update_frequency": {
+      "real_time_metrics": "Every 5 minutes",
+      "hourly_metrics": "Every hour", 
+      "daily_metrics": "Daily at 6 AM UTC",
+      "weekly_metrics": "Mondays at 9 AM UTC",
+      "monthly_metrics": "1st of each month"
+    },
+    "dashboard_access": [
+      "C-level executives",
+      "VPs and Directors",
+      "Department heads",
+      "Board of directors",
+      "Authorized analysts"
+    ],
+    "data_retention": {
+      "real_time_data": "7 days",
+      "historical_data": "5 years",
+      "aggregated_data": "Permanent",
+      "backup_frequency": "Daily"
+    }
+  }
+}

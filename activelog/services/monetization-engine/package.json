@@ -1,0 +1,48 @@
+{
+  "name": "monetization-engine",
+  "version": "1.0.0",
+  "description": "Comprehensive monetization and billing system for ActiveLog platform",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "stripe": "^12.17.0",
+    "axios": "^1.4.0",
+    "moment": "^2.29.4",
+    "node-cron": "^3.0.2",
+    "uuid": "^9.0.0",
+    "joi": "^17.9.2",
+    "helmet": "^7.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "jsonwebtoken": "^9.0.1",
+    "bcryptjs": "^2.4.3",
+    "winston": "^3.10.0",
+    "winston-daily-rotate-file": "^4.7.1",
+    "knex": "^2.5.1",
+    "pg": "^8.11.1",
+    "redis": "^4.6.7",
+    "express-rate-limit": "^6.8.1",
+    "compression": "^1.7.4",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "monetization",
+    "billing",
+    "stripe",
+    "subscription",
+    "payment"
+  ],
+  "author": "ActiveLog Team",
+  "license": "MIT"
+}

@@ -1,0 +1,92 @@
+{
+  "active_puzzles": [
+    {
+      "id": "ssh-timeout-instance",
+      "title": "SSH Timeout to Instance 54.212.119.66",
+      "assigned_bot": "infrastructure",
+      "severity": "high",
+      "created_at": "2025-08-26T18:45:00Z",
+      "details": {
+        "instance_id": "i-00542baaf389823da",
+        "public_ip": "54.212.119.66",
+        "private_ip": "10.0.1.82",
+        "security_group": "sg-05c39709a7b7923c1",
+        "ssh_port_open": true,
+        "instance_state": "running",
+        "attempted_solutions": [
+          "Waited 30+ seconds for boot completion",
+          "Verified security group has SSH access",
+          "Confirmed instance is in running state"
+        ]
+      },
+      "suggested_solutions": [
+        "Try alternative instance i-06149656a24cd0eda (35.85.21.186) which had working SSH",
+        "Check if newer instance needs different SSH key",
+        "Verify route table and internet gateway association",
+        "Check if instance is in different availability zone"
+      ],
+      "blocking": [
+        "k8s-cluster-setup",
+        "container-registry-setup"
+      ],
+      "status": "resolved",
+      "resolution": "Switched to working instance 35.85.21.186",
+      "resolved_at": "2025-08-27T02:54:30.729054+00:00"
+    }
+  ],
+  "future_puzzles": [
+    {
+      "id": "cross-domain-schema-design",
+      "title": "Cross-Domain Database Schema Coordination",
+      "priority": "medium",
+      "estimated_complexity": "high",
+      "description": "Need to coordinate database schemas between fitness, fishing, gaming, and business domains for cross-domain analytics",
+      "involves_bots": [
+        "services",
+        "domains"
+      ],
+      "prerequisite_tasks": [
+        "postgres-cluster",
+        "auth-service-deploy"
+      ]
+    },
+    {
+      "id": "service-mesh-economic-routing",
+      "title": "Istio Service Mesh with Compute Capital Routing",
+      "priority": "medium",
+      "estimated_complexity": "very_high",
+      "description": "Implement intelligent routing based on compute capital economics and resource optimization",
+      "involves_bots": [
+        "infrastructure",
+        "services"
+      ],
+      "prerequisite_tasks": [
+        "k8s-cluster-setup",
+        "istio-installation"
+      ]
+    },
+    {
+      "id": "multi-domain-auth-integration",
+      "title": "Multi-Domain Authentication with Fitness Focus",
+      "priority": "high",
+      "estimated_complexity": "medium",
+      "description": "Ensure auth service works across all domains with special focus on ActiveLog fitness domain for SuperInstance rebranding",
+      "involves_bots": [
+        "services",
+        "domains"
+      ],
+      "prerequisite_tasks": [
+        "auth-service-deploy"
+      ]
+    }
+  ],
+  "solved_puzzles": [
+    {
+      "id": "aws-credentials-access",
+      "title": "AWS Credentials Configuration",
+      "solved_at": "2025-08-26T18:35:00Z",
+      "solution": "Verified activelog-deploy user has proper permissions for account 451523008183",
+      "solved_by": "foreman"
+    }
+  ]
+}

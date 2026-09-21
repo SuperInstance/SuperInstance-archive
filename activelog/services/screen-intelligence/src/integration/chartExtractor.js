@@ -1,0 +1,1 @@
+const EventEmitter = require("events"); module.exports = class ChartExtractor extends EventEmitter { constructor(options = {}) { super(); this.options = options; this.currentChart = null; } async extractFromFrame(frameData) { return null; } getCurrentChart() { return this.currentChart; } async cleanup() {} };

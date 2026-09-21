@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swarm-api
+  namespace: swarm-intelligence
+  labels:
+    app: swarm-api
+    version: v1
+spec:
+  replicas: 20
+  selector:
+    matchLabels:
+      app: swarm-api
+  template:
+    metadata:
+      labels:
+        app: swarm-api
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9091"
+        prometheus.io/path: "/metrics"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - swarm-api
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: swarm-api
+        image: ghcr.io/yourusername/swarm-api:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        - containerPort: 9091
+          name: metrics
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3000"
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: swarm-config
+              key: redis.host
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: swarm-config
+              key: redis.port
+        - name: CORE_SERVICE_URL
+          value: "http://swarm-core:8080"
+        - name: MAX_CONNECTIONS
+          value: "1000"
+        - name: KEEP_ALIVE_TIMEOUT
+          value: "65000"
+        - name: BODY_LIMIT
+          value: "10mb"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: swarm-secrets
+              key: jwt.secret
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 2Gi
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 10"]
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: swarm-api
+  namespace: swarm-intelligence
+  labels:
+    app: swarm-api
+spec:
+  type: ClusterIP
+  selector:
+    app: swarm-api
+  ports:
+  - port: 3000
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  - port: 9091
+    targetPort: 9091
+    protocol: TCP
+    name: metrics
+  sessionAffinity: None

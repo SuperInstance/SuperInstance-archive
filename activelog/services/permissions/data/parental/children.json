@@ -1,0 +1,89 @@
+[
+  {
+    "child_id": "child_3087b1e1a5c2",
+    "name": "Test Child",
+    "date_of_birth": "2015-05-15T00:00:00",
+    "parent_ids": [
+      "parent_001"
+    ],
+    "age_group": "elementary",
+    "safety_level": "moderate",
+    "content_rating": "everyone_10_plus",
+    "supervision_level": "approval_required",
+    "allowed_hours": {
+      "monday": {
+        "start": "07:00",
+        "end": "20:00"
+      },
+      "tuesday": {
+        "start": "07:00",
+        "end": "20:00"
+      },
+      "wednesday": {
+        "start": "07:00",
+        "end": "20:00"
+      },
+      "thursday": {
+        "start": "07:00",
+        "end": "20:00"
+      },
+      "friday": {
+        "start": "07:00",
+        "end": "21:00"
+      },
+      "saturday": {
+        "start": "07:00",
+        "end": "21:00"
+      },
+      "sunday": {
+        "start": "07:00",
+        "end": "20:00"
+      }
+    },
+    "time_limits": {
+      "educational": 120,
+      "games": 60,
+      "video_streaming": 90,
+      "social_media": 0,
+      "total_screen_time": 180
+    },
+    "blocked_categories": [
+      "social_media",
+      "shopping",
+      "adult_content",
+      "violence",
+      "gambling"
+    ],
+    "allowed_websites": [
+      "education.gov",
+      "pbskids.org",
+      "nationalgeographic.kids",
+      "kidshealth.org",
+      "scholastic.com",
+      "funbrain.com"
+    ],
+    "blocked_websites": [
+      "adult-content.com",
+      "gambling-site.com",
+      "violent-games.net",
+      "inappropriate-content.org"
+    ],
+    "allowed_applications": [],
+    "blocked_applications": [],
+    "emergency_contacts": [
+      "parent_001"
+    ],
+    "location_restrictions": [],
+    "requires_approval_for": [
+      "social_media",
+      "app_downloads",
+      "purchases",
+      "location_sharing"
+    ],
+    "is_active": true,
+    "created_at": "2025-08-24T20:28:20.395705+00:00",
+    "metadata": {
+      "age": 10
+    }
+  }
+]

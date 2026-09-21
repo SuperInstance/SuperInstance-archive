@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ActiveLog Edge Device Dashboard</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .header .subtitle {
+            opacity: 0.9;
+            margin-top: 0.25rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+
+        .devices-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .refresh-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .device-list {
+            padding: 1rem;
+        }
+
+        .device-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .device-item:hover {
+            background: #f8f9ff;
+            border-color: #667eea;
+        }
+
+        .device-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .status-online { background: #4caf50; }
+        .status-offline { background: #f44336; }
+        .status-error { background: #ff9800; }
+
+        .device-info {
+            flex: 1;
+        }
+
+        .device-name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .device-details {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .device-type {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            margin-left: 1rem;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .events-list {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .event-item {
+            padding: 0.75rem;
+            border-left: 4px solid #667eea;
+            background: #f8f9ff;
+            margin-bottom: 0.5rem;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .event-time {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .event-text {
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .chart-container {
+            padding: 1rem;
+            height: 200px;
+            position: relative;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .metric-card {
+            background: #f8f9ff;
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .no-devices {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ActiveLog Edge Device Dashboard</h1>
+        <div class="subtitle">Real-time monitoring and management</div>
+    </div>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-number" id="total-devices">-</span>
+                <div class="stat-label">Total Devices</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="online-devices">-</span>
+                <div class="stat-label">Online</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="offline-devices">-</span>
+                <div class="stat-label">Offline</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="device-types">-</span>
+                <div class="stat-label">Device Types</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="devices-section">
+                <div class="section-header">
+                    <h2 class="section-title">Edge Devices</h2>
+                    <button class="refresh-btn" onclick="refreshDevices()">Refresh</button>
+                </div>
+                <div class="device-list" id="device-list">
+                    <div class="loading">Loading devices...</div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <div class="section-header">
+                        <h3 class="section-title">Recent Events</h3>
+                    </div>
+                    <div class="events-list" id="events-list">
+                        <div class="loading">Loading events...</div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-header">
+                        <h3 class="section-title">Network Overview</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="network-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Device Detail Modal -->
+    <div id="device-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDeviceModal()">&times;</span>
+            <h2 id="modal-device-name">Device Details</h2>
+            <div id="modal-device-content">
+                <div class="loading">Loading device details...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let socket;
+        let devices = [];
+        let networkChart;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeWebSocket();
+            loadDashboardData();
+            initializeCharts();
+            
+            // Refresh data every 30 seconds
+            setInterval(loadDashboardData, 30000);
+        });
+
+        function initializeWebSocket() {
+            socket = io();
+            
+            socket.on('connect', function() {
+                console.log('Connected to dashboard');
+            });
+            
+            socket.on('device_update', function(device) {
+                updateDeviceInList(device);
+                updateStats();
+            });
+            
+            socket.on('metrics_update', function(metrics) {
+                // Update charts if device modal is open
+                const modalDevice = document.getElementById('modal-device-name').textContent;
+                if (modalDevice && devices.find(d => d.name === modalDevice)) {
+                    // Refresh device modal with new metrics
+                    const device = devices.find(d => d.name === modalDevice);
+                    if (device) {
+                        showDeviceModal(device.device_id);
+                    }
+                }
+            });
+        }
+
+        async function loadDashboardData() {
+            try {
+                // Load devices
+                const devicesResponse = await fetch('/api/devices');
+                devices = await devicesResponse.json();
+                renderDeviceList();
+                
+                // Load stats
+                const statsResponse = await fetch('/api/stats');
+                const stats = await statsResponse.json();
+                updateStatsDisplay(stats);
+                
+                // Load events
+                const eventsResponse = await fetch('/api/events');
+                const events = await eventsResponse.json();
+                renderEventsList(events);
+                
+            } catch (error) {
+                console.error('Failed to load dashboard data:', error);
+            }
+        }
+
+        function renderDeviceList() {
+            const deviceList = document.getElementById('device-list');
+            
+            if (devices.length === 0) {
+                deviceList.innerHTML = '<div class="no-devices">No devices found</div>';
+                return;
+            }
+            
+            deviceList.innerHTML = devices.map(device => `
+                <div class="device-item" onclick="showDeviceModal('${device.device_id}')">
+                    <div class="device-status status-${device.status}"></div>
+                    <div class="device-info">
+                        <div class="device-name">${device.name}</div>
+                        <div class="device-details">
+                            ${device.ip_address} • Last seen: ${formatTimestamp(device.last_heartbeat)}
+                        </div>
+                    </div>
+                    <div class="device-type">${device.device_type}</div>
+                </div>
+            `).join('');
+        }
+
+        function updateStatsDisplay(stats) {
+            document.getElementById('total-devices').textContent = stats.total_devices;
+            document.getElementById('online-devices').textContent = stats.online_devices;
+            document.getElementById('offline-devices').textContent = stats.offline_devices;
+            document.getElementById('device-types').textContent = Object.keys(stats.device_types).length;
+        }
+
+        function renderEventsList(events) {
+            const eventsList = document.getElementById('events-list');
+            
+            if (events.length === 0) {
+                eventsList.innerHTML = '<div class="no-devices">No recent events</div>';
+                return;
+            }
+            
+            eventsList.innerHTML = events.slice(0, 10).map(event => `
+                <div class="event-item">
+                    <div class="event-time">${formatTimestamp(event.timestamp)}</div>
+                    <div class="event-text">${event.event_type}: ${event.device_id}</div>
+                </div>
+            `).join('');
+        }
+
+        async function showDeviceModal(deviceId) {
+            const modal = document.getElementById('device-modal');
+            const modalContent = document.getElementById('modal-device-content');
+            const modalName = document.getElementById('modal-device-name');
+            
+            modal.style.display = 'block';
+            modalContent.innerHTML = '<div class="loading">Loading device details...</div>';
+            
+            try {
+                const response = await fetch(`/api/devices/${deviceId}`);
+                const data = await response.json();
+                
+                modalName.textContent = data.device.name;
+                renderDeviceDetails(data);
+                
+                // Subscribe to real-time updates for this device
+                socket.emit('subscribe_device', { device_id: deviceId });
+                
+            } catch (error) {
+                modalContent.innerHTML = '<div class="error">Failed to load device details</div>';
+                console.error('Failed to load device details:', error);
+            }
+        }
+
+        function renderDeviceDetails(data) {
+            const { device, metrics, events } = data;
+            const modalContent = document.getElementById('modal-device-content');
+            
+            // Get latest metrics
+            const latestMetrics = metrics.length > 0 ? metrics[0] : {};
+            
+            modalContent.innerHTML = `
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">${latestMetrics.cpu_usage?.toFixed(1) || 'N/A'}%</div>
+                        <div class="metric-label">CPU Usage</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${latestMetrics.memory_usage?.toFixed(1) || 'N/A'}%</div>
+                        <div class="metric-label">Memory Usage</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${latestMetrics.disk_usage?.toFixed(1) || 'N/A'}%</div>
+                        <div class="metric-label">Disk Usage</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${latestMetrics.temperature?.toFixed(1) || 'N/A'}°C</div>
+                        <div class="metric-label">Temperature</div>
+                    </div>
+                </div>
+                
+                <h3>Device Information</h3>
+                <table style="width: 100%; margin: 1rem 0;">
+                    <tr><td><strong>Type:</strong></td><td>${device.device_type}</td></tr>
+                    <tr><td><strong>IP Address:</strong></td><td>${device.ip_address}</td></tr>
+                    <tr><td><strong>MAC Address:</strong></td><td>${device.mac_address || 'N/A'}</td></tr>
+                    <tr><td><strong>Version:</strong></td><td>${device.version || 'N/A'}</td></tr>
+                    <tr><td><strong>Status:</strong></td><td>${device.status}</td></tr>
+                    <tr><td><strong>Location:</strong></td><td>${device.location || 'N/A'}</td></tr>
+                    <tr><td><strong>Group:</strong></td><td>${device.group || 'default'}</td></tr>
+                </table>
+                
+                <h3>Capabilities</h3>
+                <div style="margin: 1rem 0;">
+                    ${device.capabilities.length > 0 ? 
+                        device.capabilities.map(cap => `<span class="device-type">${cap}</span>`).join(' ') :
+                        'No capabilities listed'
+                    }
+                </div>
+                
+                <h3>Recent Events</h3>
+                <div style="max-height: 200px; overflow-y: auto; margin: 1rem 0;">
+                    ${events.length > 0 ? 
+                        events.slice(0, 5).map(event => `
+                            <div class="event-item">
+                                <div class="event-time">${formatTimestamp(event.timestamp)}</div>
+                                <div class="event-text">${event.event_type}</div>
+                            </div>
+                        `).join('') :
+                        '<div class="no-devices">No recent events</div>'
+                    }
+                </div>
+                
+                <h3>Actions</h3>
+                <div style="margin: 1rem 0;">
+                    <button class="refresh-btn" onclick="sendDeviceCommand('${device.device_id}', 'restart')">Restart</button>
+                    <button class="refresh-btn" onclick="sendDeviceCommand('${device.device_id}', 'update')">Update</button>
+                    <button class="refresh-btn" onclick="sendDeviceCommand('${device.device_id}', 'status')">Get Status</button>
+                </div>
+            `;
+        }
+
+        async function sendDeviceCommand(deviceId, command) {
+            try {
+                const response = await fetch(`/api/devices/${deviceId}/command`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command: command })
+                });
+                
+                const result = await response.json();
+                alert(`Command ${command} sent to device. Command ID: ${result.command_id}`);
+                
+            } catch (error) {
+                alert('Failed to send command');
+                console.error('Command failed:', error);
+            }
+        }
+
+        function closeDeviceModal() {
+            document.getElementById('device-modal').style.display = 'none';
+        }
+
+        function refreshDevices() {
+            loadDashboardData();
+        }
+
+        function updateDeviceInList(updatedDevice) {
+            const index = devices.findIndex(d => d.device_id === updatedDevice.device_id);
+            if (index !== -1) {
+                devices[index] = updatedDevice;
+                renderDeviceList();
+            } else {
+                devices.push(updatedDevice);
+                renderDeviceList();
+            }
+        }
+
+        function updateStats() {
+            const stats = {
+                total_devices: devices.length,
+                online_devices: devices.filter(d => d.status === 'online').length,
+                offline_devices: devices.filter(d => d.status === 'offline').length,
+                device_types: {}
+            };
+            
+            devices.forEach(device => {
+                if (!stats.device_types[device.device_type]) {
+                    stats.device_types[device.device_type] = 0;
+                }
+                stats.device_types[device.device_type]++;
+            });
+            
+            updateStatsDisplay(stats);
+        }
+
+        function initializeCharts() {
+            const ctx = document.getElementById('network-chart').getContext('2d');
+            
+            networkChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Online', 'Offline'],
+                    datasets: [{
+                        data: [0, 0],
+                        backgroundColor: ['#4caf50', '#f44336'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            // Update chart with initial data
+            updateNetworkChart();
+        }
+
+        function updateNetworkChart() {
+            if (networkChart && devices.length > 0) {
+                const online = devices.filter(d => d.status === 'online').length;
+                const offline = devices.filter(d => d.status === 'offline').length;
+                
+                networkChart.data.datasets[0].data = [online, offline];
+                networkChart.update();
+            }
+        }
+
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) {
+                return 'Just now';
+            } else if (diff < 3600000) {
+                return `${Math.floor(diff / 60000)}m ago`;
+            } else if (diff < 86400000) {
+                return `${Math.floor(diff / 3600000)}h ago`;
+            } else {
+                return date.toLocaleDateString();
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('device-modal');
+            if (event.target === modal) {
+                closeDeviceModal();
+            }
+        }
+    </script>
+</body>
+</html>

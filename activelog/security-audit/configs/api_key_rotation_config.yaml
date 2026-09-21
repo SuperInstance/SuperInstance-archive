@@ -1,0 +1,23 @@
+api_key_rotation:
+  database:
+    backup_enabled: true
+    backup_interval_hours: 24
+    path: /var/lib/activelog/api_keys.db
+  monitoring:
+    alert_on_suspicious_activity: true
+    log_usage: true
+    usage_stats_retention_days: 90
+  redis:
+    key_prefix: 'activelog:api_keys:'
+    url: redis://localhost:6379
+  rotation:
+    auto_rotation_enabled: true
+    max_key_age_days: 30
+    rotation_interval_hours: 24
+    rotation_window_days: 7
+  security:
+    encryption_enabled: true
+    key_length: 32
+    rate_limiting:
+      burst_limit: 50
+      max_requests_per_hour: 1000

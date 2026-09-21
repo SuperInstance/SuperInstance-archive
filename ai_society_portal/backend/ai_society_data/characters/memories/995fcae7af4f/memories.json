@@ -1,0 +1,170 @@
+{
+  "character_id": "995fcae7af4f",
+  "memories": [
+    {
+      "id": "a8671ac95d68",
+      "content": "Published groundbreaking paper on hippocampal memory formation",
+      "memory_type": "experience",
+      "importance": 10,
+      "timestamp": "2025-10-21T17:02:01.219646",
+      "context": {},
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "hippocampus",
+        "memory formation",
+        "research"
+      ],
+      "emotional_valence": 0.9,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.010000000000000002,
+      "current_strength": 0.9999999992524305
+    },
+    {
+      "id": "af6dbfbf5dbb",
+      "content": "Learned about memory consolidation during sleep through recent research",
+      "memory_type": "learning",
+      "importance": 8,
+      "timestamp": "2025-10-21T17:02:01.220007",
+      "context": {},
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "sleep",
+        "memory consolidation",
+        "neuroscience"
+      ],
+      "emotional_valence": 0.6,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.03,
+      "current_strength": 0.9999999978826389
+    },
+    {
+      "id": "10e382328e97",
+      "content": "Met Prof. Martinez and had fascinating discussion about consciousness",
+      "memory_type": "relationship",
+      "importance": 7,
+      "timestamp": "2025-10-21T17:02:01.222862",
+      "context": {},
+      "related_characters": [
+        "47e82d273492"
+      ],
+      "related_rooms": [],
+      "topics": [
+        "consciousness",
+        "interdisciplinary discussion",
+        "collaboration"
+      ],
+      "emotional_valence": 0.7,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.04000000000000001,
+      "current_strength": 0.9999999984986111
+    },
+    {
+      "id": "d41ab2125d6c",
+      "content": "Learned new philosophical perspectives on consciousness from Prof. Martinez",
+      "memory_type": "learning",
+      "importance": 6,
+      "timestamp": "2025-10-21T17:02:01.223714",
+      "context": {},
+      "related_characters": [
+        "47e82d273492"
+      ],
+      "related_rooms": [],
+      "topics": [
+        "philosophy of mind",
+        "consciousness",
+        "interdisciplinary learning"
+      ],
+      "emotional_valence": 0.5,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.05,
+      "current_strength": 0.9999999986163195
+    },
+    {
+      "id": "1ab6516d17b2",
+      "content": "Need to follow up with Bob about collaboration",
+      "memory_type": "self_reflection",
+      "importance": 3,
+      "timestamp": "2025-10-21T17:02:01.226129",
+      "context": {
+        "source": "working_memory_consolidation"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.08000000000000002,
+      "current_strength": 1.0
+    },
+    {
+      "id": "4e07711e3cfa",
+      "content": "Should read more about philosophical frameworks",
+      "memory_type": "self_reflection",
+      "importance": 3,
+      "timestamp": "2025-10-21T17:02:01.226717",
+      "context": {
+        "source": "working_memory_consolidation"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.08000000000000002,
+      "current_strength": 1.0
+    },
+    {
+      "id": "cdbe010a009c",
+      "content": "My research could benefit from philosophical insights",
+      "memory_type": "self_reflection",
+      "importance": 3,
+      "timestamp": "2025-10-21T17:02:01.227173",
+      "context": {
+        "source": "working_memory_consolidation"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.08000000000000002,
+      "current_strength": 1.0
+    },
+    {
+      "id": "e3858074d0ee",
+      "content": "Interesting connection between memory and consciousness",
+      "memory_type": "self_reflection",
+      "importance": 3,
+      "timestamp": "2025-10-21T17:02:01.227679",
+      "context": {
+        "source": "working_memory_consolidation"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.08000000000000002,
+      "current_strength": 1.0
+    }
+  ],
+  "last_saved": "2025-10-21T17:02:01.227821"
+}

@@ -1,0 +1,83 @@
+{
+  "device_profile": {
+    "device_type": "desktop",
+    "cpu_cores": 12,
+    "memory_gb": 15.17983627319336,
+    "storage_type": "ssd",
+    "network_type": "ethernet",
+    "platform": "linux",
+    "architecture": "x86_64",
+    "performance_tier": "medium"
+  },
+  "service_configs": {
+    "api-gateway": {
+      "max_workers": 4,
+      "memory_limit_mb": 9326,
+      "connection_pool_size": 20,
+      "cache_size_mb": 128,
+      "batch_size": 50,
+      "concurrent_requests": 10,
+      "io_buffer_size": 4096,
+      "fsync_frequency": "normal",
+      "process_priority": "high",
+      "memory_strategy": "aggressive"
+    },
+    "auth": {
+      "max_workers": 2,
+      "memory_limit_mb": 2797,
+      "connection_pool_size": 20,
+      "cache_size_mb": 128,
+      "batch_size": 50,
+      "concurrent_requests": 10,
+      "io_buffer_size": 4096,
+      "fsync_frequency": "normal",
+      "process_priority": "high",
+      "memory_strategy": "aggressive"
+    },
+    "file-sync": {
+      "max_workers": 4,
+      "memory_limit_mb": 9326,
+      "connection_pool_size": 20,
+      "cache_size_mb": 128,
+      "batch_size": 50,
+      "concurrent_requests": 10,
+      "io_buffer_size": 4096,
+      "fsync_frequency": "normal",
+      "process_priority": "high",
+      "memory_strategy": "aggressive"
+    },
+    "ai-orchestrator": {
+      "max_workers": 4,
+      "memory_limit_mb": 13989,
+      "connection_pool_size": 20,
+      "cache_size_mb": 128,
+      "batch_size": 50,
+      "concurrent_requests": 10,
+      "io_buffer_size": 4096,
+      "fsync_frequency": "normal",
+      "process_priority": "high",
+      "memory_strategy": "aggressive",
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    "metadata": {
+      "max_workers": 4,
+      "memory_limit_mb": 9326,
+      "connection_pool_size": 20,
+      "cache_size_mb": 128,
+      "batch_size": 50,
+      "concurrent_requests": 10,
+      "io_buffer_size": 4096,
+      "fsync_frequency": "normal",
+      "process_priority": "high",
+      "memory_strategy": "aggressive"
+    }
+  },
+  "optimization_timestamp": "353127.538689832"
+}

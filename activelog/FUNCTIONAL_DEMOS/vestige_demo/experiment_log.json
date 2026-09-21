@@ -1,0 +1,15 @@
+{
+  "researcher": "vestige_demo",
+  "start_time": "2025-08-30T10:38:39.127193",
+  "objective": "Build working death-rebirth cycle demo",
+  "starting_simple": "Single process that restarts itself with memory",
+  "demo_goal": "Show I=k/P optimization in action",
+  "iteration": 1,
+  "status": "starting_simple",
+  "notes": [],
+  "working_versions": [],
+  "failures": [],
+  "next_steps": [
+    "Single process that restarts itself with memory"
+  ]
+}

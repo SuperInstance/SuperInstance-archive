@@ -1,0 +1,40 @@
+networks:
+  activelog:
+    driver: bridge
+services:
+  nginx:
+    cap_add:
+    - CHOWN
+    - SETGID
+    - SETUID
+    cap_drop:
+    - ALL
+    depends_on:
+    - api-gateway
+    environment:
+      TZ: UTC
+    image: nginx:alpine
+    logging:
+      driver: json-file
+      options:
+        max-file: '3'
+        max-size: 10m
+    networks:
+    - activelog
+    ports:
+    - 80:80
+    - 443:443
+    read_only: true
+    restart: unless-stopped
+    security_opt:
+    - no-new-privileges:true
+    tmpfs:
+    - /var/cache/nginx
+    - /var/run
+    - /var/log/nginx
+    volumes:
+    - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    - ./docker/nginx/ssl.conf:/etc/nginx/conf.d/ssl.conf:ro
+    - ./security-audit/configs/certificates:/etc/nginx/ssl:ro
+    - ./docker/nginx/dhparam.pem:/etc/nginx/ssl/dhparam.pem:ro
+version: '3.8'

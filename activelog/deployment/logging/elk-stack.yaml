@@ -1,0 +1,603 @@
+# Centralized Logging with ELK Stack for ActiveLog Platform
+# Elasticsearch, Logstash, and Kibana deployment for comprehensive log management
+
+# Elasticsearch StatefulSet
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: elasticsearch
+  namespace: activelog-logging
+spec:
+  serviceName: elasticsearch
+  replicas: 3
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+      - name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+        resources:
+          limits:
+            cpu: 2
+            memory: 4Gi
+          requests:
+            cpu: 1
+            memory: 2Gi
+        ports:
+        - containerPort: 9200
+          name: rest
+          protocol: TCP
+        - containerPort: 9300
+          name: inter-node
+          protocol: TCP
+        volumeMounts:
+        - name: data
+          mountPath: /usr/share/elasticsearch/data
+        env:
+        - name: cluster.name
+          value: activelog-cluster
+        - name: node.name
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: discovery.seed_hosts
+          value: "elasticsearch-0.elasticsearch,elasticsearch-1.elasticsearch,elasticsearch-2.elasticsearch"
+        - name: cluster.initial_master_nodes
+          value: "elasticsearch-0,elasticsearch-1,elasticsearch-2"
+        - name: ES_JAVA_OPTS
+          value: "-Xms2g -Xmx2g"
+        - name: xpack.security.enabled
+          value: "false"
+        - name: xpack.monitoring.collection.enabled
+          value: "true"
+      initContainers:
+      - name: fix-permissions
+        image: busybox
+        command: ["sh", "-c", "chown -R 1000:1000 /usr/share/elasticsearch/data"]
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: data
+          mountPath: /usr/share/elasticsearch/data
+      - name: increase-vm-max-map
+        image: busybox
+        command: ["sysctl", "-w", "vm.max_map_count=262144"]
+        securityContext:
+          privileged: true
+      - name: increase-fd-ulimit
+        image: busybox
+        command: ["sh", "-c", "ulimit -n 65536"]
+        securityContext:
+          privileged: true
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      labels:
+        app: elasticsearch
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: fast-ssd
+      resources:
+        requests:
+          storage: 100Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  namespace: activelog-logging
+  labels:
+    app: elasticsearch
+spec:
+  selector:
+    app: elasticsearch
+  clusterIP: None
+  ports:
+    - port: 9200
+      name: rest
+    - port: 9300
+      name: inter-node
+---
+# Kibana Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  namespace: activelog-logging
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+      - name: kibana
+        image: docker.elastic.co/kibana/kibana:8.11.0
+        resources:
+          limits:
+            cpu: 1
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        env:
+        - name: ELASTICSEARCH_HOSTS
+          value: "http://elasticsearch:9200"
+        - name: SERVER_NAME
+          value: "activelog-kibana"
+        - name: SERVER_HOST
+          value: "0.0.0.0"
+        - name: XPACK_SECURITY_ENABLED
+          value: "false"
+        - name: XPACK_MONITORING_UI_CONTAINER_ELASTICSEARCH_ENABLED
+          value: "true"
+        ports:
+        - containerPort: 5601
+        livenessProbe:
+          httpGet:
+            path: /api/status
+            port: 5601
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /api/status
+            port: 5601
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+  namespace: activelog-logging
+spec:
+  selector:
+    app: kibana
+  ports:
+    - port: 5601
+      targetPort: 5601
+  type: ClusterIP
+---
+# Logstash Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+  namespace: activelog-logging
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      containers:
+      - name: logstash
+        image: docker.elastic.co/logstash/logstash:8.11.0
+        resources:
+          limits:
+            cpu: 2
+            memory: 4Gi
+          requests:
+            cpu: 1
+            memory: 2Gi
+        ports:
+        - containerPort: 5044
+          name: beats
+        - containerPort: 5000
+          name: tcp
+        - containerPort: 9600
+          name: http
+        env:
+        - name: LS_JAVA_OPTS
+          value: "-Xmx2g -Xms2g"
+        volumeMounts:
+        - name: logstash-config
+          mountPath: /usr/share/logstash/pipeline
+        - name: logstash-settings
+          mountPath: /usr/share/logstash/config/logstash.yml
+          subPath: logstash.yml
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9600
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9600
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: logstash-config
+        configMap:
+          name: logstash-config
+      - name: logstash-settings
+        configMap:
+          name: logstash-settings
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logstash
+  namespace: activelog-logging
+spec:
+  selector:
+    app: logstash
+  ports:
+    - port: 5044
+      name: beats
+    - port: 5000
+      name: tcp
+    - port: 9600
+      name: http
+---
+# Logstash Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-config
+  namespace: activelog-logging
+data:
+  logstash.conf: |
+    input {
+      beats {
+        port => 5044
+      }
+      
+      tcp {
+        port => 5000
+        codec => json_lines
+      }
+      
+      # Kubernetes logs
+      http {
+        port => 8080
+        codec => "json"
+      }
+    }
+    
+    filter {
+      # Parse Kubernetes logs
+      if [kubernetes] {
+        mutate {
+          add_field => { "service_name" => "%{[kubernetes][labels][app]}" }
+          add_field => { "namespace" => "%{[kubernetes][namespace]}" }
+          add_field => { "pod_name" => "%{[kubernetes][pod][name]}" }
+          add_field => { "container_name" => "%{[kubernetes][container][name]}" }
+        }
+      }
+      
+      # Parse JSON logs
+      if [message] =~ /^\{.*\}$/ {
+        json {
+          source => "message"
+        }
+      }
+      
+      # Parse application logs
+      grok {
+        match => { 
+          "message" => "%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:level} \[%{DATA:service}\] %{GREEDYDATA:log_message}"
+        }
+        tag_on_failure => ["_grok_parse_failure"]
+      }
+      
+      # Parse error logs
+      if [level] == "ERROR" or [level] == "FATAL" {
+        mutate {
+          add_tag => ["error"]
+          add_field => { "alert_level" => "high" }
+        }
+      }
+      
+      # Parse performance metrics
+      if [log_message] =~ /response_time|latency|duration/ {
+        grok {
+          match => { 
+            "log_message" => ".*response_time=(?<response_time>\d+).*"
+          }
+          tag_on_failure => ["_performance_parse_failure"]
+        }
+        if [response_time] {
+          mutate {
+            convert => { "response_time" => "integer" }
+            add_tag => ["performance"]
+          }
+        }
+      }
+      
+      # Security event parsing
+      if [log_message] =~ /authentication|authorization|security|attack|breach/ {
+        mutate {
+          add_tag => ["security"]
+          add_field => { "alert_level" => "critical" }
+        }
+      }
+      
+      # AI/ML service specific parsing
+      if [service_name] =~ /^(ai-|ml-|predictive|cognitive)/ {
+        mutate {
+          add_tag => ["ai-ml"]
+        }
+        
+        # Parse model inference logs
+        grok {
+          match => { 
+            "log_message" => ".*model=(?<model_name>\w+).*inference_time=(?<inference_time>\d+).*accuracy=(?<accuracy>\d+\.\d+).*"
+          }
+          tag_on_failure => ["_ai_parse_failure"]
+        }
+      }
+      
+      # Gaming service specific parsing
+      if [service_name] =~ /^(gaming|dmlog)/ {
+        mutate {
+          add_tag => ["gaming"]
+        }
+        
+        # Parse player activity logs
+        grok {
+          match => { 
+            "log_message" => ".*player_id=(?<player_id>\w+).*session_id=(?<session_id>\w+).*action=(?<player_action>\w+).*"
+          }
+          tag_on_failure => ["_gaming_parse_failure"]
+        }
+      }
+      
+      # Data processing service parsing
+      if [service_name] =~ /^(data-|file-|sync-|batch)/ {
+        mutate {
+          add_tag => ["data-processing"]
+        }
+        
+        # Parse data pipeline metrics
+        grok {
+          match => { 
+            "log_message" => ".*processed_records=(?<processed_records>\d+).*processing_time=(?<processing_time>\d+).*"
+          }
+          tag_on_failure => ["_data_parse_failure"]
+        }
+      }
+      
+      # Add timestamp
+      date {
+        match => [ "timestamp", "ISO8601" ]
+        target => "@timestamp"
+      }
+      
+      # Remove unwanted fields
+      mutate {
+        remove_field => ["host", "agent", "ecs"]
+      }
+    }
+    
+    output {
+      elasticsearch {
+        hosts => ["elasticsearch:9200"]
+        index => "activelog-%{+YYYY.MM.dd}"
+        
+        # Create separate indices for different log types
+        if "error" in [tags] {
+          index => "activelog-errors-%{+YYYY.MM.dd}"
+        } else if "security" in [tags] {
+          index => "activelog-security-%{+YYYY.MM.dd}"
+        } else if "performance" in [tags] {
+          index => "activelog-performance-%{+YYYY.MM.dd}"
+        } else if "ai-ml" in [tags] {
+          index => "activelog-ai-ml-%{+YYYY.MM.dd}"
+        } else if "gaming" in [tags] {
+          index => "activelog-gaming-%{+YYYY.MM.dd}"
+        } else if "data-processing" in [tags] {
+          index => "activelog-data-%{+YYYY.MM.dd}"
+        }
+      }
+      
+      # Output to stdout for debugging
+      stdout {
+        codec => rubydebug
+      }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-settings
+  namespace: activelog-logging
+data:
+  logstash.yml: |
+    http.host: "0.0.0.0"
+    xpack.monitoring.elasticsearch.hosts: [ "http://elasticsearch:9200" ]
+    path.config: /usr/share/logstash/pipeline
+    path.data: /usr/share/logstash/data
+    pipeline.workers: 4
+    pipeline.batch.size: 1000
+    pipeline.batch.delay: 50
+---
+# Filebeat DaemonSet for collecting container logs
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: filebeat
+  namespace: activelog-logging
+spec:
+  selector:
+    matchLabels:
+      app: filebeat
+  template:
+    metadata:
+      labels:
+        app: filebeat
+    spec:
+      serviceAccountName: filebeat
+      terminationGracePeriodSeconds: 30
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: filebeat
+        image: docker.elastic.co/beats/filebeat:8.11.0
+        args: [
+          "-c", "/etc/filebeat.yml",
+          "-e",
+        ]
+        env:
+        - name: ELASTICSEARCH_HOST
+          value: elasticsearch
+        - name: ELASTICSEARCH_PORT
+          value: "9200"
+        - name: LOGSTASH_HOST
+          value: logstash
+        - name: LOGSTASH_PORT
+          value: "5044"
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        securityContext:
+          runAsUser: 0
+        resources:
+          limits:
+            memory: 500Mi
+            cpu: 500m
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        volumeMounts:
+        - name: config
+          mountPath: /etc/filebeat.yml
+          readOnly: true
+          subPath: filebeat.yml
+        - name: data
+          mountPath: /usr/share/filebeat/data
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+        - name: varlog
+          mountPath: /var/log
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          defaultMode: 0640
+          name: filebeat-config
+      - name: varlibdockercontainers
+        hostPath:
+          path: /var/lib/docker/containers
+      - name: varlog
+        hostPath:
+          path: /var/log
+      - name: data
+        hostPath:
+          path: /var/lib/filebeat-data
+          type: DirectoryOrCreate
+---
+# Filebeat Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+  namespace: activelog-logging
+data:
+  filebeat.yml: |
+    filebeat.inputs:
+    - type: container
+      paths:
+        - /var/log/containers/*.log
+      processors:
+        - add_kubernetes_metadata:
+            host: ${NODE_NAME}
+            matchers:
+            - logs_path:
+                logs_path: "/var/log/containers/"
+        - drop_event:
+            when:
+              not:
+                kubernetes.namespace: "activelog"
+    
+    # Additional inputs for specific log files
+    - type: log
+      paths:
+        - /var/log/activelog/*.log
+      fields:
+        logtype: application
+        service: activelog
+    
+    processors:
+    - add_host_metadata:
+        when.not.contains.tags: forwarded
+    - add_docker_metadata: ~
+    - add_kubernetes_metadata: ~
+    
+    # Multiline patterns for stack traces
+    multiline:
+      pattern: '^\s'
+      negate: false
+      match: after
+    
+    output.logstash:
+      hosts: ["${LOGSTASH_HOST}:${LOGSTASH_PORT}"]
+    
+    setup.kibana:
+      host: "kibana:5601"
+    
+    logging.level: info
+    logging.to_files: true
+    logging.files:
+      path: /var/log/filebeat
+      name: filebeat
+      keepfiles: 7
+      permissions: 0644
+---
+# Service Account and RBAC for Filebeat
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: filebeat
+  namespace: activelog-logging
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: filebeat
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources:
+  - namespaces
+  - pods
+  - nodes
+  verbs:
+  - get
+  - watch
+  - list
+- apiGroups: ["apps"]
+  resources:
+    - replicasets
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: filebeat
+subjects:
+- kind: ServiceAccount
+  name: filebeat
+  namespace: activelog-logging
+roleRef:
+  kind: ClusterRole
+  name: filebeat
+  apiGroup: rbac.authorization.k8s.io

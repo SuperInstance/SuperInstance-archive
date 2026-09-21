@@ -1,0 +1,149 @@
+/* Marine Navigation CSS */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #001122;
+    color: #00FFFF;
+    overflow: hidden;
+}
+
+/* Night mode - red light preservation */
+body.night-mode {
+    background: #000;
+    color: #FF0000;
+}
+
+#nav-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+#chart-display {
+    flex: 1;
+    position: relative;
+}
+
+#chart-canvas {
+    width: 100%;
+    height: 100%;
+    background: #001122;
+    border: 2px solid #00FFFF;
+}
+
+#control-panel {
+    width: 300px;
+    background: #002244;
+    border-left: 2px solid #00FFFF;
+    padding: 20px;
+}
+
+.panel-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #004488;
+    border-radius: 5px;
+}
+
+.panel-section h3 {
+    color: #00FFFF;
+    margin-bottom: 10px;
+}
+
+#position-display {
+    font-family: monospace;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#position-display span {
+    display: block;
+    margin: 5px 0;
+}
+
+button {
+    background: #004488;
+    border: 1px solid #00FFFF;
+    color: #00FFFF;
+    padding: 10px 15px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+button:hover {
+    background: #0066AA;
+}
+
+#mob-button {
+    background: #CC0000;
+    color: #FFFFFF;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 20px 40px;
+    border-radius: 10px;
+}
+
+#mob-button:hover {
+    background: #FF0000;
+}
+
+/* Station-specific styles */
+.helm-station {
+    background: #001100;
+}
+
+.nav-station {
+    background: #000011;
+}
+
+.flybridge {
+    background: #110000;
+}
+
+#helm-display, #nav-station-display, #flybridge-display {
+    width: 100%;
+    height: 100vh;
+    padding: 20px;
+}
+
+#compass-display, #speed-display {
+    width: 200px;
+    height: 200px;
+    border: 3px solid #00FF00;
+    border-radius: 50%;
+    margin: 20px auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#ais-list, #radar-controls {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.ais-target {
+    padding: 5px;
+    border-bottom: 1px solid #004488;
+    font-size: 12px;
+}
+
+.ais-target.danger {
+    background: #330000;
+    color: #FF0000;
+}
+
+.ais-target.warning {
+    background: #331100;
+    color: #FFAA00;
+}

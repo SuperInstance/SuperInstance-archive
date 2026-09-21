@@ -1,0 +1,199 @@
+{
+  "meta": {
+    "generated_at": "2025-08-26T23:45:41.002985",
+    "analysis_period": "last_30_days",
+    "total_users": 2541,
+    "active_services": 8
+  },
+  "platform_overview": {
+    "platform_health": {
+      "healthy_services": 8,
+      "total_services": 8,
+      "health_percentage": 100.0,
+      "average_response_time": 27.49,
+      "average_uptime": 99.795
+    },
+    "ai_performance": {
+      "total_ai_queries": 6432,
+      "total_insights_generated": 2462,
+      "insights_per_query": 0.383,
+      "ai_efficiency_score": 8.2
+    },
+    "user_activity": {
+      "daily_active_users": 936,
+      "cross_domain_users": 241,
+      "power_users": 88,
+      "retention_rate": 90.82
+    }
+  },
+  "domain_analytics": {
+    "activelog": "DomainAnalytics(domain='ActiveLog (Fitness & Health)', user_count=172, active_users=419, engagement_score=8.821340340500345, retention_rate=70.47273561016502, conversion_metrics={'trial_to_premium': 18.50237733129707, 'feature_adoption': 57.851901399129815, 'cross_domain_activation': 43.95400405012673}, top_features=['Workout Tracking', 'Nutrition Analysis', 'AI Fitness Insights', 'Goal Setting', 'Progress Analytics'], growth_rate=-1.6514469608756155)",
+    "personallog": "DomainAnalytics(domain='PersonalLog (Productivity)', user_count=272, active_users=328, engagement_score=8.024707233580333, retention_rate=82.5384134052249, conversion_metrics={'trial_to_premium': 12.765232093931104, 'feature_adoption': 60.15343642553472, 'cross_domain_activation': 31.167560511398392}, top_features=['Habit Tracking', 'Productivity Analytics', 'Goal Management', 'Time Optimization', 'Focus Insights'], growth_rate=3.743782936991412)",
+    "fishinglog": "DomainAnalytics(domain='FishingLog (Commercial Intelligence)', user_count=200, active_users=209, engagement_score=8.668830405810997, retention_rate=77.37216303630208, conversion_metrics={'trial_to_premium': 7.837301100203082, 'feature_adoption': 59.363507438175844, 'cross_domain_activation': 42.40881160481472}, top_features=['Weather Predictions', 'Catch Analytics', 'Location Intelligence', 'Commercial Optimization', 'Route Planning'], growth_rate=31.036011369407518)",
+    "dmlog": "DomainAnalytics(domain='DMLog (Creative Campaigns)', user_count=312, active_users=266, engagement_score=9.417061963306104, retention_rate=90.61270001017854, conversion_metrics={'trial_to_premium': 19.210187817415374, 'feature_adoption': 61.4768049001793, 'cross_domain_activation': 57.72153195704399}, top_features=['Campaign Creation', 'Story Generation', 'Character Development', 'World Building', 'Session Planning'], growth_rate=4.622445592589454)",
+    "businesslog": "DomainAnalytics(domain='BusinessLog (Enterprise Analytics)', user_count=473, active_users=647, engagement_score=8.738262314240735, retention_rate=90.12205594451903, conversion_metrics={'trial_to_premium': 11.798486254059439, 'feature_adoption': 52.34888365190066, 'cross_domain_activation': 56.840925409793805}, top_features=['Performance Analytics', 'Cross-Domain Insights', 'Team Productivity', 'ROI Analysis', 'Predictive Modeling'], growth_rate=14.22502383149309)"
+  },
+  "user_behavior": {
+    "session_analytics": {
+      "average_session_duration": 37.87185210578954,
+      "sessions_per_user": 6.029425264591996,
+      "bounce_rate": 20.482716013553095,
+      "peak_usage_hours": [
+        "9-11 AM",
+        "1-3 PM",
+        "7-9 PM"
+      ]
+    },
+    "feature_usage": {
+      "ai_insights_usage": 76.95665628802898,
+      "cross_domain_features": 67.99898298658854,
+      "mobile_vs_desktop": {
+        "mobile": 66.97918325249282,
+        "desktop": 33.91685457819624
+      }
+    },
+    "user_journey": {
+      "onboarding_completion": 80.19170498999313,
+      "feature_discovery_rate": 57.96167333232491,
+      "support_ticket_rate": 3.990209197990238,
+      "user_satisfaction_score": 8.008105450858187
+    },
+    "engagement_patterns": {
+      "daily_active_users": 34.45564835180831,
+      "weekly_active_users": 54.74510522902482,
+      "monthly_active_users": 84.81705276234803,
+      "power_user_percentage": 15.716511680131484
+    }
+  },
+  "cross_domain_insights": [
+    "CrossDomainInsight(domains_involved=['ActiveLog', 'PersonalLog'], insight_type='correlation', correlation_strength=0.73, description='Users who track fitness data show 23% higher productivity scores', recommendation='Promote fitness tracking to productivity users for enhanced outcomes', impact_score=8.2, confidence=0.87)",
+    "CrossDomainInsight(domains_involved=['BusinessLog', 'PersonalLog', 'ActiveLog'], insight_type='multi_domain_optimization', correlation_strength=0.65, description='Team productivity correlates with individual health metrics across organizations', recommendation='Implement corporate wellness programs leveraging SuperInstance cross-domain data', impact_score=9.1, confidence=0.82)",
+    "CrossDomainInsight(domains_involved=['DMLog', 'PersonalLog'], insight_type='creativity_productivity', correlation_strength=0.58, description='Creative session quality improves 40% following structured productivity routines', recommendation='Suggest productivity preparation rituals for creative work sessions', impact_score=7.5, confidence=0.79)",
+    "CrossDomainInsight(domains_involved=['FishingLog', 'BusinessLog'], insight_type='commercial_optimization', correlation_strength=0.84, description='Commercial fishing operations show optimal ROI patterns aligned with specific weather/location combinations', recommendation='Develop predictive commercial optimization features combining fishing intelligence with business analytics', impact_score=9.6, confidence=0.91)",
+    "CrossDomainInsight(domains_involved=['All Domains'], insight_type='platform_synergy', correlation_strength=0.71, description='Users active in 3+ domains show 45% higher lifetime value and 60% lower churn', recommendation='Incentivize cross-domain adoption with unified achievement systems and insights', impact_score=9.8, confidence=0.88)"
+  ],
+  "user_segments": [
+    "UserSegment(segment_id='power_users', name='Power Users', description='Highly engaged users across multiple domains', user_count=370, characteristics={'domains_used': 3.8, 'session_frequency': 'daily', 'feature_adoption': 0.85, 'ai_query_volume': 'high'}, behavior_patterns={'cross_domain_correlation_usage': 0.78, 'advanced_feature_usage': 0.82, 'community_engagement': 0.65, 'feedback_contribution': 0.71}, recommendations=['Provide early access to new features', 'Create power user community programs', 'Offer advanced analytics dashboards', 'Implement referral incentives'])",
+    "UserSegment(segment_id='fitness_focused', name='Fitness Enthusiasts', description='Primary focus on ActiveLog with occasional productivity tracking', user_count=717, characteristics={'primary_domain': 'ActiveLog', 'secondary_domain': 'PersonalLog', 'workout_frequency': '5+ times/week', 'goal_oriented': True}, behavior_patterns={'workout_logging_consistency': 0.89, 'nutrition_tracking': 0.67, 'progress_analytics_usage': 0.78, 'social_sharing': 0.54}, recommendations=['Enhance fitness-productivity correlation insights', 'Develop nutrition-performance tracking', 'Create fitness community challenges', 'Integrate wearable device data'])",
+    "UserSegment(segment_id='business_professionals', name='Business Professionals', description='BusinessLog and PersonalLog users focused on productivity and analytics', user_count=360, characteristics={'primary_domains': ['BusinessLog', 'PersonalLog'], 'role': 'manager/executive', 'team_features_usage': 'high', 'analytics_focus': True}, behavior_patterns={'dashboard_usage': 0.91, 'report_generation': 0.76, 'team_collaboration': 0.83, 'strategic_planning': 0.69}, recommendations=['Develop advanced team analytics', 'Create executive summary reports', 'Implement strategic planning tools', 'Offer business intelligence certifications'])",
+    "UserSegment(segment_id='creative_professionals', name='Creative Professionals', description='DMLog users with cross-over to productivity and business domains', user_count=298, characteristics={'primary_domain': 'DMLog', 'creative_role': True, 'session_length': 'extended', 'story_generation_focus': True}, behavior_patterns={'campaign_creation': 0.87, 'ai_story_generation': 0.74, 'world_building_tools': 0.81, 'collaboration_features': 0.63}, recommendations=['Enhance AI storytelling capabilities', 'Create creative workflow templates', 'Develop collaboration tools for teams', 'Integrate with creative software ecosystems'])",
+    "UserSegment(segment_id='explorers', name='Domain Explorers', description='Users experimenting across domains with moderate engagement', user_count=555, characteristics={'exploration_pattern': 'high', 'domain_switching': 'frequent', 'feature_trial': 'extensive', 'commitment_level': 'moderate'}, behavior_patterns={'domain_switching_frequency': 0.85, 'feature_completion_rate': 0.45, 'tutorial_engagement': 0.72, 'upgrade_consideration': 0.38}, recommendations=['Create guided domain exploration paths', 'Implement progressive feature unlocking', 'Develop domain-bridging tutorials', 'Offer exploration achievement rewards'])"
+  ],
+  "predictive_analytics": {
+    "growth_predictions": {
+      "user_growth_forecast": {
+        "next_month": "+12.5%",
+        "next_quarter": "+38.7%",
+        "next_year": "+156.3%",
+        "confidence": 0.84
+      },
+      "domain_growth_trends": {
+        "ActiveLog": "+15.2%",
+        "BusinessLog": "+22.8%",
+        "PersonalLog": "+18.9%",
+        "DMLog": "+8.7%",
+        "FishingLog": "+11.4%"
+      }
+    },
+    "churn_prediction": {
+      "at_risk_users": 98,
+      "churn_indicators": [
+        "Decreasing session frequency",
+        "Reduced cross-domain usage",
+        "Lower AI query volume",
+        "Minimal feature adoption"
+      ],
+      "retention_strategies": [
+        "Personalized re-engagement campaigns",
+        "Feature recommendation notifications",
+        "Cross-domain insight highlights",
+        "Achievement milestone celebrations"
+      ]
+    },
+    "revenue_forecasting": {
+      "projected_mrr_growth": "+28.4%",
+      "conversion_rate_trends": {
+        "trial_to_paid": "+5.2%",
+        "basic_to_premium": "+12.7%",
+        "cross_domain_upgrades": "+18.9%"
+      },
+      "lifetime_value_prediction": "+34.6%"
+    },
+    "feature_demand_prediction": {
+      "high_demand_features": [
+        "Advanced AI correlations",
+        "Team collaboration tools",
+        "Mobile app enhancements",
+        "Third-party integrations",
+        "Predictive analytics dashboards"
+      ],
+      "emerging_opportunities": [
+        "Voice interaction capabilities",
+        "Augmented reality fitness tracking",
+        "AI-powered content generation",
+        "Blockchain-based achievements"
+      ]
+    }
+  },
+  "recommendations": {
+    "immediate_actions": [
+      {
+        "priority": "High",
+        "action": "Optimize ActiveLog-PersonalLog cross-domain onboarding",
+        "rationale": "73% correlation between fitness and productivity shows untapped synergy",
+        "expected_impact": "15-25% increase in cross-domain adoption",
+        "timeline": "2 weeks"
+      },
+      {
+        "priority": "High",
+        "action": "Implement churn prevention campaigns for at-risk users",
+        "rationale": "Early intervention can improve retention by 40-60%",
+        "expected_impact": "12% reduction in monthly churn",
+        "timeline": "1 week"
+      },
+      {
+        "priority": "Medium",
+        "action": "Enhance BusinessLog team collaboration features",
+        "rationale": "Business professionals show highest engagement with team features",
+        "expected_impact": "20% increase in business segment retention",
+        "timeline": "4 weeks"
+      }
+    ],
+    "strategic_initiatives": [
+      {
+        "initiative": "Cross-Domain Intelligence Platform",
+        "description": "Develop unified analytics that surface insights across all domains",
+        "business_case": "Users with 3+ domains show 45% higher lifetime value",
+        "investment_required": "High",
+        "timeline": "3 months"
+      },
+      {
+        "initiative": "AI-Powered User Journey Optimization",
+        "description": "Implement dynamic user journey personalization using AI insights",
+        "business_case": "Personalized experiences show 35% higher engagement",
+        "investment_required": "Medium",
+        "timeline": "6 weeks"
+      }
+    ],
+    "optimization_opportunities": [
+      {
+        "area": "Mobile Experience",
+        "current_performance": "68% mobile usage",
+        "optimization": "Enhance mobile-specific features and responsiveness",
+        "potential_impact": "10-15% engagement improvement"
+      },
+      {
+        "area": "Onboarding Flow",
+        "current_performance": "78% completion rate",
+        "optimization": "Streamline domain selection and initial setup",
+        "potential_impact": "5-8% improvement in trial conversions"
+      },
+      {
+        "area": "AI Query Experience",
+        "current_performance": "Average 2.3 queries per session",
+        "optimization": "Implement suggested queries and query templates",
+        "potential_impact": "25-40% increase in AI feature usage"
+      }
+    ]
+  }
+}

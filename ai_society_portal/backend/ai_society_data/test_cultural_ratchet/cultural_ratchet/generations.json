@@ -1,0 +1,61 @@
+{
+  "generations": {
+    "1": {
+      "id": 1,
+      "name": "Pioneer Generation",
+      "members": [
+        "alice",
+        "bob",
+        "charlie"
+      ],
+      "start_time": "2025-10-21T18:51:43.175391",
+      "end_time": "2025-10-21T18:52:04.523699",
+      "artifacts_created": [
+        "d3af3eab4a57",
+        "b63666a94dce",
+        "5575ad85cfad",
+        "1502cc38e3d3",
+        "40cf28ed8524",
+        "83956fb5d3b5"
+      ],
+      "knowledge_packages": [],
+      "innovations": [
+        "1502cc38e3d3",
+        "40cf28ed8524"
+      ],
+      "total_cultural_output": 0.0,
+      "average_consciousness": 0.0,
+      "cultural_diversity": 0.6666666666666667
+    },
+    "2": {
+      "id": 2,
+      "name": "Pioneer Generation",
+      "members": [
+        "alice",
+        "bob",
+        "charlie"
+      ],
+      "start_time": "2025-10-21T18:52:04.523700",
+      "end_time": null,
+      "artifacts_created": [
+        "776b0f891d69",
+        "425dcbcf9d36",
+        "6ae73097d554",
+        "62047578569f",
+        "fe1464a4c41e",
+        "c7cc61888603"
+      ],
+      "knowledge_packages": [],
+      "innovations": [
+        "62047578569f",
+        "fe1464a4c41e"
+      ],
+      "total_cultural_output": 0.0,
+      "average_consciousness": 0.0,
+      "cultural_diversity": 0.6666666666666667
+    }
+  },
+  "ratchet_threshold": 0.7,
+  "innovation_threshold": 0.1,
+  "last_saved": "2025-10-21T18:52:04.532340"
+}

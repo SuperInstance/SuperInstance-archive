@@ -1,0 +1,86 @@
+{
+  "device_assessment": {
+    "tier": "high",
+    "cpu_cores": 12,
+    "memory_gb": 15.17983627319336,
+    "platform": "linux",
+    "architecture": "x86_64",
+    "offload_threshold": 0.3,
+    "can_handle_ml": true,
+    "can_handle_image_processing": true,
+    "can_handle_data_processing": true
+  },
+  "cloud_providers": [
+    {
+      "name": "aws_lambda",
+      "endpoint": "https://lambda.us-east-1.amazonaws.com/2015-03-31/functions",
+      "api_key": "YOUR_AWS_KEY",
+      "region": "us-east-1",
+      "capabilities": [
+        "ml_inference",
+        "data_processing",
+        "image_processing",
+        "nlp"
+      ],
+      "cost_per_hour": 1.66e-05,
+      "max_concurrent_tasks": 1000,
+      "latency_ms": 150
+    },
+    {
+      "name": "google_cloud_run",
+      "endpoint": "https://run.googleapis.com/apis/serving.knative.dev/v1",
+      "api_key": "YOUR_GOOGLE_KEY",
+      "region": "us-central1",
+      "capabilities": [
+        "ml_inference",
+        "data_processing",
+        "vision_api",
+        "speech_api"
+      ],
+      "cost_per_hour": 2.4e-05,
+      "max_concurrent_tasks": 200,
+      "latency_ms": 200
+    },
+    {
+      "name": "azure_functions",
+      "endpoint": "https://management.azure.com/subscriptions",
+      "api_key": "YOUR_AZURE_KEY",
+      "region": "eastus",
+      "capabilities": [
+        "ml_inference",
+        "cognitive_services",
+        "data_processing"
+      ],
+      "cost_per_hour": 1.6e-05,
+      "max_concurrent_tasks": 500,
+      "latency_ms": 180
+    },
+    {
+      "name": "edge_compute",
+      "endpoint": "https://edge-compute.activelog.ai/api/v1",
+      "api_key": "EDGE_COMPUTE_KEY",
+      "region": "global",
+      "capabilities": [
+        "lightweight_ml",
+        "data_processing",
+        "caching"
+      ],
+      "cost_per_hour": 1e-05,
+      "max_concurrent_tasks": 50,
+      "latency_ms": 50
+    }
+  ],
+  "offload_rules": {
+    "automatic_offloading": true,
+    "cost_limit_per_hour": 1.0,
+    "bandwidth_limit_mb": 1000,
+    "latency_threshold_ms": 2000,
+    "fallback_enabled": true
+  },
+  "optimization_settings": {
+    "compression_enabled": true,
+    "caching_enabled": true,
+    "batch_processing": true,
+    "priority_queue": true
+  }
+}

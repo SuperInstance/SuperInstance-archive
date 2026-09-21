@@ -1,0 +1,283 @@
+{
+  "name": "data-visualization-plugin",
+  "version": "2.1.0",
+  "display_name": "Data Visualization Plugin",
+  "description": "Create interactive charts, graphs, and dashboards from your ActiveLog data",
+  "author": {
+    "name": "ActiveLog Team",
+    "email": "plugins@activelog.ai",
+    "url": "https://activelog.ai"
+  },
+  "license": "MIT",
+  "keywords": ["visualization", "charts", "graphs", "dashboard", "analytics"],
+  "category": "visualization",
+  "main": "index.js",
+  "runtime": {
+    "type": "typescript",
+    "version": ">=18.0.0",
+    "environment": "node"
+  },
+  "permissions": {
+    "network": {
+      "enabled": true,
+      "domains": ["cdn.plot.ly", "d3js.org", "cdnjs.cloudflare.com"],
+      "ports": [80, 443]
+    },
+    "filesystem": {
+      "read": ["/tmp", "/data/exports"],
+      "write": ["/tmp", "/data/exports"],
+      "temp": true
+    },
+    "database": {
+      "read": true,
+      "write": false,
+      "tables": ["*"]
+    },
+    "services": ["metadata", "analytics"]
+  },
+  "resources": {
+    "cpu": 1.0,
+    "memory": "512MB",
+    "disk": "100MB",
+    "network": "20MB",
+    "timeout": 180
+  },
+  "triggers": [
+    {
+      "type": "user-action",
+      "config": {
+        "action": "create_visualization",
+        "description": "User creates a new visualization"
+      }
+    },
+    {
+      "type": "schedule",
+      "config": {
+        "cron": "0 0 * * *",
+        "description": "Generate daily dashboard reports"
+      }
+    }
+  ],
+  "config": {
+    "schema": {
+      "type": "object",
+      "properties": {
+        "default_chart_library": {
+          "type": "string",
+          "enum": ["plotly", "d3", "chartjs", "highcharts"],
+          "default": "plotly",
+          "description": "Default charting library to use"
+        },
+        "theme": {
+          "type": "object",
+          "properties": {
+            "primary_color": {
+              "type": "string",
+              "default": "#3498db",
+              "description": "Primary color for charts"
+            },
+            "secondary_color": {
+              "type": "string", 
+              "default": "#2ecc71",
+              "description": "Secondary color for charts"
+            },
+            "background_color": {
+              "type": "string",
+              "default": "#ffffff",
+              "description": "Background color"
+            },
+            "text_color": {
+              "type": "string",
+              "default": "#2c3e50",
+              "description": "Text color"
+            },
+            "font_family": {
+              "type": "string",
+              "default": "Arial, sans-serif",
+              "description": "Font family for text"
+            }
+          }
+        },
+        "export_settings": {
+          "type": "object",
+          "properties": {
+            "default_format": {
+              "type": "string",
+              "enum": ["png", "jpg", "svg", "pdf", "html"],
+              "default": "png",
+              "description": "Default export format"
+            },
+            "image_quality": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 90,
+              "description": "Image quality for exports (1-100)"
+            },
+            "include_data": {
+              "type": "boolean",
+              "default": false,
+              "description": "Include raw data in exports"
+            }
+          }
+        },
+        "dashboard_settings": {
+          "type": "object",
+          "properties": {
+            "auto_refresh": {
+              "type": "boolean",
+              "default": true,
+              "description": "Auto-refresh dashboards"
+            },
+            "refresh_interval": {
+              "type": "integer",
+              "minimum": 30,
+              "default": 300,
+              "description": "Refresh interval in seconds"
+            },
+            "max_widgets": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20,
+              "description": "Maximum widgets per dashboard"
+            }
+          }
+        },
+        "data_limits": {
+          "type": "object",
+          "properties": {
+            "max_data_points": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 100000,
+              "default": 10000,
+              "description": "Maximum data points per chart"
+            },
+            "sampling_method": {
+              "type": "string",
+              "enum": ["random", "systematic", "stratified"],
+              "default": "systematic",
+              "description": "Sampling method for large datasets"
+            }
+          }
+        }
+      }
+    },
+    "defaults": {
+      "default_chart_library": "plotly",
+      "theme": {
+        "primary_color": "#3498db",
+        "secondary_color": "#2ecc71",
+        "background_color": "#ffffff",
+        "text_color": "#2c3e50",
+        "font_family": "Arial, sans-serif"
+      },
+      "export_settings": {
+        "default_format": "png",
+        "image_quality": 90,
+        "include_data": false
+      },
+      "dashboard_settings": {
+        "auto_refresh": true,
+        "refresh_interval": 300,
+        "max_widgets": 20
+      },
+      "data_limits": {
+        "max_data_points": 10000,
+        "sampling_method": "systematic"
+      }
+    }
+  },
+  "api": {
+    "endpoints": [
+      {
+        "path": "/charts",
+        "method": "GET",
+        "description": "List all saved charts"
+      },
+      {
+        "path": "/charts",
+        "method": "POST",
+        "description": "Create a new chart"
+      },
+      {
+        "path": "/charts/:id",
+        "method": "GET",
+        "description": "Get chart by ID"
+      },
+      {
+        "path": "/charts/:id",
+        "method": "PUT",
+        "description": "Update chart"
+      },
+      {
+        "path": "/charts/:id",
+        "method": "DELETE",
+        "description": "Delete chart"
+      },
+      {
+        "path": "/charts/:id/export",
+        "method": "POST",
+        "description": "Export chart to file"
+      },
+      {
+        "path": "/dashboards",
+        "method": "GET",
+        "description": "List all dashboards"
+      },
+      {
+        "path": "/dashboards",
+        "method": "POST",
+        "description": "Create new dashboard"
+      },
+      {
+        "path": "/dashboards/:id",
+        "method": "GET",
+        "description": "Get dashboard by ID"
+      },
+      {
+        "path": "/templates",
+        "method": "GET",
+        "description": "List chart templates"
+      },
+      {
+        "path": "/data/:source",
+        "method": "GET",
+        "description": "Get data from source for visualization"
+      }
+    ]
+  },
+  "ui": {
+    "settings": "settings.html",
+    "dashboard": "dashboard.html",
+    "icon": "chart-icon.svg"
+  },
+  "dependencies": {
+    "npm": {
+      "@types/d3": "^7.4.0",
+      "d3": "^7.8.5",
+      "plotly.js": "^2.26.0",
+      "chart.js": "^4.4.0",
+      "canvas": "^2.11.2",
+      "puppeteer": "^21.4.1",
+      "sharp": "^0.32.6",
+      "lodash": "^4.17.21",
+      "moment": "^2.29.4"
+    }
+  },
+  "compatibility": {
+    "activelog_version": ">=2.0.0",
+    "os": ["linux", "macos", "windows"],
+    "arch": ["x64", "arm64"]
+  },
+  "marketplace": {
+    "pricing": {
+      "model": "freemium",
+      "price": 19.99,
+      "currency": "USD"
+    },
+    "featured": true,
+    "verified": true
+  }
+}

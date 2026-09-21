@@ -1,0 +1,42 @@
+
+🎵 RADIO THEATER SOUND EFFECTS GUIDE
+===================================
+
+REQUIRED SOUND EFFECTS:
+You can find these on freesound.org or similar:
+
+🏠 TAVERN ATMOSPHERE:
+- Crackling fireplace (continuous background)
+- Rain outside (gentle, atmospheric)
+- Distant tavern murmur (very quiet)
+
+🌊 OCEAN/BOAT SOUNDS:
+- Gentle waves lapping
+- Boat creaking (subtle)
+- Seagull calls (distant)
+- Water ambiance
+
+⚡ SYSTEM CHAOS:
+- Electronic glitching: bzzt-click-whirr-BUZZ
+- Computer error sounds
+- System startup/shutdown chimes
+- Gentle electronic hums
+
+🎵 MUSICAL ELEMENTS:
+- Casey's seven impossible notes (mystical, beautiful)
+- Transition music between scenes
+- Closing theme music
+
+📻 RADIO THEATER ASSEMBLY:
+1. Import all generated MP3 segments
+2. Layer background sounds underneath dialogue
+3. Add sound effects at specified moments
+4. Balance levels: dialogue prominent, effects supporting
+5. Add music transitions between major scenes
+
+RECOMMENDED FREE TOOLS:
+- Audacity (free, cross-platform)
+- GarageBand (Mac)
+- Reaper (free trial, then $60)
+
+Your radio theater will be 12-15 minutes of compelling audio! 📻

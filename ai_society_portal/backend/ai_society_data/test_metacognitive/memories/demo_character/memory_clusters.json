@@ -1,0 +1,46 @@
+{
+  "character_id": "demo_character",
+  "clusters": [
+    {
+      "id": "406f4ef1",
+      "name": "Learning Memories",
+      "topic": "learning",
+      "memory_ids": [
+        "eece0377648b"
+      ],
+      "created_at": "2025-10-21T19:21:25.333928",
+      "importance": 6
+    },
+    {
+      "id": "e7669617",
+      "name": "Uncertainty Memories",
+      "topic": "uncertainty",
+      "memory_ids": [
+        "eece0377648b"
+      ],
+      "created_at": "2025-10-21T19:21:25.333933",
+      "importance": 6
+    },
+    {
+      "id": "e18924a9",
+      "name": "Confidence Memories",
+      "topic": "confidence",
+      "memory_ids": [
+        "e063b5a649f9"
+      ],
+      "created_at": "2025-10-21T19:21:25.334407",
+      "importance": 5
+    },
+    {
+      "id": "76298628",
+      "name": "Social Memories",
+      "topic": "social",
+      "memory_ids": [
+        "e063b5a649f9"
+      ],
+      "created_at": "2025-10-21T19:21:25.334410",
+      "importance": 5
+    }
+  ],
+  "last_saved": "2025-10-21T19:21:25.334640"
+}

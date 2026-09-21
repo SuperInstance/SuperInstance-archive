@@ -1,0 +1,36 @@
+{
+  "character_id": "7c1acdf47952",
+  "clusters": [
+    {
+      "id": "fc2ff7e4",
+      "name": "Chemistry Memories",
+      "topic": "chemistry",
+      "memory_ids": [
+        "cee82acb837d"
+      ],
+      "created_at": "2025-10-21T17:09:36.631258",
+      "importance": 8
+    },
+    {
+      "id": "814302f6",
+      "name": "Safety Memories",
+      "topic": "safety",
+      "memory_ids": [
+        "cee82acb837d"
+      ],
+      "created_at": "2025-10-21T17:09:36.631261",
+      "importance": 8
+    },
+    {
+      "id": "80cefc6a",
+      "name": "Radioactivity Memories",
+      "topic": "radioactivity",
+      "memory_ids": [
+        "cee82acb837d"
+      ],
+      "created_at": "2025-10-21T17:09:36.631264",
+      "importance": 8
+    }
+  ],
+  "last_saved": "2025-10-21T17:09:36.631429"
+}

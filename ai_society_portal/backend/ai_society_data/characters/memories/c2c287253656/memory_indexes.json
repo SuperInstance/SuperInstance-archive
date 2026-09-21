@@ -1,0 +1,31 @@
+{
+  "topic_index": {
+    "hippocampus": [
+      "c99ea4bff947"
+    ],
+    "memory formation": [
+      "c99ea4bff947"
+    ],
+    "research": [
+      "c99ea4bff947"
+    ],
+    "sleep": [
+      "b8ae66415c3f"
+    ],
+    "memory consolidation": [
+      "b8ae66415c3f"
+    ],
+    "neuroscience": [
+      "b8ae66415c3f"
+    ]
+  },
+  "character_index": {},
+  "type_index": {
+    "experience": [
+      "c99ea4bff947"
+    ],
+    "learning": [
+      "b8ae66415c3f"
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "character_id": "c2c287253656",
+  "memories": [
+    {
+      "id": "c99ea4bff947",
+      "content": "Published groundbreaking paper on hippocampal memory formation",
+      "memory_type": "experience",
+      "importance": 10,
+      "timestamp": "2025-10-21T17:01:47.384571",
+      "context": {},
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "hippocampus",
+        "memory formation",
+        "research"
+      ],
+      "emotional_valence": 0.9,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.010000000000000002,
+      "current_strength": 1.0
+    },
+    {
+      "id": "b8ae66415c3f",
+      "content": "Learned about memory consolidation during sleep through recent research",
+      "memory_type": "learning",
+      "importance": 8,
+      "timestamp": "2025-10-21T17:01:47.385342",
+      "context": {},
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "sleep",
+        "memory consolidation",
+        "neuroscience"
+      ],
+      "emotional_valence": 0.6,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.03,
+      "current_strength": 1.0
+    }
+  ],
+  "last_saved": "2025-10-21T17:01:47.385443"
+}

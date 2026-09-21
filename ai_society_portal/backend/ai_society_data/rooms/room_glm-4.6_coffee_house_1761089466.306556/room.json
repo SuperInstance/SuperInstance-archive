@@ -1,0 +1,57 @@
+{
+  "id": "room_glm-4.6_coffee_house_1761089466.306556",
+  "name": "GLM-4.6 Coffee House",
+  "room_type": "coffee_house",
+  "created_at": "2025-10-21T15:31:06.306581",
+  "atmosphere": {
+    "room_type": "coffee_house",
+    "description": "A cozy coffee house with the smell of fresh coffee. Comfortable seating, warm lighting. People work on laptops or chat casually over espresso.",
+    "ambient_sounds": [
+      "espresso machine",
+      "light chatter",
+      "music playing softly",
+      "laptop typing"
+    ],
+    "visual_elements": [
+      "comfortable chairs",
+      "small tables",
+      "artwork on walls",
+      "warm lighting",
+      "coffee bar"
+    ],
+    "mood_tags": [
+      "casual",
+      "comfortable",
+      "social",
+      "productive",
+      "relaxed"
+    ],
+    "temperature": 0.6,
+    "pace": "moderate",
+    "formality": 0.2,
+    "collaboration_level": 0.5,
+    "cognitive_effects": {
+      "social_comfort": 0.4,
+      "productivity": 0.2,
+      "openness": 0.3
+    },
+    "turn_taking": "natural",
+    "speaking_style": "casual",
+    "content_focus": [
+      "casual conversation",
+      "light work",
+      "networking",
+      "stories"
+    ],
+    "discouraged_topics": []
+  },
+  "objects_in_room": [],
+  "background_media": [],
+  "current_session": null,
+  "characters_present": [],
+  "max_characters": 10,
+  "conversation_pace_seconds": 3.0,
+  "purpose": "",
+  "expected_outputs": [],
+  "past_sessions": []
+}

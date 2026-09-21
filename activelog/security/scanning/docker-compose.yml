@@ -1,0 +1,335 @@
+version: '3.8'
+
+services:
+  vulnerability-scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: activelog-vulnerability-scanner
+    ports:
+      - "8089:8089"
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=activelog_security
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=4
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./configs:/app/configs:ro
+      - ./reports:/app/reports
+      - scan_cache:/tmp/scan_cache
+    depends_on:
+      - postgres
+      - redis
+      - trivy
+    networks:
+      - scanning_network
+    restart: unless-stopped
+    privileged: true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8089/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: activelog-scanning-db
+    environment:
+      - POSTGRES_DB=activelog_security
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - scanning_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: activelog-scanning-redis
+    command: redis-server --appendonly yes --maxmemory 1g --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - scanning_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  trivy:
+    image: aquasec/trivy:latest
+    container_name: activelog-trivy
+    command: ["server", "--listen", "0.0.0.0:4954"]
+    ports:
+      - "4954:4954"
+    volumes:
+      - trivy_cache:/root/.cache/trivy
+    networks:
+      - scanning_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:4954/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.celery
+    container_name: activelog-scan-worker
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=activelog_security
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - TRIVY_SERVER_URL=http://trivy:4954
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./reports:/app/reports
+      - scan_cache:/tmp/scan_cache
+    depends_on:
+      - redis
+      - postgres
+      - trivy
+    networks:
+      - scanning_network
+    restart: unless-stopped
+    privileged: true
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile.celery
+    container_name: activelog-scan-scheduler
+    command: celery -A vulnerability_scanner beat --loglevel=info
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=activelog_security
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - scanning_network
+    restart: unless-stopped
+
+  clair:
+    image: quay.io/coreos/clair:latest
+    container_name: activelog-clair
+    ports:
+      - "6060:6060"
+      - "6061:6061"
+    environment:
+      - CLAIR_CONF=/config/config.yaml
+      - CLAIR_MODE=combo
+    volumes:
+      - ./clair/config.yaml:/config/config.yaml:ro
+      - clair_data:/var/lib/clair
+    depends_on:
+      - clair-db
+    networks:
+      - scanning_network
+    restart: unless-stopped
+
+  clair-db:
+    image: postgres:15-alpine
+    container_name: activelog-clair-db
+    environment:
+      - POSTGRES_DB=clair
+      - POSTGRES_USER=clair
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - clair_db_data:/var/lib/postgresql/data
+    networks:
+      - scanning_network
+    restart: unless-stopped
+
+  zap:
+    image: zaproxy/zap-stable:latest
+    container_name: activelog-zap
+    ports:
+      - "8080:8080"
+      - "8090:8090"
+    command: ["zap-webswing.sh"]
+    volumes:
+      - zap_data:/zap/wrk
+    networks:
+      - scanning_network
+    restart: unless-stopped
+
+  sonarqube:
+    image: sonarqube:community
+    container_name: activelog-sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://sonar-db:5432/sonar
+      - SONAR_JDBC_USERNAME=sonar
+      - SONAR_JDBC_PASSWORD=password
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_extensions:/opt/sonarqube/extensions
+    depends_on:
+      - sonar-db
+    networks:
+      - scanning_network
+    restart: unless-stopped
+
+  sonar-db:
+    image: postgres:15-alpine
+    container_name: activelog-sonar-db
+    environment:
+      - POSTGRES_DB=sonar
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - sonar_db_data:/var/lib/postgresql/data
+    networks:
+      - scanning_network
+    restart: unless-stopped
+
+  scanning-dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: activelog-scanning-dashboard
+    ports:
+      - "3003:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8089
+      - REACT_APP_TRIVY_URL=http://localhost:4954
+      - REACT_APP_ZAP_URL=http://localhost:8080
+      - REACT_APP_SONAR_URL=http://localhost:9000
+    depends_on:
+      - vulnerability-scanner
+    networks:
+      - scanning_network
+    restart: unless-stopped
+
+  report-generator:
+    build:
+      context: ./reporting
+      dockerfile: Dockerfile
+    container_name: activelog-scan-reporter
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=activelog_security
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - REPORT_SCHEDULE=0 6 * * *  # Daily at 6 AM
+      - EMAIL_SMTP_HOST=${EMAIL_SMTP_HOST}
+      - EMAIL_USERNAME=${EMAIL_USERNAME}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - EMAIL_FROM=${EMAIL_FROM}
+      - SECURITY_RECIPIENTS=${SECURITY_RECIPIENTS:-security@activelog.com}
+    volumes:
+      - ./templates:/app/templates:ro
+      - ./reports:/app/reports
+    depends_on:
+      - postgres
+      - vulnerability-scanner
+    networks:
+      - scanning_network
+    restart: unless-stopped
+
+  registry-scanner:
+    build:
+      context: ./registry-scanner
+      dockerfile: Dockerfile
+    container_name: activelog-registry-scanner
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=activelog_security
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - REGISTRY_URL=${REGISTRY_URL:-registry.activelog.com}
+      - REGISTRY_USERNAME=${REGISTRY_USERNAME}
+      - REGISTRY_PASSWORD=${REGISTRY_PASSWORD}
+      - SCAN_SCHEDULE=0 2 * * *  # Daily at 2 AM
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - registry_cache:/tmp/registry_cache
+    depends_on:
+      - postgres
+      - trivy
+    networks:
+      - scanning_network
+    restart: unless-stopped
+
+  k8s-scanner:
+    build:
+      context: ./k8s-scanner
+      dockerfile: Dockerfile
+    container_name: activelog-k8s-scanner
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=activelog_security
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - KUBECONFIG=/etc/kubeconfig/config
+    volumes:
+      - ${KUBECONFIG:-~/.kube/config}:/etc/kubeconfig/config:ro
+      - k8s_reports:/app/reports
+    depends_on:
+      - postgres
+      - vulnerability-scanner
+    networks:
+      - scanning_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  trivy_cache:
+    driver: local
+  clair_data:
+    driver: local
+  clair_db_data:
+    driver: local
+  zap_data:
+    driver: local
+  sonarqube_data:
+    driver: local
+  sonarqube_logs:
+    driver: local
+  sonarqube_extensions:
+    driver: local
+  sonar_db_data:
+    driver: local
+  scan_cache:
+    driver: local
+  registry_cache:
+    driver: local
+  k8s_reports:
+    driver: local
+
+networks:
+  scanning_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/16

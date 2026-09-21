@@ -1,0 +1,123 @@
+{
+  "web_development": {
+    "rest_api": {
+      "components": [
+        "setup_framework",
+        "create_routes",
+        "add_middleware",
+        "database_integration",
+        "authentication",
+        "testing"
+      ],
+      "estimated_time_minutes": 120,
+      "complexity_score": 7,
+      "reuse_count": 0
+    },
+    "react_dashboard": {
+      "components": [
+        "setup_react",
+        "create_components",
+        "state_management",
+        "api_integration",
+        "styling",
+        "responsive_design"
+      ],
+      "estimated_time_minutes": 180,
+      "complexity_score": 8,
+      "reuse_count": 0
+    },
+    "task_00b2536a": {
+      "description": "Build a REST API with authentication and database integration",
+      "components": [
+        "setup_framework",
+        "create_routes",
+        "add_middleware",
+        "database_integration",
+        "authentication",
+        "testing"
+      ],
+      "estimated_time_minutes": 102.0,
+      "complexity_score": 5,
+      "reuse_count": 1,
+      "success_rate": 1.0,
+      "created_date": "2025-08-30T15:34:24.365972"
+    },
+    "task_baf7eacf": {
+      "description": "Create a React dashboard with real-time data updates",
+      "components": [
+        "setup_react",
+        "create_components",
+        "state_management",
+        "api_integration",
+        "styling",
+        "responsive_design"
+      ],
+      "estimated_time_minutes": 138.0,
+      "complexity_score": 7,
+      "reuse_count": 1,
+      "success_rate": 1.0,
+      "created_date": "2025-08-30T15:34:54.824833"
+    },
+    "task_10790981": {
+      "description": "Build a web-based task management system with real-time collaboration",
+      "components": [
+        "setup_framework",
+        "create_routes",
+        "add_middleware",
+        "database_integration",
+        "authentication",
+        "testing"
+      ],
+      "estimated_time_minutes": 138.0,
+      "complexity_score": 7,
+      "reuse_count": 1,
+      "success_rate": 1.0,
+      "created_date": "2025-08-30T15:58:10.649650"
+    }
+  },
+  "data_science": {
+    "ml_pipeline": {
+      "components": [
+        "data_ingestion",
+        "preprocessing",
+        "feature_engineering",
+        "model_training",
+        "validation",
+        "deployment"
+      ],
+      "estimated_time_minutes": 240,
+      "complexity_score": 9,
+      "reuse_count": 0
+    },
+    "task_e69e101a": {
+      "description": "Build a machine learning pipeline with A/B testing and model deployment",
+      "components": [
+        "data_ingestion",
+        "preprocessing",
+        "feature_engineering",
+        "model_training",
+        "validation",
+        "deployment"
+      ],
+      "estimated_time_minutes": 138.0,
+      "complexity_score": 7,
+      "reuse_count": 1,
+      "success_rate": 1.0,
+      "created_date": "2025-08-30T15:34:59.925343"
+    }
+  },
+  "devops": {
+    "ci_cd_pipeline": {
+      "components": [
+        "git_setup",
+        "build_automation",
+        "testing_pipeline",
+        "deployment_automation",
+        "monitoring"
+      ],
+      "estimated_time_minutes": 90,
+      "complexity_score": 6,
+      "reuse_count": 0
+    }
+  }
+}

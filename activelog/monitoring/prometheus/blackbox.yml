@@ -1,0 +1,176 @@
+# Blackbox Exporter Configuration
+modules:
+  http_2xx:
+    prober: http
+    timeout: 5s
+    http:
+      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+      valid_status_codes: [200, 201, 202]
+      method: GET
+      headers:
+        Host: vhost.example.com
+        Accept-Language: en-US
+      no_follow_redirects: false
+      fail_if_ssl: false
+      fail_if_not_ssl: false
+      tls_config:
+        insecure_skip_verify: false
+      preferred_ip_protocol: "ip4"
+
+  http_post_2xx:
+    prober: http
+    timeout: 5s
+    http:
+      method: POST
+      headers:
+        Content-Type: application/json
+      body: '{}'
+
+  http_basic_auth_example:
+    prober: http
+    timeout: 5s
+    http:
+      method: POST
+      headers:
+        Host: "login.example.com"
+      basic_auth:
+        username: "username"
+        password: "mysecret"
+
+  http_custom_ca_example:
+    prober: http
+    http:
+      method: GET
+      tls_config:
+        ca_file: "/certs/my_cert.crt"
+
+  tcp_connect:
+    prober: tcp
+    timeout: 5s
+
+  pop3s_banner:
+    prober: tcp
+    tcp:
+      query_response:
+        - expect: "^+OK"
+      tls: true
+      tls_config:
+        insecure_skip_verify: false
+
+  grpc:
+    prober: grpc
+    timeout: 5s
+
+  grpc_plain:
+    prober: grpc
+    grpc:
+      tls: false
+      service: "service1"
+
+  ssh_banner:
+    prober: tcp
+    timeout: 5s
+    tcp:
+      query_response:
+        - expect: "^SSH-2.0-"
+        - send: "SSH-2.0-blackbox-ssh-check"
+
+  irc_banner:
+    prober: tcp
+    timeout: 5s
+    tcp:
+      query_response:
+        - send: "NICK prober"
+        - send: "USER prober prober prober :prober"
+        - expect: "PING :([^ ]+)"
+          send: "PONG ${1}"
+        - expect: "^:[^ ]+ 001"
+
+  icmp:
+    prober: icmp
+    timeout: 5s
+    icmp:
+      preferred_ip_protocol: "ip4"
+      source_ip_address: "127.0.0.1"
+
+  dns_udp_example:
+    prober: dns
+    timeout: 5s
+    dns:
+      query_name: "www.prometheus.io"
+      query_type: "A"
+      valid_rcodes:
+      - NOERROR
+      validate_answer_rrs:
+        fail_if_matches_regexp:
+        - ".*127.0.0.1"
+        fail_if_all_match_regexp:
+        - ".*127.0.0.1"
+        fail_if_not_matches_regexp:
+        - "www.prometheus.io.\t300\tIN\tA\t.*"
+        fail_if_none_matches_regexp:
+        - "127.0.0.1"
+
+  dns_soa:
+    prober: dns
+    dns:
+      query_name: "prometheus.io"
+      query_type: "SOA"
+
+  dns_tcp_example:
+    prober: dns
+    dns:
+      transport_protocol: "tcp"
+      preferred_ip_protocol: "ip4"
+      query_name: "www.prometheus.io"
+      query_type: "A"
+
+  # GraphQL specific probe
+  graphql_check:
+    prober: http
+    timeout: 5s
+    http:
+      method: POST
+      headers:
+        Content-Type: application/json
+      body: '{"query": "query { health { status } }"}'
+      valid_status_codes: [200]
+      fail_if_body_not_matches_regexp:
+        - '"status":\s*"OK"'
+
+  # Mobile API health check
+  mobile_api_check:
+    prober: http
+    timeout: 5s
+    http:
+      method: GET
+      valid_status_codes: [200]
+      fail_if_body_not_matches_regexp:
+        - '"status":\s*"OK"'
+
+  # Redis connectivity check
+  redis_check:
+    prober: tcp
+    timeout: 5s
+    tcp:
+      query_response:
+        - send: "*1\r\n$4\r\nPING\r\n"
+        - expect: "+PONG"
+
+  # PostgreSQL connectivity check
+  postgres_check:
+    prober: tcp
+    timeout: 5s
+
+  # WebSocket check
+  websocket_check:
+    prober: http
+    timeout: 5s
+    http:
+      method: GET
+      headers:
+        Upgrade: websocket
+        Connection: Upgrade
+        Sec-WebSocket-Key: "x3JJHMbDL1EzLkh9GBhXDw=="
+        Sec-WebSocket-Version: "13"
+      valid_status_codes: [101]

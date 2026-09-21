@@ -1,0 +1,564 @@
+/* Passage Layout Specific Styles */
+
+.passage-layout .layout-container {
+    grid-template-areas: 
+        "chart weather watchkeeping"
+        "status status status";
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 1fr auto;
+}
+
+.passage-layout .chart-main {
+    grid-area: chart;
+}
+
+.passage-layout .weather-panel {
+    grid-area: weather;
+    background: var(--marine-panel-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.passage-layout .watchkeeping-panel {
+    grid-area: watchkeeping;
+    background: var(--marine-panel-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.passage-layout .status-bar {
+    grid-area: status;
+}
+
+/* Track History */
+.track-history {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.track-line {
+    position: absolute;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--track-color) 20%, 
+        var(--track-color) 80%, 
+        transparent 100%);
+    opacity: 0.7;
+    border-radius: 1px;
+}
+
+.track-points {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.track-point {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: var(--track-color);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 6px var(--track-color);
+}
+
+.track-point.waypoint {
+    width: 8px;
+    height: 8px;
+    background: var(--waypoint-color);
+    box-shadow: 0 0 8px var(--waypoint-color);
+}
+
+.track-point.current {
+    animation: currentPosition 2s infinite;
+}
+
+@keyframes currentPosition {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.3); }
+}
+
+/* Weather Routes */
+.weather-routes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.weather-route {
+    position: absolute;
+    height: 2px;
+    border: 1px dashed var(--marine-warning);
+    opacity: 0.6;
+}
+
+.weather-route.optimal {
+    border-color: var(--marine-success);
+    opacity: 0.8;
+}
+
+/* Weather Panel Extended */
+.weather-routing-extended {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--marine-border);
+}
+
+.weather-routing-extended h4 {
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+.route-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm);
+    background: var(--marine-darker-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.route-option:hover {
+    background: var(--marine-panel-bg);
+    border-color: var(--marine-accent);
+}
+
+.route-option.selected {
+    background: rgba(0, 168, 255, 0.1);
+    border-color: var(--marine-accent);
+}
+
+.route-option-info {
+    flex: 1;
+}
+
+.route-option-name {
+    color: var(--marine-text);
+    font-weight: bold;
+    font-size: var(--font-size-small);
+    margin-bottom: var(--spacing-xs);
+}
+
+.route-option-details {
+    color: var(--marine-text-secondary);
+    font-size: var(--font-size-small);
+}
+
+.route-option-metrics {
+    text-align: right;
+    font-size: var(--font-size-small);
+}
+
+.route-metric {
+    margin-bottom: var(--spacing-xs);
+}
+
+.route-metric.time {
+    color: var(--marine-accent);
+    font-weight: bold;
+}
+
+.route-metric.distance {
+    color: var(--marine-text-secondary);
+}
+
+.route-metric.weather {
+    color: var(--marine-warning);
+}
+
+.extended-forecast {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--marine-border);
+}
+
+.extended-forecast h4 {
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+.forecast-chart {
+    height: 150px;
+    background: var(--marine-darker-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.forecast-timeline-extended {
+    display: flex;
+    justify-content: space-between;
+    height: 100%;
+    align-items: end;
+}
+
+.forecast-bar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    margin: 0 1px;
+}
+
+.wind-bar {
+    background: var(--marine-accent);
+    width: 100%;
+    margin-bottom: var(--spacing-xs);
+    border-radius: 2px 2px 0 0;
+    min-height: 10px;
+}
+
+.wave-bar {
+    background: var(--marine-warning);
+    width: 100%;
+    border-radius: 0 0 2px 2px;
+    min-height: 5px;
+}
+
+.forecast-time {
+    font-size: var(--font-size-small);
+    color: var(--marine-text-secondary);
+    transform: rotate(-45deg);
+    margin-top: var(--spacing-xs);
+}
+
+.weather-alerts-extended {
+    padding: var(--spacing-md);
+}
+
+.weather-alerts-extended h4 {
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+.alert-item-extended {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background: var(--marine-darker-bg);
+    border-radius: var(--radius-sm);
+    border-left: 4px solid var(--marine-warning);
+    margin-bottom: var(--spacing-sm);
+}
+
+.alert-item-extended.severe {
+    border-left-color: var(--marine-danger);
+}
+
+.alert-item-extended.info {
+    border-left-color: var(--marine-accent);
+}
+
+.alert-severity {
+    font-weight: bold;
+    color: var(--marine-warning);
+    font-size: var(--font-size-small);
+    margin-bottom: var(--spacing-xs);
+}
+
+.alert-severity.severe {
+    color: var(--marine-danger);
+}
+
+.alert-severity.info {
+    color: var(--marine-accent);
+}
+
+/* Watchkeeping Panel */
+.current-watch {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--marine-border);
+}
+
+.current-watch h4 {
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+.watch-officer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    background: var(--marine-darker-bg);
+    border: 2px solid var(--marine-success);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.officer-info {
+    flex: 1;
+}
+
+.officer-name {
+    font-weight: bold;
+    color: var(--marine-text);
+    font-size: var(--font-size-medium);
+    margin-bottom: var(--spacing-xs);
+}
+
+.watch-time {
+    color: var(--marine-text-secondary);
+    font-size: var(--font-size-small);
+}
+
+.officer-status {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--marine-success);
+    color: white;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-small);
+    font-weight: bold;
+}
+
+.watch-schedule {
+    margin-bottom: var(--spacing-lg);
+}
+
+.schedule-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm);
+    background: var(--marine-panel-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-small);
+}
+
+.schedule-item.next {
+    background: rgba(0, 168, 255, 0.1);
+    border-color: var(--marine-accent);
+}
+
+.schedule-time {
+    color: var(--marine-text);
+    font-weight: bold;
+}
+
+.schedule-officer {
+    color: var(--marine-text-secondary);
+}
+
+.watch-log {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--marine-border);
+}
+
+.watch-log h4 {
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+.log-entry {
+    padding: var(--spacing-sm);
+    background: var(--marine-darker-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-small);
+}
+
+.log-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xs);
+}
+
+.log-time {
+    color: var(--marine-accent);
+    font-weight: bold;
+}
+
+.log-category {
+    padding: var(--spacing-xs);
+    background: var(--marine-panel-bg);
+    border-radius: var(--radius-sm);
+    color: var(--marine-text-secondary);
+}
+
+.log-content {
+    color: var(--marine-text);
+    line-height: 1.4;
+}
+
+.passage-metrics {
+    padding: var(--spacing-md);
+}
+
+.passage-metrics h4 {
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+}
+
+.metric-card {
+    background: var(--marine-darker-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    text-align: center;
+}
+
+.metric-value {
+    font-size: var(--font-size-xl);
+    font-weight: bold;
+    color: var(--marine-accent);
+    margin-bottom: var(--spacing-xs);
+}
+
+.metric-label {
+    color: var(--marine-text-secondary);
+    font-size: var(--font-size-small);
+    margin-bottom: var(--spacing-xs);
+}
+
+.metric-trend {
+    color: var(--marine-success);
+    font-size: var(--font-size-small);
+}
+
+.metric-trend.down {
+    color: var(--marine-danger);
+}
+
+/* Passage Tools */
+.passage-tools {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    background: var(--marine-panel-bg);
+    border: 1px solid var(--marine-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    backdrop-filter: blur(10px);
+    z-index: 20;
+}
+
+.passage-tools .tool-group {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.passage-tools .tool-btn {
+    font-size: var(--font-size-small);
+    white-space: nowrap;
+}
+
+.passage-progress {
+    padding: var(--spacing-sm);
+    background: var(--marine-darker-bg);
+    border-radius: var(--radius-sm);
+    text-align: center;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--marine-border);
+    border-radius: 3px;
+    margin: var(--spacing-sm) 0;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--marine-accent);
+    width: 68%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    color: var(--marine-text-secondary);
+    font-size: var(--font-size-small);
+}
+
+.progress-value {
+    color: var(--marine-accent);
+    font-weight: bold;
+}
+
+/* Responsive Design for Passage Layout */
+@media (max-width: 1200px) {
+    .passage-layout .layout-container {
+        grid-template-areas: 
+            "chart chart"
+            "weather watchkeeping"
+            "status status";
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 2fr 1fr auto;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .passage-layout .layout-container {
+        grid-template-areas: 
+            "chart"
+            "weather"
+            "watchkeeping"
+            "status";
+        grid-template-columns: 1fr;
+        grid-template-rows: 2fr 1fr 1fr auto;
+    }
+    
+    .forecast-timeline-extended {
+        gap: 2px;
+    }
+    
+    .forecast-time {
+        font-size: 10px;
+        transform: rotate(-90deg);
+    }
+    
+    .passage-tools {
+        position: static;
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .passage-tools .tool-group {
+        flex-direction: column;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+}

@@ -1,0 +1,336 @@
+{% extends "base.html" %}
+
+{% block title %}Mobile App Instructions - DMLog Revolutionary{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-icon">📱</span>
+            <h1 class="card-title">DMLog Revolutionary Mobile App</h1>
+        </div>
+        <p style="color: #bdc3c7; font-size: 1.1rem;">
+            Everything you need to get the full DMLog Revolutionary experience on your iPhone
+        </p>
+    </div>
+
+    <!-- Quick Setup -->
+    <div class="card" style="border: 2px solid #27ae60;">
+        <div class="card-header">
+            <span class="card-icon">⚡</span>
+            <h2 class="card-title" style="color: #27ae60;">Quick Setup (30 seconds)</h2>
+        </div>
+        
+        <div style="background: rgba(39, 174, 96, 0.1); padding: 1.5rem; border-radius: 10px; margin-bottom: 1rem;">
+            <h3 style="color: #27ae60; margin-bottom: 1rem;">🔥 Get Playing Right Now!</h3>
+            <ol style="color: #ffffff; font-size: 1.1rem; line-height: 1.8;">
+                <li><strong>Download Expo Go</strong> from the App Store (free)</li>
+                <li><strong>Scan this QR code</strong> with your camera app</li>
+                <li><strong>Start playing!</strong> Full D&D Beyond clone in your pocket</li>
+            </ol>
+        </div>
+
+        <!-- QR Code -->
+        <div style="background: #ffffff; padding: 2rem; border-radius: 15px; text-align: center; margin-bottom: 1rem;">
+            <div style="display: inline-block; padding: 1rem; background: #f8f9fa; border-radius: 10px;">
+                <img src="{{ url_for('generate_qr_code') }}" alt="DMLog QR Code" style="max-width: 200px; max-height: 200px; border: 2px solid #2c3e50; border-radius: 8px;">
+            </div>
+            <div style="margin-top: 1rem; color: #2c3e50; font-weight: bold;">
+                Scan with your phone camera
+            </div>
+            <div style="margin-top: 0.5rem; color: #6c757d; font-size: 0.9rem;">
+                Professional React Native App<br>
+                <strong>exp://dmlog-expo.loca.lt</strong>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="#full-instructions" class="btn" style="background: #27ae60; font-size: 1.1rem; padding: 1rem 2rem;">
+                Need detailed instructions? Scroll down ↓
+            </a>
+        </div>
+    </div>
+
+    <div id="full-instructions">
+        <!-- Step by Step Instructions -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">📋</span>
+                <h2 class="card-title">Detailed Setup Instructions</h2>
+            </div>
+
+            <!-- Step 1 -->
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem; border-left: 4px solid #3498db;">
+                <h3 style="color: #3498db; margin-bottom: 1rem;">📱 Step 1: Download Expo Go</h3>
+                <p style="color: #bdc3c7; font-size: 1.1rem; margin-bottom: 1rem;">
+                    Expo Go is a free app that lets you run React Native apps without installing from the App Store.
+                </p>
+                <ol style="color: #ffffff; line-height: 1.6;">
+                    <li>Open the <strong>App Store</strong> on your iPhone</li>
+                    <li>Search for <strong>"Expo Go"</strong></li>
+                    <li>Install the app (it's completely free)</li>
+                    <li>Open Expo Go when installation is complete</li>
+                </ol>
+                <div style="background: rgba(46, 204, 113, 0.2); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                    <strong style="color: #27ae60;">✅ Pro Tip:</strong> 
+                    <span style="color: #bdc3c7;">Expo Go is made by the same team that created React Native. It's trusted by millions of developers worldwide.</span>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div style="background: rgba(155, 89, 182, 0.1); padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem; border-left: 4px solid #9b59b6;">
+                <h3 style="color: #9b59b6; margin-bottom: 1rem;">🔗 Step 2: Connect to DMLog Server</h3>
+                <p style="color: #bdc3c7; font-size: 1.1rem; margin-bottom: 1rem;">
+                    The mobile app connects to the same backend server you're using right now.
+                </p>
+                
+                <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <h4 style="color: #ffffff; margin-bottom: 0.5rem;">Server Connection Info:</h4>
+                    <p style="color: #f39c12; font-family: monospace;">Backend URL: http://localhost:8099</p>
+                    <p style="color: #bdc3c7; font-size: 0.9rem;">The app will automatically connect to this server for all data.</p>
+                </div>
+
+                <ol style="color: #ffffff; line-height: 1.6;">
+                    <li>Make sure your phone is on the <strong>same WiFi network</strong> as this computer</li>
+                    <li>The app will automatically find and connect to the backend server</li>
+                    <li>All your character data, spells, and voice commands sync instantly</li>
+                </ol>
+            </div>
+
+            <!-- Step 3 -->
+            <div style="background: rgba(231, 76, 60, 0.1); padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem; border-left: 4px solid #e74c3c;">
+                <h3 style="color: #e74c3c; margin-bottom: 1rem;">🎯 Step 3: Launch the App</h3>
+                <p style="color: #bdc3c7; font-size: 1.1rem; margin-bottom: 1rem;">
+                    Multiple ways to open the DMLog Revolutionary app:
+                </p>
+                
+                <div style="display: grid; gap: 1rem; margin-bottom: 1rem;">
+                    <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px;">
+                        <h4 style="color: #27ae60; margin-bottom: 0.5rem;">🎯 Option A: QR Code (Easiest)</h4>
+                        <ul style="color: #bdc3c7; margin-left: 1rem;">
+                            <li>Open your iPhone Camera app</li>
+                            <li>Point it at the QR code above</li>
+                            <li>Tap the notification that appears</li>
+                            <li>Choose "Open in Expo Go"</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px;">
+                        <h4 style="color: #3498db; margin-bottom: 0.5rem;">🔗 Option B: Direct Link</h4>
+                        <ul style="color: #bdc3c7; margin-left: 1rem;">
+                            <li>Open Expo Go app</li>
+                            <li>Tap "Enter URL manually"</li>
+                            <li>Type: <code style="background: rgba(0,0,0,0.5); padding: 0.2rem; border-radius: 3px;">exp://exp.host/@your-username/dmlog-mobile</code></li>
+                            <li>Tap "Connect"</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="background: rgba(241, 196, 15, 0.2); padding: 1rem; border-radius: 8px;">
+                    <strong style="color: #f1c40f;">⚠️ Troubleshooting:</strong> 
+                    <span style="color: #bdc3c7;">If the app doesn't load, make sure you're on the same WiFi network and the backend server is running (it should be!).</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Overview -->
+        <div class="grid grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">🎲</span>
+                    <h2 class="card-title">What You'll Get</h2>
+                </div>
+                <ul style="color: #bdc3c7; line-height: 1.8; font-size: 1rem;">
+                    <li><strong style="color: #e74c3c;">🎯 D&D Beyond Clone:</strong> Exact same interface, but better</li>
+                    <li><strong style="color: #3498db;">👤 Character Management:</strong> Create, edit, view character sheets</li>
+                    <li><strong style="color: #9b59b6;">✨ Spell Database:</strong> Search all D&D 5e spells</li>
+                    <li><strong style="color: #27ae60;">🎲 Physics Dice:</strong> Realistic dice rolling with haptics</li>
+                    <li><strong style="color: #f39c12;">🎤 Voice Control:</strong> Say commands, get results</li>
+                    <li><strong style="color: #e67e22;">⚔️ Campaign Tools:</strong> Join sessions, track progress</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">🚀</span>
+                    <h2 class="card-title">Revolutionary Features</h2>
+                </div>
+                <ul style="color: #bdc3c7; line-height: 1.8; font-size: 1rem;">
+                    <li><strong style="color: #e74c3c;">🧠 AI Integration:</strong> Smart character suggestions</li>
+                    <li><strong style="color: #3498db;">📡 Real-time Sync:</strong> Changes sync instantly</li>
+                    <li><strong style="color: #27ae60;">📱 Offline Ready:</strong> Works without internet</li>
+                    <li><strong style="color: #f39c12;">🔄 Live Updates:</strong> Backend pushes new features</li>
+                    <li><strong style="color: #9b59b6;">🎮 Native Feel:</strong> Smooth iOS performance</li>
+                    <li><strong style="color: #e67e22;">🌟 Future-Proof:</strong> AR/VR features coming soon</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Voice Commands -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">🎤</span>
+                <h2 class="card-title">Voice Commands to Try</h2>
+            </div>
+            <p style="color: #bdc3c7; margin-bottom: 1.5rem;">
+                The mobile app has full voice control. Try these commands once you have it running:
+            </p>
+            
+            <div class="grid grid-2">
+                <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px;">
+                    <h4 style="color: #e74c3c; margin-bottom: 0.5rem;">🎲 Dice Commands</h4>
+                    <ul style="color: #bdc3c7; font-size: 0.9rem; line-height: 1.6;">
+                        <li>"Roll a d20"</li>
+                        <li>"Roll 3d6"</li>
+                        <li>"Roll for advantage"</li>
+                        <li>"Roll initiative"</li>
+                    </ul>
+                </div>
+                
+                <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px;">
+                    <h4 style="color: #3498db; margin-bottom: 0.5rem;">👤 Character Commands</h4>
+                    <ul style="color: #bdc3c7; font-size: 0.9rem; line-height: 1.6;">
+                        <li>"Show my character"</li>
+                        <li>"Create new character"</li>
+                        <li>"What are my stats?"</li>
+                        <li>"Show my inventory"</li>
+                    </ul>
+                </div>
+                
+                <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px;">
+                    <h4 style="color: #9b59b6; margin-bottom: 0.5rem;">✨ Spell Commands</h4>
+                    <ul style="color: #bdc3c7; font-size: 0.9rem; line-height: 1.6;">
+                        <li>"Search for fireball spell"</li>
+                        <li>"Show me healing spells"</li>
+                        <li>"What's magic missile?"</li>
+                        <li>"Level 3 spells"</li>
+                    </ul>
+                </div>
+                
+                <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px;">
+                    <h4 style="color: #27ae60; margin-bottom: 0.5rem;">🎮 Navigation Commands</h4>
+                    <ul style="color: #bdc3c7; font-size: 0.9rem; line-height: 1.6;">
+                        <li>"Go to dashboard"</li>
+                        <li>"Open spell list"</li>
+                        <li>"Show campaigns"</li>
+                        <li>"Voice settings"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">🆘</span>
+                <h2 class="card-title">Need Help?</h2>
+            </div>
+            
+            <div class="grid grid-2">
+                <div style="background: rgba(231, 76, 60, 0.1); padding: 1rem; border-radius: 8px;">
+                    <h4 style="color: #e74c3c; margin-bottom: 0.5rem;">🐛 Common Issues</h4>
+                    <ul style="color: #bdc3c7; font-size: 0.9rem; line-height: 1.6;">
+                        <li><strong>App won't load:</strong> Check WiFi connection</li>
+                        <li><strong>Voice not working:</strong> Allow microphone access</li>
+                        <li><strong>Slow loading:</strong> Backend server might be starting</li>
+                        <li><strong>QR code error:</strong> Try the direct link method</li>
+                    </ul>
+                </div>
+                
+                <div style="background: rgba(39, 174, 96, 0.1); padding: 1rem; border-radius: 8px;">
+                    <h4 style="color: #27ae60; margin-bottom: 0.5rem;">✅ Quick Fixes</h4>
+                    <ul style="color: #bdc3c7; font-size: 0.9rem; line-height: 1.6;">
+                        <li><strong>Restart Expo Go</strong> and try again</li>
+                        <li><strong>Check server status</strong> in this web dashboard</li>
+                        <li><strong>Make sure</strong> backend is running on port 8099</li>
+                        <li><strong>Use same WiFi</strong> network as this computer</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 1.5rem; background: rgba(52, 152, 219, 0.1); padding: 1rem; border-radius: 8px;">
+                <h4 style="color: #3498db; margin-bottom: 0.5rem;">📊 Server Status</h4>
+                <p style="color: #27ae60; font-weight: bold;">✅ Backend Server: Running on port 8099</p>
+                <p style="color: #bdc3c7; font-size: 0.9rem;">Mobile app will connect automatically when launched</p>
+            </div>
+        </div>
+
+        <!-- Back to Dashboard -->
+        <div style="text-align: center; margin: 2rem 0;">
+            <a href="{{ url_for('dashboard') }}" class="btn" style="background: #3498db; font-size: 1.1rem; padding: 1rem 2rem;">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .container {
+        padding-bottom: 80px; /* Make room for mobile footer */
+    }
+    
+    code {
+        background: rgba(0,0,0,0.5);
+        color: #f39c12;
+        padding: 0.2rem 0.4rem;
+        border-radius: 3px;
+        font-family: 'Monaco', 'Menlo', monospace;
+    }
+    
+    /* Smooth scrolling for anchor links */
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+        .grid-2 {
+            grid-template-columns: 1fr;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+        }
+        
+        .card {
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+
+<script>
+    // Smooth scroll to full instructions
+    document.querySelector('a[href="#full-instructions"]').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('full-instructions').scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    });
+    
+    // Auto-update server status
+    function updateServerStatus() {
+        fetch('/api/roll-dice?sides=20&count=1')
+            .then(response => response.ok)
+            .then(isOnline => {
+                const statusElements = document.querySelectorAll('.server-status');
+                statusElements.forEach(el => {
+                    el.innerHTML = isOnline 
+                        ? '<span style="color: #27ae60;">✅ Online</span>' 
+                        : '<span style="color: #e74c3c;">❌ Offline</span>';
+                });
+            })
+            .catch(() => {
+                const statusElements = document.querySelectorAll('.server-status');
+                statusElements.forEach(el => {
+                    el.innerHTML = '<span style="color: #f39c12;">⚠️ Checking...</span>';
+                });
+            });
+    }
+    
+    // Check server status on load and every 30 seconds
+    updateServerStatus();
+    setInterval(updateServerStatus, 30000);
+</script>
+{% endblock %}

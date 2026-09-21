@@ -1,0 +1,66 @@
+{
+  "service_health": {
+    "api_gateway": {
+      "status": "healthy",
+      "response_time": 0.786343,
+      "integration_status": {}
+    },
+    "user_management": {
+      "status": "healthy",
+      "response_time": 0.043832,
+      "integration_status": {}
+    },
+    "ai_insights": {
+      "status": "healthy",
+      "response_time": 0.046358,
+      "integration_status": {}
+    },
+    "dmlog_core": {
+      "status": "unhealthy",
+      "response_time": 0.041917,
+      "integration_status": {}
+    },
+    "dmlog_ai": {
+      "status": "healthy",
+      "response_time": 0.022279,
+      "integration_status": {
+        "activelog_ai": "connected",
+        "personallog_ai": "connected",
+        "auth_service": "integrated",
+        "compute_capital_economy": "ready"
+      }
+    },
+    "dmlog_final": {
+      "status": "unhealthy",
+      "response_time": 0.046837,
+      "integration_status": {}
+    }
+  },
+  "cross_domain_character_enhancement": {
+    "status": "error",
+    "code": 500
+  },
+  "dm_rewards_system": {
+    "status": "error",
+    "code": 500
+  },
+  "ai_campaign_generation": {
+    "status": "error",
+    "code": 500
+  },
+  "gaming_profile_integration": {
+    "status": "endpoint_available",
+    "code": 404
+  },
+  "compute_capital_integration": {
+    "status": "integration_ready",
+    "gateway_routing": true,
+    "code": 404
+  },
+  "api_gateway_routing": {
+    "status": "success",
+    "gateway_healthy": true,
+    "services_registered": 5,
+    "dmlog_services_detected": false
+  }
+}

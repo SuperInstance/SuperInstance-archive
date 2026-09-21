@@ -1,0 +1,338 @@
+{
+  "vendor_register": {
+    "last_updated": "2024-09-15",
+    "total_vendors": 47,
+    "total_annual_spend": 2847000,
+    "critical_vendors": 12,
+    "contract_status_summary": {
+      "active": 43,
+      "renewal_pending": 4,
+      "terminated": 0
+    }
+  },
+  "critical_vendors": [
+    {
+      "vendor_name": "Amazon Web Services (AWS)",
+      "category": "Cloud Infrastructure",
+      "contract_value_annual": 486000,
+      "contract_start": "2024-01-01",
+      "contract_end": "2024-12-31",
+      "auto_renewal": true,
+      "termination_notice": "30 days",
+      "key_services": ["EC2", "RDS", "S3", "CloudFront", "EKS"],
+      "criticality": "Critical",
+      "alternatives": "Azure, GCP",
+      "contract_type": "Enterprise Agreement",
+      "payment_terms": "Monthly",
+      "key_contacts": {
+        "account_manager": "Sarah Wilson",
+        "technical_contact": "AWS Support",
+        "email": "enterprise@aws.amazon.com"
+      },
+      "sla_terms": "99.99% uptime",
+      "data_processing_agreement": true,
+      "security_certifications": ["SOC 2", "ISO 27001", "PCI DSS"],
+      "change_of_control_clause": false
+    },
+    {
+      "vendor_name": "Twilio Inc.",
+      "category": "Communication Services",
+      "contract_value_annual": 234000,
+      "contract_start": "2024-03-15",
+      "contract_end": "2025-03-14",
+      "auto_renewal": true,
+      "termination_notice": "60 days",
+      "key_services": ["Voice API", "SMS", "Video", "Programmable Voice"],
+      "criticality": "Critical",
+      "alternatives": "Vonage, Plivo",
+      "contract_type": "Master Service Agreement",
+      "payment_terms": "Monthly usage-based",
+      "key_contacts": {
+        "account_manager": "Michael Chen",
+        "technical_contact": "enterprise-support@twilio.com",
+        "email": "sales@twilio.com"
+      },
+      "sla_terms": "99.95% API uptime",
+      "data_processing_agreement": true,
+      "security_certifications": ["SOC 2", "HIPAA", "PCI DSS"],
+      "change_of_control_clause": true
+    },
+    {
+      "vendor_name": "Stripe, Inc.",
+      "category": "Payment Processing",
+      "contract_value_annual": 187000,
+      "contract_start": "2024-02-01",
+      "contract_end": "2025-01-31",
+      "auto_renewal": true,
+      "termination_notice": "30 days",
+      "key_services": ["Payment Processing", "Subscription Management", "Connect"],
+      "criticality": "Critical",
+      "alternatives": "PayPal, Square",
+      "contract_type": "Services Agreement",
+      "payment_terms": "Transaction-based fees",
+      "key_contacts": {
+        "account_manager": "Lisa Park",
+        "technical_contact": "support@stripe.com",
+        "email": "sales@stripe.com"
+      },
+      "sla_terms": "99.99% payment processing uptime",
+      "data_processing_agreement": true,
+      "security_certifications": ["PCI DSS Level 1", "SOC 2"],
+      "change_of_control_clause": false
+    },
+    {
+      "vendor_name": "OpenAI, L.L.C.",
+      "category": "AI/ML Services",
+      "contract_value_annual": 156000,
+      "contract_start": "2024-06-01",
+      "contract_end": "2025-05-31",
+      "auto_renewal": false,
+      "termination_notice": "30 days",
+      "key_services": ["GPT-4 API", "Whisper API", "Embeddings API"],
+      "criticality": "High",
+      "alternatives": "Anthropic Claude, Google Gemini",
+      "contract_type": "API Services Agreement",
+      "payment_terms": "Monthly usage-based",
+      "key_contacts": {
+        "account_manager": "Enterprise Team",
+        "technical_contact": "api-support@openai.com",
+        "email": "enterprise@openai.com"
+      },
+      "sla_terms": "99.9% API availability",
+      "data_processing_agreement": true,
+      "security_certifications": ["SOC 2"],
+      "change_of_control_clause": false
+    },
+    {
+      "vendor_name": "Salesforce.com, Inc.",
+      "category": "CRM & Business Applications",
+      "contract_value_annual": 134000,
+      "contract_start": "2024-01-15",
+      "contract_end": "2025-01-14",
+      "auto_renewal": true,
+      "termination_notice": "60 days",
+      "key_services": ["Sales Cloud", "Service Cloud", "Platform", "Integrations"],
+      "criticality": "High",
+      "alternatives": "HubSpot, Microsoft Dynamics",
+      "contract_type": "Master Subscription Agreement",
+      "payment_terms": "Annual prepaid",
+      "key_contacts": {
+        "account_manager": "David Kim",
+        "technical_contact": "enterprise-support@salesforce.com",
+        "email": "sales@salesforce.com"
+      },
+      "sla_terms": "99.9% system availability",
+      "data_processing_agreement": true,
+      "security_certifications": ["SOC 2", "ISO 27001"],
+      "change_of_control_clause": true
+    },
+    {
+      "vendor_name": "MongoDB, Inc.",
+      "category": "Database Services",
+      "contract_value_annual": 89000,
+      "contract_start": "2024-04-01",
+      "contract_end": "2025-03-31",
+      "auto_renewal": true,
+      "termination_notice": "30 days",
+      "key_services": ["MongoDB Atlas", "Database Hosting", "Analytics"],
+      "criticality": "Medium",
+      "alternatives": "PostgreSQL, DynamoDB",
+      "contract_type": "Cloud Services Agreement",
+      "payment_terms": "Monthly usage-based",
+      "key_contacts": {
+        "account_manager": "Jennifer Lopez",
+        "technical_contact": "support@mongodb.com",
+        "email": "sales@mongodb.com"
+      },
+      "sla_terms": "99.95% database uptime",
+      "data_processing_agreement": true,
+      "security_certifications": ["SOC 2", "ISO 27001"],
+      "change_of_control_clause": false
+    }
+  ],
+  "vendor_categories": {
+    "cloud_infrastructure": {
+      "total_spend": 623000,
+      "vendors": ["AWS", "Azure", "Cloudflare"],
+      "criticality": "Critical"
+    },
+    "software_licenses": {
+      "total_spend": 445000,
+      "vendors": ["Salesforce", "Microsoft", "Atlassian", "GitHub"],
+      "criticality": "High"
+    },
+    "ai_ml_services": {
+      "total_spend": 287000,
+      "vendors": ["OpenAI", "Anthropic", "Hugging Face"],
+      "criticality": "High"
+    },
+    "communication_services": {
+      "total_spend": 298000,
+      "vendors": ["Twilio", "SendGrid", "Zoom"],
+      "criticality": "Critical"
+    },
+    "payment_processing": {
+      "total_spend": 187000,
+      "vendors": ["Stripe", "PayPal"],
+      "criticality": "Critical"
+    },
+    "security_compliance": {
+      "total_spend": 156000,
+      "vendors": ["Vanta", "OneTrust", "Snyk"],
+      "criticality": "High"
+    },
+    "monitoring_analytics": {
+      "total_spend": 134000,
+      "vendors": ["Datadog", "New Relic", "Mixpanel"],
+      "criticality": "Medium"
+    },
+    "professional_services": {
+      "total_spend": 234000,
+      "vendors": ["Legal Counsel", "Accounting Firm", "Consultants"],
+      "criticality": "Medium"
+    }
+  },
+  "contract_renewal_schedule": {
+    "q4_2024": [
+      {
+        "vendor": "AWS",
+        "renewal_date": "2024-12-31",
+        "contract_value": 486000,
+        "status": "Auto-renewal"
+      },
+      {
+        "vendor": "Microsoft",
+        "renewal_date": "2024-11-15",
+        "contract_value": 67000,
+        "status": "Under negotiation"
+      }
+    ],
+    "q1_2025": [
+      {
+        "vendor": "Salesforce",
+        "renewal_date": "2025-01-14",
+        "contract_value": 134000,
+        "status": "Auto-renewal"
+      },
+      {
+        "vendor": "Stripe",
+        "renewal_date": "2025-01-31",
+        "contract_value": 187000,
+        "status": "Auto-renewal"
+      }
+    ],
+    "q2_2025": [
+      {
+        "vendor": "Twilio",
+        "renewal_date": "2025-03-14",
+        "contract_value": 234000,
+        "status": "Auto-renewal"
+      },
+      {
+        "vendor": "OpenAI",
+        "renewal_date": "2025-05-31",
+        "contract_value": 156000,
+        "status": "Requires renewal negotiation"
+      }
+    ]
+  },
+  "risk_assessment": {
+    "high_risk_dependencies": [
+      {
+        "vendor": "AWS",
+        "risk": "Single cloud provider dependency",
+        "mitigation": "Multi-cloud strategy in development"
+      },
+      {
+        "vendor": "Twilio",
+        "risk": "Critical communication services",
+        "mitigation": "Backup provider (Vonage) contract in place"
+      },
+      {
+        "vendor": "Stripe",
+        "risk": "Payment processing dependency",
+        "mitigation": "PayPal integration as backup"
+      }
+    ],
+    "change_of_control_impacts": [
+      {
+        "vendor": "Twilio",
+        "impact": "Requires consent for change of control",
+        "action_required": "Obtain consent letter"
+      },
+      {
+        "vendor": "Salesforce",
+        "impact": "30-day notification required",
+        "action_required": "Provide notification"
+      }
+    ],
+    "data_processing_compliance": {
+      "vendors_with_dpa": 34,
+      "gdpr_compliant": 34,
+      "ccpa_compliant": 28,
+      "hipaa_compliant": 12
+    }
+  },
+  "spend_analysis": {
+    "by_payment_terms": {
+      "monthly": 1456000,
+      "quarterly": 234000,
+      "annual": 1157000
+    },
+    "by_contract_type": {
+      "saas_subscriptions": 1678000,
+      "usage_based": 689000,
+      "professional_services": 234000,
+      "hardware_software": 246000
+    },
+    "growth_forecast": {
+      "2024_projected": 2847000,
+      "2025_projected": 3456000,
+      "growth_rate": 21.4
+    }
+  },
+  "vendor_performance_metrics": {
+    "sla_compliance": {
+      "aws": 99.98,
+      "twilio": 99.94,
+      "stripe": 99.99,
+      "salesforce": 99.89
+    },
+    "support_satisfaction": {
+      "average_rating": 4.2,
+      "response_time_avg": "2.4 hours",
+      "resolution_time_avg": "6.8 hours"
+    },
+    "vendor_scorecards": {
+      "performance": 4.1,
+      "cost_effectiveness": 3.8,
+      "innovation": 4.3,
+      "support_quality": 4.2
+    }
+  },
+  "legal_compliance_summary": {
+    "contracts_reviewed": 47,
+    "contracts_standardized": 38,
+    "custom_terms_count": 9,
+    "legal_issues_outstanding": 0,
+    "warranty_claims_active": 0,
+    "indemnification_exposure": "Standard market terms",
+    "liability_caps": "Majority capped at 12 months fees"
+  },
+  "m_and_a_considerations": {
+    "transferable_contracts": 43,
+    "consent_required": 4,
+    "change_of_control_termination": 2,
+    "key_person_dependencies": 1,
+    "integration_complexity": {
+      "low": 31,
+      "medium": 12,
+      "high": 4
+    },
+    "cost_synergies": {
+      "estimated_savings": 145000,
+      "consolidation_opportunities": 8,
+      "renegotiation_potential": 234000
+    }
+  }
+}

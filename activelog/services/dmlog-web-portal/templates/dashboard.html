@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - DMLog Revolutionary{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Welcome Section -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-icon">🏠</span>
+            <h1 class="card-title">Welcome back, {{ user.display_name or user.username }}!</h1>
+        </div>
+        <p style="color: #bdc3c7; font-size: 1.1rem;">
+            Your D&D Beyond experience, revolutionized with AI, voice control, and seamless gameplay.
+        </p>
+    </div>
+
+    <!-- Quick Actions Grid -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-icon">⚡</span>
+            <h2 class="card-title">Quick Actions</h2>
+        </div>
+        <div class="grid grid-4">
+            <a href="{{ url_for('dice') }}" class="btn" style="text-align: center; padding: 1.5rem;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎲</div>
+                <div>Roll Dice</div>
+            </a>
+            <a href="{{ url_for('characters') }}" class="btn btn-secondary" style="text-align: center; padding: 1.5rem;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">👤</div>
+                <div>My Characters</div>
+            </a>
+            <a href="{{ url_for('spells') }}" class="btn" style="background: #9b59b6; text-align: center; padding: 1.5rem;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">✨</div>
+                <div>Spell List</div>
+            </a>
+            <a href="{{ url_for('voice') }}" class="btn" style="background: #f39c12; text-align: center; padding: 1.5rem;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎤</div>
+                <div>Voice Commands</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-2">
+        <!-- Character Preview -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">🛡️</span>
+                <h2 class="card-title">Featured Character</h2>
+            </div>
+            {% if character %}
+            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                <div style="background: #e74c3c; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin-right: 1rem;">
+                    {{ character.name[:2] }}
+                </div>
+                <div>
+                    <h3 style="color: #ffffff; margin-bottom: 0.25rem;">{{ character.name }}</h3>
+                    <p style="color: #bdc3c7;">Level {{ character.level }} {{ character.race }} {{ character.class_name }}</p>
+                    <p style="color: #95a5a6; font-size: 0.9rem;">{{ character.background or "Adventurer" }}</p>
+                </div>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem;">
+                <div style="text-align: center; background: rgba(0,0,0,0.2); padding: 0.75rem; border-radius: 8px;">
+                    <div style="color: #e74c3c; font-size: 1.5rem; font-weight: bold;">{{ character.hit_points or 'N/A' }}</div>
+                    <div style="color: #bdc3c7; font-size: 0.8rem;">Hit Points</div>
+                </div>
+                <div style="text-align: center; background: rgba(0,0,0,0.2); padding: 0.75rem; border-radius: 8px;">
+                    <div style="color: #3498db; font-size: 1.5rem; font-weight: bold;">{{ character.armor_class or 'N/A' }}</div>
+                    <div style="color: #bdc3c7; font-size: 0.8rem;">Armor Class</div>
+                </div>
+                <div style="text-align: center; background: rgba(0,0,0,0.2); padding: 0.75rem; border-radius: 8px;">
+                    <div style="color: #f39c12; font-size: 1.5rem; font-weight: bold;">{{ character.level }}</div>
+                    <div style="color: #bdc3c7; font-size: 0.8rem;">Level</div>
+                </div>
+            </div>
+            
+            <a href="{{ url_for('characters') }}" class="btn" style="width: 100%;">View Full Character Sheet</a>
+            {% else %}
+            <p style="color: #95a5a6; text-align: center; padding: 2rem;">
+                No characters found. Create your first character to get started!
+            </p>
+            <a href="{{ url_for('characters') }}" class="btn" style="width: 100%;">Create Character</a>
+            {% endif %}
+        </div>
+
+        <!-- Recent Activity / Quick Dice -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">🎲</span>
+                <h2 class="card-title">Quick Dice Roller</h2>
+            </div>
+            
+            <!-- Dice Buttons -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 1rem;">
+                <button onclick="rollDice(4)" class="btn" style="background: #e74c3c; padding: 0.5rem;">d4</button>
+                <button onclick="rollDice(6)" class="btn" style="background: #3498db; padding: 0.5rem;">d6</button>
+                <button onclick="rollDice(8)" class="btn" style="background: #f39c12; padding: 0.5rem;">d8</button>
+                <button onclick="rollDice(10)" class="btn" style="background: #27ae60; padding: 0.5rem;">d10</button>
+                <button onclick="rollDice(12)" class="btn" style="background: #9b59b6; padding: 0.5rem;">d12</button>
+                <button onclick="rollDice(20)" class="btn" style="background: #e67e22; padding: 0.5rem;">d20</button>
+                <button onclick="rollDice(100)" class="btn" style="background: #2c3e50; padding: 0.5rem;">d100</button>
+                <button onclick="rollDice(20, 2)" class="btn" style="background: #34495e; padding: 0.5rem; font-size: 0.8rem;">Adv</button>
+            </div>
+            
+            <!-- Roll Result -->
+            <div id="diceResult" style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; text-align: center; margin-bottom: 1rem;">
+                <div style="color: #95a5a6;">Roll some dice to see results!</div>
+            </div>
+            
+            <a href="{{ url_for('dice') }}" class="btn" style="width: 100%;">Advanced Dice Roller</a>
+        </div>
+    </div>
+
+    <!-- Spells Preview -->
+    {% if spells %}
+    <div class="card">
+        <div class="card-header">
+            <span class="card-icon">✨</span>
+            <h2 class="card-title">Popular Spells</h2>
+        </div>
+        <div class="grid grid-3">
+            {% for spell in spells %}
+            <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <h4 style="color: #ffffff; margin: 0;">{{ spell.name }}</h4>
+                    <span style="background: {% if spell.level == 0 %}#95a5a6{% else %}#e74c3c{% endif %}; color: #ffffff; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.7rem;">
+                        {% if spell.level == 0 %}Cantrip{% else %}{{ spell.level }}{% endif %}
+                    </span>
+                </div>
+                <p style="color: #bdc3c7; font-size: 0.9rem; margin-bottom: 0.5rem;">{{ spell.school }}</p>
+                {% if spell.damage %}
+                <p style="color: #e74c3c; font-size: 0.8rem; margin: 0;">⚔️ Damage: {{ spell.damage }}</p>
+                {% elif spell.healing %}
+                <p style="color: #27ae60; font-size: 0.8rem; margin: 0;">💚 Healing: {{ spell.healing }}</p>
+                {% elif spell.effect %}
+                <p style="color: #f39c12; font-size: 0.8rem; margin: 0;">✨ {{ spell.effect }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        <div style="text-align: center; margin-top: 1rem;">
+            <a href="{{ url_for('spells') }}" class="btn">Browse All Spells</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Featured Tools -->
+    <div class="grid grid-2">
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">🎤</span>
+                <h2 class="card-title">Voice Control</h2>
+            </div>
+            <p style="color: #bdc3c7; margin-bottom: 1rem;">
+                Control everything with your voice. Say "Roll d20", "Show my character", or "Search for spells" and watch the magic happen!
+            </p>
+            <div style="background: rgba(52, 152, 219, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                <h4 style="color: #3498db; margin-bottom: 0.5rem;">Try These Commands:</h4>
+                <ul style="color: #bdc3c7; font-size: 0.9rem; margin-left: 1rem;">
+                    <li>"Roll a d20"</li>
+                    <li>"Show my character"</li>
+                    <li>"Search for fireball spell"</li>
+                    <li>"Create new character"</li>
+                </ul>
+            </div>
+            <a href="{{ url_for('voice') }}" class="btn" style="background: #f39c12; width: 100%;">Try Voice Control</a>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">🧠</span>
+                <h2 class="card-title">AI Assistant</h2>
+            </div>
+            <p style="color: #bdc3c7; margin-bottom: 1rem;">
+                Get intelligent suggestions for character builds, encounter balancing, and campaign ideas. Your personal D&D AI companion.
+            </p>
+            <div style="background: rgba(46, 204, 113, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                <h4 style="color: #27ae60; margin-bottom: 0.5rem;">AI Features:</h4>
+                <ul style="color: #bdc3c7; font-size: 0.9rem; margin-left: 1rem;">
+                    <li>Character build optimization</li>
+                    <li>Encounter balancing</li>
+                    <li>Campaign story suggestions</li>
+                    <li>Rule clarifications</li>
+                </ul>
+            </div>
+            <button class="btn" style="background: #27ae60; width: 100%;" onclick="alert('AI Assistant coming soon to web version! Use mobile app for full AI features.')">Chat with AI</button>
+        </div>
+    </div>
+
+    <!-- Server Stats -->
+    {% if stats %}
+    <div class="card">
+        <div class="card-header">
+            <span class="card-icon">📊</span>
+            <h2 class="card-title">Server Statistics</h2>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div style="text-align: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                <div style="color: #27ae60; font-size: 2rem; font-weight: bold;">{{ stats.users or 0 }}</div>
+                <div style="color: #bdc3c7; font-size: 0.9rem;">Registered Users</div>
+            </div>
+            <div style="text-align: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                <div style="color: #3498db; font-size: 2rem; font-weight: bold;">{{ stats.characters or 0 }}</div>
+                <div style="color: #bdc3c7; font-size: 0.9rem;">Characters Created</div>
+            </div>
+            <div style="text-align: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                <div style="color: #e74c3c; font-size: 2rem; font-weight: bold;">{{ stats.voice_commands or 0 }}</div>
+                <div style="color: #bdc3c7; font-size: 0.9rem;">Voice Commands</div>
+            </div>
+            {% if stats.features %}
+            <div style="text-align: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                <div style="color: #f39c12; font-size: 2rem; font-weight: bold;">{{ stats.features|length }}</div>
+                <div style="color: #bdc3c7; font-size: 0.9rem;">Active Features</div>
+            </div>
+            {% endif %}
+        </div>
+        <p style="color: #95a5a6; text-align: center; margin-top: 1rem; font-size: 0.9rem;">
+            Server Status: {{ stats.server_status or "Running" }} • API Version: {{ stats.api_version or "1.0.0" }}
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    let rollHistory = [];
+
+    async function rollDice(sides, count = 1) {
+        const resultDiv = document.getElementById('diceResult');
+        
+        // Show rolling animation
+        resultDiv.innerHTML = `
+            <div style="color: #f39c12; font-size: 1.2rem;">
+                🎲 Rolling ${count}d${sides}...
+            </div>
+        `;
+        
+        try {
+            const response = await fetch(`/api/roll-dice?sides=${sides}&count=${count}`);
+            const data = await response.json();
+            
+            if (data.results) {
+                const total = data.total;
+                const results = data.results;
+                
+                // Determine result quality for d20
+                let qualityColor = '#ffffff';
+                let qualityText = '';
+                
+                if (sides === 20 && results.length === 1) {
+                    const roll = results[0];
+                    if (roll === 20) {
+                        qualityColor = '#27ae60';
+                        qualityText = ' - Natural 20! 🌟';
+                    } else if (roll === 1) {
+                        qualityColor = '#e74c3c';
+                        qualityText = ' - Natural 1 😱';
+                    } else if (roll >= 18) {
+                        qualityColor = '#2ecc71';
+                        qualityText = ' - Excellent!';
+                    } else if (roll >= 15) {
+                        qualityColor = '#3498db';
+                        qualityText = ' - Good!';
+                    }
+                }
+                
+                resultDiv.innerHTML = `
+                    <div style="margin-bottom: 0.5rem;">
+                        <span style="color: #e74c3c; font-weight: bold;">${data.dice}</span>
+                    </div>
+                    <div style="margin-bottom: 0.5rem;">
+                        ${results.map(r => `<span style="display: inline-block; margin: 0 2px; padding: 4px 8px; background: rgba(231, 76, 60, 0.2); border-radius: 4px; color: ${qualityColor};">${r}</span>`).join('')}
+                    </div>
+                    <div style="color: #ffffff; font-size: 1.3rem; font-weight: bold;">
+                        Total: ${total}${qualityText}
+                    </div>
+                `;
+                
+                // Add to history
+                rollHistory.unshift({
+                    dice: data.dice,
+                    results: results,
+                    total: total,
+                    timestamp: new Date().toLocaleTimeString()
+                });
+                
+                // Keep last 5 rolls
+                if (rollHistory.length > 5) {
+                    rollHistory = rollHistory.slice(0, 5);
+                }
+            }
+        } catch (error) {
+            console.error('Dice roll error:', error);
+            resultDiv.innerHTML = `
+                <div style="color: #e74c3c;">
+                    Error rolling dice. Please try again!
+                </div>
+            `;
+        }
+    }
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .container {
+        padding-bottom: 80px; /* Make room for mobile footer */
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+        .grid-4 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .card {
+            margin-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+        }
+    }
+</style>
+{% endblock %}

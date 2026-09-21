@@ -1,0 +1,66 @@
+{
+  "name": "kids-connect-safety-system",
+  "version": "1.0.0",
+  "description": "Secure educational connection platform for children with comprehensive safety features",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest",
+    "lint": "eslint src/",
+    "security-audit": "npm audit && node src/security/audit-runner.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.0",
+    "express-rate-limit": "^6.8.1",
+    "helmet": "^7.0.0",
+    "cors": "^2.8.5",
+    "joi": "^17.9.2",
+    "node-cron": "^3.0.2",
+    "nodemailer": "^6.9.4",
+    "twilio": "^4.15.0",
+    "multer": "^1.4.5-lts.1",
+    "sharp": "^0.32.5",
+    "compromise": "^14.10.0",
+    "sentiment": "^5.0.2",
+    "bad-words": "^3.0.4",
+    "geoip-lite": "^1.4.7",
+    "express-validator": "^7.0.1",
+    "winston": "^3.10.0",
+    "redis": "^4.6.8",
+    "bull": "^4.11.3",
+    "express-session": "^1.17.3",
+    "connect-redis": "^7.1.0",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
+    "uuid": "^9.0.0",
+    "moment-timezone": "^0.5.43",
+    "country-list": "^2.2.0",
+    "language-detect": "^1.1.0",
+    "profanity-check": "^1.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.6.2",
+    "eslint": "^8.47.0",
+    "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "author": "ActiveLog Education Safety Team",
+  "license": "PROPRIETARY",
+  "keywords": [
+    "kids-safety",
+    "educational-platform",
+    "parental-controls",
+    "child-protection",
+    "cultural-exchange",
+    "language-learning",
+    "school-connections"
+  ]
+}

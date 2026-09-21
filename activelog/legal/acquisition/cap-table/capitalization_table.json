@@ -1,0 +1,237 @@
+{
+  "company": {
+    "name": "ActiveLog Technologies, Inc.",
+    "incorporation_date": "2024-01-15",
+    "state_of_incorporation": "Delaware",
+    "ein": "88-1234567",
+    "authorized_shares": {
+      "common": 10000000,
+      "preferred": 5000000
+    }
+  },
+  "valuation": {
+    "current_valuation": 25000000,
+    "last_round_valuation": 18000000,
+    "valuation_date": "2024-08-01",
+    "valuation_method": "DCF + Market Multiples"
+  },
+  "share_classes": {
+    "common_stock": {
+      "class": "Common Stock",
+      "voting_rights": "1x",
+      "liquidation_preference": "None",
+      "dividend_rights": "Non-cumulative",
+      "conversion_rights": "None",
+      "anti_dilution": "None"
+    },
+    "series_a": {
+      "class": "Series A Preferred",
+      "voting_rights": "1x",
+      "liquidation_preference": "1x non-participating",
+      "dividend_rights": "8% cumulative",
+      "conversion_rights": "Automatic on IPO or sale",
+      "anti_dilution": "Weighted average broad-based"
+    },
+    "series_b": {
+      "class": "Series B Preferred",
+      "voting_rights": "1x",
+      "liquidation_preference": "1x non-participating",
+      "dividend_rights": "8% cumulative",
+      "conversion_rights": "Automatic on IPO or sale",
+      "anti_dilution": "Weighted average narrow-based"
+    }
+  },
+  "shareholders": [
+    {
+      "name": "Alex Thompson",
+      "type": "Founder",
+      "common_shares": 3500000,
+      "preferred_shares": 0,
+      "ownership_percentage": 42.5,
+      "fully_diluted_percentage": 35.7,
+      "vesting_schedule": "4-year with 1-year cliff",
+      "vested_shares": 2625000,
+      "unvested_shares": 875000,
+      "exercise_price": 0.001,
+      "grant_date": "2024-01-15"
+    },
+    {
+      "name": "Sarah Chen",
+      "type": "Co-Founder",
+      "common_shares": 2500000,
+      "preferred_shares": 0,
+      "ownership_percentage": 30.3,
+      "fully_diluted_percentage": 25.5,
+      "vesting_schedule": "4-year with 1-year cliff",
+      "vested_shares": 1875000,
+      "unvested_shares": 625000,
+      "exercise_price": 0.001,
+      "grant_date": "2024-01-15"
+    },
+    {
+      "name": "Velocity Ventures",
+      "type": "Series A Investor",
+      "common_shares": 0,
+      "preferred_shares": 1200000,
+      "ownership_percentage": 14.5,
+      "fully_diluted_percentage": 12.2,
+      "investment_amount": 5000000,
+      "price_per_share": 4.17,
+      "investment_date": "2024-03-01",
+      "board_seats": 1,
+      "protective_provisions": true
+    },
+    {
+      "name": "Growth Capital Partners",
+      "type": "Series B Investor",
+      "common_shares": 0,
+      "preferred_shares": 800000,
+      "ownership_percentage": 9.7,
+      "fully_diluted_percentage": 8.2,
+      "investment_amount": 8000000,
+      "price_per_share": 10.00,
+      "investment_date": "2024-08-01",
+      "board_seats": 1,
+      "protective_provisions": true
+    },
+    {
+      "name": "Employee Stock Option Pool",
+      "type": "Option Pool",
+      "common_shares": 0,
+      "preferred_shares": 0,
+      "reserved_shares": 1000000,
+      "ownership_percentage": 0,
+      "fully_diluted_percentage": 10.2,
+      "allocated_shares": 650000,
+      "available_shares": 350000
+    },
+    {
+      "name": "Marcus Rodriguez",
+      "type": "Employee",
+      "common_shares": 0,
+      "preferred_shares": 0,
+      "option_shares": 150000,
+      "ownership_percentage": 1.8,
+      "fully_diluted_percentage": 1.5,
+      "exercise_price": 2.50,
+      "vesting_schedule": "4-year with 1-year cliff",
+      "vested_options": 75000,
+      "unvested_options": 75000,
+      "grant_date": "2024-02-01"
+    },
+    {
+      "name": "Jennifer Park",
+      "type": "Employee",
+      "common_shares": 0,
+      "preferred_shares": 0,
+      "option_shares": 100000,
+      "ownership_percentage": 1.2,
+      "fully_diluted_percentage": 1.0,
+      "exercise_price": 2.50,
+      "vesting_schedule": "4-year with 1-year cliff",
+      "vested_options": 50000,
+      "unvested_options": 50000,
+      "grant_date": "2024-02-15"
+    }
+  ],
+  "option_pool_details": {
+    "total_reserved": 1000000,
+    "total_granted": 650000,
+    "total_exercised": 0,
+    "total_forfeited": 50000,
+    "available_for_grant": 350000,
+    "outstanding_options": 650000,
+    "weighted_average_exercise_price": 2.75
+  },
+  "liquidation_waterfall": {
+    "scenario_1": {
+      "exit_value": 50000000,
+      "series_b_payout": 8000000,
+      "series_a_payout": 5000000,
+      "common_payout": 37000000,
+      "description": "Series B and A take liquidation preference, remainder to common"
+    },
+    "scenario_2": {
+      "exit_value": 100000000,
+      "series_b_conversion": true,
+      "series_a_conversion": true,
+      "pro_rata_distribution": true,
+      "description": "All convert to common for pro-rata distribution"
+    }
+  },
+  "recent_transactions": [
+    {
+      "date": "2024-08-01",
+      "type": "Series B Financing",
+      "amount": 8000000,
+      "shares_issued": 800000,
+      "price_per_share": 10.00,
+      "pre_money_valuation": 18000000,
+      "post_money_valuation": 26000000,
+      "investor": "Growth Capital Partners"
+    },
+    {
+      "date": "2024-06-15",
+      "type": "Employee Option Grant",
+      "shares_granted": 75000,
+      "exercise_price": 4.50,
+      "recipient": "David Kim - VP Engineering"
+    },
+    {
+      "date": "2024-03-01",
+      "type": "Series A Financing",
+      "amount": 5000000,
+      "shares_issued": 1200000,
+      "price_per_share": 4.17,
+      "pre_money_valuation": 8000000,
+      "post_money_valuation": 13000000,
+      "investor": "Velocity Ventures"
+    }
+  ],
+  "key_metrics": {
+    "fully_diluted_shares": 9800000,
+    "total_invested_capital": 13000000,
+    "current_ownership": {
+      "founders": 61.2,
+      "investors": 24.2,
+      "employees": 4.4,
+      "option_pool": 10.2
+    },
+    "liquidation_overhang": 13000000,
+    "option_pool_utilization": 65.0
+  },
+  "legal_documents": {
+    "certificate_of_incorporation": "Filed 2024-01-15",
+    "bylaws": "Adopted 2024-01-15, Amended 2024-08-01",
+    "series_a_documents": "Executed 2024-03-01",
+    "series_b_documents": "Executed 2024-08-01",
+    "option_plan": "2024 Equity Incentive Plan",
+    "stockholder_agreement": "Amended and Restated 2024-08-01"
+  },
+  "board_composition": {
+    "total_seats": 5,
+    "founder_seats": 2,
+    "investor_seats": 2,
+    "independent_seats": 1,
+    "current_members": [
+      "Alex Thompson (CEO, Founder)",
+      "Sarah Chen (CTO, Co-Founder)",
+      "Michael Johnson (Velocity Ventures)",
+      "Patricia Davis (Growth Capital Partners)",
+      "Robert Wilson (Independent)"
+    ]
+  },
+  "voting_control": {
+    "common_voting_power": 76.3,
+    "preferred_voting_power": 23.7,
+    "drag_along_threshold": 50.1,
+    "tag_along_rights": true,
+    "board_approval_matters": [
+      "Budget approval",
+      "Hiring C-level executives",
+      "Major contracts > $500K",
+      "Equity issuances",
+      "M&A transactions"
+    ]
+  }
+}

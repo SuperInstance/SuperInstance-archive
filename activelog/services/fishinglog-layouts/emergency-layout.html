@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FishingLog - Emergency Layout</title>
+    <link rel="stylesheet" href="styles/marine-common.css">
+    <link rel="stylesheet" href="styles/emergency-layout.css">
+</head>
+<body class="marine-interface emergency-layout">
+    <div class="layout-container emergency-active">
+        <!-- Emergency Alert Banner -->
+        <div class="emergency-banner" id="emergencyBanner">
+            <div class="emergency-status">
+                <div class="emergency-indicator">🚨</div>
+                <div class="emergency-info">
+                    <div class="emergency-type">EMERGENCY ACTIVE</div>
+                    <div class="emergency-time">Started: 16:45:23</div>
+                </div>
+            </div>
+            <div class="emergency-actions">
+                <button class="emergency-btn primary" id="maydayBtn">MAYDAY</button>
+                <button class="emergency-btn" id="panpanBtn">PAN-PAN</button>
+                <button class="emergency-btn" id="securiteBtn">SÉCURITÉ</button>
+            </div>
+        </div>
+
+        <!-- Main Chart Display - Emergency Mode -->
+        <div class="chart-main emergency" id="chartMain">
+            <div class="chart-header">
+                <h2>Electronic Chart - Emergency Mode</h2>
+                <div class="chart-controls">
+                    <button class="btn-chart" id="zoomIn">+</button>
+                    <button class="btn-chart" id="zoomOut">-</button>
+                    <button class="btn-chart" id="centerVessel">📍</button>
+                    <button class="btn-chart active" id="emergencyOverlay">🚨</button>
+                    <select id="chartType">
+                        <option value="emergency" selected>Emergency Chart</option>
+                        <option value="rescue">Rescue Resources</option>
+                        <option value="medical">Medical Facilities</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-display" id="chartCanvas">
+                <div class="vessel-position emergency">
+                    <div class="vessel-icon distress">
+                        <div class="distress-signal"></div>
+                        🚢
+                    </div>
+                    <div class="emergency-circle">
+                        <div class="search-radius" data-radius="2nm"></div>
+                        <div class="search-radius" data-radius="5nm"></div>
+                        <div class="search-radius" data-radius="10nm"></div>
+                    </div>
+                </div>
+                
+                <!-- Emergency Overlays -->
+                <div class="emergency-overlay">
+                    <!-- Coast Guard Assets -->
+                    <div class="rescue-asset cutter" style="top: 30%; left: 60%;" data-asset="USCG-47">
+                        <div class="asset-icon">🚢</div>
+                        <div class="asset-info">
+                            <div class="asset-name">USCG Cutter</div>
+                            <div class="asset-eta">ETA: 45 min</div>
+                        </div>
+                    </div>
+                    
+                    <div class="rescue-asset helicopter" style="top: 20%; left: 40%;" data-asset="USCG-65">
+                        <div class="asset-icon">🚁</div>
+                        <div class="asset-info">
+                            <div class="asset-name">USCG Helo</div>
+                            <div class="asset-eta">ETA: 20 min</div>
+                        </div>
+                    </div>
+
+                    <!-- Nearby Vessels -->
+                    <div class="nearby-vessel" style="top: 45%; left: 70%;" data-vessel="samaritan">
+                        <div class="vessel-icon">⛵</div>
+                        <div class="vessel-info">
+                            <div class="vessel-name">Good Samaritan</div>
+                            <div class="vessel-distance">3.2 nm NE</div>
+                        </div>
+                    </div>
+
+                    <!-- Safe Harbors -->
+                    <div class="safe-harbor" style="top: 60%; left: 30%;" data-harbor="newport">
+                        <div class="harbor-icon">🏠</div>
+                        <div class="harbor-info">
+                            <div class="harbor-name">Newport Harbor</div>
+                            <div class="harbor-distance">8.5 nm W</div>
+                            <div class="harbor-facilities">Medical, Fuel</div>
+                        </div>
+                    </div>
+
+                    <!-- Medical Facilities -->
+                    <div class="medical-facility" style="top: 25%; left: 25%;" data-facility="hospital">
+                        <div class="facility-icon">🏥</div>
+                        <div class="facility-info">
+                            <div class="facility-name">Newport Hospital</div>
+                            <div class="facility-distance">9.1 nm W</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-info emergency">
+                <span class="coordinates">LAT: 41°24.123'N LON: 71°51.456'W</span>
+                <span class="emergency-info">DISTRESS • Nearest CG Asset: 45min • Safe Harbor: 8.5nm</span>
+            </div>
+        </div>
+
+        <!-- AIS Traffic Panel -->
+        <div class="ais-panel" id="aisPanel">
+            <div class="panel-header">
+                <h3>AIS Traffic & Rescue Assets</h3>
+                <div class="ais-controls">
+                    <button class="btn-small active" id="aisFilter">🚨 Emergency</button>
+                    <button class="btn-small" id="aisAll">All Traffic</button>
+                </div>
+            </div>
+            
+            <!-- Emergency Assets -->
+            <div class="emergency-assets">
+                <h4>Coast Guard Assets</h4>
+                <div class="asset-list">
+                    <div class="asset-item responding">
+                        <div class="asset-type">🚁</div>
+                        <div class="asset-details">
+                            <div class="asset-name">USCG 6505</div>
+                            <div class="asset-callsign">CG-6505</div>
+                            <div class="asset-status">En Route</div>
+                        </div>
+                        <div class="asset-eta">
+                            <div class="eta-time">20 min</div>
+                            <div class="eta-distance">12.3 nm</div>
+                        </div>
+                    </div>
+                    
+                    <div class="asset-item responding">
+                        <div class="asset-type">🚢</div>
+                        <div class="asset-details">
+                            <div class="asset-name">USCG Cutter Vigilant</div>
+                            <div class="asset-callsign">USCG-47315</div>
+                            <div class="asset-status">En Route</div>
+                        </div>
+                        <div class="asset-eta">
+                            <div class="eta-time">45 min</div>
+                            <div class="eta-distance">18.7 nm</div>
+                        </div>
+                    </div>
+
+                    <div class="asset-item standby">
+                        <div class="asset-type">🚤</div>
+                        <div class="asset-details">
+                            <div class="asset-name">Station Point Judith</div>
+                            <div class="asset-callsign">CG-47240</div>
+                            <div class="asset-status">Standby</div>
+                        </div>
+                        <div class="asset-eta">
+                            <div class="eta-time">35 min</div>
+                            <div class="eta-distance">22.1 nm</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nearby Vessels -->
+            <div class="nearby-vessels">
+                <h4>Nearby Vessels (AIS)</h4>
+                <div class="vessel-list">
+                    <div class="vessel-item samaritan">
+                        <div class="vessel-type">⛵</div>
+                        <div class="vessel-details">
+                            <div class="vessel-name">Good Samaritan</div>
+                            <div class="vessel-mmsi">338123456</div>
+                            <div class="vessel-length">45 ft</div>
+                        </div>
+                        <div class="vessel-position">
+                            <div class="distance">3.2 nm NE</div>
+                            <div class="bearing">045°</div>
+                            <div class="cpa">CPA: 2.8nm</div>
+                        </div>
+                        <button class="contact-btn" data-vessel="338123456">📻 Contact</button>
+                    </div>
+
+                    <div class="vessel-item">
+                        <div class="vessel-type">🚤</div>
+                        <div class="vessel-details">
+                            <div class="vessel-name">Miss Behavin</div>
+                            <div class="vessel-mmsi">338789012</div>
+                            <div class="vessel-length">38 ft</div>
+                        </div>
+                        <div class="vessel-position">
+                            <div class="distance">5.7 nm SW</div>
+                            <div class="bearing">225°</div>
+                            <div class="cpa">CPA: 5.1nm</div>
+                        </div>
+                        <button class="contact-btn" data-vessel="338789012">📻 Contact</button>
+                    </div>
+
+                    <div class="vessel-item commercial">
+                        <div class="vessel-type">🚢</div>
+                        <div class="vessel-details">
+                            <div class="vessel-name">Atlantic Trader</div>
+                            <div class="vessel-mmsi">367123456</div>
+                            <div class="vessel-length">180 ft</div>
+                        </div>
+                        <div class="vessel-position">
+                            <div class="distance">8.3 nm E</div>
+                            <div class="bearing">090°</div>
+                            <div class="cpa">CPA: 7.9nm</div>
+                        </div>
+                        <button class="contact-btn" data-vessel="367123456">📻 Contact</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SAR Pattern -->
+            <div class="sar-pattern">
+                <h4>Search Pattern</h4>
+                <div class="pattern-display">
+                    <div class="pattern-type">Expanding Square</div>
+                    <div class="pattern-center">41°24.123'N 71°51.456'W</div>
+                    <div class="pattern-radius">Initial: 1nm</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Communications Panel -->
+        <div class="communications-panel" id="communicationsPanel">
+            <div class="panel-header">
+                <h3>Emergency Communications</h3>
+                <div class="comm-status">
+                    <span class="status-indicator active">📻</span>
+                    <span class="dsca-status">DSC: Armed</span>
+                </div>
+            </div>
+            
+            <!-- VHF Radio -->
+            <div class="vhf-radio">
+                <h4>VHF Radio</h4>
+                <div class="radio-display">
+                    <div class="channel-display">
+                        <div class="channel-number">16</div>
+                        <div class="channel-name">DISTRESS</div>
+                    </div>
+                    <div class="radio-controls">
+                        <button class="radio-btn" id="channel16">CH 16</button>
+                        <button class="radio-btn" id="channel70">CH 70 DSC</button>
+                        <button class="radio-btn" id="channel22A">22A CG</button>
+                    </div>
+                </div>
+                
+                <div class="distress-calls">
+                    <button class="distress-btn mayday" id="maydayCall">
+                        <div class="btn-icon">🚨</div>
+                        <div class="btn-text">MAYDAY CALL</div>
+                    </button>
+                    <button class="distress-btn panpan" id="panpanCall">
+                        <div class="btn-icon">⚠️</div>
+                        <div class="btn-text">PAN-PAN CALL</div>
+                    </button>
+                    <button class="distress-btn securite" id="securiteCall">
+                        <div class="btn-icon">ℹ️</div>
+                        <div class="btn-text">SÉCURITÉ CALL</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- DSC (Digital Selective Calling) -->
+            <div class="dsc-system">
+                <h4>Digital Selective Calling</h4>
+                <div class="dsc-status">
+                    <div class="dsc-mmsi">MMSI: 338123789</div>
+                    <div class="dsc-position">Auto Position: ON</div>
+                </div>
+                <div class="dsc-controls">
+                    <button class="dsc-btn emergency" id="dscDistress">
+                        🚨 DSC DISTRESS
+                    </button>
+                    <button class="dsc-btn" id="dscUrgency">
+                        ⚠️ DSC URGENCY
+                    </button>
+                    <button class="dsc-btn" id="dscSafety">
+                        ℹ️ DSC SAFETY
+                    </button>
+                </div>
+            </div>
+
+            <!-- EPIRB -->
+            <div class="epirb-system">
+                <h4>EPIRB (Emergency Position Beacon)</h4>
+                <div class="epirb-status">
+                    <div class="epirb-indicator">
+                        <span class="status-light standby">●</span>
+                        <span class="status-text">STANDBY</span>
+                    </div>
+                    <div class="epirb-battery">Battery: Good</div>
+                    <div class="epirb-test">Last Test: 30 days ago</div>
+                </div>
+                <button class="epirb-btn" id="activateEpirb">
+                    🚨 ACTIVATE EPIRB
+                </button>
+                <div class="epirb-warning">
+                    ⚠️ Manual activation only in life-threatening emergency
+                </div>
+            </div>
+
+            <!-- Recent Communications -->
+            <div class="recent-comms">
+                <h4>Recent Communications</h4>
+                <div class="comm-log">
+                    <div class="comm-entry mayday">
+                        <div class="comm-time">16:45</div>
+                        <div class="comm-type">MAYDAY</div>
+                        <div class="comm-details">
+                            Transmitted on CH 16<br>
+                            "MAYDAY MAYDAY MAYDAY, This is sailing vessel Blue Water..."
+                        </div>
+                    </div>
+                    <div class="comm-entry response">
+                        <div class="comm-time">16:46</div>
+                        <div class="comm-type">CG RESPONSE</div>
+                        <div class="comm-details">
+                            USCG Group Woods Hole acknowledged<br>
+                            Assets dispatched - Helo ETA 20 min
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency Procedures -->
+        <div class="procedures-panel" id="proceduresPanel">
+            <div class="panel-header">
+                <h3>Emergency Procedures</h3>
+                <button class="btn-small" id="procedureGuide">📖 Guide</button>
+            </div>
+            
+            <!-- Active Emergency -->
+            <div class="active-emergency">
+                <h4>Active Emergency</h4>
+                <div class="emergency-details">
+                    <div class="emergency-type-detail">
+                        <span class="type-label">Type:</span>
+                        <span class="type-value">Medical Emergency</span>
+                    </div>
+                    <div class="emergency-severity">
+                        <span class="severity-label">Severity:</span>
+                        <span class="severity-value critical">Critical</span>
+                    </div>
+                    <div class="emergency-started">
+                        <span class="started-label">Started:</span>
+                        <span class="started-value">16:45:23</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency Checklist -->
+            <div class="emergency-checklist">
+                <h4>Emergency Checklist</h4>
+                <div class="checklist-items">
+                    <div class="checklist-item completed">
+                        <input type="checkbox" id="step1" checked>
+                        <label for="step1">🚨 MAYDAY call transmitted</label>
+                        <div class="step-time">16:45</div>
+                    </div>
+                    <div class="checklist-item completed">
+                        <input type="checkbox" id="step2" checked>
+                        <label for="step2">📍 Position transmitted</label>
+                        <div class="step-time">16:45</div>
+                    </div>
+                    <div class="checklist-item completed">
+                        <input type="checkbox" id="step3" checked>
+                        <label for="step3">👥 Crew accounted for</label>
+                        <div class="step-time">16:46</div>
+                    </div>
+                    <div class="checklist-item active">
+                        <input type="checkbox" id="step4">
+                        <label for="step4">🦺 Life jackets donned</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="step5">
+                        <label for="step5">⚓ Prepare abandon ship</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency Equipment -->
+            <div class="emergency-equipment">
+                <h4>Emergency Equipment</h4>
+                <div class="equipment-list">
+                    <div class="equipment-item">
+                        <div class="equip-icon">🦺</div>
+                        <div class="equip-name">Life Jackets</div>
+                        <div class="equip-status">6 aboard</div>
+                        <div class="equip-condition good">Good</div>
+                    </div>
+                    <div class="equipment-item">
+                        <div class="equip-icon">🛟</div>
+                        <div class="equip-name">Life Raft</div>
+                        <div class="equip-status">6-person</div>
+                        <div class="equip-condition good">Good</div>
+                    </div>
+                    <div class="equipment-item">
+                        <div class="equip-icon">🧯</div>
+                        <div class="equip-name">Fire Extinguisher</div>
+                        <div class="equip-status">2 aboard</div>
+                        <div class="equip-condition good">Good</div>
+                    </div>
+                    <div class="equipment-item">
+                        <div class="equip-icon">🚨</div>
+                        <div class="equip-name">Flares</div>
+                        <div class="equip-status">12 count</div>
+                        <div class="equip-condition good">Good</div>
+                    </div>
+                    <div class="equipment-item">
+                        <div class="equip-icon">🩹</div>
+                        <div class="equip-name">First Aid Kit</div>
+                        <div class="equip-status">Complete</div>
+                        <div class="equip-condition good">Good</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical Emergency Guide -->
+            <div class="medical-guide">
+                <h4>Medical Emergency - Unconscious Person</h4>
+                <div class="guide-steps">
+                    <div class="guide-step priority">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Check for responsiveness and breathing</div>
+                    </div>
+                    <div class="guide-step priority">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Begin CPR if no pulse/breathing</div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Continue until medical help arrives</div>
+                    </div>
+                </div>
+                <div class="medical-contacts">
+                    <button class="contact-btn urgent" id="coastGuardMedical">
+                        📞 CG Medical Advice
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar - Emergency Mode -->
+        <div class="status-bar emergency">
+            <div class="status-item critical">
+                <span class="status-label">EMERGENCY:</span>
+                <span class="status-value">Medical - Critical</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">CG ETA:</span>
+                <span class="status-value">Helo 20min • Cutter 45min</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Safe Harbor:</span>
+                <span class="status-value">Newport 8.5nm</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Nearest Vessel:</span>
+                <span class="status-value">Good Samaritan 3.2nm</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">DSC:</span>
+                <span class="status-value active">Armed</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emergency Call Modal -->
+    <div class="modal emergency hidden" id="emergencyCallModal">
+        <div class="modal-content">
+            <h3 id="callModalTitle">MAYDAY CALL</h3>
+            <div class="call-script">
+                <h4>Radio Script:</h4>
+                <div class="script-text">
+                    "MAYDAY, MAYDAY, MAYDAY<br>
+                    This is sailing vessel <span class="vessel-name">Blue Water</span><br>
+                    MAYDAY <span class="vessel-name">Blue Water</span><br>
+                    Position: <span class="position">41°24.123'N 71°51.456'W</span><br>
+                    We have a medical emergency<br>
+                    <span class="people-count">4</span> people on board<br>
+                    Request immediate medical assistance<br>
+                    Over."
+                </div>
+            </div>
+            <div class="call-actions">
+                <button class="btn-emergency" id="transmitCall">📻 TRANSMIT CALL</button>
+                <button class="btn-secondary" id="cancelCall">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/marine-common.js"></script>
+    <script src="scripts/emergency-layout.js"></script>
+</body>
+</html>

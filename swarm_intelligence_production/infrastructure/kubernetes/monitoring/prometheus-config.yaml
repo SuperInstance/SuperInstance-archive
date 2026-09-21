@@ -1,0 +1,209 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: swarm-intelligence
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      scrape_timeout: 10s
+      evaluation_interval: 15s
+      external_labels:
+        cluster: swarm-intelligence
+        environment: production
+
+    # Alertmanager configuration
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets:
+              - alertmanager:9093
+
+    # Rule files
+    rule_files:
+      - /etc/prometheus/rules/*.yml
+
+    # Scrape configurations
+    scrape_configs:
+      # Kubernetes API server
+      - job_name: 'kubernetes-apiservers'
+        kubernetes_sd_configs:
+        - role: endpoints
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+          action: keep
+          regex: default;kubernetes;https
+
+      # Kubernetes nodes
+      - job_name: 'kubernetes-nodes'
+        kubernetes_sd_configs:
+        - role: node
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+        - action: labelmap
+          regex: __meta_kubernetes_node_label_(.+)
+
+      # Kubernetes pods
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+        - role: pod
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+          action: keep
+          regex: true
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+          action: replace
+          target_label: __metrics_path__
+          regex: (.+)
+        - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+          action: replace
+          regex: ([^:]+)(?::\d+)?;(\d+)
+          replacement: $1:$2
+          target_label: __address__
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
+        - source_labels: [__meta_kubernetes_namespace]
+          action: replace
+          target_label: kubernetes_namespace
+        - source_labels: [__meta_kubernetes_pod_name]
+          action: replace
+          target_label: kubernetes_pod_name
+
+      # Swarm Core Service
+      - job_name: 'swarm-core'
+        kubernetes_sd_configs:
+        - role: service
+          namespaces:
+            names:
+            - swarm-intelligence
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_service_label_app]
+          regex: swarm-core
+          action: keep
+        - source_labels: [__meta_kubernetes_service_name]
+          target_label: job
+        metric_relabel_configs:
+        - source_labels: [__name__]
+          regex: 'swarm_(agents|tasks|pheromones|votes)_.*'
+          action: keep
+
+      # Swarm API Service
+      - job_name: 'swarm-api'
+        kubernetes_sd_configs:
+        - role: service
+          namespaces:
+            names:
+            - swarm-intelligence
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_service_label_app]
+          regex: swarm-api
+          action: keep
+        - source_labels: [__meta_kubernetes_service_name]
+          target_label: job
+
+      # PostgreSQL
+      - job_name: 'postgres'
+        static_configs:
+        - targets: ['postgres-exporter:9187']
+
+      # Redis
+      - job_name: 'redis'
+        static_configs:
+        - targets: ['redis-exporter:9121']
+
+      # Kafka
+      - job_name: 'kafka'
+        static_configs:
+        - targets: ['kafka-exporter:9308']
+
+  # Alert rules
+  swarm_alerts.yml: |
+    groups:
+    - name: swarm_intelligence
+      interval: 30s
+      rules:
+      # Agent count alerts
+      - alert: HighAgentCount
+        expr: swarm_agents_total > 9000000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High agent count detected"
+          description: "Agent count is {{ $value }}, approaching maximum capacity"
+
+      - alert: CriticalAgentCount
+        expr: swarm_agents_total > 9500000
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical agent count"
+          description: "Agent count is {{ $value }}, immediate scaling required"
+
+      # Performance alerts
+      - alert: HighProcessingLatency
+        expr: histogram_quantile(0.99, rate(swarm_processing_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High processing latency"
+          description: "99th percentile latency is {{ $value }}s"
+
+      # Resource alerts
+      - alert: HighCPUUsage
+        expr: rate(process_cpu_seconds_total[5m]) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}%"
+
+      - alert: HighMemoryUsage
+        expr: (process_resident_memory_bytes / 1024 / 1024 / 1024) > 14
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value }}GB"
+
+      # Database alerts
+      - alert: DatabaseConnectionPoolExhausted
+        expr: pg_stat_database_numbackends / pg_settings_max_connections > 0.9
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database connection pool exhausted"
+          description: "{{ $value }}% of connections in use"
+
+      # Cache alerts
+      - alert: RedisHighMemory
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis memory usage high"
+          description: "Redis using {{ $value }}% of available memory"
+
+      # Kafka alerts
+      - alert: KafkaConsumerLag
+        expr: kafka_consumergroup_lag > 10000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kafka consumer lag detected"
+          description: "Consumer lag is {{ $value }} messages"

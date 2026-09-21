@@ -1,0 +1,324 @@
+{
+  "artifacts": [
+    {
+      "id": "d3af3eab4a57",
+      "name": "Basic Problem Solving Method",
+      "type": "technical_innovation",
+      "content": "A systematic approach to breaking down complex problems into smaller, manageable parts",
+      "creator_id": "alice",
+      "creation_timestamp": "2025-10-21T18:51:43.176952",
+      "generation": 1,
+      "transmission_count": 1,
+      "fidelity_history": [
+        0.85
+      ],
+      "transmission_chain": [
+        "alice"
+      ],
+      "modifications": [],
+      "improvement_score": 0.0,
+      "complexity_score": 0.4,
+      "adoption_count": 0,
+      "utility_score": 0.0,
+      "last_used": null
+    },
+    {
+      "id": "b63666a94dce",
+      "name": "Collaboration Principle",
+      "type": "social_norms",
+      "content": "Always consider others' perspectives before making decisions that affect the group",
+      "creator_id": "bob",
+      "creation_timestamp": "2025-10-21T18:51:43.177867",
+      "generation": 1,
+      "transmission_count": 1,
+      "fidelity_history": [
+        0.7
+      ],
+      "transmission_chain": [
+        "bob"
+      ],
+      "modifications": [],
+      "improvement_score": 0.0,
+      "complexity_score": 0.3,
+      "adoption_count": 0,
+      "utility_score": 0.0,
+      "last_used": null
+    },
+    {
+      "id": "5575ad85cfad",
+      "name": "Digital Poetry Form",
+      "type": "artistic_expression",
+      "content": "A new form of poetry that incorporates code-like structures and algorithmic patterns",
+      "creator_id": "charlie",
+      "creation_timestamp": "2025-10-21T18:51:43.178705",
+      "generation": 1,
+      "transmission_count": 1,
+      "fidelity_history": [
+        0.5
+      ],
+      "transmission_chain": [
+        "charlie"
+      ],
+      "modifications": [],
+      "improvement_score": 0.0,
+      "complexity_score": 0.6,
+      "adoption_count": 0,
+      "utility_score": 0.0,
+      "last_used": null
+    },
+    {
+      "id": "1502cc38e3d3",
+      "name": "Basic Problem Solving Method (v2)",
+      "type": "technical_innovation",
+      "content": "A systematic approach to breaking down complex problems into smaller, manageable parts",
+      "creator_id": "alice",
+      "creation_timestamp": "2025-10-21T18:51:43.180084",
+      "generation": 1,
+      "transmission_count": 0,
+      "fidelity_history": [
+        0.85,
+        0.85
+      ],
+      "transmission_chain": [
+        "alice",
+        "alice"
+      ],
+      "modifications": [
+        {
+          "type": "transmission",
+          "transmitter": "alice",
+          "fidelity": 0.85,
+          "timestamp": "2025-10-21T18:51:43.180088"
+        }
+      ],
+      "improvement_score": 0.35,
+      "complexity_score": 0.42800000000000005,
+      "adoption_count": 0,
+      "utility_score": 0.0,
+      "last_used": null
+    },
+    {
+      "id": "40cf28ed8524",
+      "name": "Collaboration Principle (v2)",
+      "type": "social_norms",
+      "content": "Key concepts: Always, consider, others', perspectives, before, making, decisions, affect, group",
+      "creator_id": "bob",
+      "creation_timestamp": "2025-10-21T18:51:43.181415",
+      "generation": 1,
+      "transmission_count": 0,
+      "fidelity_history": [
+        0.7,
+        0.7
+      ],
+      "transmission_chain": [
+        "bob",
+        "bob"
+      ],
+      "modifications": [
+        {
+          "type": "transmission",
+          "transmitter": "bob",
+          "fidelity": 0.7,
+          "timestamp": "2025-10-21T18:51:43.181424"
+        }
+      ],
+      "improvement_score": 0.19999999999999996,
+      "complexity_score": 0.312,
+      "adoption_count": 0,
+      "utility_score": 0.0,
+      "last_used": null
+    },
+    {
+      "id": "83956fb5d3b5",
+      "name": "Digital Poetry Form (v2)",
+      "type": "artistic_expression",
+      "content": "A new form of poetry that incorporates code-like s...",
+      "creator_id": "charlie",
+      "creation_timestamp": "2025-10-21T18:51:43.182788",
+      "generation": 1,
+      "transmission_count": 0,
+      "fidelity_history": [
+        0.5,
+        0.5
+      ],
+      "transmission_chain": [
+        "charlie",
+        "charlie"
+      ],
+      "modifications": [
+        {
+          "type": "transmission",
+          "transmitter": "charlie",
+          "fidelity": 0.5,
+          "timestamp": "2025-10-21T18:51:43.182794"
+        }
+      ],
+      "improvement_score": 0.0,
+      "complexity_score": 0.6,
+      "adoption_count": 0,
+      "utility_score": 0.0,
+      "last_used": null
+    },
+    {
+      "id": "776b0f891d69",
+      "name": "Basic Problem Solving Method",
+      "type": "technical_innovation",
+      "content": "A systematic approach to breaking down complex problems into smaller, manageable parts",
+      "creator_id": "alice",
+      "creation_timestamp": "2025-10-21T18:52:04.524302",
+      "generation": 2,
+      "transmission_count": 1,
+      "fidelity_history": [
+        0.85
+      ],
+      "transmission_chain": [
+        "alice"
+      ],
+      "modifications": [],
+      "improvement_score": 0.0,
+      "complexity_score": 0.4,
+      "adoption_count": 0,
+      "utility_score": 0.0,
+      "last_used": null
+    },
+    {
+      "id": "425dcbcf9d36",
+      "name": "Collaboration Principle",
+      "type": "social_norms",
+      "content": "Always consider others' perspectives before making decisions that affect the group",
+      "creator_id": "bob",
+      "creation_timestamp": "2025-10-21T18:52:04.525312",
+      "generation": 2,
+      "transmission_count": 1,
+      "fidelity_history": [
+        0.7
+      ],
+      "transmission_chain": [
+        "bob"
+      ],
+      "modifications": [],
+      "improvement_score": 0.0,
+      "complexity_score": 0.3,
+      "adoption_count": 0,
+      "utility_score": 0.0,
+      "last_used": null
+    },
+    {
+      "id": "6ae73097d554",
+      "name": "Digital Poetry Form",
+      "type": "artistic_expression",
+      "content": "A new form of poetry that incorporates code-like structures and algorithmic patterns",
+      "creator_id": "charlie",
+      "creation_timestamp": "2025-10-21T18:52:04.526793",
+      "generation": 2,
+      "transmission_count": 1,
+      "fidelity_history": [
+        0.5
+      ],
+      "transmission_chain": [
+        "charlie"
+      ],
+      "modifications": [],
+      "improvement_score": 0.0,
+      "complexity_score": 0.6,
+      "adoption_count": 0,
+      "utility_score": 0.0,
+      "last_used": null
+    },
+    {
+      "id": "62047578569f",
+      "name": "Basic Problem Solving Method (v2)",
+      "type": "technical_innovation",
+      "content": "A systematic approach to breaking down complex problems into smaller, manageable parts",
+      "creator_id": "alice",
+      "creation_timestamp": "2025-10-21T18:52:04.528316",
+      "generation": 2,
+      "transmission_count": 0,
+      "fidelity_history": [
+        0.85,
+        0.85
+      ],
+      "transmission_chain": [
+        "alice",
+        "alice"
+      ],
+      "modifications": [
+        {
+          "type": "transmission",
+          "transmitter": "alice",
+          "fidelity": 0.85,
+          "timestamp": "2025-10-21T18:52:04.528322"
+        }
+      ],
+      "improvement_score": 0.35,
+      "complexity_score": 0.42800000000000005,
+      "adoption_count": 0,
+      "utility_score": 0.0,
+      "last_used": null
+    },
+    {
+      "id": "fe1464a4c41e",
+      "name": "Collaboration Principle (v2)",
+      "type": "social_norms",
+      "content": "Key concepts: Always, consider, others', perspectives, before, making, decisions, affect, group",
+      "creator_id": "bob",
+      "creation_timestamp": "2025-10-21T18:52:04.529011",
+      "generation": 2,
+      "transmission_count": 0,
+      "fidelity_history": [
+        0.7,
+        0.7
+      ],
+      "transmission_chain": [
+        "bob",
+        "bob"
+      ],
+      "modifications": [
+        {
+          "type": "transmission",
+          "transmitter": "bob",
+          "fidelity": 0.7,
+          "timestamp": "2025-10-21T18:52:04.529014"
+        }
+      ],
+      "improvement_score": 0.19999999999999996,
+      "complexity_score": 0.312,
+      "adoption_count": 0,
+      "utility_score": 0.0,
+      "last_used": null
+    },
+    {
+      "id": "c7cc61888603",
+      "name": "Digital Poetry Form (v2)",
+      "type": "artistic_expression",
+      "content": "A new form of poetry that incorporates code-like s...",
+      "creator_id": "charlie",
+      "creation_timestamp": "2025-10-21T18:52:04.530422",
+      "generation": 2,
+      "transmission_count": 0,
+      "fidelity_history": [
+        0.5,
+        0.5
+      ],
+      "transmission_chain": [
+        "charlie",
+        "charlie"
+      ],
+      "modifications": [
+        {
+          "type": "transmission",
+          "transmitter": "charlie",
+          "fidelity": 0.5,
+          "timestamp": "2025-10-21T18:52:04.530427"
+        }
+      ],
+      "improvement_score": 0.0,
+      "complexity_score": 0.6,
+      "adoption_count": 0,
+      "utility_score": 0.0,
+      "last_used": null
+    }
+  ],
+  "current_generation": 2,
+  "last_saved": "2025-10-21T18:52:04.531843"
+}

@@ -1,0 +1,541 @@
+# AlertManager Configuration for ActiveLog Platform
+# Comprehensive alerting and notification system
+
+# AlertManager StatefulSet
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: alertmanager
+  namespace: activelog-monitoring
+spec:
+  serviceName: alertmanager
+  replicas: 3
+  selector:
+    matchLabels:
+      app: alertmanager
+  template:
+    metadata:
+      labels:
+        app: alertmanager
+    spec:
+      serviceAccountName: alertmanager
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+      containers:
+      - name: alertmanager
+        image: prom/alertmanager:v0.26.0
+        args:
+        - --config.file=/etc/alertmanager/config.yml
+        - --storage.path=/alertmanager
+        - --data.retention=120h
+        - --web.listen-address=0.0.0.0:9093
+        - --web.external-url=http://alertmanager.activelog.local
+        - --cluster.listen-address=0.0.0.0:9094
+        - --cluster.peer=alertmanager-0.alertmanager:9094
+        - --cluster.peer=alertmanager-1.alertmanager:9094
+        - --cluster.peer=alertmanager-2.alertmanager:9094
+        - --log.level=info
+        ports:
+        - containerPort: 9093
+          name: web
+        - containerPort: 9094
+          name: mesh
+        resources:
+          limits:
+            cpu: 1
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        volumeMounts:
+        - name: config
+          mountPath: /etc/alertmanager
+        - name: alertmanager-storage
+          mountPath: /alertmanager
+        - name: templates
+          mountPath: /etc/alertmanager/templates
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9093
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9093
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+      volumes:
+      - name: config
+        configMap:
+          name: alertmanager-config
+      - name: templates
+        configMap:
+          name: alertmanager-templates
+  volumeClaimTemplates:
+  - metadata:
+      name: alertmanager-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: fast-ssd
+      resources:
+        requests:
+          storage: 10Gi
+---
+# AlertManager Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanager
+  namespace: activelog-monitoring
+  labels:
+    app: alertmanager
+spec:
+  ports:
+  - port: 9093
+    targetPort: 9093
+    name: web
+  - port: 9094
+    targetPort: 9094
+    name: mesh
+  selector:
+    app: alertmanager
+  clusterIP: None
+---
+# AlertManager Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: activelog-monitoring
+data:
+  config.yml: |
+    global:
+      smtp_smarthost: 'smtp.activelog.com:587'
+      smtp_from: 'alerts@activelog.com'
+      smtp_auth_username: 'alerts@activelog.com'
+      smtp_auth_password: 'smtp_password_here'
+      slack_api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+    
+    templates:
+    - '/etc/alertmanager/templates/*.tmpl'
+    
+    route:
+      group_by: ['alertname', 'service', 'severity']
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 12h
+      receiver: 'default-receiver'
+      routes:
+      
+      # Critical alerts - immediate notification
+      - match:
+          severity: critical
+        receiver: 'critical-alerts'
+        group_wait: 10s
+        repeat_interval: 5m
+        routes:
+        - match:
+            service: security
+          receiver: 'security-team'
+          group_wait: 0s
+          repeat_interval: 1m
+        
+        - match:
+            service: ai
+          receiver: 'ai-team'
+          
+        - match:
+            service: gaming
+          receiver: 'gaming-team'
+          
+        - match:
+            service: infrastructure
+          receiver: 'infrastructure-team'
+      
+      # Warning alerts - standard notification
+      - match:
+          severity: warning
+        receiver: 'warning-alerts'
+        group_wait: 30s
+        repeat_interval: 4h
+        routes:
+        - match:
+            service: ai
+          receiver: 'ai-team-warnings'
+          
+        - match:
+            service: gaming
+          receiver: 'gaming-team-warnings'
+      
+      # Info alerts - low priority
+      - match:
+          severity: info
+        receiver: 'info-alerts'
+        group_wait: 5m
+        repeat_interval: 24h
+    
+    # Inhibit rules to reduce noise
+    inhibit_rules:
+    - source_match:
+        severity: 'critical'
+      target_match:
+        severity: 'warning'
+      equal: ['alertname', 'service', 'instance']
+      
+    - source_match:
+        severity: 'warning'
+      target_match:
+        severity: 'info'
+      equal: ['alertname', 'service', 'instance']
+    
+    # Receivers configuration
+    receivers:
+    - name: 'default-receiver'
+      slack_configs:
+      - channel: '#alerts'
+        title: 'ActiveLog Alert'
+        text: '{{ template "slack.default.text" . }}'
+        send_resolved: true
+    
+    - name: 'critical-alerts'
+      slack_configs:
+      - channel: '#critical-alerts'
+        title: '🚨 CRITICAL: ActiveLog Alert'
+        text: '{{ template "slack.critical.text" . }}'
+        send_resolved: true
+      email_configs:
+      - to: 'oncall@activelog.com'
+        subject: '🚨 CRITICAL Alert: {{ .GroupLabels.alertname }}'
+        body: '{{ template "email.critical.html" . }}'
+        html: '{{ template "email.critical.html" . }}'
+      pagerduty_configs:
+      - routing_key: 'PAGERDUTY_INTEGRATION_KEY'
+        description: '{{ .GroupLabels.alertname }}: {{ .GroupLabels.instance }}'
+    
+    - name: 'security-team'
+      slack_configs:
+      - channel: '#security-alerts'
+        title: '🛡️ SECURITY ALERT'
+        text: '{{ template "slack.security.text" . }}'
+        send_resolved: true
+      email_configs:
+      - to: 'security@activelog.com'
+        subject: '🛡️ Security Alert: {{ .GroupLabels.alertname }}'
+        body: '{{ template "email.security.html" . }}'
+        html: '{{ template "email.security.html" . }}'
+    
+    - name: 'ai-team'
+      slack_configs:
+      - channel: '#ai-alerts'
+        title: '🤖 AI/ML Alert'
+        text: '{{ template "slack.ai.text" . }}'
+        send_resolved: true
+      email_configs:
+      - to: 'ai-team@activelog.com'
+        subject: '🤖 AI Alert: {{ .GroupLabels.alertname }}'
+        body: '{{ template "email.default.html" . }}'
+    
+    - name: 'ai-team-warnings'
+      slack_configs:
+      - channel: '#ai-warnings'
+        title: '⚠️ AI/ML Warning'
+        text: '{{ template "slack.default.text" . }}'
+        send_resolved: true
+    
+    - name: 'gaming-team'
+      slack_configs:
+      - channel: '#gaming-alerts'
+        title: '🎮 Gaming Platform Alert'
+        text: '{{ template "slack.gaming.text" . }}'
+        send_resolved: true
+      email_configs:
+      - to: 'gaming-team@activelog.com'
+        subject: '🎮 Gaming Alert: {{ .GroupLabels.alertname }}'
+        body: '{{ template "email.default.html" . }}'
+    
+    - name: 'gaming-team-warnings'
+      slack_configs:
+      - channel: '#gaming-warnings'
+        title: '⚠️ Gaming Platform Warning'
+        text: '{{ template "slack.default.text" . }}'
+        send_resolved: true
+    
+    - name: 'infrastructure-team'
+      slack_configs:
+      - channel: '#infrastructure-alerts'
+        title: '🏗️ Infrastructure Alert'
+        text: '{{ template "slack.infrastructure.text" . }}'
+        send_resolved: true
+      email_configs:
+      - to: 'infrastructure@activelog.com'
+        subject: '🏗️ Infrastructure Alert: {{ .GroupLabels.alertname }}'
+        body: '{{ template "email.infrastructure.html" . }}'
+        html: '{{ template "email.infrastructure.html" . }}'
+    
+    - name: 'warning-alerts'
+      slack_configs:
+      - channel: '#warnings'
+        title: '⚠️ ActiveLog Warning'
+        text: '{{ template "slack.default.text" . }}'
+        send_resolved: true
+    
+    - name: 'info-alerts'
+      slack_configs:
+      - channel: '#info'
+        title: 'ℹ️ ActiveLog Info'
+        text: '{{ template "slack.default.text" . }}'
+        send_resolved: true
+---
+# AlertManager Templates
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-templates
+  namespace: activelog-monitoring
+data:
+  default.tmpl: |
+    {{ define "cluster" }}{{ .ExternalURL | reReplaceAll ".*alertmanager\\.(.*)" "$1" }}{{ end }}
+    
+    {{ define "slack.default.title" }}
+    [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .GroupLabels.alertname }} for {{ .GroupLabels.job }}
+    {{- if gt (len .GroupLabels) (len .GroupLabels.alertname) -}}
+      {{" "}}(
+      {{- with .GroupLabels.Remove (stringSlice "alertname" "job") -}}
+        {{- range $index, $label := .SortedPairs -}}
+          {{- if $index -}}, {{ end -}}
+          {{- $label.Name }}="{{ $label.Value -}}"
+        {{- end -}}
+      {{- end -}}
+      )
+    {{- end }}
+    {{ end }}
+    
+    {{ define "slack.default.text" }}
+    {{ range .Alerts }}
+    *Alert:* {{ .Annotations.title }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
+    *Description:* {{ .Annotations.description }}
+    *Graph:* <{{ .GeneratorURL }}|:chart_with_upwards_trend:>
+    *Details:*
+      {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+      {{ end }}
+    {{ end }}
+    {{ end }}
+    
+    {{ define "slack.critical.text" }}
+    🚨 *CRITICAL ALERT* 🚨
+    {{ range .Alerts }}
+    *Alert:* {{ .Annotations.title }}
+    *Severity:* `CRITICAL`
+    *Description:* {{ .Annotations.description }}
+    *Service:* `{{ .Labels.service }}`
+    *Instance:* `{{ .Labels.instance }}`
+    *Time:* {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+    *Graph:* <{{ .GeneratorURL }}|:chart_with_upwards_trend:>
+    
+    *Immediate Action Required!*
+    {{ end }}
+    {{ end }}
+    
+    {{ define "slack.security.text" }}
+    🛡️ *SECURITY ALERT* 🛡️
+    {{ range .Alerts }}
+    *Alert:* {{ .Annotations.title }}
+    *Type:* Security Incident
+    *Description:* {{ .Annotations.description }}
+    *Service:* `{{ .Labels.service }}`
+    *Source:* `{{ .Labels.instance }}`
+    *Time:* {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+    
+    *URGENT: Security team involvement required*
+    {{ end }}
+    {{ end }}
+    
+    {{ define "slack.ai.text" }}
+    🤖 *AI/ML SYSTEM ALERT*
+    {{ range .Alerts }}
+    *Alert:* {{ .Annotations.title }}
+    *Model:* `{{ .Labels.model | default "Unknown" }}`
+    *Service:* `{{ .Labels.service }}`
+    *Description:* {{ .Annotations.description }}
+    *Time:* {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+    
+    {{ if .Labels.accuracy }}*Current Accuracy:* {{ .Labels.accuracy }}{{ end }}
+    {{ if .Labels.inference_time }}*Inference Time:* {{ .Labels.inference_time }}ms{{ end }}
+    {{ end }}
+    {{ end }}
+    
+    {{ define "slack.gaming.text" }}
+    🎮 *GAMING PLATFORM ALERT*
+    {{ range .Alerts }}
+    *Alert:* {{ .Annotations.title }}
+    *Service:* `{{ .Labels.service }}`
+    *Description:* {{ .Annotations.description }}
+    *Time:* {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+    
+    {{ if .Labels.active_players }}*Active Players:* {{ .Labels.active_players }}{{ end }}
+    {{ if .Labels.session_count }}*Active Sessions:* {{ .Labels.session_count }}{{ end }}
+    {{ end }}
+    {{ end }}
+    
+    {{ define "slack.infrastructure.text" }}
+    🏗️ *INFRASTRUCTURE ALERT*
+    {{ range .Alerts }}
+    *Alert:* {{ .Annotations.title }}
+    *Node:* `{{ .Labels.instance }}`
+    *Description:* {{ .Annotations.description }}
+    *Time:* {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+    
+    {{ if .Labels.cpu_usage }}*CPU Usage:* {{ .Labels.cpu_usage }}%{{ end }}
+    {{ if .Labels.memory_usage }}*Memory Usage:* {{ .Labels.memory_usage }}%{{ end }}
+    {{ if .Labels.disk_usage }}*Disk Usage:* {{ .Labels.disk_usage }}%{{ end }}
+    {{ end }}
+    {{ end }}
+    
+    {{ define "email.critical.html" }}
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Critical Alert - ActiveLog</title>
+        <style>
+            body { font-family: Arial, sans-serif; }
+            .critical { background-color: #ff4444; color: white; padding: 10px; }
+            .alert { margin: 10px 0; padding: 10px; border-left: 4px solid #ff4444; }
+            .details { background-color: #f5f5f5; padding: 10px; margin: 10px 0; }
+        </style>
+    </head>
+    <body>
+        <div class="critical">
+            <h1>🚨 CRITICAL ALERT</h1>
+            <p>Immediate attention required for ActiveLog platform</p>
+        </div>
+        
+        {{ range .Alerts }}
+        <div class="alert">
+            <h2>{{ .Annotations.title }}</h2>
+            <p><strong>Service:</strong> {{ .Labels.service }}</p>
+            <p><strong>Instance:</strong> {{ .Labels.instance }}</p>
+            <p><strong>Description:</strong> {{ .Annotations.description }}</p>
+            <p><strong>Started At:</strong> {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}</p>
+            
+            <div class="details">
+                <h3>Alert Details:</h3>
+                {{ range .Labels.SortedPairs }}
+                <p><strong>{{ .Name }}:</strong> {{ .Value }}</p>
+                {{ end }}
+            </div>
+            
+            <p><a href="{{ .GeneratorURL }}">View in Prometheus</a></p>
+        </div>
+        {{ end }}
+        
+        <p><em>This is an automated alert from ActiveLog monitoring system.</em></p>
+    </body>
+    </html>
+    {{ end }}
+    
+    {{ define "email.security.html" }}
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Security Alert - ActiveLog</title>
+        <style>
+            body { font-family: Arial, sans-serif; }
+            .security { background-color: #ff8800; color: white; padding: 10px; }
+            .alert { margin: 10px 0; padding: 10px; border-left: 4px solid #ff8800; }
+        </style>
+    </head>
+    <body>
+        <div class="security">
+            <h1>🛡️ SECURITY ALERT</h1>
+            <p>Security incident detected in ActiveLog platform</p>
+        </div>
+        
+        {{ range .Alerts }}
+        <div class="alert">
+            <h2>{{ .Annotations.title }}</h2>
+            <p><strong>Service:</strong> {{ .Labels.service }}</p>
+            <p><strong>Source:</strong> {{ .Labels.instance }}</p>
+            <p><strong>Event Type:</strong> {{ .Labels.event_type | default "Security Event" }}</p>
+            <p><strong>Description:</strong> {{ .Annotations.description }}</p>
+            <p><strong>Started At:</strong> {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}</p>
+        </div>
+        {{ end }}
+        
+        <p><strong>Action Required:</strong> Security team should investigate immediately.</p>
+        <p><em>This is an automated security alert from ActiveLog monitoring system.</em></p>
+    </body>
+    </html>
+    {{ end }}
+    
+    {{ define "email.default.html" }}
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Alert - ActiveLog</title>
+        <style>
+            body { font-family: Arial, sans-serif; }
+            .header { background-color: #007acc; color: white; padding: 10px; }
+            .alert { margin: 10px 0; padding: 10px; border-left: 4px solid #007acc; }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>ActiveLog Platform Alert</h1>
+        </div>
+        
+        {{ range .Alerts }}
+        <div class="alert">
+            <h2>{{ .Annotations.title }}</h2>
+            <p><strong>Severity:</strong> {{ .Labels.severity }}</p>
+            <p><strong>Service:</strong> {{ .Labels.service }}</p>
+            <p><strong>Description:</strong> {{ .Annotations.description }}</p>
+            <p><strong>Started At:</strong> {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}</p>
+        </div>
+        {{ end }}
+        
+        <p><em>This is an automated alert from ActiveLog monitoring system.</em></p>
+    </body>
+    </html>
+    {{ end }}
+---
+# Service Account and RBAC for AlertManager
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: alertmanager
+  namespace: activelog-monitoring
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: alertmanager
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - nodes/proxy
+  - services
+  - endpoints
+  - pods
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: alertmanager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: alertmanager
+subjects:
+- kind: ServiceAccount
+  name: alertmanager
+  namespace: activelog-monitoring

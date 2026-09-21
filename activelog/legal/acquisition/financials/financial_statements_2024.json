@@ -1,0 +1,296 @@
+{
+  "company": {
+    "name": "ActiveLog Technologies, Inc.",
+    "reporting_period": "Q3 2024 (Year-to-Date)",
+    "fiscal_year_end": "December 31",
+    "reporting_currency": "USD",
+    "prepared_by": "CFO Office",
+    "audited": false,
+    "review_status": "Reviewed by Independent Accountant"
+  },
+  "income_statement": {
+    "ytd_2024": {
+      "revenue": {
+        "subscription_revenue": 2856000,
+        "professional_services": 324000,
+        "other_revenue": 78000,
+        "total_revenue": 3258000
+      },
+      "cost_of_revenue": {
+        "hosting_infrastructure": 142000,
+        "third_party_licenses": 89000,
+        "customer_support": 156000,
+        "payment_processing": 47000,
+        "other_cos": 32000,
+        "total_cos": 466000
+      },
+      "gross_profit": 2792000,
+      "gross_margin_percent": 85.7,
+      "operating_expenses": {
+        "sales_marketing": {
+          "advertising_marketing": 234000,
+          "sales_salaries": 445000,
+          "sales_commissions": 178000,
+          "marketing_salaries": 267000,
+          "events_conferences": 89000,
+          "lead_generation": 123000,
+          "total_sales_marketing": 1336000
+        },
+        "research_development": {
+          "engineering_salaries": 892000,
+          "contractor_fees": 234000,
+          "software_tools": 67000,
+          "cloud_services": 45000,
+          "total_rd": 1238000
+        },
+        "general_administrative": {
+          "executive_salaries": 345000,
+          "professional_services": 123000,
+          "office_rent": 78000,
+          "insurance": 34000,
+          "accounting_legal": 89000,
+          "other_ga": 67000,
+          "total_ga": 736000
+        },
+        "total_operating_expenses": 3310000
+      },
+      "operating_income": -518000,
+      "operating_margin_percent": -15.9,
+      "other_income_expense": {
+        "interest_income": 12000,
+        "interest_expense": -5000,
+        "other_income": 3000,
+        "total_other": 10000
+      },
+      "net_income": -508000,
+      "net_margin_percent": -15.6,
+      "earnings_per_share": -0.08,
+      "weighted_avg_shares": 6200000
+    },
+    "ytd_2023": {
+      "total_revenue": 1456000,
+      "gross_profit": 1167000,
+      "gross_margin_percent": 80.1,
+      "operating_income": -1234000,
+      "net_income": -1198000,
+      "growth_rates": {
+        "revenue_growth": 123.8,
+        "gross_profit_growth": 139.2
+      }
+    },
+    "quarterly_breakdown": {
+      "q1_2024": {
+        "revenue": 892000,
+        "gross_profit": 756000,
+        "operating_income": -234000,
+        "net_income": -221000
+      },
+      "q2_2024": {
+        "revenue": 1134000,
+        "gross_profit": 967000,
+        "operating_income": -167000,
+        "net_income": -154000
+      },
+      "q3_2024": {
+        "revenue": 1232000,
+        "gross_profit": 1069000,
+        "operating_income": -117000,
+        "net_income": -133000
+      }
+    }
+  },
+  "balance_sheet": {
+    "as_of_september_30_2024": {
+      "assets": {
+        "current_assets": {
+          "cash_equivalents": 4567000,
+          "accounts_receivable": 234000,
+          "prepaid_expenses": 67000,
+          "other_current_assets": 23000,
+          "total_current_assets": 4891000
+        },
+        "non_current_assets": {
+          "property_equipment_net": 123000,
+          "intangible_assets_net": 234000,
+          "deposits": 12000,
+          "deferred_tax_assets": 0,
+          "total_non_current_assets": 369000
+        },
+        "total_assets": 5260000
+      },
+      "liabilities": {
+        "current_liabilities": {
+          "accounts_payable": 89000,
+          "accrued_compensation": 234000,
+          "accrued_expenses": 67000,
+          "deferred_revenue": 456000,
+          "current_portion_debt": 12000,
+          "total_current_liabilities": 858000
+        },
+        "non_current_liabilities": {
+          "long_term_debt": 178000,
+          "deferred_revenue_lt": 89000,
+          "other_liabilities": 23000,
+          "total_non_current_liabilities": 290000
+        },
+        "total_liabilities": 1148000
+      },
+      "stockholders_equity": {
+        "preferred_stock": 13000000,
+        "common_stock": 6000,
+        "additional_paid_in_capital": 2345000,
+        "accumulated_deficit": -11239000,
+        "total_stockholders_equity": 4112000
+      },
+      "total_liab_equity": 5260000
+    }
+  },
+  "cash_flow_statement": {
+    "ytd_2024": {
+      "operating_activities": {
+        "net_income": -508000,
+        "adjustments": {
+          "depreciation_amortization": 34000,
+          "stock_compensation": 234000,
+          "bad_debt_expense": 12000,
+          "other_non_cash": 8000
+        },
+        "changes_working_capital": {
+          "accounts_receivable": -45000,
+          "prepaid_other_assets": -23000,
+          "accounts_payable": 34000,
+          "accrued_expenses": 67000,
+          "deferred_revenue": 178000
+        },
+        "net_cash_operating": 291000
+      },
+      "investing_activities": {
+        "capex": -67000,
+        "software_development": -123000,
+        "other_investments": -12000,
+        "net_cash_investing": -202000
+      },
+      "financing_activities": {
+        "series_b_proceeds": 8000000,
+        "debt_proceeds": 0,
+        "debt_repayment": -15000,
+        "transaction_costs": -234000,
+        "net_cash_financing": 7751000
+      },
+      "net_change_cash": 7840000,
+      "beginning_cash": -3273000,
+      "ending_cash": 4567000
+    }
+  },
+  "key_metrics": {
+    "revenue_metrics": {
+      "arr": 3200000,
+      "mrr": 266667,
+      "revenue_growth_yoy": 123.8,
+      "revenue_growth_qoq": 8.6,
+      "gross_revenue_retention": 94.2,
+      "net_revenue_retention": 127.3
+    },
+    "customer_metrics": {
+      "total_customers": 1247,
+      "new_customers_qtd": 134,
+      "churn_rate": 3.2,
+      "arpu": 213,
+      "cac": 234,
+      "ltv": 2890,
+      "ltv_cac_ratio": 12.4
+    },
+    "unit_economics": {
+      "gross_margin": 85.7,
+      "contribution_margin": 78.9,
+      "payback_period_months": 8.2,
+      "magic_number": 1.47
+    },
+    "financial_health": {
+      "cash_runway_months": 36.4,
+      "burn_rate_monthly": 125000,
+      "current_ratio": 5.7,
+      "debt_to_equity": 0.046,
+      "working_capital": 4033000
+    }
+  },
+  "segment_reporting": {
+    "by_product": {
+      "ai_receptionist": {
+        "revenue": 2134000,
+        "percentage": 65.5,
+        "gross_margin": 87.2
+      },
+      "automation_suite": {
+        "revenue": 789000,
+        "percentage": 24.2,
+        "gross_margin": 82.1
+      },
+      "professional_services": {
+        "revenue": 335000,
+        "percentage": 10.3,
+        "gross_margin": 89.4
+      }
+    },
+    "by_geography": {
+      "north_america": {
+        "revenue": 2456000,
+        "percentage": 75.4
+      },
+      "europe": {
+        "revenue": 567000,
+        "percentage": 17.4
+      },
+      "asia_pacific": {
+        "revenue": 235000,
+        "percentage": 7.2
+      }
+    },
+    "by_customer_size": {
+      "enterprise": {
+        "revenue": 1456000,
+        "customers": 89,
+        "arpu": 1362
+      },
+      "mid_market": {
+        "revenue": 1234000,
+        "customers": 234,
+        "arpu": 439
+      },
+      "smb": {
+        "revenue": 568000,
+        "customers": 924,
+        "arpu": 51
+      }
+    }
+  },
+  "covenant_compliance": {
+    "financial_covenants": [
+      {
+        "covenant": "Minimum Cash Balance",
+        "requirement": "$2,000,000",
+        "actual": "$4,567,000",
+        "compliance": "Pass"
+      },
+      {
+        "covenant": "Maximum Burn Rate",
+        "requirement": "<$200,000/month",
+        "actual": "$125,000/month",
+        "compliance": "Pass"
+      },
+      {
+        "covenant": "Minimum ARR Growth",
+        "requirement": ">50% YoY",
+        "actual": "124% YoY",
+        "compliance": "Pass"
+      }
+    ]
+  },
+  "audit_notes": [
+    "Financial statements prepared in accordance with GAAP",
+    "Revenue recognition follows ASC 606",
+    "Stock compensation expense calculated using Black-Scholes model",
+    "Deferred revenue represents annual contracts paid in advance",
+    "No material subsequent events through report date"
+  ]
+}

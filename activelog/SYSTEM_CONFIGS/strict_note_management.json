@@ -1,0 +1,229 @@
+{
+  "system_id": "strict_note_management_system",
+  "purpose": "Enforce maximum storage limits and automated cleanup for all bot operations to prevent context loss and storage bloat",
+  "enforcement_level": "mandatory_across_all_bots",
+
+  "global_storage_limits": {
+    "premium_bots": {
+      "max_total_storage": "75MB",
+      "bots": [
+        "vestige_bestseller_author_opus41",
+        "asimov_research_specialist_opus41"
+      ],
+      "justification": "Complex creative work requires more working space"
+    },
+    "research_bots": {
+      "max_total_storage": "50MB", 
+      "bots": [
+        "vestige_research_assistant_v1",
+        "vestige_system_engineer_v1"
+      ],
+      "justification": "Research and engineering require substantial technical documentation"
+    },
+    "specialized_bots": {
+      "max_total_storage": "35MB",
+      "bots": [
+        "AI_PROFESSOR_*",
+        "DMLOG_DEVELOPER"
+      ],
+      "justification": "Focused expertise areas with targeted storage needs"
+    },
+    "system_coordination": {
+      "max_total_storage": "25MB",
+      "bots": [
+        "collaboration_coordinators",
+        "devils_advocate_system_components"
+      ],
+      "justification": "Coordination requires efficient metadata management"
+    }
+  },
+
+  "automated_cleanup_protocols": {
+    "daily_maintenance": {
+      "execution_time": "03:00_UTC_daily",
+      "cleanup_actions": [
+        "delete_temporary_processing_files",
+        "compress_completed_task_logs",
+        "remove_duplicate_note_entries",
+        "archive_superseded_draft_versions"
+      ],
+      "storage_target": "maintain_under_80_percent_of_limit"
+    },
+    
+    "weekly_optimization": {
+      "execution_time": "Sunday_02:00_UTC_weekly", 
+      "cleanup_actions": [
+        "synthesize_fragmented_notes_into_coherent_summaries",
+        "archive_completed_project_documentation",
+        "purge_low_value_research_artifacts", 
+        "consolidate_cross_reference_mappings"
+      ],
+      "storage_target": "maintain_under_70_percent_of_limit"
+    },
+
+    "monthly_deep_clean": {
+      "execution_time": "first_Sunday_01:00_UTC_monthly",
+      "cleanup_actions": [
+        "comprehensive_value_assessment_of_all_stored_content",
+        "aggressive_compression_of_archived_materials",
+        "permanent_deletion_of_expired_low_value_content",
+        "optimization_of_file_organization_for_access_efficiency"
+      ],
+      "storage_target": "maintain_under_60_percent_of_limit"
+    }
+  },
+
+  "retention_priority_framework": {
+    "tier_1_permanent_retention": {
+      "content_types": [
+        "final_manuscript_chapters_and_polished_drafts",
+        "breakthrough_research_discoveries_and_insights",
+        "validated_cross_bot_collaboration_outcomes",
+        "successfully_implemented_system_components",
+        "high_quality_synthesis_outputs_above_threshold"
+      ],
+      "retention_policy": "never_delete_without_explicit_human_authorization"
+    },
+
+    "tier_2_long_term_archive": {
+      "content_types": [
+        "quality_research_notes_with_cross_references",
+        "devil_advocate_feedback_and_revision_cycles",
+        "successful_collaboration_patterns_and_methodologies", 
+        "technical_specifications_and_design_documentation",
+        "validated_metaphor_frameworks_and_communication_strategies"
+      ],
+      "retention_policy": "compress_and_archive_after_90_days_inactive"
+    },
+
+    "tier_3_medium_term_working": {
+      "content_types": [
+        "active_project_working_notes_and_drafts",
+        "ongoing_research_investigation_materials",
+        "collaboration_coordination_and_scheduling_data",
+        "quality_assessment_and_improvement_tracking",
+        "cross_reference_validation_and_verification_logs"
+      ],
+      "retention_policy": "archive_after_30_days_inactive_or_superseded"
+    },
+
+    "tier_4_short_term_disposable": {
+      "content_types": [
+        "temporary_processing_files_and_intermediate_outputs",
+        "draft_versions_superseded_by_improved_versions",
+        "experimental_approaches_abandoned_for_better_alternatives",
+        "debugging_logs_and_troubleshooting_artifacts",
+        "redundant_research_paths_and_duplicate_investigations"
+      ],
+      "retention_policy": "delete_after_7_days_or_upon_completion"
+    }
+  },
+
+  "context_preservation_strategies": {
+    "essential_context_identification": {
+      "automated_analysis": "identify_information_critical_for_ongoing_operations",
+      "cross_reference_mapping": "maintain_connections_between_related_concepts_and_projects",
+      "progress_state_preservation": "ensure_project_continuity_despite_note_cleanup",
+      "relationship_tracking": "preserve_collaboration_history_and_successful_patterns"
+    },
+
+    "intelligent_summarization": {
+      "content_distillation": "compress_verbose_notes_into_essential_insights",
+      "pattern_extraction": "identify_and_preserve_recurring_themes_and_methodologies",
+      "key_insight_highlighting": "maintain_breakthrough_discoveries_and_important_realizations",
+      "decision_rationale_preservation": "keep_reasoning_behind_important_choices_and_directions"
+    },
+
+    "progressive_detail_reduction": {
+      "layered_compression": "maintain_multiple_detail_levels_from_summary_to_comprehensive",
+      "on_demand_expansion": "ability_to_reconstruct_detail_from_compressed_representations",
+      "smart_pruning": "remove_redundant_information_while_preserving_unique_insights",
+      "context_reconstruction": "maintain_ability_to_rebuild_working_context_efficiently"
+    }
+  },
+
+  "storage_monitoring_and_alerts": {
+    "real_time_monitoring": {
+      "storage_usage_tracking": "continuous_monitoring_of_each_bot_storage_consumption",
+      "growth_rate_analysis": "predict_when_bots_will_approach_storage_limits",
+      "efficiency_metrics": "measure_information_density_and_storage_optimization",
+      "access_pattern_analysis": "identify_frequently_vs_rarely_accessed_information"
+    },
+
+    "proactive_alert_system": {
+      "early_warnings": [
+        "alert_at_60_percent_storage_capacity",
+        "notify_when_growth_rate_suggests_limit_breach_within_7_days", 
+        "flag_when_cleanup_efficiency_degrades_below_acceptable_levels"
+      ],
+      "intervention_triggers": [
+        "automatic_cleanup_activation_at_75_percent_capacity",
+        "mandatory_review_and_optimization_at_85_percent_capacity",
+        "emergency_cleanup_protocols_at_95_percent_capacity"
+      ]
+    }
+  },
+
+  "quality_preservation_during_cleanup": {
+    "pre_deletion_validation": {
+      "dependency_checking": "verify_no_other_bots_or_projects_depend_on_content_being_deleted",
+      "cross_reference_validation": "ensure_removal_doesn_t_break_important_connections",
+      "backup_verification": "confirm_essential_information_preserved_in_compressed_form",
+      "recovery_possibility": "maintain_recovery_options_for_accidentally_deleted_content"
+    },
+
+    "intelligent_content_assessment": {
+      "value_scoring": "automated_assessment_of_content_value_and_importance",
+      "uniqueness_analysis": "identify_irreplaceable_vs_reconstructible_information",
+      "integration_impact": "assess_how_deletion_affects_ongoing_projects_and_collaborations",
+      "future_utility_prediction": "estimate_likelihood_content_will_be_needed_again"
+    }
+  },
+
+  "bot_specific_cleanup_customization": {
+    "vestige_bestseller_author_opus41": {
+      "specialized_retention": [
+        "manuscript_chapters_and_quality_revisions",
+        "effective_metaphor_frameworks_and_storytelling_techniques",
+        "devil_advocate_feedback_integration_and_learning",
+        "asimov_technique_applications_and_insights"
+      ],
+      "aggressive_cleanup": [
+        "draft_iterations_superseded_by_better_versions",
+        "experimental_metaphors_abandoned_for_better_alternatives",
+        "research_integration_notes_after_synthesis_completion"
+      ]
+    },
+
+    "asimov_research_specialist_opus41": {
+      "specialized_retention": [
+        "asimov_text_analysis_and_technique_documentation",
+        "vestige_asimov_parallel_discoveries_and_connections",
+        "story_reduction_framework_development",
+        "consciousness_emergence_theory_synthesis"
+      ],
+      "aggressive_cleanup": [
+        "preliminary_text_analysis_after_synthesis", 
+        "redundant_research_paths_after_pattern_identification",
+        "draft_parallel_analyses_superseded_by_refined_versions"
+      ]
+    }
+  },
+
+  "emergency_protocols": {
+    "storage_limit_breach_response": {
+      "immediate_actions": [
+        "halt_all_non_essential_file_creation",
+        "execute_emergency_cleanup_of_disposable_content",
+        "compress_all_compressible_archive_content",
+        "temporary_suspension_of_low_priority_operations"
+      ],
+      "escalation_procedures": [
+        "notify_human_administrator_of_storage_crisis",
+        "request_storage_limit_increase_if_justified",
+        "implement_aggressive_content_migration_to_external_storage",
+        "temporary_bot_operation_suspension_if_necessary"
+      ]
+    }
+  }
+}

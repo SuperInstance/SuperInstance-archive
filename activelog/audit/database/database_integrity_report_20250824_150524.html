@@ -1,0 +1,1513 @@
+
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Database Integrity Report</title>
+            <meta charset="utf-8">
+            <style>
+                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f8f9fa; }
+                .container { max-width: 1400px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                h1 { color: #343a40; margin-bottom: 30px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                th { background: #343a40; color: white; padding: 12px 8px; text-align: left; }
+                .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+                .card { padding: 20px; border-radius: 8px; text-align: center; color: white; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>🗃️ Database Integrity Report</h1>
+                <p><strong>Generated:</strong> 2025-08-24 15:05:24</p>
+                <p><strong>Check Duration:</strong> 7.25 seconds</p>
+                <p><strong>Total Database Size:</strong> 9.86 MB</p>
+                
+                <div class="summary-cards">
+                    <div class="card" style="background: #17a2b8;">
+                        <h3 style="margin: 0; font-size: 2em;">63</h3>
+                        <p style="margin: 5px 0 0 0;">Databases Checked</p>
+                    </div>
+                    <div class="card" style="background: #dc3545;">
+                        <h3 style="margin: 0; font-size: 2em;">0</h3>
+                        <p style="margin: 5px 0 0 0;">Critical Issues</p>
+                    </div>
+                    <div class="card" style="background: #ffc107; color: #212529;">
+                        <h3 style="margin: 0; font-size: 2em;">102</h3>
+                        <p style="margin: 5px 0 0 0;">Warnings</p>
+                    </div>
+                    <div class="card" style="background: #fd7e14;">
+                        <h3 style="margin: 0; font-size: 2em;">1</h3>
+                        <p style="margin: 5px 0 0 0;">Errors</p>
+                    </div>
+                    <div class="card" style="background: #28a745;">
+                        <h3 style="margin: 0; font-size: 2em;">149</h3>
+                        <p style="margin: 5px 0 0 0;">Passed Checks</p>
+                    </div>
+                </div>
+                
+                <h2>🚨 Issues Found</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Database</th>
+                            <th>Table</th>
+                            <th>Check Type</th>
+                            <th>Status</th>
+                            <th>Message</th>
+                            <th>Suggestion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">security_clearance.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Corruption</td>
+                <td style="padding: 8px; color: #fd7e14; font-weight: bold;">ERROR</td>
+                <td style="padding: 8px; max-width: 300px;">Failed to check corruption: foreign key mismatch - "security_training" referencing "personnel_clearances"</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Check database file permissions and integrity</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">accounting_core.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">accounting_core.db</td>
+                <td style="padding: 8px; font-family: monospace;">chart_of_accounts</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'parent_account_id' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">accounting_core.db</td>
+                <td style="padding: 8px; font-family: monospace;">chart_of_accounts</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'entity_id' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">accounting_core.db</td>
+                <td style="padding: 8px; font-family: monospace;">chart_of_accounts</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'tax_code' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">accounting_core.db</td>
+                <td style="padding: 8px; font-family: monospace;">currencies</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'data' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">acquisitions.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">api_marketplace.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">audit_api_validation.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">audit_database_integrity.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">audit_preparation.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">beta_pricing.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">bluetooth_headsets.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">business_incubator.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">business_units.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">certification_system.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">charts.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">competition_analytics.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">compliance_audits.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">compliance_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">confirmation_protocols.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">context_awareness.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">context_awareness.db</td>
+                <td style="padding: 8px; font-family: monospace;">sensor_data</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Large table (52318 rows) has no indexes</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider adding indexes on frequently queried columns</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">contract_lifecycle.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">cost_proposals.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">crm_sales.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">dcaa_timekeeping.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">dmlog_analytics.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">dmlog_analytics.db</td>
+                <td style="padding: 8px; font-family: monospace;">events</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Large table (33758 rows) has no indexes</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider adding indexes on frequently queried columns</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">dmlog_analytics.db</td>
+                <td style="padding: 8px; font-family: monospace;">events</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'user_id' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">dmlog_analytics.db</td>
+                <td style="padding: 8px; font-family: monospace;">events</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'session_id' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">dmlog_analytics.db</td>
+                <td style="padding: 8px; font-family: monospace;">events</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'campaign_id' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">dmlog_analytics.db</td>
+                <td style="padding: 8px; font-family: monospace;">metrics</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Large table (1425 rows) has no indexes</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider adding indexes on frequently queried columns</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">dmlog_analytics.db</td>
+                <td style="padding: 8px; font-family: monospace;">metrics</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'service' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">documents.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">dream_mode_v2_demonstrations.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">education_ai.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">emergency_procedures.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">enterprise_custom.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">escrow.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">feature_discovery.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">feature_discovery.db</td>
+                <td style="padding: 8px; font-family: monospace;">features</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'deprecation_date' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">frontend_market.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">frontend_valuation.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">gdpr.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">hands_free.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">improvement_bounties.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">industry_simulations.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">integrations.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">invoice_engine.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">invoice_engine.db</td>
+                <td style="padding: 8px; font-family: monospace;">approval_workflows</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'data' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">ip.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">licenses.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">marketplace_v2_browser.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">partnerships.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">patents.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">payroll_hr.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">payroll_hr.db</td>
+                <td style="padding: 8px; font-family: monospace;">benefit_plans</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'enrollment_start_date' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">payroll_hr.db</td>
+                <td style="padding: 8px; font-family: monospace;">benefit_plans</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'enrollment_end_date' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">payroll_hr.db</td>
+                <td style="padding: 8px; font-family: monospace;">benefit_plans</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'termination_date' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">payroll_hr.db</td>
+                <td style="padding: 8px; font-family: monospace;">benefit_plans</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'eligibility_rules' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">payroll_hr.db</td>
+                <td style="padding: 8px; font-family: monospace;">benefit_plans</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'coverage_options' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">payroll_hr.db</td>
+                <td style="padding: 8px; font-family: monospace;">commission_structures</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'expiration_date' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">payroll_hr.db</td>
+                <td style="padding: 8px; font-family: monospace;">document_templates</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'description' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">payroll_hr.db</td>
+                <td style="padding: 8px; font-family: monospace;">document_templates</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'created_by' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">payroll_hr.db</td>
+                <td style="padding: 8px; font-family: monospace;">orientation_sessions</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'materials_required' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">payroll_hr.db</td>
+                <td style="padding: 8px; font-family: monospace;">tax_year_data</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'year_end_processed_date' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">performance_metrics.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">performance_reporting.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">product_marketplace.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">pto_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">revenue_distribution.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">revenue_sharing.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">revenue_sharing.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">rfp_management.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">security_clearance.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">small_business_certs.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">subcontractor_management.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">supply_chain.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">tax_compliance.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">template_store.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">time_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">time_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">audit_trail</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'old_values' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">time_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">audit_trail</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'new_values' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">time_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">audit_trail</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'ip_address' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">time_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">audit_trail</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'user_agent' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">time_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">time_entries</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'task_code' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">time_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">time_entries</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'break_type' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">time_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">time_entries</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'latitude' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">time_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">time_entries</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'longitude' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">time_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">time_entries</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'location_accuracy' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">time_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">time_entries</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'address' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">time_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">time_entries</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'approved_by' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">time_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">time_entries</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'approval_timestamp' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">time_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">timesheets</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'submitted_at' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">time_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">timesheets</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'approved_at' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">time_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">timesheets</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'approved_by' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">time_tracking.db</td>
+                <td style="padding: 8px; font-family: monospace;">timesheets</td>
+                <td style="padding: 8px;">Data</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Column 'rejection_reason' contains only NULL values</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider removing unused columns to optimize storage</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">trademarks.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">transfer_process.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">user_management.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">user_persona_simulations.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">whitelabel_system.db</td>
+                <td style="padding: 8px; font-family: monospace;">*</td>
+                <td style="padding: 8px;">Performance</td>
+                <td style="padding: 8px; color: #ffc107; font-weight: bold;">WARNING</td>
+                <td style="padding: 8px; max-width: 300px;">Journal mode is delete, WAL mode recommended</td>
+                <td style="padding: 8px; font-size: 0.9em; color: #6c757d;">Consider enabling WAL mode for better concurrent access</td>
+            </tr>
+            
+                    </tbody>
+                </table>
+                
+                <h2>📊 Database Overview</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Database Name</th>
+                            <th>Size</th>
+                            <th>Tables</th>
+                            <th>Total Rows</th>
+                            <th>Last Modified</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">context_awareness.db</td>
+                <td style="padding: 8px; text-align: right;">2.86 MB</td>
+                <td style="padding: 8px; text-align: right;">5</td>
+                <td style="padding: 8px; text-align: right;">52,323</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 15:05</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">dmlog_analytics.db</td>
+                <td style="padding: 8px; text-align: right;">2.40 MB</td>
+                <td style="padding: 8px; text-align: right;">3</td>
+                <td style="padding: 8px; text-align: right;">35,185</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 06:52</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">payroll_hr.db</td>
+                <td style="padding: 8px; text-align: right;">0.70 MB</td>
+                <td style="padding: 8px; text-align: right;">71</td>
+                <td style="padding: 8px; text-align: right;">332</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 06:24</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">invoice_engine.db</td>
+                <td style="padding: 8px; text-align: right;">0.35 MB</td>
+                <td style="padding: 8px; text-align: right;">35</td>
+                <td style="padding: 8px; text-align: right;">21</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 05:36</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">supply_chain.db</td>
+                <td style="padding: 8px; text-align: right;">0.28 MB</td>
+                <td style="padding: 8px; text-align: right;">15</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 06:43</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">business_units.db</td>
+                <td style="padding: 8px; text-align: right;">0.23 MB</td>
+                <td style="padding: 8px; text-align: right;">26</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 23:11</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">crm_sales.db</td>
+                <td style="padding: 8px; text-align: right;">0.22 MB</td>
+                <td style="padding: 8px; text-align: right;">18</td>
+                <td style="padding: 8px; text-align: right;">17</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 05:50</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">accounting_core.db</td>
+                <td style="padding: 8px; text-align: right;">0.22 MB</td>
+                <td style="padding: 8px; text-align: right;">21</td>
+                <td style="padding: 8px; text-align: right;">29</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 00:01</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">enterprise_custom.db</td>
+                <td style="padding: 8px; text-align: right;">0.21 MB</td>
+                <td style="padding: 8px; text-align: right;">23</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 22:47</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">beta_pricing.db</td>
+                <td style="padding: 8px; text-align: right;">0.19 MB</td>
+                <td style="padding: 8px; text-align: right;">20</td>
+                <td style="padding: 8px; text-align: right;">4</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 22:20</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">user_management.db</td>
+                <td style="padding: 8px; text-align: right;">0.09 MB</td>
+                <td style="padding: 8px; text-align: right;">7</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 21:30</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">marketplace_v2_browser.db</td>
+                <td style="padding: 8px; text-align: right;">0.09 MB</td>
+                <td style="padding: 8px; text-align: right;">6</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 13:56</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">integrations.db</td>
+                <td style="padding: 8px; text-align: right;">0.08 MB</td>
+                <td style="padding: 8px; text-align: right;">9</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 23:45</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">pto_tracking.db</td>
+                <td style="padding: 8px; text-align: right;">0.08 MB</td>
+                <td style="padding: 8px; text-align: right;">8</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 06:18</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">subcontractor_management.db</td>
+                <td style="padding: 8px; text-align: right;">0.07 MB</td>
+                <td style="padding: 8px; text-align: right;">7</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 06:50</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">contract_lifecycle.db</td>
+                <td style="padding: 8px; text-align: right;">0.07 MB</td>
+                <td style="padding: 8px; text-align: right;">7</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 06:50</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">security_clearance.db</td>
+                <td style="padding: 8px; text-align: right;">0.07 MB</td>
+                <td style="padding: 8px; text-align: right;">7</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 06:50</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">audit_preparation.db</td>
+                <td style="padding: 8px; text-align: right;">0.07 MB</td>
+                <td style="padding: 8px; text-align: right;">7</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 06:50</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">cost_proposals.db</td>
+                <td style="padding: 8px; text-align: right;">0.07 MB</td>
+                <td style="padding: 8px; text-align: right;">7</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 06:50</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">performance_reporting.db</td>
+                <td style="padding: 8px; text-align: right;">0.07 MB</td>
+                <td style="padding: 8px; text-align: right;">7</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 06:50</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">small_business_certs.db</td>
+                <td style="padding: 8px; text-align: right;">0.07 MB</td>
+                <td style="padding: 8px; text-align: right;">7</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 06:50</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">acquisitions.db</td>
+                <td style="padding: 8px; text-align: right;">0.06 MB</td>
+                <td style="padding: 8px; text-align: right;">6</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 23:04</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">rfp_management.db</td>
+                <td style="padding: 8px; text-align: right;">0.06 MB</td>
+                <td style="padding: 8px; text-align: right;">6</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 06:50</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">product_marketplace.db</td>
+                <td style="padding: 8px; text-align: right;">0.06 MB</td>
+                <td style="padding: 8px; text-align: right;">6</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 12:51</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">user_persona_simulations.db</td>
+                <td style="padding: 8px; text-align: right;">0.05 MB</td>
+                <td style="padding: 8px; text-align: right;">5</td>
+                <td style="padding: 8px; text-align: right;">5</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 13:32</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">time_tracking.db</td>
+                <td style="padding: 8px; text-align: right;">0.05 MB</td>
+                <td style="padding: 8px; text-align: right;">6</td>
+                <td style="padding: 8px; text-align: right;">8</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 05:46</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">feature_discovery.db</td>
+                <td style="padding: 8px; text-align: right;">0.05 MB</td>
+                <td style="padding: 8px; text-align: right;">6</td>
+                <td style="padding: 8px; text-align: right;">8</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 13:32</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">dcaa_timekeeping.db</td>
+                <td style="padding: 8px; text-align: right;">0.05 MB</td>
+                <td style="padding: 8px; text-align: right;">5</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 06:50</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">gdpr.db</td>
+                <td style="padding: 8px; text-align: right;">0.04 MB</td>
+                <td style="padding: 8px; text-align: right;">5</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 23:03</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">partnerships.db</td>
+                <td style="padding: 8px; text-align: right;">0.04 MB</td>
+                <td style="padding: 8px; text-align: right;">5</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 23:04</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">business_incubator.db</td>
+                <td style="padding: 8px; text-align: right;">0.04 MB</td>
+                <td style="padding: 8px; text-align: right;">5</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 20:37</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">competition_analytics.db</td>
+                <td style="padding: 8px; text-align: right;">0.04 MB</td>
+                <td style="padding: 8px; text-align: right;">5</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 21:31</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">performance_metrics.db</td>
+                <td style="padding: 8px; text-align: right;">0.04 MB</td>
+                <td style="padding: 8px; text-align: right;">5</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 21:30</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">improvement_bounties.db</td>
+                <td style="padding: 8px; text-align: right;">0.04 MB</td>
+                <td style="padding: 8px; text-align: right;">4</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 21:31</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">bluetooth_headsets.db</td>
+                <td style="padding: 8px; text-align: right;">0.04 MB</td>
+                <td style="padding: 8px; text-align: right;">5</td>
+                <td style="padding: 8px; text-align: right;">5</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 13:01</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">audit_api_validation.db</td>
+                <td style="padding: 8px; text-align: right;">0.04 MB</td>
+                <td style="padding: 8px; text-align: right;">3</td>
+                <td style="padding: 8px; text-align: right;">26</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 15:02</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">education_ai.db</td>
+                <td style="padding: 8px; text-align: right;">0.04 MB</td>
+                <td style="padding: 8px; text-align: right;">4</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-22 22:59</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">licenses.db</td>
+                <td style="padding: 8px; text-align: right;">0.04 MB</td>
+                <td style="padding: 8px; text-align: right;">3</td>
+                <td style="padding: 8px; text-align: right;">1</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 23:03</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">industry_simulations.db</td>
+                <td style="padding: 8px; text-align: right;">0.04 MB</td>
+                <td style="padding: 8px; text-align: right;">5</td>
+                <td style="padding: 8px; text-align: right;">3</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 13:32</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">transfer_process.db</td>
+                <td style="padding: 8px; text-align: right;">0.04 MB</td>
+                <td style="padding: 8px; text-align: right;">4</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 21:30</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">compliance_tracking.db</td>
+                <td style="padding: 8px; text-align: right;">0.04 MB</td>
+                <td style="padding: 8px; text-align: right;">4</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 06:50</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">revenue_distribution.db</td>
+                <td style="padding: 8px; text-align: right;">0.04 MB</td>
+                <td style="padding: 8px; text-align: right;">4</td>
+                <td style="padding: 8px; text-align: right;">2</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 21:45</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">tax_compliance.db</td>
+                <td style="padding: 8px; text-align: right;">0.04 MB</td>
+                <td style="padding: 8px; text-align: right;">4</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 21:57</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">hands_free.db</td>
+                <td style="padding: 8px; text-align: right;">0.04 MB</td>
+                <td style="padding: 8px; text-align: right;">5</td>
+                <td style="padding: 8px; text-align: right;">3</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 13:01</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">confirmation_protocols.db</td>
+                <td style="padding: 8px; text-align: right;">0.03 MB</td>
+                <td style="padding: 8px; text-align: right;">5</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 13:01</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">audit_database_integrity.db</td>
+                <td style="padding: 8px; text-align: right;">0.03 MB</td>
+                <td style="padding: 8px; text-align: right;">4</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 15:04</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">documents.db</td>
+                <td style="padding: 8px; text-align: right;">0.03 MB</td>
+                <td style="padding: 8px; text-align: right;">3</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 23:03</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">ip.db</td>
+                <td style="padding: 8px; text-align: right;">0.03 MB</td>
+                <td style="padding: 8px; text-align: right;">3</td>
+                <td style="padding: 8px; text-align: right;">1</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 23:08</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">dream_mode_v2_demonstrations.db</td>
+                <td style="padding: 8px; text-align: right;">0.03 MB</td>
+                <td style="padding: 8px; text-align: right;">3</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 13:32</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">frontend_market.db</td>
+                <td style="padding: 8px; text-align: right;">0.03 MB</td>
+                <td style="padding: 8px; text-align: right;">3</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 21:31</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">frontend_valuation.db</td>
+                <td style="padding: 8px; text-align: right;">0.03 MB</td>
+                <td style="padding: 8px; text-align: right;">3</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 21:30</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">revenue_sharing.db</td>
+                <td style="padding: 8px; text-align: right;">0.03 MB</td>
+                <td style="padding: 8px; text-align: right;">3</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 21:30</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">emergency_procedures.db</td>
+                <td style="padding: 8px; text-align: right;">0.03 MB</td>
+                <td style="padding: 8px; text-align: right;">3</td>
+                <td style="padding: 8px; text-align: right;">4</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 13:01</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">escrow.db</td>
+                <td style="padding: 8px; text-align: right;">0.02 MB</td>
+                <td style="padding: 8px; text-align: right;">2</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 23:04</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">charts.db</td>
+                <td style="padding: 8px; text-align: right;">0.02 MB</td>
+                <td style="padding: 8px; text-align: right;">2</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-24 07:41</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">compliance_audits.db</td>
+                <td style="padding: 8px; text-align: right;">0.01 MB</td>
+                <td style="padding: 8px; text-align: right;">1</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 23:04</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">patents.db</td>
+                <td style="padding: 8px; text-align: right;">0.01 MB</td>
+                <td style="padding: 8px; text-align: right;">1</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 23:04</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">revenue_sharing.db</td>
+                <td style="padding: 8px; text-align: right;">0.01 MB</td>
+                <td style="padding: 8px; text-align: right;">1</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 23:04</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">trademarks.db</td>
+                <td style="padding: 8px; text-align: right;">0.01 MB</td>
+                <td style="padding: 8px; text-align: right;">1</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 23:04</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">api_marketplace.db</td>
+                <td style="padding: 8px; text-align: right;">0.01 MB</td>
+                <td style="padding: 8px; text-align: right;">1</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 21:31</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">certification_system.db</td>
+                <td style="padding: 8px; text-align: right;">0.01 MB</td>
+                <td style="padding: 8px; text-align: right;">1</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 21:31</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">template_store.db</td>
+                <td style="padding: 8px; text-align: right;">0.01 MB</td>
+                <td style="padding: 8px; text-align: right;">1</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 21:31</td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px; font-family: monospace;">whitelabel_system.db</td>
+                <td style="padding: 8px; text-align: right;">0.01 MB</td>
+                <td style="padding: 8px; text-align: right;">1</td>
+                <td style="padding: 8px; text-align: right;">0</td>
+                <td style="padding: 8px; font-size: 0.9em;">2025-08-23 21:31</td>
+            </tr>
+            
+                    </tbody>
+                </table>
+            </div>
+        </body>
+        </html>
+        

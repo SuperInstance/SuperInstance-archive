@@ -1,0 +1,199 @@
+{
+  "name": "PersonalLog.ai",
+  "version": "1.0.0",
+  "title": "PersonalLog.ai - Your Personal Digital Memory",
+  "description": "Consumer-friendly personal logging with ad-supported features",
+  "favicon": "/assets/personallog/favicon.ico",
+  "domain": "personallog.ai",
+  "devPort": 3001,
+  "theme": "consumer",
+  "layout": "sidebar",
+  "monetization": {
+    "type": "ads",
+    "providers": ["google-ads", "carbon"],
+    "positions": ["sidebar", "footer", "content-breaks"]
+  },
+  "features": {
+    "journaling": true,
+    "photoGallery": true,
+    "memoryTimeline": true,
+    "socialSharing": true,
+    "voiceNotes": true,
+    "moodTracking": true,
+    "habitTracking": true,
+    "aiInsights": true,
+    "memoryBooks": true,
+    "quickCapture": true,
+    "searchAndTags": true,
+    "cloudBackup": true
+  },
+  "modules": [
+    {
+      "name": "journal",
+      "component": "JournalModule",
+      "props": {
+        "defaultTemplate": "daily",
+        "enableMarkdown": true,
+        "enableRichText": true,
+        "autoSave": true
+      }
+    },
+    {
+      "name": "photos",
+      "component": "PhotoGalleryModule",
+      "props": {
+        "enableFaceRecognition": true,
+        "enableGeotagging": true,
+        "enableAutoAlbums": true,
+        "qualitySettings": "standard"
+      }
+    },
+    {
+      "name": "timeline",
+      "component": "TimelineModule",
+      "props": {
+        "viewModes": ["day", "week", "month", "year"],
+        "enableFilters": true,
+        "enableSearch": true
+      }
+    },
+    {
+      "name": "quickCapture",
+      "component": "QuickCaptureModule",
+      "props": {
+        "enableVoice": true,
+        "enablePhoto": true,
+        "enableText": true,
+        "enableLocation": true
+      }
+    },
+    {
+      "name": "insights",
+      "component": "AIInsightsModule",
+      "props": {
+        "enableMoodAnalysis": true,
+        "enablePatternRecognition": true,
+        "enableSuggestions": true,
+        "updateFrequency": "daily"
+      }
+    },
+    {
+      "name": "social",
+      "component": "SocialModule",
+      "props": {
+        "platforms": ["facebook", "twitter", "instagram"],
+        "enablePrivacyControls": true,
+        "enableSelectiveSharing": true
+      }
+    },
+    {
+      "name": "ads",
+      "component": "AdModule",
+      "props": {
+        "respectDoNotTrack": true,
+        "enablePersonalization": true,
+        "frequencyCapEnabled": true
+      }
+    }
+  ],
+  "aiModels": [
+    {
+      "name": "mood-analyzer",
+      "type": "text-classification",
+      "endpoint": "/ai/mood-analysis",
+      "features": ["sentiment", "emotion", "tone"]
+    },
+    {
+      "name": "memory-suggester",
+      "type": "recommendation",
+      "endpoint": "/ai/memory-suggestions",
+      "features": ["content-similarity", "temporal-patterns"]
+    },
+    {
+      "name": "photo-tagger",
+      "type": "image-classification",
+      "endpoint": "/ai/photo-tagging",
+      "features": ["object-detection", "scene-recognition", "face-recognition"]
+    }
+  ],
+  "auth": {
+    "providers": ["google", "facebook", "apple", "email"],
+    "requireEmailVerification": true,
+    "enableTwoFactor": false,
+    "sessionDuration": "30d",
+    "rememberDevice": true
+  },
+  "dataSync": {
+    "enabled": true,
+    "cloudProvider": "activelog-cloud",
+    "encryption": "client-side",
+    "conflictResolution": "merge",
+    "syncFrequency": "realtime",
+    "offlineSupport": true
+  },
+  "settings": {
+    "privacy": {
+      "defaultVisibility": "private",
+      "enableDataExport": true,
+      "enableDataDeletion": true,
+      "showDataUsage": true
+    },
+    "notifications": {
+      "enablePush": true,
+      "enableEmail": true,
+      "enableSMS": false,
+      "dailyDigest": true,
+      "weeklyReport": true
+    },
+    "appearance": {
+      "defaultTheme": "light",
+      "enableCustomization": true,
+      "enableColorSchemes": true,
+      "enableFontSelection": false
+    },
+    "accessibility": {
+      "enableHighContrast": true,
+      "enableLargeText": true,
+      "enableScreenReader": true,
+      "enableKeyboardNavigation": true
+    }
+  },
+  "customModules": [
+    {
+      "name": "mood-tracker",
+      "path": "/modules/personallog/MoodTracker.js"
+    },
+    {
+      "name": "habit-tracker",
+      "path": "/modules/personallog/HabitTracker.js"
+    },
+    {
+      "name": "memory-books",
+      "path": "/modules/personallog/MemoryBooks.js"
+    }
+  ],
+  "integrations": [
+    {
+      "name": "google-photos",
+      "enabled": true,
+      "autoImport": false
+    },
+    {
+      "name": "apple-health",
+      "enabled": true,
+      "syncData": ["steps", "mood", "sleep"]
+    },
+    {
+      "name": "spotify",
+      "enabled": true,
+      "linkToMemories": true
+    }
+  ],
+  "analytics": {
+    "provider": "privacy-first",
+    "enableUserTracking": false,
+    "enablePerformanceTracking": true,
+    "enableErrorTracking": true,
+    "respectDoNotTrack": true
+  }
+}

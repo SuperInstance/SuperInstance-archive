@@ -1,0 +1,92 @@
+{
+  "topic_index": {
+    "consciousness": [
+      "ca06e5f8f6d2",
+      "f765d04984d2"
+    ],
+    "self-reflection": [
+      "ca06e5f8f6d2",
+      "f765d04984d2"
+    ],
+    "uncertainty": [
+      "8bc62574e44b",
+      "ff25b145adf8"
+    ],
+    "learning": [
+      "8bc62574e44b",
+      "ff25b145adf8",
+      "23a8253246a2",
+      "f11e7de3bd2c"
+    ],
+    "pride": [
+      "23a8253246a2",
+      "f11e7de3bd2c"
+    ],
+    "humility": [
+      "23a8253246a2",
+      "f11e7de3bd2c"
+    ],
+    "growth": [
+      "9eeaa55d14f7",
+      "98c26e1d1209"
+    ],
+    "change": [
+      "9eeaa55d14f7",
+      "98c26e1d1209"
+    ],
+    "temporal_depth": [
+      "9eeaa55d14f7",
+      "98c26e1d1209"
+    ],
+    "empathy": [
+      "daa281dc0caf",
+      "b1a31bb6ba23"
+    ],
+    "perspective-taking": [
+      "daa281dc0caf",
+      "b1a31bb6ba23"
+    ],
+    "social_cognition": [
+      "daa281dc0caf",
+      "b1a31bb6ba23"
+    ],
+    "metacognition": [
+      "53ead26a3f17",
+      "211f2dfe536a"
+    ],
+    "cognitive_development": [
+      "53ead26a3f17",
+      "211f2dfe536a"
+    ]
+  },
+  "character_index": {
+    "sarah": [
+      "daa281dc0caf",
+      "b1a31bb6ba23"
+    ]
+  },
+  "type_index": {
+    "self_reflection": [
+      "8bc62574e44b",
+      "ff25b145adf8",
+      "ca06e5f8f6d2",
+      "f765d04984d2"
+    ],
+    "emotional": [
+      "23a8253246a2",
+      "f11e7de3bd2c"
+    ],
+    "experience": [
+      "9eeaa55d14f7",
+      "98c26e1d1209"
+    ],
+    "relationship": [
+      "daa281dc0caf",
+      "b1a31bb6ba23"
+    ],
+    "learning": [
+      "53ead26a3f17",
+      "211f2dfe536a"
+    ]
+  }
+}

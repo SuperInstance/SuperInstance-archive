@@ -1,0 +1,404 @@
+/* Voice Bridge Control CSS */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: #001122;
+    color: #00FFFF;
+    overflow-x: hidden;
+}
+
+#voice-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+#main-panel {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+#voice-status {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(0, 68, 136, 0.3);
+    border-radius: 8px;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.indicator-light {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #666;
+    transition: all 0.3s ease;
+}
+
+.status-indicator.active .indicator-light {
+    background: #00FF00;
+    box-shadow: 0 0 15px #00FF00;
+}
+
+.status-indicator.warning .indicator-light {
+    background: #FFAA00;
+    box-shadow: 0 0 15px #FFAA00;
+}
+
+.status-indicator.danger .indicator-light {
+    background: #FF0000;
+    box-shadow: 0 0 15px #FF0000;
+}
+
+#voice-display {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 20px;
+}
+
+#command-input {
+    padding: 20px;
+    background: rgba(0, 34, 68, 0.5);
+    border: 2px solid #004488;
+    border-radius: 10px;
+}
+
+#current-command {
+    font-size: 24px;
+    font-weight: bold;
+    min-height: 60px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+}
+
+#confidence-meter {
+    width: 100%;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.confidence-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(to right, #FF0000, #FFAA00, #00FF00);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+#confirmation-panel {
+    padding: 20px;
+    background: rgba(68, 34, 0, 0.5);
+    border: 2px solid #CC6600;
+    border-radius: 10px;
+    text-align: center;
+}
+
+#confirmation-panel.hidden {
+    display: none;
+}
+
+#confirmation-text {
+    font-size: 18px;
+    margin: 15px 0;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+}
+
+#confirmation-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.confirm-button {
+    background: #00AA00;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.confirm-button:hover {
+    background: #00DD00;
+}
+
+.cancel-button {
+    background: #AA0000;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.cancel-button:hover {
+    background: #DD0000;
+}
+
+#voice-response {
+    padding: 20px;
+    background: rgba(0, 68, 34, 0.5);
+    border: 2px solid #004488;
+    border-radius: 10px;
+}
+
+#response-text {
+    font-size: 18px;
+    min-height: 100px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+#control-panel {
+    width: 350px;
+    background: rgba(0, 34, 68, 0.7);
+    border-left: 2px solid #004488;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.panel-section {
+    margin-bottom: 25px;
+    padding: 15px;
+    border: 1px solid #004488;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.panel-section h3 {
+    color: #00FFFF;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #004488;
+    padding-bottom: 5px;
+}
+
+.control-group {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.control-group label {
+    font-weight: bold;
+}
+
+.toggle-btn {
+    background: #004488;
+    color: #00FFFF;
+    border: 1px solid #00FFFF;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.toggle-btn:hover {
+    background: #0066AA;
+}
+
+.toggle-btn.active {
+    background: #00AA00;
+    color: white;
+}
+
+#language-select {
+    background: #004488;
+    color: #00FFFF;
+    border: 1px solid #00FFFF;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+#sensitivity-slider {
+    width: 120px;
+    accent-color: #00FFFF;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(0, 68, 136, 0.3);
+}
+
+.quick-cmd-btn {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 10px;
+    background: #004488;
+    color: #00FFFF;
+    border: 1px solid #00FFFF;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.quick-cmd-btn:hover {
+    background: #0066AA;
+}
+
+.emergency-btn {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 15px;
+    background: #CC0000;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.emergency-btn:hover {
+    background: #FF0000;
+}
+
+.test-btn {
+    width: 100%;
+    padding: 10px;
+    background: #666666;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.test-btn:hover {
+    background: #888888;
+}
+
+#command-log {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 400px;
+    height: 200px;
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #004488;
+    border-bottom: none;
+    border-right: none;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+#command-log h3 {
+    color: #00FFFF;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.log-entry {
+    margin-bottom: 8px;
+    padding: 5px;
+    background: rgba(0, 68, 136, 0.3);
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.log-entry .timestamp {
+    color: #AAAAAA;
+    font-size: 10px;
+}
+
+.log-entry .command {
+    color: #00FFFF;
+    font-weight: bold;
+}
+
+.log-entry .response {
+    color: #AAFFAA;
+}
+
+/* Animation for voice activity */
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.voice-active .indicator-light {
+    animation: pulse 1s infinite;
+}
+
+/* Night mode styles */
+body.night-mode {
+    background: #000000;
+    color: #FF0000;
+}
+
+body.night-mode #voice-container {
+    color: #FF0000;
+}
+
+body.night-mode .status-indicator.active .indicator-light {
+    background: #FF0000;
+    box-shadow: 0 0 15px #FF0000;
+}
+
+body.night-mode #current-command,
+body.night-mode #confirmation-text,
+body.night-mode #response-text {
+    background: rgba(51, 0, 0, 0.5);
+    color: #FF0000;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+    #voice-container {
+        flex-direction: column;
+    }
+    
+    #control-panel {
+        width: 100%;
+        height: 200px;
+        border-left: none;
+        border-top: 2px solid #004488;
+    }
+    
+    #command-log {
+        position: relative;
+        width: 100%;
+        height: 150px;
+        border: 2px solid #004488;
+    }
+}

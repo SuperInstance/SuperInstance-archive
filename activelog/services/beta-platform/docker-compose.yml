@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  beta-platform:
+    build: .
+    ports:
+      - "8323:8323"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/activelog_beta
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./static:/app/static
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: activelog_beta
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:

@@ -1,0 +1,184 @@
+name: Performance and Load Testing
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Run daily at 2 AM
+  workflow_dispatch:
+    inputs:
+      target_agents:
+        description: 'Number of agents to test'
+        required: true
+        default: '1000000'
+      duration:
+        description: 'Test duration in minutes'
+        required: true
+        default: '30'
+
+jobs:
+  load-test:
+    name: Load Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Run load test
+        env:
+          TARGET_URL: ${{ secrets.STAGING_URL }}
+          AGENTS_COUNT: ${{ github.event.inputs.target_agents || '1000000' }}
+          DURATION: ${{ github.event.inputs.duration || '30' }}m
+        run: |
+          k6 run \
+            --vus 1000 \
+            --duration $DURATION \
+            --out json=load-test-results.json \
+            --summary-export=summary.json \
+            tests/load-test.js
+
+      - name: Analyze results
+        run: |
+          python3 tests/analyze-performance.py load-test-results.json
+
+      - name: Upload results
+        uses: actions/upload-artifact@v3
+        with:
+          name: load-test-results
+          path: |
+            load-test-results.json
+            summary.json
+
+      - name: Check performance thresholds
+        run: |
+          P95_LATENCY=$(jq -r '.metrics.http_req_duration.values.p95' summary.json)
+          ERROR_RATE=$(jq -r '.metrics.http_req_failed.values.rate' summary.json)
+
+          if (( $(echo "$P95_LATENCY > 1000" | bc -l) )); then
+            echo "::error::P95 latency exceeded threshold: ${P95_LATENCY}ms"
+            exit 1
+          fi
+
+          if (( $(echo "$ERROR_RATE > 0.01" | bc -l) )); then
+            echo "::error::Error rate exceeded threshold: ${ERROR_RATE}"
+            exit 1
+          fi
+
+  swarm-scale-test:
+    name: Swarm Scaling Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r tests/requirements.txt
+
+      - name: Run swarm scaling test
+        env:
+          API_URL: ${{ secrets.STAGING_URL }}
+          MAX_AGENTS: ${{ github.event.inputs.target_agents || '1000000' }}
+        run: |
+          python3 tests/swarm-scale-test.py \
+            --api-url $API_URL \
+            --max-agents $MAX_AGENTS \
+            --increment 100000 \
+            --metrics-output scaling-metrics.json
+
+      - name: Analyze scaling behavior
+        run: |
+          python3 tests/analyze-scaling.py scaling-metrics.json
+
+      - name: Upload results
+        uses: actions/upload-artifact@v3
+        with:
+          name: scaling-test-results
+          path: scaling-metrics.json
+
+  memory-leak-test:
+    name: Memory Leak Detection
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Run memory profiling
+        run: |
+          go test -bench=. -benchmem -memprofile=mem.prof -cpuprofile=cpu.prof ./...
+
+      - name: Analyze memory profile
+        run: |
+          go tool pprof -text mem.prof > memory-analysis.txt
+          go tool pprof -text cpu.prof > cpu-analysis.txt
+
+      - name: Check for memory leaks
+        run: |
+          python3 tests/detect-memory-leaks.py memory-analysis.txt
+
+      - name: Upload profiles
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-profiles
+          path: |
+            mem.prof
+            cpu.prof
+            memory-analysis.txt
+            cpu-analysis.txt
+
+  report:
+    name: Generate Performance Report
+    needs: [load-test, swarm-scale-test, memory-leak-test]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Generate performance report
+        run: |
+          python3 tests/generate-report.py \
+            --output performance-report.html
+
+      - name: Upload report
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-report
+          path: performance-report.html
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('performance-report.html', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '## Performance Test Results\n\n' + report
+            });

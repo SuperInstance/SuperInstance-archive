@@ -1,0 +1,103 @@
+# Vertical Pod Autoscaler for Core Service
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: swarm-core-vpa
+  namespace: swarm-intelligence
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: swarm-core
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: swarm-core
+      minAllowed:
+        cpu: 2000m
+        memory: 4Gi
+      maxAllowed:
+        cpu: 8000m
+        memory: 32Gi
+      controlledResources:
+        - cpu
+        - memory
+---
+# VPA for API Service
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: swarm-api-vpa
+  namespace: swarm-intelligence
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: swarm-api
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: swarm-api
+      minAllowed:
+        cpu: 500m
+        memory: 1Gi
+      maxAllowed:
+        cpu: 4000m
+        memory: 8Gi
+      controlledResources:
+        - cpu
+        - memory
+---
+# VPA for PostgreSQL
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: postgres-vpa
+  namespace: swarm-intelligence
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: postgres
+  updatePolicy:
+    updateMode: "Initial"  # Only set on pod creation
+  resourcePolicy:
+    containerPolicies:
+    - containerName: postgres
+      minAllowed:
+        cpu: 2000m
+        memory: 4Gi
+      maxAllowed:
+        cpu: 8000m
+        memory: 16Gi
+      controlledResources:
+        - cpu
+        - memory
+---
+# VPA for Redis
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: redis-vpa
+  namespace: swarm-intelligence
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: redis
+  updatePolicy:
+    updateMode: "Initial"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: redis
+      minAllowed:
+        cpu: 500m
+        memory: 2Gi
+      maxAllowed:
+        cpu: 4000m
+        memory: 16Gi
+      controlledResources:
+        - cpu
+        - memory

@@ -1,0 +1,30 @@
+{
+  "name": "ui-polish",
+  "version": "1.0.0",
+  "description": "Professional UI Polish Package - Advanced micro-interactions and animations",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "framer-motion": "^10.16.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "lottie-react": "^2.4.0",
+    "react-spring": "^9.7.0",
+    "hammerjs": "^2.0.8",
+    "intersection-observer": "^0.12.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
+    "vite": "^4.4.0",
+    "tailwindcss": "^3.3.0",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.24"
+  }
+}

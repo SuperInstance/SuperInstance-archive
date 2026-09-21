@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ActiveLog Daily Digest</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #059669; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f9f9f9; }
+        .summary { background: white; padding: 15px; margin: 15px 0; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .notification-item { border-bottom: 1px solid #e5e5e5; padding: 10px 0; }
+        .notification-item:last-child { border-bottom: none; }
+        .button { display: inline-block; background: #059669; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📈 Your ActiveLog Digest</h1>
+            <p>{{ period_start }} - {{ period_end }}</p>
+        </div>
+        <div class="content">
+            <h2>Hi {{ user_name }},</h2>
+            
+            <div class="summary">
+                <h3>Activity Summary</h3>
+                <p>Here's what happened with your ActiveLog account:</p>
+                <ul>
+                    <li><strong>{{ total_notifications }}</strong> new notifications</li>
+                    <li><strong>{{ files_processed }}</strong> files processed</li>
+                    <li><strong>{{ sync_operations }}</strong> sync operations</li>
+                    <li><strong>{{ ai_analyses }}</strong> AI analyses completed</li>
+                </ul>
+            </div>
+            
+            {% if notifications %}
+            <div class="summary">
+                <h3>Recent Notifications</h3>
+                {% for notification in notifications %}
+                <div class="notification-item">
+                    <strong>{{ notification.title }}</strong><br>
+                    <small>{{ notification.timestamp }}</small><br>
+                    {{ notification.message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <p>Want to see more details?</p>
+            <a href="{{ dashboard_url }}" class="button">View Dashboard</a>
+            
+            <hr style="margin: 30px 0;">
+            <p><small>You're receiving this digest because you have digest notifications enabled. 
+            <a href="{{ unsubscribe_url }}">Update your notification preferences</a>.</small></p>
+        </div>
+    </div>
+</body>
+</html>

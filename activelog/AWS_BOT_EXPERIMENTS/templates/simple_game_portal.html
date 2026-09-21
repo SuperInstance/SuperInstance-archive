@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Game Testing Portal - Live AI Player</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 100%);
+            color: #00ff41;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-areas: 
+                "header header header"
+                "status gameplay console"
+                "controls gameplay console";
+            grid-template-columns: 300px 1fr 350px;
+            grid-template-rows: 80px 1fr 120px;
+            height: 100vh;
+            gap: 10px;
+            padding: 10px;
+        }
+        .header {
+            grid-area: header;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+        }
+        .header h1 {
+            font-size: 20px;
+            text-shadow: 0 0 10px #00ff41;
+        }
+        .status {
+            grid-area: status;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff41;
+            border-radius: 10px;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        .gameplay {
+            grid-area: gameplay;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff41;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .console {
+            grid-area: console;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ff41;
+            border-radius: 10px;
+            padding: 10px;
+            overflow-y: auto;
+            font-size: 12px;
+            line-height: 1.4;
+            max-height: 100%;
+        }
+        .controls {
+            grid-area: controls;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            background: transparent;
+            color: #00ff41;
+            border: 1px solid #00ff41;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: rgba(0, 255, 65, 0.2);
+            box-shadow: 0 0 10px #00ff41;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .status-item {
+            margin: 8px 0;
+            padding: 5px;
+            border-left: 2px solid #00ff41;
+            padding-left: 10px;
+        }
+        .level-indicator {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffff00;
+            text-shadow: 0 0 5px #ffff00;
+        }
+        .game-frame {
+            width: 90%;
+            height: 80%;
+            border: 1px solid #00ff41;
+            border-radius: 5px;
+            background: white;
+            display: none;
+        }
+        .game-placeholder {
+            text-align: center;
+            font-size: 18px;
+            opacity: 0.7;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff41, #ffff00);
+            width: 0%;
+            transition: width 0.5s;
+            border-radius: 8px;
+        }
+        .console-line {
+            margin: 1px 0;
+            opacity: 0.9;
+            font-size: 11px;
+        }
+        .console-line.highlight {
+            color: #ffff00;
+            font-weight: bold;
+        }
+        .score-display {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px;
+            border: 1px solid #00ff41;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .live-indicator {
+            color: #ff0041;
+            font-weight: bold;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 GAME TESTING PORTAL - AI PLAYER LIVE VIEW</h1>
+        </div>
+        
+        <div class="status">
+            <div class="status-item">
+                <strong>📊 Level:</strong><br>
+                <span id="current-level" class="level-indicator">LEVEL 1 MATH</span>
+            </div>
+            <div class="status-item">
+                <strong>🎮 Tested:</strong> <span id="games-tested">0</span>
+            </div>
+            <div class="status-item">
+                <strong>✅ Success:</strong> <span id="games-successful">0</span>
+            </div>
+            <div class="status-item">
+                <strong>⭐ Avg Quality:</strong> <span id="average-quality">0.0</span>/10
+            </div>
+            <div class="status-item">
+                <strong>🎯 Game:</strong><br>
+                <span id="current-game">No game loaded</span>
+            </div>
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+        </div>
+        
+        <div class="gameplay">
+            <div id="game-placeholder" class="game-placeholder">
+                🤖 AI Player Ready<br>
+                <small>Start testing to see live gameplay simulation</small>
+            </div>
+            <iframe id="game-frame" class="game-frame" src="about:blank"></iframe>
+            <div class="score-display">
+                <div>⚡ Actions: <span id="action-count">0</span></div>
+                <div>⏱️ Duration: <span id="test-duration">0</span>s</div>
+                <div>⭐ Quality: <span id="quality-score">-</span>/10</div>
+            </div>
+        </div>
+        
+        <div class="console" id="console">
+            <div class="console-line highlight">🎮 GAME TESTING CONSOLE READY</div>
+            <div class="console-line">🤖 AI player systems initialized</div>
+            <div class="console-line">📊 Progression: Math → Logic → Arcade → Retro → Classic</div>
+            <div class="console-line">⏱️ Minimum 10+ seconds gameplay per test</div>
+        </div>
+        
+        <div class="controls">
+            <button id="start-btn" class="btn">🚀 Start Testing</button>
+            <button id="stop-btn" class="btn" disabled>⏹️ Stop Testing</button>
+            <button id="clear-btn" class="btn">🗑️ Clear</button>
+            <div style="margin-left: auto;">
+                <span class="live-indicator">🔴 LIVE</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let testingActive = false;
+        let updateInterval;
+
+        // DOM elements
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const consoleEl = document.getElementById('console');
+        const gameFrame = document.getElementById('game-frame');
+        const gamePlaceholder = document.getElementById('game-placeholder');
+
+        // Button event handlers
+        startBtn.onclick = () => startTesting();
+        stopBtn.onclick = () => stopTesting();
+        clearBtn.onclick = () => clearConsole();
+
+        // Start live data polling
+        function startLiveUpdates() {
+            updateInterval = setInterval(fetchLiveData, 1000); // Update every second
+        }
+
+        async function fetchLiveData() {
+            try {
+                const response = await fetch('/api/live_data');
+                const data = await response.json();
+                updateDisplay(data);
+            } catch (error) {
+                console.error('Failed to fetch live data:', error);
+            }
+        }
+
+        function updateDisplay(data) {
+            // Update status panel
+            document.getElementById('current-level').textContent = 
+                (data.current_level || 'level_1_math').replace('_', ' ').toUpperCase();
+            document.getElementById('games-tested').textContent = data.games_completed || 0;
+            document.getElementById('games-successful').textContent = data.successful_games || 0;
+            
+            if (data.quality_scores && data.quality_scores.length > 0) {
+                const avg = data.quality_scores.reduce((a, b) => a + b, 0) / data.quality_scores.length;
+                document.getElementById('average-quality').textContent = avg.toFixed(1);
+            }
+            
+            document.getElementById('current-game').textContent = data.current_game || 'No game loaded';
+            
+            // Update progress bar
+            document.getElementById('progress-fill').style.width = (data.testing_progress || 0) + '%';
+            
+            // Update score display
+            document.getElementById('action-count').textContent = data.action_count || 0;
+            document.getElementById('test-duration').textContent = (data.test_duration || 0) + 's';
+            document.getElementById('quality-score').textContent = 
+                data.current_quality ? data.current_quality.toFixed(1) : '-';
+            
+            // Update console with latest message
+            if (data.latest_update && data.latest_update !== lastUpdate) {
+                addConsoleMessage(data.latest_update);
+                lastUpdate = data.latest_update;
+            }
+            
+            // Update game frame
+            if (data.game_url && data.game_url !== currentGameUrl) {
+                showGameFrame(data.game_url);
+                currentGameUrl = data.game_url;
+            }
+            
+            // Update testing status
+            if (data.testing_status === 'idle' && testingActive) {
+                // Testing finished
+                testingActive = false;
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                hideGameFrame();
+            }
+        }
+
+        let lastUpdate = '';
+        let currentGameUrl = '';
+
+        async function startTesting() {
+            try {
+                const response = await fetch('/api/start_testing', { method: 'POST' });
+                const result = await response.json();
+                
+                if (result.success) {
+                    testingActive = true;
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    addConsoleMessage('🚀 Game testing session started', true);
+                }
+            } catch (error) {
+                addConsoleMessage(`❌ Failed to start testing: ${error.message}`);
+            }
+        }
+
+        async function stopTesting() {
+            try {
+                const response = await fetch('/api/stop_testing', { method: 'POST' });
+                const result = await response.json();
+                
+                if (result.success) {
+                    testingActive = false;
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    addConsoleMessage('⏹️ Game testing session stopped', true);
+                    hideGameFrame();
+                }
+            } catch (error) {
+                addConsoleMessage(`❌ Failed to stop testing: ${error.message}`);
+            }
+        }
+
+        function clearConsole() {
+            consoleEl.innerHTML = '<div class="console-line highlight">🗑️ Console cleared</div>';
+        }
+
+        function addConsoleMessage(message, highlight = false) {
+            const line = document.createElement('div');
+            line.className = `console-line ${highlight ? 'highlight' : ''}`;
+            line.textContent = message;
+            consoleEl.appendChild(line);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+            
+            // Keep console from getting too long
+            if (consoleEl.children.length > 100) {
+                consoleEl.removeChild(consoleEl.firstChild);
+            }
+        }
+
+        function showGameFrame(gameUrl) {
+            gameFrame.src = gameUrl;
+            gameFrame.style.display = 'block';
+            gamePlaceholder.style.display = 'none';
+        }
+
+        function hideGameFrame() {
+            gameFrame.style.display = 'none';
+            gamePlaceholder.style.display = 'block';
+            currentGameUrl = '';
+        }
+
+        // Start live updates when page loads
+        startLiveUpdates();
+        addConsoleMessage('📡 Live data polling started');
+    </script>
+</body>
+</html>

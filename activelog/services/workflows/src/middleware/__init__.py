@@ -1,0 +1,1 @@
+"""Middleware package for workflow automation service"""

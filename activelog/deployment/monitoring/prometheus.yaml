@@ -1,0 +1,511 @@
+# Prometheus Configuration for ActiveLog Platform Monitoring
+# Comprehensive metrics collection and alerting
+
+# Prometheus StatefulSet
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: prometheus
+  namespace: activelog-monitoring
+spec:
+  serviceName: prometheus
+  replicas: 2
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+      annotations:
+        prometheus.io/scrape: "false"
+    spec:
+      serviceAccountName: prometheus
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+      containers:
+      - name: prometheus
+        image: prom/prometheus:v2.47.0
+        args:
+        - --config.file=/etc/prometheus/prometheus.yml
+        - --storage.tsdb.path=/prometheus
+        - --storage.tsdb.retention.time=30d
+        - --storage.tsdb.retention.size=50GB
+        - --web.console.libraries=/etc/prometheus/console_libraries
+        - --web.console.templates=/etc/prometheus/consoles
+        - --web.enable-lifecycle
+        - --web.enable-admin-api
+        - --web.external-url=http://prometheus.activelog.local
+        ports:
+        - containerPort: 9090
+          name: web
+        resources:
+          limits:
+            cpu: 4
+            memory: 8Gi
+          requests:
+            cpu: 2
+            memory: 4Gi
+        volumeMounts:
+        - name: config
+          mountPath: /etc/prometheus
+        - name: prometheus-storage
+          mountPath: /prometheus
+        - name: rules
+          mountPath: /etc/prometheus/rules
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9090
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9090
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+      - name: config-reloader
+        image: jimmidyson/configmap-reload:v0.8.0
+        args:
+        - --volume-dir=/etc/prometheus
+        - --webhook-url=http://localhost:9090/-/reload
+        volumeMounts:
+        - name: config
+          mountPath: /etc/prometheus
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 10m
+            memory: 10Mi
+      volumes:
+      - name: config
+        configMap:
+          name: prometheus-config
+      - name: rules
+        configMap:
+          name: prometheus-rules
+  volumeClaimTemplates:
+  - metadata:
+      name: prometheus-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: fast-ssd
+      resources:
+        requests:
+          storage: 100Gi
+---
+# Prometheus Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: activelog-monitoring
+  labels:
+    app: prometheus
+spec:
+  ports:
+  - port: 9090
+    targetPort: 9090
+    name: web
+  selector:
+    app: prometheus
+  type: ClusterIP
+---
+# Prometheus Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: activelog-monitoring
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+      external_labels:
+        cluster: 'activelog-production'
+        region: 'us-west-2'
+    
+    rule_files:
+    - "/etc/prometheus/rules/*.yml"
+    
+    alerting:
+      alertmanagers:
+      - static_configs:
+        - targets:
+          - alertmanager:9093
+    
+    scrape_configs:
+    # Prometheus itself
+    - job_name: 'prometheus'
+      static_configs:
+      - targets: ['localhost:9090']
+    
+    # Kubernetes API Server
+    - job_name: 'kubernetes-apiservers'
+      kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names: ['default']
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: default;kubernetes;https
+    
+    # Kubernetes Nodes
+    - job_name: 'kubernetes-nodes'
+      kubernetes_sd_configs:
+      - role: node
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecure_skip_verify: true
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      relabel_configs:
+      - action: labelmap
+        regex: __meta_kubernetes_node_label_(.+)
+    
+    # Kubernetes Pods
+    - job_name: 'kubernetes-pods'
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names: ['activelog', 'activelog-monitoring', 'activelog-logging']
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+    
+    # ActiveLog Core Services
+    - job_name: 'activelog-api-gateway'
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names: ['activelog']
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_app]
+        action: keep
+        regex: api-gateway
+      - source_labels: [__address__]
+        action: replace
+        regex: '([^:]+):.*'
+        replacement: '${1}:9090'
+        target_label: __address__
+      metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'go_.*'
+        action: drop
+    
+    # AI/ML Services
+    - job_name: 'activelog-ai-services'
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names: ['activelog']
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_component]
+        action: keep
+        regex: ai
+      - source_labels: [__address__]
+        action: replace
+        regex: '([^:]+):.*'
+        replacement: '${1}:9090'
+        target_label: __address__
+      metric_relabel_configs:
+      - source_labels: [service_name]
+        target_label: ai_service
+      - source_labels: [model_name]
+        target_label: ml_model
+    
+    # Gaming Services
+    - job_name: 'activelog-gaming'
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names: ['activelog']
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_app]
+        action: keep
+        regex: '(gaming-platform|dmlog-.*)'
+      - source_labels: [__address__]
+        action: replace
+        regex: '([^:]+):.*'
+        replacement: '${1}:9090'
+        target_label: __address__
+      metric_relabel_configs:
+      - source_labels: [player_id]
+        target_label: game_player
+      - source_labels: [session_id]
+        target_label: game_session
+    
+    # Data Services
+    - job_name: 'activelog-data-services'
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names: ['activelog']
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_type]
+        action: keep
+        regex: '(data|sync|processing)'
+      - source_labels: [__address__]
+        action: replace
+        regex: '([^:]+):.*'
+        replacement: '${1}:9090'
+        target_label: __address__
+    
+    # Infrastructure Services
+    - job_name: 'activelog-infrastructure'
+      static_configs:
+      - targets:
+        - 'postgres-exporter:9187'
+        - 'redis-exporter:9121'
+        - 'nginx-exporter:9113'
+      relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - target_label: service_type
+        replacement: infrastructure
+    
+    # Node Exporter
+    - job_name: 'node-exporter'
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names: ['activelog-monitoring']
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_app]
+        action: keep
+        regex: node-exporter
+      - source_labels: [__address__]
+        action: replace
+        regex: '([^:]+):.*'
+        replacement: '${1}:9100'
+        target_label: __address__
+    
+    # Istio Service Mesh
+    - job_name: 'istio-mesh'
+      kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names: ['istio-system']
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: istio-proxy;http-monitoring
+    
+    # Custom Business Metrics
+    - job_name: 'activelog-business-metrics'
+      static_configs:
+      - targets: ['custom-metrics-collector:8080']
+      scrape_interval: 30s
+      metrics_path: /business-metrics
+      relabel_configs:
+      - target_label: metrics_type
+        replacement: business
+---
+# Prometheus Rules for Alerting
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  namespace: activelog-monitoring
+data:
+  activelog-alerts.yml: |
+    groups:
+    - name: activelog.rules
+      interval: 30s
+      rules:
+      # Infrastructure Alerts
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: infrastructure
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 80% for instance {{ $labels.instance }}"
+      
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: infrastructure
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 85% for instance {{ $labels.instance }}"
+      
+      - alert: DiskSpaceLow
+        expr: (1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100 > 90
+        for: 5m
+        labels:
+          severity: critical
+          service: infrastructure
+        annotations:
+          summary: "Low disk space"
+          description: "Disk usage is above 90% for {{ $labels.instance }}:{{ $labels.mountpoint }}"
+      
+      # Application Alerts
+      - alert: ServiceDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: "{{ $labels.job }}"
+        annotations:
+          summary: "Service is down"
+          description: "Service {{ $labels.job }} on {{ $labels.instance }} is down"
+      
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          service: "{{ $labels.service }}"
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is above 10% for service {{ $labels.service }}"
+      
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          service: "{{ $labels.service }}"
+        annotations:
+          summary: "High response time"
+          description: "95th percentile response time is above 2s for service {{ $labels.service }}"
+      
+      # AI/ML Specific Alerts
+      - alert: AIModelInferenceTime
+        expr: histogram_quantile(0.95, rate(ai_inference_duration_seconds_bucket[5m])) > 30
+        for: 5m
+        labels:
+          severity: warning
+          service: ai
+        annotations:
+          summary: "AI model inference time high"
+          description: "AI model {{ $labels.model }} inference time is above 30s"
+      
+      - alert: AIModelAccuracyDrop
+        expr: ai_model_accuracy < 0.85
+        for: 10m
+        labels:
+          severity: critical
+          service: ai
+        annotations:
+          summary: "AI model accuracy dropped"
+          description: "AI model {{ $labels.model }} accuracy dropped below 85%"
+      
+      # Gaming Platform Alerts
+      - alert: GameSessionHighLatency
+        expr: histogram_quantile(0.95, rate(game_session_latency_seconds_bucket[5m])) > 0.1
+        for: 3m
+        labels:
+          severity: warning
+          service: gaming
+        annotations:
+          summary: "High gaming session latency"
+          description: "Gaming session latency is above 100ms"
+      
+      - alert: PlayerDisconnections
+        expr: rate(game_player_disconnections_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          service: gaming
+        annotations:
+          summary: "High player disconnection rate"
+          description: "Player disconnection rate is above 10%"
+      
+      # Data Pipeline Alerts
+      - alert: DataProcessingBacklog
+        expr: data_processing_queue_size > 1000
+        for: 5m
+        labels:
+          severity: warning
+          service: data
+        annotations:
+          summary: "Data processing backlog"
+          description: "Data processing queue has {{ $value }} items"
+      
+      - alert: SyncFailure
+        expr: rate(sync_operations_failed_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          service: sync
+        annotations:
+          summary: "High sync failure rate"
+          description: "Sync failure rate is above 5%"
+      
+      # Database Alerts
+      - alert: DatabaseConnectionsHigh
+        expr: postgres_connections_active / postgres_connections_max > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          service: database
+        annotations:
+          summary: "Database connections high"
+          description: "Database connections are above 80% of maximum"
+      
+      - alert: DatabaseSlowQueries
+        expr: rate(postgres_slow_queries_total[5m]) > 1
+        for: 3m
+        labels:
+          severity: warning
+          service: database
+        annotations:
+          summary: "Database slow queries detected"
+          description: "{{ $value }} slow queries per second detected"
+      
+      # Security Alerts
+      - alert: SecurityIncident
+        expr: rate(security_events_total{type="breach"}[5m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+          service: security
+        annotations:
+          summary: "Security incident detected"
+          description: "Security breach event detected in service {{ $labels.service }}"
+      
+      - alert: AuthenticationFailures
+        expr: rate(auth_failures_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          service: auth
+        annotations:
+          summary: "High authentication failure rate"
+          description: "Authentication failures are above 10 per minute"

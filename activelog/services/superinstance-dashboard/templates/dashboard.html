@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .dashboard-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+            gap: 1.5rem; 
+        }
+        .metric-card { 
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.8) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 32px rgba(31,38,135,0.15);
+        }
+        .status-indicator {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .service-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        .service-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+        .service-running { border-left-color: #10b981; }
+        .service-stopped { border-left-color: #f59e0b; }
+        .service-error { border-left-color: #ef4444; }
+        .alert-slide-in {
+            animation: slideInRight 0.5s ease-out;
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .real-time-indicator {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { box-shadow: 0 0 10px rgba(34, 197, 94, 0.5); }
+            to { box-shadow: 0 0 20px rgba(34, 197, 94, 0.8); }
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center">
+                            <i data-lucide="command" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                                SuperInstance Dashboard
+                            </h1>
+                            <p class="text-xs text-gray-500">ActiveLog Ecosystem Control</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="real-time-indicator w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span class="text-sm text-gray-600 hidden sm:block">Live</span>
+                    
+                    <button id="alerts-btn" class="relative p-2 rounded-lg hover:bg-gray-100/50 transition-colors">
+                        <i data-lucide="bell" class="w-5 h-5 text-gray-600"></i>
+                        <span id="alerts-badge" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center hidden">0</span>
+                    </button>
+                    
+                    <button id="settings-btn" class="p-2 rounded-lg hover:bg-gray-100/50 transition-colors">
+                        <i data-lucide="settings" class="w-5 h-5 text-gray-600"></i>
+                    </button>
+                    
+                    <div class="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full cursor-pointer"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- System Overview Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="metric-card rounded-xl p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Services</p>
+                        <p id="total-services" class="text-3xl font-bold text-gray-900">{{ total_services }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="server" class="w-6 h-6 text-blue-600"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-sm">
+                    <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                    <span class="text-gray-600">Ecosystem Active</span>
+                </div>
+            </div>
+
+            <div class="metric-card rounded-xl p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Active Services</p>
+                        <p id="active-services" class="text-3xl font-bold text-green-600">{{ active_services }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="activity" class="w-6 h-6 text-green-600"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-sm">
+                    <div class="status-indicator w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                    <span class="text-gray-600">Running Smooth</span>
+                </div>
+            </div>
+
+            <div class="metric-card rounded-xl p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">System Health</p>
+                        <p id="system-health" class="text-2xl font-bold text-green-600">{{ system_health|title }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="heart" class="w-6 h-6 text-purple-600"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex justify-between text-sm text-gray-600 mb-1">
+                        <span>Performance</span>
+                        <span id="performance-pct">98%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div id="performance-bar" class="bg-green-500 h-2 rounded-full" style="width: 98%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metric-card rounded-xl p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Bot Coordination</p>
+                        <p id="bot-status" class="text-2xl font-bold text-indigo-600">Active</p>
+                    </div>
+                    <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="cpu" class="w-6 h-6 text-indigo-600"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-sm">
+                    <div class="w-2 h-2 bg-indigo-500 rounded-full mr-2"></div>
+                    <span class="text-gray-600">Coordinating Tasks</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Metrics Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="metric-card rounded-xl p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <i data-lucide="trending-up" class="w-5 h-5 mr-2 text-blue-600"></i>
+                    System Performance
+                </h3>
+                <div class="chart-container">
+                    <canvas id="performance-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="metric-card rounded-xl p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <i data-lucide="pie-chart" class="w-5 h-5 mr-2 text-purple-600"></i>
+                    Resource Distribution
+                </h3>
+                <div class="chart-container">
+                    <canvas id="resources-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Grid -->
+        <div class="metric-card rounded-xl p-6 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                    <i data-lucide="layers" class="w-5 h-5 mr-2 text-indigo-600"></i>
+                    Services Overview
+                </h3>
+                <div class="flex items-center space-x-4">
+                    <select id="category-filter" class="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm">
+                        <option value="all">All Categories</option>
+                        <option value="core">Core</option>
+                        <option value="frontend">Frontend</option>
+                        <option value="backend">Backend</option>
+                        <option value="ai">AI Services</option>
+                        <option value="monitoring">Monitoring</option>
+                    </select>
+                    <button id="refresh-services" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                        <i data-lucide="refresh-cw" class="w-4 h-4 mr-1"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+            
+            <div id="services-grid" class="dashboard-grid">
+                <!-- Services will be loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- Alerts Panel -->
+        <div id="alerts-panel" class="metric-card rounded-xl p-6 hidden">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <i data-lucide="alert-triangle" class="w-5 h-5 mr-2 text-orange-600"></i>
+                System Alerts
+            </h3>
+            <div id="alerts-list">
+                <!-- Alerts will be loaded dynamically -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Service Management Modal -->
+    <div id="service-modal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h3 id="modal-title" class="text-lg font-semibold text-gray-800">Service Management</h3>
+                        <button id="close-modal" class="p-2 hover:bg-gray-100 rounded-lg">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="modal-content" class="p-6 overflow-y-auto max-h-96">
+                    <!-- Modal content will be loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // WebSocket connection for real-time updates
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}/ws/dashboard`;
+        let ws;
+        
+        function connectWebSocket() {
+            ws = new WebSocket(wsUrl);
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                updateDashboard(data);
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket disconnected, attempting to reconnect...');
+                setTimeout(connectWebSocket, 5000);
+            };
+            
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+        }
+
+        // Dashboard state
+        let currentServices = [];
+        let performanceChart, resourcesChart;
+
+        // Initialize dashboard
+        async function initializeDashboard() {
+            await loadServices();
+            await loadAlerts();
+            initializeCharts();
+            connectWebSocket();
+            
+            // Set up periodic updates as fallback
+            setInterval(async () => {
+                if (ws.readyState !== WebSocket.OPEN) {
+                    await loadServices();
+                    await loadAlerts();
+                }
+            }, 30000);
+        }
+
+        // Load services data
+        async function loadServices() {
+            try {
+                const response = await fetch('/api/services');
+                const data = await response.json();
+                currentServices = data.services;
+                renderServices(currentServices);
+                updateServiceCounts();
+            } catch (error) {
+                console.error('Error loading services:', error);
+            }
+        }
+
+        // Render services grid
+        function renderServices(services) {
+            const grid = document.getElementById('services-grid');
+            const categoryFilter = document.getElementById('category-filter').value;
+            
+            const filteredServices = categoryFilter === 'all' 
+                ? services 
+                : services.filter(s => s.category === categoryFilter);
+
+            grid.innerHTML = filteredServices.map(service => `
+                <div class="service-card service-${service.status} bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-all cursor-pointer" 
+                     data-service="${service.name}">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 rounded-full ${getStatusColor(service.status)}"></div>
+                            <h4 class="font-semibold text-gray-800 truncate">${service.name}</h4>
+                        </div>
+                        <span class="px-2 py-1 text-xs font-medium rounded-full ${getCategoryBadge(service.category)}">${service.category}</span>
+                    </div>
+                    
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <div class="flex justify-between">
+                            <span>Port:</span>
+                            <span class="font-mono">${service.port}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Status:</span>
+                            <span class="font-medium ${getStatusTextColor(service.status)}">${service.status}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Health:</span>
+                            <span class="font-medium ${getHealthTextColor(service.health)}">${service.health}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Priority:</span>
+                            <span class="font-medium">${getPriorityText(service.priority)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 flex space-x-2">
+                        <button class="flex-1 px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200 transition-colors" 
+                                onclick="openServiceModal('${service.name}')">
+                            Manage
+                        </button>
+                        <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded text-xs hover:bg-gray-200 transition-colors"
+                                onclick="window.open('${service.url}', '_blank')">
+                            <i data-lucide="external-link" class="w-3 h-3"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Re-initialize Lucide icons for new elements
+            lucide.createIcons();
+        }
+
+        // Helper functions for styling
+        function getStatusColor(status) {
+            switch(status) {
+                case 'running': return 'bg-green-500';
+                case 'stopped': return 'bg-yellow-500';
+                case 'error': return 'bg-red-500';
+                default: return 'bg-gray-500';
+            }
+        }
+
+        function getStatusTextColor(status) {
+            switch(status) {
+                case 'running': return 'text-green-600';
+                case 'stopped': return 'text-yellow-600';
+                case 'error': return 'text-red-600';
+                default: return 'text-gray-600';
+            }
+        }
+
+        function getHealthTextColor(health) {
+            switch(health) {
+                case 'healthy': return 'text-green-600';
+                case 'unhealthy': return 'text-red-600';
+                default: return 'text-gray-600';
+            }
+        }
+
+        function getCategoryBadge(category) {
+            const badges = {
+                'core': 'bg-purple-100 text-purple-700',
+                'frontend': 'bg-blue-100 text-blue-700',
+                'backend': 'bg-green-100 text-green-700',
+                'ai': 'bg-indigo-100 text-indigo-700',
+                'monitoring': 'bg-orange-100 text-orange-700',
+                'infrastructure': 'bg-gray-100 text-gray-700'
+            };
+            return badges[category] || 'bg-gray-100 text-gray-700';
+        }
+
+        function getPriorityText(priority) {
+            const priorities = { 1: 'High', 2: 'Medium', 3: 'Low' };
+            return priorities[priority] || 'Unknown';
+        }
+
+        // Update service counts
+        function updateServiceCounts() {
+            const total = currentServices.length;
+            const active = currentServices.filter(s => s.status === 'running').length;
+            
+            document.getElementById('total-services').textContent = total;
+            document.getElementById('active-services').textContent = active;
+            
+            const healthPercentage = total > 0 ? Math.round((active / total) * 100) : 0;
+            document.getElementById('performance-pct').textContent = `${healthPercentage}%`;
+            document.getElementById('performance-bar').style.width = `${healthPercentage}%`;
+        }
+
+        // Load alerts
+        async function loadAlerts() {
+            try {
+                const response = await fetch('/api/alerts');
+                const data = await response.json();
+                renderAlerts(data.alerts);
+                updateAlertsBadge(data.alerts.length);
+            } catch (error) {
+                console.error('Error loading alerts:', error);
+            }
+        }
+
+        // Render alerts
+        function renderAlerts(alerts) {
+            const alertsList = document.getElementById('alerts-list');
+            
+            if (alerts.length === 0) {
+                alertsList.innerHTML = '<p class="text-gray-500 text-center py-4">No active alerts</p>';
+                return;
+            }
+            
+            alertsList.innerHTML = alerts.map(alert => `
+                <div class="alert-slide-in border-l-4 ${getAlertBorderColor(alert.severity)} bg-white p-4 mb-3 rounded-r-lg shadow-sm">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <i data-lucide="${getAlertIcon(alert.type)}" class="w-5 h-5 ${getAlertColor(alert.severity)}"></i>
+                        </div>
+                        <div class="ml-3 flex-1">
+                            <p class="text-sm font-medium text-gray-900">${alert.message}</p>
+                            <p class="mt-1 text-xs text-gray-500">${new Date(alert.timestamp).toLocaleString()}</p>
+                        </div>
+                        <button class="ml-3 text-gray-400 hover:text-gray-600" onclick="dismissAlert('${alert.id}')">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            lucide.createIcons();
+        }
+
+        function getAlertBorderColor(severity) {
+            switch(severity) {
+                case 'high': return 'border-red-400';
+                case 'medium': return 'border-yellow-400';
+                case 'low': return 'border-blue-400';
+                default: return 'border-gray-400';
+            }
+        }
+
+        function getAlertColor(severity) {
+            switch(severity) {
+                case 'high': return 'text-red-500';
+                case 'medium': return 'text-yellow-500';
+                case 'low': return 'text-blue-500';
+                default: return 'text-gray-500';
+            }
+        }
+
+        function getAlertIcon(type) {
+            switch(type) {
+                case 'error': return 'alert-circle';
+                case 'warning': return 'alert-triangle';
+                case 'critical': return 'zap';
+                default: return 'info';
+            }
+        }
+
+        // Update alerts badge
+        function updateAlertsBadge(count) {
+            const badge = document.getElementById('alerts-badge');
+            if (count > 0) {
+                badge.textContent = count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // Initialize charts
+        function initializeCharts() {
+            // Performance chart
+            const perfCtx = document.getElementById('performance-chart').getContext('2d');
+            performanceChart = new Chart(perfCtx, {
+                type: 'line',
+                data: {
+                    labels: ['6h ago', '5h ago', '4h ago', '3h ago', '2h ago', '1h ago', 'Now'],
+                    datasets: [{
+                        label: 'CPU Usage',
+                        data: [65, 59, 80, 81, 56, 55, 40],
+                        borderColor: 'rgb(99, 102, 241)',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Memory Usage',
+                        data: [45, 49, 60, 71, 46, 45, 35],
+                        borderColor: 'rgb(16, 185, 129)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 100 }
+                    }
+                }
+            });
+
+            // Resources chart
+            const resCtx = document.getElementById('resources-chart').getContext('2d');
+            resourcesChart = new Chart(resCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Core Services', 'AI Services', 'Backends', 'Frontends', 'Infrastructure'],
+                    datasets: [{
+                        data: [30, 25, 20, 15, 10],
+                        backgroundColor: [
+                            'rgb(99, 102, 241)',
+                            'rgb(16, 185, 129)', 
+                            'rgb(245, 158, 11)',
+                            'rgb(239, 68, 68)',
+                            'rgb(107, 114, 128)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        // Update dashboard with real-time data
+        function updateDashboard(data) {
+            // Update system metrics in real-time
+            if (data.system_metrics) {
+                const metrics = data.system_metrics;
+                // Update performance chart with new data
+                if (performanceChart && metrics.cpu_percent !== undefined) {
+                    const chart = performanceChart;
+                    chart.data.labels.shift();
+                    chart.data.labels.push('Now');
+                    chart.data.datasets[0].data.shift();
+                    chart.data.datasets[0].data.push(metrics.cpu_percent);
+                    chart.data.datasets[1].data.shift();
+                    chart.data.datasets[1].data.push(metrics.memory_percent);
+                    chart.update('none');
+                }
+            }
+            
+            // Update service counts
+            if (data.services !== undefined) {
+                document.getElementById('total-services').textContent = data.services;
+            }
+            if (data.active_services !== undefined) {
+                document.getElementById('active-services').textContent = data.active_services;
+            }
+            
+            // Update alerts count
+            if (data.alerts_count !== undefined) {
+                updateAlertsBadge(data.alerts_count);
+            }
+        }
+
+        // Service management modal
+        function openServiceModal(serviceName) {
+            const modal = document.getElementById('service-modal');
+            const title = document.getElementById('modal-title');
+            const content = document.getElementById('modal-content');
+            
+            title.textContent = `Manage ${serviceName}`;
+            
+            const service = currentServices.find(s => s.name === serviceName);
+            if (!service) return;
+            
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Service Status</label>
+                            <div class="mt-1 p-3 bg-gray-50 rounded-lg">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryBadge(service.status)}">
+                                    ${service.status}
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Port</label>
+                            <div class="mt-1 p-3 bg-gray-50 rounded-lg font-mono">${service.port}</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Actions</label>
+                        <div class="mt-2 flex space-x-3">
+                            <button onclick="restartService('${service.name}')" 
+                                    class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+                                <i data-lucide="refresh-cw" class="w-4 h-4 mr-1"></i>
+                                Restart
+                            </button>
+                            <button onclick="viewLogs('${service.name}')"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                <i data-lucide="file-text" class="w-4 h-4 mr-1"></i>
+                                View Logs
+                            </button>
+                            <button onclick="scaleService('${service.name}')"
+                                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                                <i data-lucide="maximize" class="w-4 h-4 mr-1"></i>
+                                Scale
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="action-result" class="hidden p-3 rounded-lg"></div>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        // Service management functions
+        async function restartService(serviceName) {
+            const result = document.getElementById('action-result');
+            result.className = 'p-3 rounded-lg bg-blue-50 text-blue-800';
+            result.textContent = `Restarting ${serviceName}...`;
+            result.classList.remove('hidden');
+            
+            try {
+                const response = await fetch(`/api/services/${serviceName}/restart`, { method: 'POST' });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.className = 'p-3 rounded-lg bg-green-50 text-green-800';
+                    result.textContent = data.message;
+                    setTimeout(() => loadServices(), 2000);
+                } else {
+                    throw new Error(data.detail || 'Unknown error');
+                }
+            } catch (error) {
+                result.className = 'p-3 rounded-lg bg-red-50 text-red-800';
+                result.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function viewLogs(serviceName) {
+            const result = document.getElementById('action-result');
+            result.className = 'p-3 rounded-lg bg-blue-50 text-blue-800';
+            result.textContent = 'Loading logs...';
+            result.classList.remove('hidden');
+            
+            try {
+                const response = await fetch(`/api/services/${serviceName}/logs`);
+                const data = await response.json();
+                
+                result.className = 'p-3 rounded-lg bg-gray-50 text-gray-800';
+                result.innerHTML = `
+                    <h5 class="font-medium mb-2">Recent Logs:</h5>
+                    <pre class="text-xs overflow-auto max-h-32">${data.logs.join('\\n')}</pre>
+                `;
+            } catch (error) {
+                result.className = 'p-3 rounded-lg bg-red-50 text-red-800';
+                result.textContent = `Error loading logs: ${error.message}`;
+            }
+        }
+
+        async function scaleService(serviceName) {
+            const instances = prompt('Number of instances:', '2');
+            if (!instances) return;
+            
+            const result = document.getElementById('action-result');
+            result.className = 'p-3 rounded-lg bg-blue-50 text-blue-800';
+            result.textContent = `Scaling ${serviceName} to ${instances} instances...`;
+            result.classList.remove('hidden');
+            
+            try {
+                const response = await fetch(`/api/services/${serviceName}/scale?instances=${instances}`, { method: 'POST' });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.className = 'p-3 rounded-lg bg-green-50 text-green-800';
+                    result.textContent = data.message;
+                } else {
+                    throw new Error(data.detail || 'Unknown error');
+                }
+            } catch (error) {
+                result.className = 'p-3 rounded-lg bg-red-50 text-red-800';
+                result.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Event listeners
+        document.getElementById('close-modal').onclick = () => {
+            document.getElementById('service-modal').classList.add('hidden');
+        };
+
+        document.getElementById('alerts-btn').onclick = () => {
+            const panel = document.getElementById('alerts-panel');
+            panel.classList.toggle('hidden');
+            if (!panel.classList.contains('hidden')) {
+                loadAlerts();
+            }
+        };
+
+        document.getElementById('refresh-services').onclick = loadServices;
+
+        document.getElementById('category-filter').onchange = () => {
+            renderServices(currentServices);
+        };
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+
+        console.log('SuperInstance Dashboard loaded successfully');
+    </script>
+
+    <!-- Universal Accessibility Enhancer -->
+    <script>
+        // Load accessibility enhancer from file system or inline
+        (function() {
+            const script = document.createElement('script');
+            script.src = '/static/accessibility-enhancer.js';
+            script.onerror = function() {
+                // Fallback: Load from dev-tools if static doesn't exist
+                fetch('/dev-tools/accessibility-enhancer.js')
+                    .then(response => response.text())
+                    .then(code => {
+                        const inlineScript = document.createElement('script');
+                        inlineScript.textContent = code;
+                        document.head.appendChild(inlineScript);
+                    })
+                    .catch(() => {
+                        console.log('Accessibility enhancer not available');
+                    });
+            };
+            document.head.appendChild(script);
+        })();
+    </script>
+</body>
+</html>

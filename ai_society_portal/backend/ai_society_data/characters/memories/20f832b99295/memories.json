@@ -1,0 +1,30 @@
+{
+  "character_id": "20f832b99295",
+  "memories": [
+    {
+      "id": "14019a4fa6a9",
+      "content": "Discovered new knowledge: E=mc\u00b2: Energy and mass are interchangeable",
+      "memory_type": "learning",
+      "importance": 9,
+      "timestamp": "2025-10-21T17:09:36.630518",
+      "context": {
+        "source": "knowledge_discovery",
+        "knowledge_id": "3889fe33c7a6"
+      },
+      "related_characters": [],
+      "related_rooms": [],
+      "topics": [
+        "physics",
+        "relativity",
+        "energy"
+      ],
+      "emotional_valence": 0.0,
+      "emotional_arousal": 0.0,
+      "access_count": 0,
+      "last_accessed": null,
+      "decay_rate": 0.020000000000000004,
+      "current_strength": 1.0
+    }
+  ],
+  "last_saved": "2025-10-21T17:09:36.630600"
+}

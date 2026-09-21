@@ -1,0 +1,217 @@
+{
+  "flags": [
+    {
+      "key": "new_dashboard_ui",
+      "name": "New Dashboard UI",
+      "description": "Enable the redesigned dashboard interface for beta users",
+      "type": "boolean",
+      "enabled": true,
+      "value": true,
+      "environments": ["beta"],
+      "user_segments": ["beta_users"]
+    },
+    {
+      "key": "ai_powered_search",
+      "name": "AI-Powered Search",
+      "description": "Enable semantic search with AI embeddings",
+      "type": "boolean",
+      "enabled": true,
+      "value": true,
+      "percentage": 50,
+      "environments": ["beta"],
+      "user_segments": ["beta_users", "power_users"]
+    },
+    {
+      "key": "real_time_collaboration",
+      "name": "Real-time Collaboration",
+      "description": "Enable real-time collaborative editing features",
+      "type": "boolean",
+      "enabled": true,
+      "value": true,
+      "percentage": 75,
+      "environments": ["beta"]
+    },
+    {
+      "key": "advanced_analytics",
+      "name": "Advanced Analytics",
+      "description": "Enable advanced analytics dashboard with custom metrics",
+      "type": "boolean",
+      "enabled": true,
+      "value": true,
+      "environments": ["beta"],
+      "user_segments": ["beta_users"]
+    },
+    {
+      "key": "mobile_app_integration",
+      "name": "Mobile App Integration",
+      "description": "Enable mobile app deep linking and push notifications",
+      "type": "boolean",
+      "enabled": false,
+      "value": false,
+      "environments": ["beta"],
+      "start_date": "2024-09-01T00:00:00"
+    },
+    {
+      "key": "file_versioning",
+      "name": "File Versioning",
+      "description": "Enable file version history and rollback capabilities",
+      "type": "boolean",
+      "enabled": true,
+      "value": true,
+      "environments": ["beta"]
+    },
+    {
+      "key": "smart_categorization",
+      "name": "Smart Categorization",
+      "description": "AI-powered automatic file and content categorization",
+      "type": "boolean",
+      "enabled": true,
+      "value": true,
+      "percentage": 60,
+      "environments": ["beta"]
+    },
+    {
+      "key": "bulk_operations",
+      "name": "Bulk Operations",
+      "description": "Enable bulk file operations (move, delete, tag)",
+      "type": "boolean",
+      "enabled": true,
+      "value": true,
+      "environments": ["beta"]
+    },
+    {
+      "key": "custom_themes",
+      "name": "Custom Themes",
+      "description": "Allow users to create and apply custom UI themes",
+      "type": "boolean",
+      "enabled": true,
+      "value": true,
+      "environments": ["beta"],
+      "user_segments": ["beta_users", "premium_users"]
+    },
+    {
+      "key": "api_rate_limit",
+      "name": "API Rate Limit",
+      "description": "Rate limit for API requests per minute",
+      "type": "number",
+      "enabled": true,
+      "value": 100,
+      "environments": ["beta"]
+    },
+    {
+      "key": "max_file_size",
+      "name": "Maximum File Size",
+      "description": "Maximum file size for uploads in MB",
+      "type": "number",
+      "enabled": true,
+      "value": 100,
+      "environments": ["beta"]
+    },
+    {
+      "key": "feedback_prompt_frequency",
+      "name": "Feedback Prompt Frequency",
+      "description": "How often to show feedback prompts (in days)",
+      "type": "number",
+      "enabled": true,
+      "value": 7,
+      "environments": ["beta"]
+    },
+    {
+      "key": "beta_banner_message",
+      "name": "Beta Banner Message",
+      "description": "Message displayed in the beta environment banner",
+      "type": "string",
+      "enabled": true,
+      "value": "You're using ActiveLog Beta! Help us improve by sharing your feedback.",
+      "environments": ["beta"]
+    },
+    {
+      "key": "support_email",
+      "name": "Support Email",
+      "description": "Email address for beta support",
+      "type": "string",
+      "enabled": true,
+      "value": "beta-support@activelog.dev",
+      "environments": ["beta"]
+    },
+    {
+      "key": "experimental_features",
+      "name": "Experimental Features",
+      "description": "List of experimental features available to beta users",
+      "type": "json",
+      "enabled": true,
+      "value": {
+        "voice_commands": false,
+        "gesture_navigation": false,
+        "ar_preview": false,
+        "blockchain_storage": false,
+        "quantum_encryption": false
+      },
+      "environments": ["beta"]
+    },
+    {
+      "key": "integration_configs",
+      "name": "Integration Configurations",
+      "description": "Available third-party integrations for beta",
+      "type": "json",
+      "enabled": true,
+      "value": {
+        "google_drive": {
+          "enabled": true,
+          "beta_features": ["smart_sync", "conflict_resolution"]
+        },
+        "dropbox": {
+          "enabled": true,
+          "beta_features": ["selective_sync"]
+        },
+        "notion": {
+          "enabled": false,
+          "coming_soon": true
+        },
+        "slack": {
+          "enabled": true,
+          "beta_features": ["thread_integration", "status_updates"]
+        }
+      },
+      "environments": ["beta"]
+    },
+    {
+      "key": "debug_mode",
+      "name": "Debug Mode",
+      "description": "Enable debug logging and developer tools",
+      "type": "boolean",
+      "enabled": true,
+      "value": true,
+      "environments": ["beta"],
+      "user_segments": ["developers", "beta_testers"]
+    },
+    {
+      "key": "performance_monitoring",
+      "name": "Performance Monitoring",
+      "description": "Enable detailed performance monitoring for beta",
+      "type": "boolean",
+      "enabled": true,
+      "value": true,
+      "environments": ["beta"]
+    },
+    {
+      "key": "error_reporting",
+      "name": "Error Reporting",
+      "description": "Enable automatic error reporting to development team",
+      "type": "boolean",
+      "enabled": true,
+      "value": true,
+      "environments": ["beta"]
+    },
+    {
+      "key": "feature_usage_tracking",
+      "name": "Feature Usage Tracking",
+      "description": "Track usage of beta features for improvement",
+      "type": "boolean",
+      "enabled": true,
+      "value": true,
+      "environments": ["beta"],
+      "user_segments": ["beta_users"]
+    }
+  ]
+}

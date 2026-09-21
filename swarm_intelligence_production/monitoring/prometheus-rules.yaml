@@ -1,0 +1,260 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  namespace: swarm-intelligence
+data:
+  swarm-alerts.yml: |
+    groups:
+    - name: swarm_intelligence_alerts
+      interval: 30s
+      rules:
+
+      # Agent Performance Alerts
+      - alert: LowFPS
+        expr: avg(swarm_fps) < 30
+        for: 5m
+        labels:
+          severity: warning
+          component: swarm-core
+        annotations:
+          summary: "Swarm FPS below threshold"
+          description: "Average FPS is {{ $value | humanize }} (threshold: 30 FPS)"
+
+      - alert: CriticalLowFPS
+        expr: avg(swarm_fps) < 15
+        for: 2m
+        labels:
+          severity: critical
+          component: swarm-core
+        annotations:
+          summary: "Critical: Swarm FPS critically low"
+          description: "Average FPS is {{ $value | humanize }} - immediate action required"
+
+      - alert: HighAgentProcessingLatency
+        expr: histogram_quantile(0.99, sum(rate(swarm_processing_duration_seconds_bucket[5m])) by (le)) > 1
+        for: 5m
+        labels:
+          severity: warning
+          component: swarm-core
+        annotations:
+          summary: "High agent processing latency"
+          description: "P99 processing latency is {{ $value | humanize }}s (threshold: 1s)"
+
+      - alert: AgentCountAnomaly
+        expr: abs(deriv(swarm_agents_total[5m])) > 10000
+        for: 2m
+        labels:
+          severity: warning
+          component: swarm-core
+        annotations:
+          summary: "Abnormal agent count change"
+          description: "Agent count changing rapidly: {{ $value | humanize }} agents/sec"
+
+      # API Performance Alerts
+      - alert: HighAPILatency
+        expr: histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{service="swarm-api"}[5m])) by (le, endpoint)) > 0.2
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High API latency on {{ $labels.endpoint }}"
+          description: "P99 latency is {{ $value | humanize }}s (threshold: 200ms)"
+
+      - alert: CriticalAPILatency
+        expr: histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{service="swarm-api"}[5m])) by (le, endpoint)) > 1
+        for: 2m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "Critical: API latency over 1 second"
+          description: "P99 latency is {{ $value | humanize }}s on {{ $labels.endpoint }}"
+
+      - alert: HighAPIErrorRate
+        expr: (sum(rate(http_requests_total{service="swarm-api",status=~"5.."}[5m])) / sum(rate(http_requests_total{service="swarm-api"}[5m]))) * 100 > 1
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High API error rate"
+          description: "Error rate is {{ $value | humanize }}% (threshold: 1%)"
+
+      - alert: CriticalAPIErrorRate
+        expr: (sum(rate(http_requests_total{service="swarm-api",status=~"5.."}[5m])) / sum(rate(http_requests_total{service="swarm-api"}[5m]))) * 100 > 5
+        for: 2m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "Critical: API error rate over 5%"
+          description: "Error rate is {{ $value | humanize }}%"
+
+      # Resource Alerts
+      - alert: HighMemoryUsage
+        expr: (sum(container_memory_working_set_bytes{namespace="swarm-intelligence",container="swarm-core"}) / sum(container_spec_memory_limit_bytes{namespace="swarm-intelligence",container="swarm-core"})) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High memory usage on swarm-core"
+          description: "Memory usage is {{ $value | humanize }}% (threshold: 80%)"
+
+      - alert: CriticalMemoryUsage
+        expr: (sum(container_memory_working_set_bytes{namespace="swarm-intelligence",container="swarm-core"}) / sum(container_spec_memory_limit_bytes{namespace="swarm-intelligence",container="swarm-core"})) * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "Critical: Memory usage over 95%"
+          description: "Memory usage is {{ $value | humanize }}% - pod may be OOMKilled"
+
+      - alert: HighCPUUsage
+        expr: sum(rate(container_cpu_usage_seconds_total{namespace="swarm-intelligence",container="swarm-core"}[5m])) by (pod) > 0.9
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High CPU usage on {{ $labels.pod }}"
+          description: "CPU usage is {{ $value | humanizePercentage }} (threshold: 90%)"
+
+      # Pod Health Alerts
+      - alert: PodCrashLooping
+        expr: rate(kube_pod_container_status_restarts_total{namespace="swarm-intelligence"}[15m]) > 0
+        for: 5m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "Pod {{ $labels.pod }} is crash looping"
+          description: "Pod has restarted {{ $value | humanize }} times in the last 15 minutes"
+
+      - alert: PodNotReady
+        expr: kube_pod_status_phase{namespace="swarm-intelligence",phase!="Running"} == 1
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "Pod {{ $labels.pod }} not ready"
+          description: "Pod is in {{ $labels.phase }} state for over 10 minutes"
+
+      - alert: DeploymentReplicasMismatch
+        expr: kube_deployment_spec_replicas{namespace="swarm-intelligence"} != kube_deployment_status_replicas_available{namespace="swarm-intelligence"}
+        for: 15m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "Deployment {{ $labels.deployment }} has mismatched replicas"
+          description: "Desired: {{ $value }}, Available: different"
+
+      # Database Alerts
+      - alert: PostgreSQLConnectionsHigh
+        expr: sum(pg_stat_database_numbackends) > 80
+        for: 10m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "PostgreSQL connection count high"
+          description: "{{ $value | humanize }} active connections (threshold: 80)"
+
+      - alert: PostgreSQLSlowQueries
+        expr: rate(pg_stat_database_blks_read[5m]) > 1000
+        for: 10m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "PostgreSQL slow queries detected"
+          description: "High disk block reads: {{ $value | humanize }} blocks/sec"
+
+      - alert: RedisMemoryHigh
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 10m
+        labels:
+          severity: warning
+          component: cache
+        annotations:
+          summary: "Redis memory usage high"
+          description: "Memory usage is {{ $value | humanizePercentage }} (threshold: 90%)"
+
+      # Kafka Alerts
+      - alert: KafkaConsumerLag
+        expr: kafka_consumergroup_lag > 10000
+        for: 10m
+        labels:
+          severity: warning
+          component: messaging
+        annotations:
+          summary: "Kafka consumer lag high"
+          description: "Consumer lag is {{ $value | humanize }} messages"
+
+      - alert: KafkaUnderReplicatedPartitions
+        expr: kafka_cluster_partition_under_replicated > 0
+        for: 5m
+        labels:
+          severity: critical
+          component: messaging
+        annotations:
+          summary: "Kafka has under-replicated partitions"
+          description: "{{ $value | humanize }} partitions are under-replicated"
+
+      # Autoscaling Alerts
+      - alert: HPAAtMaxCapacity
+        expr: kube_horizontalpodautoscaler_status_current_replicas{namespace="swarm-intelligence"} >= kube_horizontalpodautoscaler_spec_max_replicas{namespace="swarm-intelligence"}
+        for: 15m
+        labels:
+          severity: warning
+          component: autoscaling
+        annotations:
+          summary: "HPA {{ $labels.horizontalpodautoscaler }} at maximum capacity"
+          description: "HPA has reached max replicas. Consider increasing limits."
+
+      # Storage Alerts
+      - alert: PersistentVolumeUsageHigh
+        expr: (kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          component: storage
+        annotations:
+          summary: "PV {{ $labels.persistentvolumeclaim }} usage high"
+          description: "Volume usage is {{ $value | humanize }}% (threshold: 80%)"
+
+      # Custom Swarm Alerts
+      - alert: NoActiveSwarms
+        expr: swarm_active_swarms_total == 0
+        for: 5m
+        labels:
+          severity: warning
+          component: swarm-core
+        annotations:
+          summary: "No active swarms detected"
+          description: "System has no active swarms for 5 minutes"
+
+      - alert: TaskCompletionRateLow
+        expr: rate(swarm_tasks_completed_total[5m]) < 10
+        for: 10m
+        labels:
+          severity: warning
+          component: swarm-core
+        annotations:
+          summary: "Low task completion rate"
+          description: "Only {{ $value | humanize }} tasks/sec completed (expected: >10)"
+
+      - alert: PheromoneUpdateStorm
+        expr: rate(swarm_pheromone_updates_total[1m]) > 100000
+        for: 5m
+        labels:
+          severity: warning
+          component: swarm-core
+        annotations:
+          summary: "Excessive pheromone updates"
+          description: "{{ $value | humanize }} pheromone updates/sec - possible performance issue"

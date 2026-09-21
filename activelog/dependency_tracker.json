@@ -1,0 +1,55 @@
+{
+  "dependency_graph": {
+    "k8s-cluster-setup": {
+      "status": "in_progress",
+      "enables": ["all-services", "container-deployments", "service-mesh"],
+      "required_by": ["auth-service", "api-gateway", "postgres-cluster", "all-domains"],
+      "current_blocker": "ssh-connectivity-issue"
+    },
+    "auth-service": {
+      "status": "waiting", 
+      "requires": ["k8s-cluster-setup", "postgres-cluster"],
+      "enables": ["domain-services", "user-management", "jwt-tokens"],
+      "required_by": ["fishinglog", "personallog", "dmlog", "activelog", "businesslog"]
+    },
+    "activelog-fitness": {
+      "status": "waiting",
+      "requires": ["auth-service", "postgres-cluster", "api-gateway"],
+      "enables": ["superinstance-rebranding", "fitness-analytics"],
+      "priority": "critical",
+      "business_impact": "Required for SuperInstance rebranding success"
+    },
+    "postgres-cluster": {
+      "status": "waiting",
+      "requires": ["k8s-cluster-setup"],
+      "enables": ["persistent-storage", "domain-databases"],
+      "required_by": ["all-domains", "auth-service"]
+    }
+  },
+  "blocking_chain": [
+    {
+      "root_blocker": "ssh-connectivity-issue",
+      "blocks": ["k8s-cluster-setup"],
+      "cascade_blocks": ["auth-service", "postgres-cluster", "all-domains", "superinstance-rebranding"],
+      "impact_severity": "critical",
+      "estimated_delay": "2-4 hours if not resolved quickly"
+    }
+  ],
+  "ready_to_start": [
+    {
+      "task": "study-existing-services",
+      "bot": "services", 
+      "description": "Review existing auth-service and fishinglog patterns while waiting for infrastructure"
+    },
+    {
+      "task": "design-fitness-domain-schema",
+      "bot": "domains",
+      "description": "Plan ActiveLog fitness domain database schema and API design"
+    },
+    {
+      "task": "alternative-instance-investigation", 
+      "bot": "infrastructure",
+      "description": "Investigate using working instance i-06149656a24cd0eda (35.85.21.186) instead"
+    }
+  ]
+}

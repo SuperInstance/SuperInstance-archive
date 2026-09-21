@@ -1,0 +1,199 @@
+{
+  "character_id": "3000923ea5ea",
+  "clusters": [
+    {
+      "id": "8c9521b9",
+      "name": "First Day Memories",
+      "topic": "first day",
+      "memory_ids": [
+        "848252eddb1f"
+      ],
+      "created_at": "2025-10-21T17:03:49.403984",
+      "importance": 8
+    },
+    {
+      "id": "c4ddd4f1",
+      "name": "Research Memories",
+      "topic": "research",
+      "memory_ids": [
+        "848252eddb1f",
+        "3367b56df76a"
+      ],
+      "created_at": "2025-10-21T17:03:49.403987",
+      "importance": 8
+    },
+    {
+      "id": "1ffb0f8a",
+      "name": "Excitement Memories",
+      "topic": "excitement",
+      "memory_ids": [
+        "848252eddb1f"
+      ],
+      "created_at": "2025-10-21T17:03:49.403990",
+      "importance": 8
+    },
+    {
+      "id": "866f22da",
+      "name": "Mentorship Memories",
+      "topic": "mentorship",
+      "memory_ids": [
+        "3367b56df76a",
+        "679cebe8ece8"
+      ],
+      "created_at": "2025-10-21T17:03:49.510516",
+      "importance": 8
+    },
+    {
+      "id": "693db41c",
+      "name": "Neural Networks Memories",
+      "topic": "neural networks",
+      "memory_ids": [
+        "3367b56df76a"
+      ],
+      "created_at": "2025-10-21T17:03:49.510522",
+      "importance": 7
+    },
+    {
+      "id": "30ebfb9f",
+      "name": "Transformers Memories",
+      "topic": "transformers",
+      "memory_ids": [
+        "cdc0f64830e7",
+        "85733466f12f"
+      ],
+      "created_at": "2025-10-21T17:03:49.616760",
+      "importance": 9
+    },
+    {
+      "id": "f9112cea",
+      "name": "Attention Memories",
+      "topic": "attention",
+      "memory_ids": [
+        "cdc0f64830e7"
+      ],
+      "created_at": "2025-10-21T17:03:49.616765",
+      "importance": 6
+    },
+    {
+      "id": "57c708a9",
+      "name": "Deep Learning Memories",
+      "topic": "deep learning",
+      "memory_ids": [
+        "cdc0f64830e7"
+      ],
+      "created_at": "2025-10-21T17:03:49.616769",
+      "importance": 6
+    },
+    {
+      "id": "76a33f6d",
+      "name": "Consciousness Memories",
+      "topic": "consciousness",
+      "memory_ids": [
+        "d388c0c9945e"
+      ],
+      "created_at": "2025-10-21T17:03:49.723322",
+      "importance": 5
+    },
+    {
+      "id": "0f516c7a",
+      "name": "Overwhelm Memories",
+      "topic": "overwhelm",
+      "memory_ids": [
+        "d388c0c9945e"
+      ],
+      "created_at": "2025-10-21T17:03:49.723327",
+      "importance": 5
+    },
+    {
+      "id": "5b77ef11",
+      "name": "Research Challenges Memories",
+      "topic": "research challenges",
+      "memory_ids": [
+        "d388c0c9945e"
+      ],
+      "created_at": "2025-10-21T17:03:49.723331",
+      "importance": 5
+    },
+    {
+      "id": "0a3b6084",
+      "name": "Breakthrough Memories",
+      "topic": "breakthrough",
+      "memory_ids": [
+        "85733466f12f"
+      ],
+      "created_at": "2025-10-21T17:03:49.828999",
+      "importance": 9
+    },
+    {
+      "id": "e24a62f2",
+      "name": "Memory Consolidation Memories",
+      "topic": "memory consolidation",
+      "memory_ids": [
+        "85733466f12f"
+      ],
+      "created_at": "2025-10-21T17:03:49.829010",
+      "importance": 9
+    },
+    {
+      "id": "2cb3d1a5",
+      "name": "Progress Memories",
+      "topic": "progress",
+      "memory_ids": [
+        "679cebe8ece8"
+      ],
+      "created_at": "2025-10-21T17:03:49.936258",
+      "importance": 8
+    },
+    {
+      "id": "96c971ae",
+      "name": "Recognition Memories",
+      "topic": "recognition",
+      "memory_ids": [
+        "679cebe8ece8"
+      ],
+      "created_at": "2025-10-21T17:03:49.936271",
+      "importance": 8
+    },
+    {
+      "id": "09230ee8",
+      "name": "Self-Awareness Memories",
+      "topic": "self-awareness",
+      "memory_ids": [
+        "3cfccf13613b"
+      ],
+      "created_at": "2025-10-21T17:03:50.043835",
+      "importance": 10
+    },
+    {
+      "id": "8aae5fb9",
+      "name": "Artificial Consciousness Memories",
+      "topic": "artificial consciousness",
+      "memory_ids": [
+        "3cfccf13613b"
+      ],
+      "created_at": "2025-10-21T17:03:50.043841",
+      "importance": 10
+    },
+    {
+      "id": "0481adef",
+      "name": "Identity Memories",
+      "topic": "identity",
+      "memory_ids": [
+        "3cfccf13613b"
+      ],
+      "created_at": "2025-10-21T17:03:50.043845",
+      "importance": 10
+    },
+    {
+      "id": "9cbf4fc6",
+      "name": "Research Collaboration Memories",
+      "topic": "research collaboration",
+      "memory_ids": [
+        "f77b1e277d45"
+      ],
+      "created_at": "2025-10-21T17:03:50.156071",
+      "importance": 5
+    }
+  ],
+  "last_saved": "2025-10-21T17:03:50.156804"
+}

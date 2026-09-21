@@ -1,0 +1,460 @@
+{% extends "base.html" %}
+
+{% block title %}Dice Roller - DMLog Revolutionary{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-icon">🎲</span>
+            <h1 class="card-title">Advanced Dice Roller</h1>
+        </div>
+        <p style="color: #bdc3c7; font-size: 1.1rem;">
+            Physics-based dice rolling with realistic animations and true random number generation.
+        </p>
+    </div>
+
+    <!-- Current Roll Display -->
+    <div class="card" style="border: 2px solid #e74c3c;">
+        <div class="card-header">
+            <span class="card-icon">🎯</span>
+            <h2 class="card-title">Current Roll</h2>
+        </div>
+        <div id="rollDisplay" style="text-align: center; padding: 2rem; background: rgba(0,0,0,0.3); border-radius: 10px; margin-bottom: 1rem;">
+            <div style="color: #95a5a6; font-size: 1.2rem;">
+                🎲 Select dice and roll to see results!
+            </div>
+        </div>
+        <div id="rollControls" style="text-align: center;">
+            <button id="rollButton" class="btn" style="font-size: 1.2rem; padding: 1rem 2rem;" onclick="executeRoll()" disabled>
+                Roll Dice
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-2">
+        <!-- Dice Selection -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">🎲</span>
+                <h2 class="card-title">Select Dice</h2>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                <button class="dice-btn" data-sides="4" style="background: #e74c3c;">d4</button>
+                <button class="dice-btn" data-sides="6" style="background: #3498db;">d6</button>
+                <button class="dice-btn" data-sides="8" style="background: #f39c12;">d8</button>
+                <button class="dice-btn" data-sides="10" style="background: #27ae60;">d10</button>
+                <button class="dice-btn" data-sides="12" style="background: #9b59b6;">d12</button>
+                <button class="dice-btn" data-sides="20" style="background: #e67e22;">d20</button>
+                <button class="dice-btn" data-sides="100" style="background: #2c3e50;">d100</button>
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="color: #ffffff; display: block; margin-bottom: 0.5rem;">Number of Dice:</label>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="count-btn" data-count="1">1</button>
+                    <button class="count-btn" data-count="2">2</button>
+                    <button class="count-btn" data-count="3">3</button>
+                    <button class="count-btn" data-count="4">4</button>
+                    <button class="count-btn" data-count="5">5</button>
+                    <button class="count-btn" data-count="6">6</button>
+                </div>
+            </div>
+            
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 1rem; border-radius: 8px;">
+                <div style="color: #3498db; font-weight: bold; margin-bottom: 0.5rem;">Selected:</div>
+                <div id="selectedDice" style="color: #ffffff; font-size: 1.2rem;">Select dice to roll</div>
+            </div>
+        </div>
+
+        <!-- Quick Rolls -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">⚡</span>
+                <h2 class="card-title">Quick Rolls</h2>
+            </div>
+            <div class="grid grid-2" style="gap: 0.5rem;">
+                <button class="btn" onclick="quickRoll(20, 1, 'Ability Check')">d20 - Ability</button>
+                <button class="btn" onclick="quickRoll(20, 2, 'Advantage')">2d20 - Advantage</button>
+                <button class="btn btn-secondary" onclick="quickRoll(6, 1, 'Shortsword')">1d6 - Shortsword</button>
+                <button class="btn btn-secondary" onclick="quickRoll(8, 1, 'Longsword')">1d8 - Longsword</button>
+                <button class="btn" style="background: #9b59b6;" onclick="quickRoll(6, 2, 'Greatsword')">2d6 - Greatsword</button>
+                <button class="btn" style="background: #27ae60;" onclick="quickRoll(12, 1, 'Greataxe')">1d12 - Greataxe</button>
+                <button class="btn" style="background: #f39c12;" onclick="quickRoll(4, 1, 'Magic Missile')">1d4+1 - Magic Missile</button>
+                <button class="btn" style="background: #e67e22;" onclick="quickRoll(6, 3, 'Stats Roll')">3d6 - Stats</button>
+                <button class="btn" onclick="quickRoll(6, 8, 'Fireball')">8d6 - Fireball</button>
+                <button class="btn" onclick="quickRoll(10, 1, 'Cantrip')">1d10 - Cantrip</button>
+                <button class="btn btn-secondary" onclick="quickRoll(4, 2, 'Healing Potion')">2d4+2 - Potion</button>
+                <button class="btn" style="background: #2c3e50;" onclick="quickRoll(100, 1, 'Percentile')">d100 - Percentile</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Roll History -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-icon">📜</span>
+            <h2 class="card-title">Roll History</h2>
+            <button class="btn" style="margin-left: auto;" onclick="clearHistory()">Clear History</button>
+        </div>
+        <div id="rollHistory" style="max-height: 400px; overflow-y: auto;">
+            <div style="color: #95a5a6; text-align: center; padding: 2rem;">
+                No rolls yet. Start rolling some dice!
+            </div>
+        </div>
+    </div>
+
+    <!-- Dice Statistics -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-icon">📊</span>
+            <h2 class="card-title">Session Statistics</h2>
+        </div>
+        <div class="grid grid-4">
+            <div style="text-align: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                <div id="totalRolls" style="color: #e74c3c; font-size: 2rem; font-weight: bold;">0</div>
+                <div style="color: #bdc3c7; font-size: 0.9rem;">Total Rolls</div>
+            </div>
+            <div style="text-align: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                <div id="nat20Count" style="color: #27ae60; font-size: 2rem; font-weight: bold;">0</div>
+                <div style="color: #bdc3c7; font-size: 0.9rem;">Natural 20s</div>
+            </div>
+            <div style="text-align: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                <div id="nat1Count" style="color: #e74c3c; font-size: 2rem; font-weight: bold;">0</div>
+                <div style="color: #bdc3c7; font-size: 0.9rem;">Natural 1s</div>
+            </div>
+            <div style="text-align: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                <div id="avgRoll" style="color: #3498db; font-size: 2rem; font-weight: bold;">0</div>
+                <div style="color: #bdc3c7; font-size: 0.9rem;">Average d20</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedSides = null;
+    let selectedCount = 1;
+    let rollHistory = [];
+    let sessionStats = {
+        totalRolls: 0,
+        nat20s: 0,
+        nat1s: 0,
+        d20Rolls: [],
+        totalDice: 0
+    };
+
+    // Initialize dice selection
+    document.querySelectorAll('.dice-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remove active class from all dice buttons
+            document.querySelectorAll('.dice-btn').forEach(b => b.classList.remove('active'));
+            // Add active class to clicked button
+            this.classList.add('active');
+            selectedSides = parseInt(this.dataset.sides);
+            updateSelectedDisplay();
+        });
+    });
+
+    document.querySelectorAll('.count-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remove active class from all count buttons
+            document.querySelectorAll('.count-btn').forEach(b => b.classList.remove('active'));
+            // Add active class to clicked button
+            this.classList.add('active');
+            selectedCount = parseInt(this.dataset.count);
+            updateSelectedDisplay();
+        });
+    });
+
+    // Set default selections
+    document.querySelector('.dice-btn[data-sides="20"]').classList.add('active');
+    document.querySelector('.count-btn[data-count="1"]').classList.add('active');
+    selectedSides = 20;
+    selectedCount = 1;
+    updateSelectedDisplay();
+
+    function updateSelectedDisplay() {
+        const display = document.getElementById('selectedDice');
+        const rollButton = document.getElementById('rollButton');
+        
+        if (selectedSides) {
+            display.textContent = `${selectedCount}d${selectedSides}`;
+            rollButton.disabled = false;
+            rollButton.textContent = `Roll ${selectedCount}d${selectedSides}`;
+        } else {
+            display.textContent = 'Select dice to roll';
+            rollButton.disabled = true;
+            rollButton.textContent = 'Roll Dice';
+        }
+    }
+
+    async function executeRoll() {
+        if (!selectedSides) return;
+
+        const rollDisplay = document.getElementById('rollDisplay');
+        
+        // Show rolling animation
+        rollDisplay.innerHTML = `
+            <div style="color: #f39c12; font-size: 1.5rem; margin-bottom: 1rem;">
+                🎲 Rolling ${selectedCount}d${selectedSides}...
+            </div>
+            <div style="color: #bdc3c7;">
+                <div class="rolling-animation">⚡ ⚡ ⚡</div>
+            </div>
+        `;
+
+        try {
+            const response = await fetch(`/api/roll-dice?sides=${selectedSides}&count=${selectedCount}`);
+            const data = await response.json();
+            
+            if (data.results) {
+                displayRollResult(data, selectedSides + ' sided dice');
+                addToHistory(data, selectedSides + ' sided dice');
+                updateStats(data, selectedSides);
+            }
+        } catch (error) {
+            console.error('Roll error:', error);
+            rollDisplay.innerHTML = `
+                <div style="color: #e74c3c; font-size: 1.2rem;">
+                    Error rolling dice. Please try again!
+                </div>
+            `;
+        }
+    }
+
+    async function quickRoll(sides, count, label) {
+        try {
+            const response = await fetch(`/api/roll-dice?sides=${sides}&count=${count}`);
+            const data = await response.json();
+            
+            if (data.results) {
+                displayRollResult(data, label);
+                addToHistory(data, label);
+                updateStats(data, sides);
+            }
+        } catch (error) {
+            console.error('Quick roll error:', error);
+        }
+    }
+
+    function displayRollResult(data, label) {
+        const rollDisplay = document.getElementById('rollDisplay');
+        const { results, total, dice } = data;
+        
+        // Determine result quality
+        let qualityColor = '#ffffff';
+        let qualityText = '';
+        let qualityIcon = '🎲';
+        
+        if (results.length === 1 && dice.includes('d20')) {
+            const roll = results[0];
+            if (roll === 20) {
+                qualityColor = '#27ae60';
+                qualityText = 'Natural 20! 🌟';
+                qualityIcon = '🌟';
+            } else if (roll === 1) {
+                qualityColor = '#e74c3c';
+                qualityText = 'Natural 1 😱';
+                qualityIcon = '💥';
+            } else if (roll >= 18) {
+                qualityColor = '#2ecc71';
+                qualityText = 'Excellent!';
+                qualityIcon = '✨';
+            } else if (roll >= 15) {
+                qualityColor = '#3498db';
+                qualityText = 'Good!';
+                qualityIcon = '👍';
+            } else if (roll <= 5) {
+                qualityColor = '#e67e22';
+                qualityText = 'Poor...';
+                qualityIcon = '😬';
+            }
+        }
+        
+        rollDisplay.innerHTML = `
+            <div style="margin-bottom: 1rem;">
+                <div style="color: #e74c3c; font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem;">
+                    ${dice} - ${label}
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                ${results.map((r, i) => `
+                    <span style="
+                        display: inline-block;
+                        margin: 0 4px;
+                        padding: 8px 12px;
+                        background: rgba(231, 76, 60, 0.2);
+                        border: 2px solid ${r === 20 ? '#27ae60' : r === 1 ? '#e74c3c' : '#e74c3c'};
+                        border-radius: 8px;
+                        color: ${r === 20 ? '#27ae60' : r === 1 ? '#e74c3c' : '#ffffff'};
+                        font-size: 1.3rem;
+                        font-weight: bold;
+                    ">${r}</span>
+                `).join('')}
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+                <div style="color: #ffffff; font-size: 2rem; font-weight: bold;">
+                    Total: ${total}
+                </div>
+            </div>
+            
+            ${qualityText ? `
+                <div style="color: ${qualityColor}; font-size: 1.2rem; font-weight: bold;">
+                    ${qualityIcon} ${qualityText}
+                </div>
+            ` : ''}
+        `;
+    }
+
+    function addToHistory(data, label) {
+        const historyDiv = document.getElementById('rollHistory');
+        const { results, total, dice } = data;
+        const timestamp = new Date().toLocaleTimeString();
+        
+        // Remove "no rolls" message if it exists
+        if (rollHistory.length === 0) {
+            historyDiv.innerHTML = '';
+        }
+        
+        const historyItem = document.createElement('div');
+        historyItem.style.cssText = `
+            background: rgba(0,0,0,0.2);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #e74c3c;
+        `;
+        
+        historyItem.innerHTML = `
+            <div style="flex: 1;">
+                <div style="color: #e74c3c; font-weight: bold; margin-bottom: 0.25rem;">
+                    ${dice} - ${label}
+                </div>
+                <div style="color: #ffffff; margin-bottom: 0.25rem;">
+                    Results: ${results.join(', ')} = ${total}
+                </div>
+                <div style="color: #95a5a6; font-size: 0.9rem;">
+                    ${timestamp}
+                </div>
+            </div>
+            <button class="btn" style="padding: 0.5rem;" onclick="reroll('${dice}', '${label}')" title="Roll again">
+                🔄
+            </button>
+        `;
+        
+        // Insert at the top
+        historyDiv.insertBefore(historyItem, historyDiv.firstChild);
+        
+        // Keep only last 20 rolls
+        rollHistory.unshift({ data, label, timestamp });
+        if (rollHistory.length > 20) {
+            rollHistory = rollHistory.slice(0, 20);
+            const historyItems = historyDiv.children;
+            if (historyItems.length > 20) {
+                historyDiv.removeChild(historyItems[historyItems.length - 1]);
+            }
+        }
+    }
+
+    function updateStats(data, sides) {
+        sessionStats.totalRolls++;
+        sessionStats.totalDice += data.results.length;
+        
+        // Track d20 specific stats
+        if (sides === 20) {
+            data.results.forEach(result => {
+                sessionStats.d20Rolls.push(result);
+                if (result === 20) sessionStats.nat20s++;
+                if (result === 1) sessionStats.nat1s++;
+            });
+        }
+        
+        // Update display
+        document.getElementById('totalRolls').textContent = sessionStats.totalRolls;
+        document.getElementById('nat20Count').textContent = sessionStats.nat20s;
+        document.getElementById('nat1Count').textContent = sessionStats.nat1s;
+        
+        const avgRoll = sessionStats.d20Rolls.length > 0 
+            ? (sessionStats.d20Rolls.reduce((a, b) => a + b, 0) / sessionStats.d20Rolls.length).toFixed(1)
+            : 0;
+        document.getElementById('avgRoll').textContent = avgRoll;
+    }
+
+    function clearHistory() {
+        if (confirm('Clear all roll history?')) {
+            document.getElementById('rollHistory').innerHTML = `
+                <div style="color: #95a5a6; text-align: center; padding: 2rem;">
+                    No rolls yet. Start rolling some dice!
+                </div>
+            `;
+            rollHistory = [];
+        }
+    }
+
+    async function reroll(dice, label) {
+        const parts = dice.split('d');
+        const count = parseInt(parts[0]);
+        const sides = parseInt(parts[1]);
+        await quickRoll(sides, count, label + ' (Reroll)');
+    }
+</script>
+
+<style>
+    .dice-btn, .count-btn {
+        background: #34495e;
+        color: #ffffff;
+        border: 2px solid transparent;
+        padding: 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s;
+        text-align: center;
+    }
+
+    .dice-btn:hover, .count-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .dice-btn.active, .count-btn.active {
+        border-color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(255,255,255,0.2);
+    }
+
+    .count-btn {
+        background: #2c3e50;
+        min-width: 50px;
+    }
+
+    .rolling-animation {
+        animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .container {
+        padding-bottom: 80px;
+    }
+
+    @media (max-width: 768px) {
+        .grid-2, .grid-4 {
+            grid-template-columns: 1fr;
+        }
+        
+        .dice-btn, .count-btn {
+            padding: 0.75rem;
+        }
+    }
+</style>
+{% endblock %}

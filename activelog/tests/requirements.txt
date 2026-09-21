@@ -1,0 +1,76 @@
+# Core testing framework
+pytest==7.4.3
+pytest-cov==4.1.0
+pytest-xdist==3.5.0
+pytest-mock==3.12.0
+pytest-asyncio==0.23.2
+pytest-timeout==2.2.0
+pytest-html==4.1.1
+pytest-benchmark==4.0.0
+
+# HTTP testing
+httpx==0.25.2
+requests==2.31.0
+responses==0.24.1
+
+# Database testing
+pytest-postgresql==5.0.0
+pytest-redis==3.0.2
+factory-boy==3.3.0
+faker==20.1.0
+
+# API testing
+fastapi[all]==0.104.1
+starlette-testclient==0.37.2
+
+# Async testing
+asyncio==3.4.3
+aioresponses==0.7.6
+
+# Load testing
+locust==2.17.0
+
+# Mock and fixtures
+responses==0.24.1
+freezegun==1.2.2
+time-machine==2.13.0
+vcrpy==5.1.0
+
+# Docker testing
+testcontainers==3.7.1
+docker==6.1.3
+
+# Security testing
+bandit==1.7.5
+safety==2.3.5
+
+# Performance monitoring
+memory-profiler==0.61.0
+psutil==5.9.6
+
+# Test utilities
+pydantic==2.5.0
+sqlalchemy==2.0.23
+alembic==1.13.1
+redis==5.0.1
+psycopg2-binary==2.9.9
+bcrypt==4.1.2
+jwt==1.3.1
+cryptography==41.0.7
+
+# AI/ML testing
+torch==2.1.1
+transformers==4.36.2
+numpy==1.24.4
+pandas==2.1.4
+scikit-learn==1.3.2
+
+# Email testing
+aiosmtpd==1.4.4.post2
+
+# File system testing
+tempfile==3.11
+shutil==3.11
+
+# Monitoring
+prometheus-client==0.19.0

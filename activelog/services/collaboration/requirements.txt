@@ -1,0 +1,63 @@
+# ActiveLog Collaboration Service Dependencies
+
+# FastAPI and async support
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+websockets==12.0
+
+# Database
+databases[postgresql]==0.8.0
+sqlalchemy==2.0.23
+alembic==1.12.1
+asyncpg==0.29.0
+
+# Redis for real-time features
+redis==5.0.1
+aioredis==2.0.1
+
+# Real-time communication
+python-socketio==5.10.0
+python-engineio==4.7.1
+
+# File handling and storage
+aiofiles==23.2.1
+python-magic==0.4.27
+pillow==10.1.0
+
+# Data validation and serialization
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Authentication and security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-dotenv==1.0.0
+
+# Date and time handling
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Document processing
+python-docx==1.1.0
+PyPDF2==3.0.1
+openpyxl==3.1.2
+
+# Version control
+GitPython==3.1.40
+diff-match-patch==20230430
+
+# Text processing and search
+whoosh==2.7.4
+nltk==3.8.1
+textdistance==4.6.2
+
+# Monitoring and logging
+prometheus-client==0.19.0
+structlog==23.2.0
+
+# Development and testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+black==23.11.0
+ruff==0.1.6

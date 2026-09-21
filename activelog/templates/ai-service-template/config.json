@@ -1,0 +1,5 @@
+{
+  "openai_api_key": "your-openai-api-key",
+  "default_model": "text-davinci-003",
+  "max_tokens": 150
+}

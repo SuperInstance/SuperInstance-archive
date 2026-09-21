@@ -1,0 +1,105 @@
+{
+  "dashboard": {
+    "title": "Swarm Intelligence - API Metrics",
+    "uid": "swarm-api-metrics",
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Request Rate",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total{namespace=\"swarm-intelligence\",service=\"swarm-api\"}[5m])) by (method, endpoint)",
+            "legendFormat": "{{method}} {{endpoint}}",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "API Latency (Percentiles)",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{namespace=\"swarm-intelligence\",service=\"swarm-api\"}[5m])) by (le, endpoint))",
+            "legendFormat": "p50 {{endpoint}}",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{namespace=\"swarm-intelligence\",service=\"swarm-api\"}[5m])) by (le, endpoint))",
+            "legendFormat": "p95 {{endpoint}}",
+            "refId": "B"
+          },
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{namespace=\"swarm-intelligence\",service=\"swarm-api\"}[5m])) by (le, endpoint))",
+            "legendFormat": "p99 {{endpoint}}",
+            "refId": "C"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Error Rate",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total{namespace=\"swarm-intelligence\",service=\"swarm-api\",status=~\"5..\"}[5m])) / sum(rate(http_requests_total{namespace=\"swarm-intelligence\",service=\"swarm-api\"}[5m])) * 100",
+            "legendFormat": "5xx Error Rate %",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(http_requests_total{namespace=\"swarm-intelligence\",service=\"swarm-api\",status=~\"4..\"}[5m])) / sum(rate(http_requests_total{namespace=\"swarm-intelligence\",service=\"swarm-api\"}[5m])) * 100",
+            "legendFormat": "4xx Error Rate %",
+            "refId": "B"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Request Status Codes",
+        "type": "piechart",
+        "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(increase(http_requests_total{namespace=\"swarm-intelligence\",service=\"swarm-api\"}[5m])) by (status)",
+            "legendFormat": "{{status}}",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "WebSocket Connections",
+        "type": "stat",
+        "gridPos": {"x": 0, "y": 16, "w": 8, "h": 4},
+        "targets": [
+          {
+            "expr": "sum(websocket_connections_active{namespace=\"swarm-intelligence\"})",
+            "legendFormat": "Active Connections",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "API Response Time by Endpoint",
+        "type": "heatmap",
+        "gridPos": {"x": 0, "y": 20, "w": 24, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(increase(http_request_duration_seconds_bucket{namespace=\"swarm-intelligence\",service=\"swarm-api\"}[1m])) by (le, endpoint)",
+            "legendFormat": "{{endpoint}}",
+            "refId": "A"
+          }
+        ]
+      }
+    ]
+  }
+}

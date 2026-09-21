@@ -1,0 +1,62 @@
+{
+  "topic_index": {
+    "hippocampus": [
+      "a8671ac95d68"
+    ],
+    "memory formation": [
+      "a8671ac95d68"
+    ],
+    "research": [
+      "a8671ac95d68"
+    ],
+    "sleep": [
+      "af6dbfbf5dbb"
+    ],
+    "memory consolidation": [
+      "af6dbfbf5dbb"
+    ],
+    "neuroscience": [
+      "af6dbfbf5dbb"
+    ],
+    "consciousness": [
+      "10e382328e97",
+      "d41ab2125d6c"
+    ],
+    "interdisciplinary discussion": [
+      "10e382328e97"
+    ],
+    "collaboration": [
+      "10e382328e97"
+    ],
+    "philosophy of mind": [
+      "d41ab2125d6c"
+    ],
+    "interdisciplinary learning": [
+      "d41ab2125d6c"
+    ]
+  },
+  "character_index": {
+    "47e82d273492": [
+      "10e382328e97",
+      "d41ab2125d6c"
+    ]
+  },
+  "type_index": {
+    "experience": [
+      "a8671ac95d68"
+    ],
+    "learning": [
+      "af6dbfbf5dbb",
+      "d41ab2125d6c"
+    ],
+    "relationship": [
+      "10e382328e97"
+    ],
+    "self_reflection": [
+      "cdbe010a009c",
+      "1ab6516d17b2",
+      "4e07711e3cfa",
+      "e3858074d0ee"
+    ]
+  }
+}

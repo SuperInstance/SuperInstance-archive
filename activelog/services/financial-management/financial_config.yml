@@ -1,0 +1,104 @@
+# ActiveLog Financial Management Service Configuration
+
+# Database configuration
+database:
+  host: "${POSTGRES_HOST:localhost}"
+  port: "${POSTGRES_PORT:5432}"
+  user: "${POSTGRES_USER:activelog}"
+  password: "${POSTGRES_PASSWORD}"
+  database: "${POSTGRES_DB:activelog_financial}"
+
+# Service component configurations
+quickbooks:
+  config_path: "quickbooks/qb_config.yml"
+  enabled: true
+
+invoicing:
+  config_path: "invoicing/invoice_config.yml"
+  automation_config_path: "invoicing/invoice_automation_config.yml"
+  enabled: true
+
+payroll:
+  config_path: "payroll/payroll_config.yml"
+  enabled: true
+
+tax_filing:
+  config_path: "tax-filing/tax_config.yml"
+  enabled: true
+
+# Web server configuration
+web_server:
+  host: "0.0.0.0"
+  port: 8080
+  cors_enabled: true
+
+# Security configuration
+security:
+  api_key_required: true
+  jwt_secret: "${JWT_SECRET}"
+  session_timeout: 3600
+
+# Integration settings
+integrations:
+  slack:
+    webhook_url: "${SLACK_WEBHOOK_URL}"
+    enabled: true
+  
+  email:
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    username: "${EMAIL_USERNAME}"
+    password: "${EMAIL_PASSWORD}"
+    from_address: "finance@activelog.com"
+    enabled: true
+  
+  aws:
+    region: "us-east-1"
+    s3_bucket: "activelog-financial-documents"
+    enabled: true
+
+# Logging configuration
+logging:
+  level: "INFO"
+  file: "logs/financial_management.log"
+  max_size: "50MB"
+  backup_count: 5
+
+# Business rules
+business_rules:
+  automatic_invoice_generation: true
+  automatic_payment_processing: false
+  tax_filing_reminders: true
+  compliance_monitoring: true
+  
+  # Approval workflows
+  approval_workflows:
+    invoice_threshold: 5000.00  # Invoices above this amount require approval
+    payroll_approval_required: true
+    tax_form_review_required: true
+
+# Backup and retention
+backup:
+  enabled: true
+  frequency: "daily"
+  retention_days: 90
+  s3_backup: true
+
+# Monitoring and alerting
+monitoring:
+  health_checks: true
+  performance_monitoring: true
+  error_alerting: true
+  
+  alert_thresholds:
+    response_time: 5000  # milliseconds
+    error_rate: 0.05     # 5%
+    queue_size: 1000
+
+# Features flags
+feature_flags:
+  multi_currency_support: false
+  advanced_reporting: true
+  api_webhooks: true
+  mobile_app_support: false
+  audit_trail: true

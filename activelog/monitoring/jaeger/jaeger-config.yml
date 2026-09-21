@@ -1,0 +1,58 @@
+spans-storage:
+  type: elasticsearch
+  options:
+    servers: http://elasticsearch:9200
+    index: jaeger-spans
+    number-of-shards: 3
+    number-of-replicas: 1
+    
+dependencies-storage:
+  type: elasticsearch
+  options:
+    servers: http://elasticsearch:9200
+    index: jaeger-dependencies
+
+collector:
+  zipkin:
+    host-port: :9411
+  jaeger:
+    protocols:
+      grpc:
+        host-port: :14250
+      thrift_http:
+        host-port: :14268
+      thrift_compact:
+        host-port: :6831
+      thrift_binary:
+        host-port: :6832
+  otlp:
+    grpc:
+      host-port: :4317
+    http:
+      host-port: :4318
+
+query:
+  base-path: /
+  static-files: /go/jaeger-ui/
+  ui-config: /etc/jaeger/ui.json
+
+agent:
+  strategies:
+    default_strategy:
+      type: adaptive
+      max_traces_per_second: 100
+      operation_strategies:
+        - operation: "GET /health"
+          type: adaptive
+          max_traces_per_second: 10
+        - operation: "GET /metrics"
+          type: adaptive
+          max_traces_per_second: 5
+  
+sampling:
+  strategies_file: /etc/jaeger/sampling_strategies.json
+  strategies_reload_interval: 2m
+
+downsampling:
+  hash_salt: "jaeger-collector"
+  ratio: 0.001

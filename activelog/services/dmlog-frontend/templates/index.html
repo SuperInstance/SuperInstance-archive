@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .fantasy-font { font-family: 'Cinzel', serif; }
+        .hero-gradient {
+            background: linear-gradient(135deg, #8b5a2b 0%, #5d4e75 25%, #2563eb 75%, #7c3aed 100%);
+        }
+        .floating-dice {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(120deg); }
+            66% { transform: translateY(-10px) rotate(240deg); }
+        }
+        .magic-sparkle {
+            animation: sparkle 3s ease-in-out infinite;
+        }
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        .feature-card {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.8) 100%);
+            backdrop-filter: blur(10px);
+        }
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-amber-50 via-orange-50 to-purple-100 min-h-screen">
+    <!-- Hero Section -->
+    <div class="hero-gradient min-h-screen flex items-center justify-center relative overflow-hidden">
+        <!-- Floating Elements -->
+        <div class="absolute top-1/4 left-1/4 floating-dice">
+            <i data-lucide="dice-6" class="w-12 h-12 text-white/30"></i>
+        </div>
+        <div class="absolute top-1/3 right-1/4 magic-sparkle">
+            <i data-lucide="sparkles" class="w-10 h-10 text-yellow-300/50"></i>
+        </div>
+        <div class="absolute bottom-1/3 left-1/3 floating-dice" style="animation-delay: -2s;">
+            <i data-lucide="sword" class="w-8 h-8 text-white/20"></i>
+        </div>
+        
+        <div class="text-center text-white z-10 max-w-4xl mx-auto px-4">
+            <div class="mb-8">
+                <div class="inline-flex items-center space-x-4 mb-6">
+                    <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                        <i data-lucide="swords" class="w-10 h-10"></i>
+                    </div>
+                    <h1 class="text-6xl font-bold fantasy-font">DMLog.ai</h1>
+                </div>
+                
+                <h2 class="text-2xl md:text-3xl font-light mb-6 leading-relaxed">
+                    Revolutionary RPG Gaming Platform
+                </h2>
+                
+                <p class="text-xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
+                    Experience AI-powered campaigns, cross-domain character enhancement, 
+                    and collaborative gaming like never before. Where your real-world skills 
+                    enhance your virtual adventures.
+                </p>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <a href="/dashboard" class="px-8 py-4 bg-white text-purple-800 rounded-xl font-semibold hover:bg-white/90 transition-all shadow-2xl hover:shadow-white/25 flex items-center justify-center">
+                    <i data-lucide="play" class="w-5 h-5 mr-2"></i>
+                    Enter the Realm
+                </a>
+                <button class="px-8 py-4 border-2 border-white text-white rounded-xl font-semibold hover:bg-white/10 transition-all flex items-center justify-center">
+                    <i data-lucide="book-open" class="w-5 h-5 mr-2"></i>
+                    Learn More
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
+                    <p class="text-3xl font-bold fantasy-font">247</p>
+                    <p class="text-sm text-white/80">AI Encounters</p>
+                </div>
+                <div class="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
+                    <p class="text-3xl font-bold fantasy-font">15</p>
+                    <p class="text-sm text-white/80">Active Campaigns</p>
+                </div>
+                <div class="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
+                    <p class="text-3xl font-bold fantasy-font">1.2K</p>
+                    <p class="text-sm text-white/80">Players</p>
+                </div>
+                <div class="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
+                    <p class="text-3xl font-bold fantasy-font">99%</p>
+                    <p class="text-sm text-white/80">Satisfaction</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <section class="py-24 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h3 class="text-4xl font-bold text-gray-800 fantasy-font mb-4">
+                    Revolutionary Gaming Features
+                </h3>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Discover how DMLog.ai transforms traditional RPG gaming with cutting-edge AI 
+                    and cross-domain integration
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- AI-Powered Campaigns -->
+                <div class="feature-card rounded-2xl p-8 border border-purple-200/50">
+                    <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-2xl flex items-center justify-center mb-6">
+                        <i data-lucide="brain" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-gray-800 fantasy-font mb-4">AI Campaign Master</h4>
+                    <p class="text-gray-600 mb-6">
+                        Dynamic storylines that adapt to player choices. Our AI learns your preferences 
+                        and generates personalized quests, NPCs, and plot twists in real-time.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Adaptive storytelling</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Infinite quest generation</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Personality-driven NPCs</li>
+                    </ul>
+                </div>
+
+                <!-- Cross-Domain Enhancement -->
+                <div class="feature-card rounded-2xl p-8 border border-amber-200/50">
+                    <div class="w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center mb-6">
+                        <i data-lucide="zap" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-gray-800 fantasy-font mb-4">Real-World Integration</h4>
+                    <p class="text-gray-600 mb-6">
+                        Your fitness data boosts character strength, business knowledge enhances 
+                        economic gameplay, and marine expertise improves naval adventures.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Fitness → Character stats</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Skills → Game abilities</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Knowledge → Campaign depth</li>
+                    </ul>
+                </div>
+
+                <!-- Collaborative Gaming -->
+                <div class="feature-card rounded-2xl p-8 border border-blue-200/50">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-6">
+                        <i data-lucide="users" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-gray-800 fantasy-font mb-4">Seamless Collaboration</h4>
+                    <p class="text-gray-600 mb-6">
+                        Real-time sessions with advanced tools for DMs and players. Share maps, 
+                        manage inventory, and coordinate actions with intuitive interfaces.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Real-time synchronization</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Interactive battle maps</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Voice & video integration</li>
+                    </ul>
+                </div>
+
+                <!-- Advanced Combat -->
+                <div class="feature-card rounded-2xl p-8 border border-red-200/50">
+                    <div class="w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6">
+                        <i data-lucide="swords" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-gray-800 fantasy-font mb-4">Dynamic Combat</h4>
+                    <p class="text-gray-600 mb-6">
+                        Intelligent encounter balancing, realistic physics, and tactical depth. 
+                        Every battle feels unique and strategically engaging.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Auto-balanced encounters</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Physics-based combat</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Tactical positioning</li>
+                    </ul>
+                </div>
+
+                <!-- Compute Rewards -->
+                <div class="feature-card rounded-2xl p-8 border border-green-200/50">
+                    <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-6">
+                        <i data-lucide="coins" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-gray-800 fantasy-font mb-4">Earn While Playing</h4>
+                    <p class="text-gray-600 mb-6">
+                        Quality DMing and engaging gameplay earn compute capital rewards. 
+                        Turn your gaming skills into real economic value.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Performance-based rewards</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Player engagement metrics</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Economic integration</li>
+                    </ul>
+                </div>
+
+                <!-- Multi-System Support -->
+                <div class="feature-card rounded-2xl p-8 border border-indigo-200/50">
+                    <div class="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center mb-6">
+                        <i data-lucide="layers" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-gray-800 fantasy-font mb-4">Universal System</h4>
+                    <p class="text-gray-600 mb-6">
+                        Support for D&D 5e, Pathfinder, Cyberpunk, and custom systems. 
+                        One platform for all your RPG needs.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Multiple rule systems</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Custom rule creation</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>System conversion tools</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-24 bg-gradient-to-r from-purple-800 via-indigo-800 to-blue-800">
+        <div class="max-w-4xl mx-auto text-center px-4">
+            <h3 class="text-4xl md:text-5xl font-bold text-white fantasy-font mb-6">
+                Ready to Transform Your Gaming?
+            </h3>
+            <p class="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+                Join thousands of players and DMs who have discovered the future of RPG gaming. 
+                Start your legendary adventure today.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <a href="/dashboard" class="px-8 py-4 bg-white text-purple-800 rounded-xl font-semibold hover:bg-white/90 transition-all shadow-2xl hover:shadow-white/25 flex items-center justify-center">
+                    <i data-lucide="gamepad-2" class="w-5 h-5 mr-2"></i>
+                    Start Gaming Now
+                </a>
+                <button class="px-8 py-4 border-2 border-white text-white rounded-xl font-semibold hover:bg-white/10 transition-all flex items-center justify-center">
+                    <i data-lucide="video" class="w-5 h-5 mr-2"></i>
+                    Watch Demo
+                </button>
+            </div>
+            
+            <div class="text-center">
+                <p class="text-white/70 text-sm mb-4">Trusted by gaming communities worldwide</p>
+                <div class="flex justify-center items-center space-x-8 opacity-60">
+                    <div class="w-8 h-8 bg-white/20 rounded-lg"></div>
+                    <div class="w-8 h-8 bg-white/20 rounded-lg"></div>
+                    <div class="w-8 h-8 bg-white/20 rounded-lg"></div>
+                    <div class="w-8 h-8 bg-white/20 rounded-lg"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="flex items-center space-x-4 mb-4 md:mb-0">
+                    <div class="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+                        <i data-lucide="swords" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold fantasy-font">DMLog.ai</h4>
+                        <p class="text-sm text-gray-400">Revolutionary RPG Gaming</p>
+                    </div>
+                </div>
+                
+                <div class="text-center md:text-right">
+                    <p class="text-gray-400 text-sm">© 2024 ActiveLog SuperInstance</p>
+                    <p class="text-gray-500 text-xs">Powered by AI • Enhanced by Reality</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Add interactive animations
+        document.addEventListener('DOMContentLoaded', () => {
+            // Floating animation for dice elements
+            const floatingElements = document.querySelectorAll('.floating-dice, .magic-sparkle');
+            floatingElements.forEach(element => {
+                element.addEventListener('mouseenter', () => {
+                    element.style.animationDuration = '1s';
+                });
+                element.addEventListener('mouseleave', () => {
+                    element.style.animationDuration = '6s';
+                });
+            });
+
+            // Feature card interactions
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            console.log('DMLog.ai landing page loaded successfully');
+        });
+    </script>
+</body>
+</html>

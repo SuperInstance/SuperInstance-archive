@@ -1,0 +1,409 @@
+name: Performance Testing
+
+on:
+  schedule:
+    # Run performance tests weekly on Sundays at 3 AM UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: 'Load test scenario'
+        required: true
+        default: 'normal_load'
+        type: choice
+        options:
+          - light_load
+          - normal_load
+          - heavy_load
+          - stress_test
+          - spike_test
+      duration:
+        description: 'Test duration'
+        required: true
+        default: '10m'
+        type: string
+      users:
+        description: 'Number of users'
+        required: true
+        default: '100'
+        type: number
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  performance-test:
+    name: Performance Test (${{ github.event.inputs.scenario || 'scheduled' }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: activelog_test
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+          POSTGRES_INITDB_ARGS: "--auth-host=md5"
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U test_user -d activelog_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: false
+          ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+        ports:
+          - 9200:9200
+        options: >-
+          --health-cmd "curl -f http://localhost:9200/_health"
+          --health-interval 30s
+          --health-timeout 10s
+          --health-retries 10
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+        pip install -r tests/requirements.txt
+        pip install locust
+    
+    - name: Wait for services
+      run: |
+        timeout 120 bash -c 'until pg_isready -h localhost -p 5432 -U test_user; do sleep 5; done'
+        timeout 60 bash -c 'until redis-cli -h localhost -p 6379 ping; do sleep 2; done'
+        timeout 180 bash -c 'until curl -f http://localhost:9200/_health; do sleep 10; done'
+    
+    - name: Set up test database
+      run: |
+        PGPASSWORD=test_pass createdb -h localhost -U test_user -p 5432 activelog_test || true
+        # Add any necessary schema setup here
+    
+    - name: Generate test data
+      run: |
+        python -c "
+        from tests.fixtures.data_generators import DataGenerators
+        from tests.fixtures.user_fixtures import UserFixtures
+        from tests.fixtures.file_fixtures import FileFixtures
+        import json
+        
+        # Generate test data for performance testing
+        test_data = DataGenerators.generate_performance_test_data('file_upload', 'large')
+        
+        # Create test users
+        users = [UserFixtures.create_user() for _ in range(50)]
+        
+        # Create test files
+        files = []
+        for user in users[:10]:
+            user_files = FileFixtures.create_files_for_user(user['id'], 100)
+            files.extend(user_files)
+        
+        # Save test data
+        with open('performance_test_data.json', 'w') as f:
+            json.dump({
+                'test_config': test_data,
+                'users': users,
+                'files': files[:500]  # Limit for performance
+            }, f, default=str)
+        
+        print(f'Generated {len(users)} users and {len(files[:500])} files for testing')
+        "
+    
+    - name: Start application with performance configuration
+      run: |
+        # Configure for performance testing
+        export DATABASE_URL="postgresql://test_user:test_pass@localhost:5432/activelog_test"
+        export REDIS_URL="redis://localhost:6379/0"
+        export ELASTICSEARCH_URL="http://localhost:9200"
+        export ENVIRONMENT=performance_test
+        export LOG_LEVEL=WARNING
+        export WORKERS=4
+        
+        # Start with performance optimizations
+        python -m uvicorn api_gateway.main:app \
+          --host 0.0.0.0 \
+          --port 8000 \
+          --workers 4 \
+          --worker-class uvicorn.workers.UvicornWorker &
+        
+        # Wait for application to be ready
+        timeout 120 bash -c 'until curl -f http://localhost:8000/health; do sleep 5; done'
+        
+        echo "Application started successfully"
+      env:
+        PYTHONPATH: .
+    
+    - name: Run performance baseline
+      run: |
+        # Quick baseline test to ensure system is responsive
+        python tests/load/run_load_tests.py \
+          --scenario light_load \
+          --users 5 \
+          --spawn-rate 1 \
+          --run-time 2m \
+          --results-dir baseline_results
+    
+    - name: Run main performance test
+      run: |
+        # Determine test parameters
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          SCENARIO="${{ github.event.inputs.scenario }}"
+          DURATION="${{ github.event.inputs.duration }}"
+          USERS="${{ github.event.inputs.users }}"
+        else
+          # Scheduled run - use comprehensive test
+          SCENARIO="normal_load"
+          DURATION="15m"
+          USERS="100"
+        fi
+        
+        echo "Running performance test with:"
+        echo "  Scenario: $SCENARIO"
+        echo "  Duration: $DURATION"  
+        echo "  Users: $USERS"
+        
+        python tests/load/run_load_tests.py \
+          --scenario "$SCENARIO" \
+          --users "$USERS" \
+          --run-time "$DURATION" \
+          --results-dir performance_results
+      
+    - name: Analyze performance results
+      run: |
+        python -c "
+        import json
+        import os
+        from pathlib import Path
+        
+        results_dir = Path('performance_results')
+        if not results_dir.exists():
+            print('No performance results found')
+            exit(1)
+        
+        # Find the latest results file
+        result_files = list(results_dir.glob('*_stats.json'))
+        if not result_files:
+            print('No stats file found')
+            exit(1)
+        
+        with open(result_files[0]) as f:
+            results = json.load(f)
+        
+        stats = results.get('stats', {})
+        
+        # Performance thresholds
+        thresholds = {
+            'max_avg_response_time': 2000,  # ms
+            'max_95th_percentile': 5000,    # ms
+            'max_error_rate': 0.05,         # 5%
+            'min_rps': 10                   # requests/second
+        }
+        
+        # Check thresholds
+        failures = []
+        
+        avg_response = stats.get('avg_response_time', 0)
+        if avg_response > thresholds['max_avg_response_time']:
+            failures.append(f'Average response time {avg_response}ms exceeds {thresholds[\"max_avg_response_time\"]}ms')
+        
+        error_rate = stats.get('failures', 0) / max(stats.get('total_requests', 1), 1)
+        if error_rate > thresholds['max_error_rate']:
+            failures.append(f'Error rate {error_rate:.2%} exceeds {thresholds[\"max_error_rate\"]:.2%}')
+        
+        rps = stats.get('rps', 0)
+        if rps < thresholds['min_rps']:
+            failures.append(f'RPS {rps} below minimum {thresholds[\"min_rps\"]}')
+        
+        # Print results
+        print('Performance Test Results:')
+        print(f'  Total Requests: {stats.get(\"total_requests\", \"N/A\")}')
+        print(f'  Failures: {stats.get(\"failures\", \"N/A\")}')
+        print(f'  Average Response Time: {avg_response}ms')
+        print(f'  Max Response Time: {stats.get(\"max_response_time\", \"N/A\")}ms')
+        print(f'  Requests/Second: {rps}')
+        print(f'  Error Rate: {error_rate:.2%}')
+        
+        if failures:
+            print('\nPerformance Failures:')
+            for failure in failures:
+                print(f'  - {failure}')
+            
+            # Create summary for GitHub
+            with open('performance_summary.md', 'w') as f:
+                f.write('# Performance Test Results\\n\\n')
+                f.write('❌ **Performance test failed**\\n\\n')
+                f.write('## Failures\\n')
+                for failure in failures:
+                    f.write(f'- {failure}\\n')
+                f.write('\\n## Metrics\\n')
+                f.write(f'- Total Requests: {stats.get(\"total_requests\", \"N/A\")}\\n')
+                f.write(f'- Average Response Time: {avg_response}ms\\n')
+                f.write(f'- Error Rate: {error_rate:.2%}\\n')
+                f.write(f'- Requests/Second: {rps}\\n')
+            
+            exit(1)
+        else:
+            print('\n✅ All performance thresholds met!')
+            
+            # Create success summary
+            with open('performance_summary.md', 'w') as f:
+                f.write('# Performance Test Results\\n\\n')
+                f.write('✅ **Performance test passed**\\n\\n')
+                f.write('## Metrics\\n')
+                f.write(f'- Total Requests: {stats.get(\"total_requests\", \"N/A\")}\\n')
+                f.write(f'- Average Response Time: {avg_response}ms\\n')
+                f.write(f'- Error Rate: {error_rate:.2%}\\n')
+                f.write(f'- Requests/Second: {rps}\\n')
+        "
+    
+    - name: Generate performance report
+      if: always()
+      run: |
+        # Create detailed HTML report
+        python -c "
+        import json
+        from pathlib import Path
+        from datetime import datetime
+        
+        results_dir = Path('performance_results')
+        if results_dir.exists():
+            result_files = list(results_dir.glob('*.json'))
+            
+            html_content = '''
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Performance Test Report</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    .metric { margin: 10px 0; padding: 10px; background: #f5f5f5; }
+                    .pass { border-left: 4px solid green; }
+                    .fail { border-left: 4px solid red; }
+                    table { border-collapse: collapse; width: 100%; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #4CAF50; color: white; }
+                </style>
+            </head>
+            <body>
+                <h1>Performance Test Report</h1>
+                <p><strong>Date:</strong> ''' + datetime.now().isoformat() + '''</p>
+                <p><strong>Scenario:</strong> ''' + ('${{ github.event.inputs.scenario }}' or 'scheduled') + '''</p>
+            '''
+            
+            if result_files:
+                with open(result_files[0]) as f:
+                    data = json.load(f)
+                    
+                stats = data.get('stats', {})
+                html_content += f'''
+                    <h2>Results Summary</h2>
+                    <table>
+                        <tr><th>Metric</th><th>Value</th></tr>
+                        <tr><td>Total Requests</td><td>{stats.get('total_requests', 'N/A')}</td></tr>
+                        <tr><td>Failures</td><td>{stats.get('failures', 'N/A')}</td></tr>
+                        <tr><td>Average Response Time</td><td>{stats.get('avg_response_time', 'N/A')}ms</td></tr>
+                        <tr><td>Max Response Time</td><td>{stats.get('max_response_time', 'N/A')}ms</td></tr>
+                        <tr><td>Requests/Second</td><td>{stats.get('rps', 'N/A')}</td></tr>
+                    </table>
+                '''
+            
+            html_content += '''
+                </body>
+            </html>
+            '''
+            
+            with open('performance_report.html', 'w') as f:
+                f.write(html_content)
+        "
+    
+    - name: Upload performance results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: performance-test-results-${{ github.run_id }}
+        path: |
+          performance_results/
+          baseline_results/
+          performance_test_data.json
+          performance_summary.md
+          performance_report.html
+    
+    - name: Comment performance results on PR
+      if: github.event_name == 'pull_request' && always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          
+          let summary = '# Performance Test Results\n\n';
+          
+          try {
+            if (fs.existsSync('performance_summary.md')) {
+              summary = fs.readFileSync('performance_summary.md', 'utf8');
+            } else {
+              summary += '⚠️ Performance test results not available';
+            }
+          } catch (error) {
+            summary += `❌ Error reading performance results: ${error.message}`;
+          }
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: summary
+          });
+    
+    - name: Store performance metrics
+      if: always()
+      run: |
+        # Store metrics for trend analysis
+        echo "Performance metrics stored for trend analysis"
+        # Here you could push metrics to a monitoring system like Prometheus, InfluxDB, etc.
+    
+    - name: Cleanup
+      if: always()
+      run: |
+        # Kill any remaining processes
+        pkill -f uvicorn || true
+        
+    - name: Notify on performance regression
+      if: failure()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          // You can add Slack notification or other alerting here
+          console.log('Performance regression detected!');
+          
+          if (context.ref === 'refs/heads/main') {
+            // Send alert for main branch performance issues
+            console.log('Main branch performance regression - consider alerting team');
+          }

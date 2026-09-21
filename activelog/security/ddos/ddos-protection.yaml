@@ -1,0 +1,653 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ddos-protection-config
+  namespace: activelog
+data:
+  fail2ban.conf: |
+    # ActiveLog Fail2Ban Configuration for DDoS Protection
+    
+    [DEFAULT]
+    # Ban duration (1 hour)
+    bantime = 3600
+    
+    # Find attempts within 10 minutes
+    findtime = 600
+    
+    # Max attempts before ban
+    maxretry = 5
+    
+    # Default backend
+    backend = auto
+    
+    # Ban action
+    banaction = iptables-multiport
+    banaction_allports = iptables-allports
+    
+    # Email notifications
+    mta = sendmail
+    destemail = security@activelog.com
+    sender = fail2ban@activelog.com
+    
+    # Log level
+    loglevel = INFO
+    
+    [activelog-api]
+    enabled = true
+    port = http,https
+    filter = activelog-api
+    logpath = /var/log/nginx/access.log
+    maxretry = 100
+    findtime = 60
+    bantime = 600
+    action = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(protocol)s"]
+             %(mta)s-whois[name=%(__name__)s, dest="%(destemail)s", sender="%(sender)s"]
+    
+    [activelog-auth]
+    enabled = true
+    port = http,https
+    filter = activelog-auth
+    logpath = /var/log/nginx/access.log
+    maxretry = 10
+    findtime = 300
+    bantime = 3600
+    action = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(protocol)s"]
+             %(mta)s-whois[name=%(__name__)s, dest="%(destemail)s", sender="%(sender)s"]
+    
+    [activelog-admin]
+    enabled = true
+    port = http,https
+    filter = activelog-admin
+    logpath = /var/log/nginx/access.log
+    maxretry = 3
+    findtime = 600
+    bantime = 7200
+    action = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(protocol)s"]
+             %(mta)s-whois[name=%(__name__)s, dest="%(destemail)s", sender="%(sender)s"]
+    
+    [activelog-upload]
+    enabled = true
+    port = http,https
+    filter = activelog-upload
+    logpath = /var/log/nginx/access.log
+    maxretry = 20
+    findtime = 3600
+    bantime = 1800
+    action = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(protocol)s"]
+             %(mta)s-whois[name=%(__name__)s, dest="%(destemail)s", sender="%(sender)s"]
+    
+    [nginx-dos]
+    enabled = true
+    port = http,https
+    filter = nginx-dos
+    logpath = /var/log/nginx/access.log
+    maxretry = 200
+    findtime = 60
+    bantime = 600
+    action = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(protocol)s"]
+    
+    [nginx-badbots]
+    enabled = true
+    port = http,https
+    filter = nginx-badbots
+    logpath = /var/log/nginx/access.log
+    maxretry = 2
+    findtime = 86400
+    bantime = 86400
+    action = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(protocol)s"]
+
+  filters.conf: |
+    # Fail2Ban filters for ActiveLog
+    
+    [activelog-api]
+    failregex = ^<HOST> .* "(GET|POST|PUT|DELETE|PATCH) /api/.* HTTP/.*" (429|503|5\d\d) .*$
+    ignoreregex = ^<HOST> .* "(GET|POST|PUT|DELETE|PATCH) /api/health.* HTTP/.*" 200 .*$
+    
+    [activelog-auth]
+    failregex = ^<HOST> .* "(POST) /auth/(login|register|reset).* HTTP/.*" (400|401|403|429) .*$
+               ^<HOST> .* "(POST) /auth/.* HTTP/.*" (422|429) .*$
+    ignoreregex = ^<HOST> .* "(GET) /auth/health.* HTTP/.*" 200 .*$
+    
+    [activelog-admin]
+    failregex = ^<HOST> .* "(GET|POST|PUT|DELETE) /admin/.* HTTP/.*" (401|403|404|429) .*$
+               ^<HOST> .* "(GET|POST|PUT|DELETE) /admin.* HTTP/.*" (401|403|404|429) .*$
+    
+    [activelog-upload]
+    failregex = ^<HOST> .* "(POST|PUT) .*/upload.* HTTP/.*" (413|429|5\d\d) .*$
+               ^<HOST> .* "(POST|PUT) /files/.* HTTP/.*" (413|429|5\d\d) .*$
+    
+    [nginx-dos]
+    failregex = ^<HOST> .* "(GET|POST|HEAD).*HTTP.*" (200|204|301|302|304) .*$
+    ignoreregex = ^<HOST> .* "(GET|POST|HEAD).*/health.*HTTP.*" 200 .*$
+                  ^<HOST> .* ".*\.(css|js|png|jpg|jpeg|gif|ico|svg).*HTTP.*" 200 .*$
+    
+    [nginx-badbots]
+    failregex = ^<HOST> .* ".*(sqlmap|nikto|nessus|openvas|w3af|paros|burp|webscarab|nmap|masscan|zap).*" .*$
+               ^<HOST> .* ".*(arachni|acunetix|appscan|netsparker|grabber|skipfish|wpscan|dirb|dirbuster).*" .*$
+               ^<HOST> .* ".*(gobuster|wfuzz|ffuf|x-scan|security|scanner|bot|crawler|spider|scraper).*" .*$
+
+  nginx-rate-limit.conf: |
+    # Advanced Nginx Rate Limiting Configuration
+    
+    # Define rate limiting zones
+    limit_req_zone $binary_remote_addr zone=global:50m rate=100r/m;
+    limit_req_zone $binary_remote_addr zone=api:50m rate=500r/m;
+    limit_req_zone $binary_remote_addr zone=auth:10m rate=20r/m;
+    limit_req_zone $binary_remote_addr zone=admin:10m rate=5r/m;
+    limit_req_zone $binary_remote_addr zone=upload:10m rate=10r/m;
+    limit_req_zone $binary_remote_addr zone=graphql:10m rate=60r/m;
+    limit_req_zone $binary_remote_addr zone=mobile:10m rate=200r/m;
+    limit_req_zone $binary_remote_addr zone=static:10m rate=1000r/m;
+    
+    # Connection limiting zones
+    limit_conn_zone $binary_remote_addr zone=perip:10m;
+    limit_conn_zone $server_name zone=perserver:10m;
+    
+    # Rate limiting by user agent
+    limit_req_zone $http_user_agent zone=useragent:10m rate=100r/m;
+    
+    # Rate limiting by country (requires GeoIP)
+    limit_req_zone $geoip_country_code zone=country:10m rate=1000r/m;
+    
+    # Adaptive rate limiting based on response codes
+    map $status $limit_rate_after_error {
+        default "";
+        "~^[45]" $binary_remote_addr;
+    }
+    limit_req_zone $limit_rate_after_error zone=error_recovery:10m rate=10r/m;
+    
+    # Custom log format for DDoS analysis
+    log_format ddos_log '$remote_addr - $remote_user [$time_local] '
+                       '"$request" $status $bytes_sent '
+                       '"$http_referer" "$http_user_agent" '
+                       '$request_time $upstream_response_time '
+                       '$geoip_country_code $geoip_city';
+
+  cloudflare-integration.conf: |
+    # Cloudflare Integration for DDoS Protection
+    
+    # Cloudflare IP ranges (update regularly)
+    set_real_ip_from 173.245.48.0/20;
+    set_real_ip_from 103.21.244.0/22;
+    set_real_ip_from 103.22.200.0/22;
+    set_real_ip_from 103.31.4.0/22;
+    set_real_ip_from 141.101.64.0/18;
+    set_real_ip_from 108.162.192.0/18;
+    set_real_ip_from 190.93.240.0/20;
+    set_real_ip_from 188.114.96.0/20;
+    set_real_ip_from 197.234.240.0/22;
+    set_real_ip_from 198.41.128.0/17;
+    set_real_ip_from 162.158.0.0/15;
+    set_real_ip_from 104.16.0.0/13;
+    set_real_ip_from 104.24.0.0/14;
+    set_real_ip_from 172.64.0.0/13;
+    set_real_ip_from 131.0.72.0/22;
+    
+    # IPv6 ranges
+    set_real_ip_from 2400:cb00::/32;
+    set_real_ip_from 2606:4700::/32;
+    set_real_ip_from 2803:f800::/32;
+    set_real_ip_from 2405:b500::/32;
+    set_real_ip_from 2405:8100::/32;
+    set_real_ip_from 2a06:98c0::/29;
+    set_real_ip_from 2c0f:f248::/32;
+    
+    # Use CF-Connecting-IP header
+    real_ip_header CF-Connecting-IP;
+    
+    # Map Cloudflare threat score to actions
+    map $http_cf_threat_score $threat_action {
+        default "allow";
+        "~^[6-9]$" "challenge";
+        "~^[1-9][0-9]$" "block";
+    }
+
+  ddos-detector.py: |
+    #!/usr/bin/env python3
+    """
+    Advanced DDoS Detection and Mitigation System
+    """
+    
+    import time
+    import json
+    import logging
+    import requests
+    import asyncio
+    from collections import defaultdict, deque
+    from datetime import datetime, timedelta
+    from dataclasses import dataclass
+    from typing import Dict, List, Optional
+    import redis
+    import psutil
+    
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    
+    @dataclass
+    class AttackPattern:
+        ip: str
+        requests_per_second: float
+        error_rate: float
+        unique_urls: int
+        user_agents: set
+        first_seen: datetime
+        last_seen: datetime
+        severity: str
+    
+    class DDoSDetector:
+        def __init__(self):
+            self.redis_client = redis.Redis(host='redis', port=6379, db=0)
+            self.request_history = defaultdict(lambda: deque(maxlen=1000))
+            self.ip_patterns = {}
+            self.alert_cooldown = {}
+            
+            # Thresholds
+            self.thresholds = {
+                'requests_per_second': 100,
+                'error_rate': 0.3,
+                'unique_ips_spike': 1000,
+                'total_requests_spike': 10000,
+                'cpu_threshold': 80,
+                'memory_threshold': 85
+            }
+        
+        async def analyze_traffic(self):
+            """Main analysis loop"""
+            while True:
+                try:
+                    await self.collect_metrics()
+                    await self.detect_patterns()
+                    await self.check_system_resources()
+                    await self.cleanup_old_data()
+                    await asyncio.sleep(5)  # Check every 5 seconds
+                except Exception as e:
+                    logger.error(f"Error in traffic analysis: {e}")
+                    await asyncio.sleep(10)
+        
+        async def collect_metrics(self):
+            """Collect traffic metrics from various sources"""
+            # Collect from Nginx access logs
+            await self.parse_nginx_logs()
+            
+            # Collect from application metrics
+            await self.collect_app_metrics()
+            
+            # Collect from network metrics
+            await self.collect_network_metrics()
+        
+        async def parse_nginx_logs(self):
+            """Parse Nginx access logs for traffic patterns"""
+            try:
+                # Read recent log entries (implement log tailing)
+                # This is a simplified version - in production, use log streaming
+                with open('/var/log/nginx/access.log', 'r') as f:
+                    lines = f.readlines()[-1000:]  # Last 1000 lines
+                
+                current_time = datetime.now()
+                
+                for line in lines:
+                    entry = self.parse_log_entry(line)
+                    if entry and (current_time - entry['timestamp']).seconds < 60:
+                        self.record_request(entry)
+                        
+            except Exception as e:
+                logger.error(f"Error parsing Nginx logs: {e}")
+        
+        def parse_log_entry(self, line: str) -> Optional[Dict]:
+            """Parse a single log entry"""
+            try:
+                # Parse common log format
+                # Example: 192.168.1.1 - - [01/Jan/2024:12:00:00 +0000] "GET /api/users HTTP/1.1" 200 1234
+                parts = line.split()
+                if len(parts) < 10:
+                    return None
+                
+                ip = parts[0]
+                timestamp_str = ' '.join(parts[3:5])[1:-1]  # Remove brackets
+                method = parts[5][1:]  # Remove quote
+                url = parts[6]
+                status = int(parts[8])
+                size = int(parts[9]) if parts[9] != '-' else 0
+                user_agent = ' '.join(parts[11:]) if len(parts) > 11 else ''
+                
+                timestamp = datetime.strptime(timestamp_str, '%d/%b/%Y:%H:%M:%S %z')
+                
+                return {
+                    'ip': ip,
+                    'timestamp': timestamp,
+                    'method': method,
+                    'url': url,
+                    'status': status,
+                    'size': size,
+                    'user_agent': user_agent
+                }
+            except Exception as e:
+                logger.error(f"Error parsing log entry: {e}")
+                return None
+        
+        def record_request(self, entry: Dict):
+            """Record a request for analysis"""
+            ip = entry['ip']
+            timestamp = entry['timestamp']
+            
+            # Store in time-series data
+            self.request_history[ip].append({
+                'timestamp': timestamp,
+                'status': entry['status'],
+                'url': entry['url'],
+                'user_agent': entry['user_agent']
+            })
+            
+            # Update Redis counters
+            self.redis_client.incr(f"requests:{ip}:{timestamp.strftime('%Y%m%d%H%M')}")
+            self.redis_client.expire(f"requests:{ip}:{timestamp.strftime('%Y%m%d%H%M')}", 3600)
+        
+        async def detect_patterns(self):
+            """Detect DDoS attack patterns"""
+            current_time = datetime.now()
+            
+            # Analyze each IP
+            for ip, requests in self.request_history.items():
+                if not requests:
+                    continue
+                
+                pattern = self.analyze_ip_pattern(ip, requests, current_time)
+                if pattern and self.is_suspicious_pattern(pattern):
+                    await self.handle_suspicious_ip(ip, pattern)
+            
+            # Analyze global patterns
+            await self.analyze_global_patterns(current_time)
+        
+        def analyze_ip_pattern(self, ip: str, requests: deque, current_time: datetime) -> Optional[AttackPattern]:
+            """Analyze request pattern for a specific IP"""
+            if not requests:
+                return None
+            
+            # Filter recent requests (last 5 minutes)
+            recent_requests = [r for r in requests if (current_time - r['timestamp']).seconds < 300]
+            
+            if not recent_requests:
+                return None
+            
+            # Calculate metrics
+            time_span = (current_time - recent_requests[0]['timestamp']).seconds
+            if time_span == 0:
+                time_span = 1
+            
+            requests_per_second = len(recent_requests) / time_span
+            error_count = sum(1 for r in recent_requests if r['status'] >= 400)
+            error_rate = error_count / len(recent_requests) if recent_requests else 0
+            unique_urls = len(set(r['url'] for r in recent_requests))
+            user_agents = set(r['user_agent'] for r in recent_requests)
+            
+            # Determine severity
+            severity = self.calculate_severity(requests_per_second, error_rate, unique_urls, len(user_agents))
+            
+            return AttackPattern(
+                ip=ip,
+                requests_per_second=requests_per_second,
+                error_rate=error_rate,
+                unique_urls=unique_urls,
+                user_agents=user_agents,
+                first_seen=recent_requests[0]['timestamp'],
+                last_seen=recent_requests[-1]['timestamp'],
+                severity=severity
+            )
+        
+        def is_suspicious_pattern(self, pattern: AttackPattern) -> bool:
+            """Determine if a pattern is suspicious"""
+            # High request rate
+            if pattern.requests_per_second > self.thresholds['requests_per_second']:
+                return True
+            
+            # High error rate with moderate request rate
+            if pattern.error_rate > self.thresholds['error_rate'] and pattern.requests_per_second > 10:
+                return True
+            
+            # Scanning behavior (many unique URLs)
+            if pattern.unique_urls > 50 and pattern.requests_per_second > 5:
+                return True
+            
+            # Bot-like behavior (single user agent, high request rate)
+            if len(pattern.user_agents) == 1 and pattern.requests_per_second > 20:
+                return True
+            
+            return False
+        
+        def calculate_severity(self, rps: float, error_rate: float, unique_urls: int, user_agents: int) -> str:
+            """Calculate attack severity"""
+            score = 0
+            
+            # Request rate scoring
+            if rps > 1000:
+                score += 10
+            elif rps > 500:
+                score += 7
+            elif rps > 100:
+                score += 5
+            elif rps > 50:
+                score += 3
+            
+            # Error rate scoring
+            if error_rate > 0.8:
+                score += 5
+            elif error_rate > 0.5:
+                score += 3
+            elif error_rate > 0.3:
+                score += 2
+            
+            # URL diversity scoring
+            if unique_urls > 100:
+                score += 3
+            elif unique_urls > 50:
+                score += 2
+            
+            # User agent diversity scoring
+            if user_agents == 1:
+                score += 2
+            
+            if score >= 15:
+                return "critical"
+            elif score >= 10:
+                return "high"
+            elif score >= 5:
+                return "medium"
+            else:
+                return "low"
+        
+        async def handle_suspicious_ip(self, ip: str, pattern: AttackPattern):
+            """Handle suspicious IP address"""
+            # Check cooldown to avoid spam
+            cooldown_key = f"alert:{ip}"
+            if cooldown_key in self.alert_cooldown:
+                if datetime.now() - self.alert_cooldown[cooldown_key] < timedelta(minutes=5):
+                    return
+            
+            self.alert_cooldown[cooldown_key] = datetime.now()
+            
+            logger.warning(f"Suspicious pattern detected for IP {ip}: {pattern}")
+            
+            # Take action based on severity
+            if pattern.severity in ["critical", "high"]:
+                await self.block_ip(ip, pattern)
+            elif pattern.severity == "medium":
+                await self.challenge_ip(ip, pattern)
+            
+            # Send alert
+            await self.send_alert(ip, pattern)
+        
+        async def block_ip(self, ip: str, pattern: AttackPattern):
+            """Block IP address"""
+            try:
+                # Add to fail2ban
+                await asyncio.create_subprocess_exec(
+                    'fail2ban-client', 'set', 'activelog-api', 'banip', ip
+                )
+                
+                # Add to Redis blacklist
+                self.redis_client.setex(f"blocked:{ip}", 3600, json.dumps({
+                    'reason': 'DDoS attack detected',
+                    'pattern': {
+                        'requests_per_second': pattern.requests_per_second,
+                        'error_rate': pattern.error_rate,
+                        'severity': pattern.severity
+                    },
+                    'blocked_at': datetime.now().isoformat()
+                }))
+                
+                # Update firewall rules (if using iptables)
+                await asyncio.create_subprocess_exec(
+                    'iptables', '-A', 'INPUT', '-s', ip, '-j', 'DROP'
+                )
+                
+                logger.info(f"Blocked IP {ip} due to {pattern.severity} severity attack")
+                
+            except Exception as e:
+                logger.error(f"Error blocking IP {ip}: {e}")
+        
+        async def challenge_ip(self, ip: str, pattern: AttackPattern):
+            """Challenge IP with CAPTCHA or rate limiting"""
+            # Add to Redis challenge list
+            self.redis_client.setex(f"challenge:{ip}", 1800, json.dumps({
+                'reason': 'Suspicious activity detected',
+                'pattern': {
+                    'requests_per_second': pattern.requests_per_second,
+                    'error_rate': pattern.error_rate,
+                    'severity': pattern.severity
+                },
+                'challenged_at': datetime.now().isoformat()
+            }))
+            
+            logger.info(f"Challenged IP {ip} due to {pattern.severity} severity activity")
+        
+        async def analyze_global_patterns(self, current_time: datetime):
+            """Analyze global traffic patterns"""
+            # Get total request count for last minute
+            minute_key = current_time.strftime('%Y%m%d%H%M')
+            total_requests = 0
+            unique_ips = set()
+            
+            for key in self.redis_client.scan_iter(match=f"requests:*:{minute_key}"):
+                count = self.redis_client.get(key)
+                if count:
+                    total_requests += int(count)
+                    ip = key.decode().split(':')[1]
+                    unique_ips.add(ip)
+            
+            # Check for global spikes
+            if total_requests > self.thresholds['total_requests_spike']:
+                await self.handle_global_spike('requests', total_requests)
+            
+            if len(unique_ips) > self.thresholds['unique_ips_spike']:
+                await self.handle_global_spike('unique_ips', len(unique_ips))
+        
+        async def handle_global_spike(self, spike_type: str, value: int):
+            """Handle global traffic spikes"""
+            logger.warning(f"Global {spike_type} spike detected: {value}")
+            
+            # Enable emergency rate limiting
+            await self.enable_emergency_mode()
+            
+            # Send alert
+            await self.send_global_alert(spike_type, value)
+        
+        async def enable_emergency_mode(self):
+            """Enable emergency DDoS protection mode"""
+            # Reduce rate limits significantly
+            emergency_config = """
+            limit_req_zone $binary_remote_addr zone=emergency:10m rate=10r/m;
+            limit_req zone=emergency burst=5 nodelay;
+            """
+            
+            # Write emergency config
+            with open('/etc/nginx/conf.d/emergency.conf', 'w') as f:
+                f.write(emergency_config)
+            
+            # Reload Nginx
+            await asyncio.create_subprocess_exec('nginx', '-s', 'reload')
+            
+            logger.info("Emergency DDoS protection mode enabled")
+        
+        async def check_system_resources(self):
+            """Check system resource usage"""
+            cpu_percent = psutil.cpu_percent(interval=1)
+            memory_percent = psutil.virtual_memory().percent
+            
+            if cpu_percent > self.thresholds['cpu_threshold']:
+                await self.handle_resource_spike('cpu', cpu_percent)
+            
+            if memory_percent > self.thresholds['memory_threshold']:
+                await self.handle_resource_spike('memory', memory_percent)
+        
+        async def handle_resource_spike(self, resource_type: str, value: float):
+            """Handle system resource spikes"""
+            logger.warning(f"High {resource_type} usage detected: {value}%")
+            
+            # Enable more aggressive rate limiting
+            if resource_type == 'cpu' and value > 90:
+                await self.enable_emergency_mode()
+        
+        async def send_alert(self, ip: str, pattern: AttackPattern):
+            """Send DDoS alert"""
+            alert_data = {
+                'type': 'ddos_attack',
+                'ip': ip,
+                'severity': pattern.severity,
+                'requests_per_second': pattern.requests_per_second,
+                'error_rate': pattern.error_rate,
+                'unique_urls': pattern.unique_urls,
+                'timestamp': datetime.now().isoformat()
+            }
+            
+            # Send to webhook
+            try:
+                webhook_url = os.getenv('SECURITY_WEBHOOK_URL')
+                if webhook_url:
+                    requests.post(webhook_url, json=alert_data, timeout=5)
+            except Exception as e:
+                logger.error(f"Error sending webhook alert: {e}")
+            
+            # Log to security log
+            logger.warning(f"DDoS Alert: {json.dumps(alert_data)}")
+        
+        async def send_global_alert(self, spike_type: str, value: int):
+            """Send global DDoS alert"""
+            alert_data = {
+                'type': 'global_ddos_spike',
+                'spike_type': spike_type,
+                'value': value,
+                'timestamp': datetime.now().isoformat()
+            }
+            
+            # Send to webhook
+            try:
+                webhook_url = os.getenv('SECURITY_WEBHOOK_URL')
+                if webhook_url:
+                    requests.post(webhook_url, json=alert_data, timeout=5)
+            except Exception as e:
+                logger.error(f"Error sending webhook alert: {e}")
+        
+        async def cleanup_old_data(self):
+            """Clean up old data to prevent memory leaks"""
+            current_time = datetime.now()
+            cutoff_time = current_time - timedelta(hours=1)
+            
+            # Clean up request history
+            for ip in list(self.request_history.keys()):
+                requests = self.request_history[ip]
+                # Remove old requests
+                while requests and requests[0]['timestamp'] < cutoff_time:
+                    requests.popleft()
+                
+                # Remove empty entries
+                if not requests:
+                    del self.request_history[ip]
+            
+            # Clean up alert cooldown
+            for key in list(self.alert_cooldown.keys()):
+                if current_time - self.alert_cooldown[key] > timedelta(hours=1):
+                    del self.alert_cooldown[key]
+    
+    if __name__ == "__main__":
+        detector = DDoSDetector()
+        asyncio.run(detector.analyze_traffic())

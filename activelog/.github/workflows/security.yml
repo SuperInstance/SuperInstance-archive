@@ -1,0 +1,286 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run weekly security scans on Sundays at 3 AM UTC
+    - cron: '0 3 * * 0'
+
+jobs:
+  dependency-check:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install safety pip-audit
+        pip install -r requirements.txt
+    
+    - name: Install Node dependencies
+      run: |
+        cd frontend
+        npm ci
+    
+    - name: Run Python dependency security check (Safety)
+      run: |
+        safety check --json --output safety-report.json || true
+        safety check
+    
+    - name: Run Python dependency audit (pip-audit)
+      run: |
+        pip-audit --format=json --output=pip-audit-report.json || true
+        pip-audit
+    
+    - name: Run Node.js dependency security check
+      run: |
+        cd frontend
+        npm audit --audit-level=moderate --json > ../npm-audit-report.json || true
+        npm audit --audit-level=moderate
+    
+    - name: Upload dependency scan results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: dependency-scan-results
+        path: |
+          safety-report.json
+          pip-audit-report.json
+          npm-audit-report.json
+
+  code-security-scan:
+    name: Code Security Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install security tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit semgrep
+    
+    - name: Run Bandit security linter
+      run: |
+        bandit -r services/ -f json -o bandit-report.json || true
+        bandit -r services/ -f txt
+    
+    - name: Run Semgrep security analysis
+      run: |
+        semgrep --config=auto --json --output=semgrep-report.json services/ || true
+        semgrep --config=auto services/
+    
+    - name: Upload code security scan results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: code-security-scan-results
+        path: |
+          bandit-report.json
+          semgrep-report.json
+
+  container-security-scan:
+    name: Container Security Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'schedule'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Build Docker image
+      run: |
+        # Build a test Docker image for scanning
+        cat > Dockerfile.test << 'EOF'
+        FROM python:3.11-slim
+        
+        WORKDIR /app
+        
+        COPY requirements.txt .
+        RUN pip install --no-cache-dir -r requirements.txt
+        
+        COPY services/ ./services/
+        
+        EXPOSE 8000
+        CMD ["uvicorn", "services.api_gateway.main:app", "--host", "0.0.0.0", "--port", "8000"]
+        EOF
+        
+        docker build -f Dockerfile.test -t activelog:test .
+    
+    - name: Run Trivy container scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'activelog:test'
+        format: 'sarif'
+        output: 'container-scan-results.sarif'
+    
+    - name: Upload container scan results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'container-scan-results.sarif'
+
+  secrets-scan:
+    name: Secrets Detection
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Run TruffleHog secrets scan
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: main
+        head: HEAD
+        extra_args: --debug --only-verified
+
+  license-check:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install license checking tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install pip-licenses
+        npm install -g license-checker
+    
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        cd frontend && npm ci
+    
+    - name: Check Python package licenses
+      run: |
+        pip-licenses --format=json --output-file=python-licenses.json
+        pip-licenses --format=csv --output-file=python-licenses.csv
+        pip-licenses
+    
+    - name: Check Node.js package licenses
+      run: |
+        cd frontend
+        license-checker --json --out ../node-licenses.json
+        license-checker --csv --out ../node-licenses.csv
+        license-checker --summary
+    
+    - name: Upload license reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: license-reports
+        path: |
+          python-licenses.json
+          python-licenses.csv
+          node-licenses.json
+          node-licenses.csv
+
+  security-report:
+    name: Generate Security Report
+    runs-on: ubuntu-latest
+    needs: [dependency-check, code-security-scan, secrets-scan, license-check]
+    if: always()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+    
+    - name: Generate security summary
+      run: |
+        cat > security-summary.md << 'EOF'
+        # Security Scan Summary
+        
+        **Scan Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        **Repository:** ${{ github.repository }}
+        **Branch:** ${{ github.ref_name }}
+        **Commit:** ${{ github.sha }}
+        
+        ## Scan Results
+        
+        ### Dependency Vulnerabilities
+        - Python dependencies scanned with Safety and pip-audit
+        - Node.js dependencies scanned with npm audit
+        
+        ### Code Security Analysis
+        - Python code scanned with Bandit and Semgrep
+        - Potential security issues identified and reported
+        
+        ### Secrets Detection
+        - Repository scanned for exposed secrets and credentials
+        - TruffleHog used for comprehensive secrets detection
+        
+        ### License Compliance
+        - All dependencies checked for license compatibility
+        - License reports generated for audit purposes
+        
+        ## Actions Required
+        
+        Review the detailed scan results in the artifacts and address any high-severity findings.
+        
+        EOF
+        
+        echo "Security scan completed. Review artifacts for detailed results."
+    
+    - name: Upload security summary
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-summary
+        path: security-summary.md
+    
+    - name: Comment on PR (if applicable)
+      uses: actions/github-script@v6
+      if: github.event_name == 'pull_request'
+      with:
+        script: |
+          const fs = require('fs');
+          if (fs.existsSync('security-summary.md')) {
+            const summary = fs.readFileSync('security-summary.md', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
+          }

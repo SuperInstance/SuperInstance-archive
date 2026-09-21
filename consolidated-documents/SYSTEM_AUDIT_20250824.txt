@@ -1,0 +1,287 @@
+=== ActiveLog System Audit v2 ===
+Date: Sun Aug 24 15:38:25 AKDT 2025
+
+SERVICES STATUS:
+✗ __pycache__ - Missing main.py
+✗ accessibility - Missing main.py
+✓ accounting-core
+✗ activeledger - Missing main.py
+✗ ad-engine - Missing main.py
+✗ ads - Missing main.py
+✗ ai-connectors - Missing main.py
+✓ ai-orchestrator
+✓ ai-receptionist
+✗ ai-tools - Missing main.py
+✗ ai_orchestrator - Missing main.py
+✗ ambient - Missing main.py
+✓ analytics-platform
+✓ analytics
+✓ api-gateway
+✓ api-monetization
+✗ api_gateway - Missing main.py
+✗ ar-layer - Missing main.py
+✓ auth
+✗ auto-improve - Missing main.py
+✓ backup
+✓ banking-service
+✓ batch-import
+✗ beta-platform - Missing main.py
+✓ beta-pricing
+✗ biological - Missing main.py
+✗ blockchain - Missing main.py
+✓ business-incubator
+✓ business-units
+✗ business-valuation - Missing main.py
+✗ businesslog-wizard - Missing main.py
+✗ cache - Missing main.py
+✓ capitaine
+✓ career-sims
+✗ ccc-economy - Missing main.py
+✓ child-safety
+✓ cli-interface
+✓ cocapn
+✗ cognitive - Missing main.py
+✓ collaboration
+✗ compute-exchange - Missing main.py
+✗ compute-market - Missing main.py
+✓ compute-tiers
+✗ content-adaptation - Missing main.py
+✗ content-creator - Missing main.py
+✗ content-economy - Missing main.py
+✗ cost-optimizer - Missing main.py
+✗ creative-suite - Missing main.py
+✓ crm-sales
+✗ cross-app-orders - Missing main.py
+✗ crypto-platform - Missing main.py
+✗ data-bridge - Missing main.py
+✓ data-export
+✓ data-manager
+✓ data-orchestrator
+✗ dev-sandbox - Missing main.py
+✓ disaster-recovery
+✗ dmlog-ai-dm - Missing main.py
+✓ dmlog-battle
+✓ dmlog-characters
+✗ dmlog-converter - Missing main.py
+✓ dmlog-core
+✗ dmlog-final - Missing main.py
+✗ dmlog-gamedev - Missing main.py
+✗ dmlog-instant - Missing main.py
+✓ dmlog-integration-hub
+✓ dmlog-integration
+✗ dmlog-marketplace - Missing main.py
+✗ dmlog-player - Missing main.py
+✗ dmlog-session - Missing main.py
+✗ dmlog-stream - Missing main.py
+✗ dmlog-templates - Missing main.py
+✗ dmlog-visualizer - Missing main.py
+✓ dmlog-world
+✓ document-ai
+✓ dream-mode-v2
+✓ dream-mode
+✓ dream-simulator
+✗ dual-interface - Missing main.py
+✓ ecommerce-platform
+✓ economy-sim
+✓ edge-programmer
+✗ edu-games - Missing main.py
+✗ education-ai - Missing main.py
+✗ educator-portal - Missing main.py
+✗ emotional-ai - Missing main.py
+✓ engine-monitor
+✓ enterprise-custom
+✗ enterprise-isolation - Missing main.py
+✓ etl-pipeline
+✓ file-sync
+✓ file-watcher
+✗ file_processor - Missing main.py
+✗ financial-management - Missing main.py
+✗ fishing-pro - Missing main.py
+✓ fishinglog-crew
+✗ fishinglog-layouts - Missing main.py
+✓ fishinglog-nav
+✓ fishinglog-voice
+✓ franchise-mgmt
+✓ frontend-market
+✓ game-dev-mode
+✓ game-enhance
+✓ gaming-platform
+✓ gov-contracting
+✗ graphql - Missing main.py
+✗ growth - Missing main.py
+✗ health-integration - Missing main.py
+✗ identity-federation - Missing main.py
+✗ imagination-engine - Missing main.py
+✓ instance-manager
+✓ insurance-platform
+✗ integration-controller - Missing main.py
+✓ integration-hub
+✗ interactive-tutorials - Missing main.py
+✗ inventory-sync - Missing main.py
+✗ investment-manager - Missing main.py
+✓ invoice-engine
+✗ iot-gateway - Missing main.py
+✗ kids-connect - Missing main.py
+✗ kids-social - Missing main.py
+✓ legal-framework
+✗ makerslog-kids - Missing main.py
+✗ makerslog-workshop - Missing main.py
+✓ manufacturing-erp
+✗ manufacturing - Missing main.py
+✓ marine-advanced
+✓ marine-alarms
+✓ marine-autopilot
+✓ marine-fishing
+✗ marketing-auto - Missing main.py
+✓ marketplace-v2
+✓ membership-migration
+✗ memory-preservation - Missing main.py
+✓ metadata
+✗ migration-toolkit - Missing main.py
+✗ ml-pipeline - Missing main.py
+✗ ml-platform - Missing main.py
+✓ mobile-api
+✗ monetization-engine - Missing main.py
+✗ multiverse - Missing main.py
+✗ nonprofit-mgmt - Missing main.py
+✗ notification - Missing main.py
+✓ notifications
+✗ org-tiers - Missing main.py
+✗ p2p-sync - Missing main.py
+✓ parts-market
+✗ payment-v2 - Missing main.py
+✓ payroll-hr
+✓ permissions
+✗ playerlog-empire - Missing main.py
+✗ podcast-gen - Missing main.py
+✗ pos-retail - Missing main.py
+✗ predictive-ai - Missing main.py
+✗ predictive - Missing main.py
+✗ pricing-engine - Missing main.py
+✗ print-automation - Missing main.py
+✓ privacy-vault
+✓ product-market
+✗ quantum-ready - Missing main.py
+✗ quantum-reality - Missing main.py
+✓ real-estate
+✗ reallog-pro - Missing main.py
+✗ realtime-events - Missing main.py
+✗ remote-control - Missing main.py
+✓ revenue-distribution
+✓ revenue-opt
+✗ screen-intelligence - Missing main.py
+✗ search-engine - Missing main.py
+✗ security-advanced - Missing main.py
+✗ service-orchestrator - Missing main.py
+✗ simulation - Missing main.py
+✗ skill-development - Missing main.py
+✓ smart-folders
+✗ social-ai - Missing main.py
+✗ social-hub - Missing main.py
+✗ sso-system - Missing main.py
+✗ studylog-adults - Missing main.py
+✗ studylog-games - Missing main.py
+✓ studylog-integration
+✗ studylog-kids - Missing main.py
+✗ studylog-languages - Missing main.py
+✓ supply-chain
+✓ sync-engine
+✗ sync-v2 - Missing main.py
+✓ tax-compliance
+✗ time-machine - Missing main.py
+✗ trek-computer - Missing main.py
+✓ tycoon-games
+✓ ui-engine
+✗ ui-polish - Missing main.py
+✗ universal-translator - Missing main.py
+✓ user-choice
+✗ vendor-ecosystem - Missing main.py
+✓ vibe-code
+✗ video-pipeline - Missing main.py
+✓ video-processor
+✗ visual-builder - Missing main.py
+✓ voice-excellence
+✓ workflows
+✓ zero-trust
+
+FRONTEND APPS:
+drwxrwxr-x  4 activeloguser activeloguser 4096 Aug 23 16:55 .
+drwxrwxr-x 61 activeloguser activeloguser 4096 Aug 24 15:38 ..
+drwxrwxr-x  2 activeloguser activeloguser 4096 Aug 23 16:55 public
+drwxrwxr-x  4 activeloguser activeloguser 4096 Aug 23 16:55 src
+drwxrwxr-x   5 activeloguser activeloguser   4096 Aug 24 08:18 .
+drwxrwxr-x  61 activeloguser activeloguser   4096 Aug 24 15:38 ..
+drwxrwxr-x   3 activeloguser activeloguser   4096 Aug 24 08:18 dist
+drwxrwxr-x 482 activeloguser activeloguser  20480 Aug 24 08:08 node_modules
+drwxrwxr-x  12 activeloguser activeloguser   4096 Aug 24 08:14 src
+drwxrwxr-x  5 activeloguser activeloguser 4096 Aug 23 07:53 .
+drwxrwxr-x 61 activeloguser activeloguser 4096 Aug 24 15:38 ..
+drwxrwxr-x  2 activeloguser activeloguser 4096 Aug 23 07:53 config
+drwxrwxr-x  2 activeloguser activeloguser 4096 Aug 23 07:53 scripts
+drwxrwxr-x 19 activeloguser activeloguser 4096 Aug 23 08:28 src
+drwxrwxr-x    5 activeloguser activeloguser   4096 Aug 23 07:53 .
+drwxrwxr-x   61 activeloguser activeloguser   4096 Aug 24 15:38 ..
+drwxrwxr-x 1133 activeloguser activeloguser  36864 Aug 23 07:53 node_modules
+drwxrwxr-x    2 activeloguser activeloguser   4096 Aug 23 07:44 public
+drwxrwxr-x    9 activeloguser activeloguser   4096 Aug 23 07:51 src
+drwxrwxr-x  4 activeloguser activeloguser 4096 Aug 22 22:35 .
+drwxrwxr-x 61 activeloguser activeloguser 4096 Aug 24 15:38 ..
+drwxrwxr-x  2 activeloguser activeloguser 4096 Aug 22 22:34 public
+drwxrwxr-x  4 activeloguser activeloguser 4096 Aug 22 22:36 src
+drwxrwxr-x   5 activeloguser activeloguser   4096 Aug 24 07:42 .
+drwxrwxr-x  61 activeloguser activeloguser   4096 Aug 24 15:38 ..
+drwxrwxr-x 982 activeloguser activeloguser  36864 Aug 24 07:40 node_modules
+drwxrwxr-x   2 activeloguser activeloguser   4096 Aug 24 07:28 public
+drwxrwxr-x   8 activeloguser activeloguser   4096 Aug 24 07:35 src
+drwxrwxr-x  6 activeloguser activeloguser 4096 Aug 23 16:28 .
+drwxrwxr-x 61 activeloguser activeloguser 4096 Aug 24 15:38 ..
+drwxrwxr-x  2 activeloguser activeloguser 4096 Aug 23 16:27 assets
+drwxrwxr-x  2 activeloguser activeloguser 4096 Aug 23 16:27 public
+drwxrwxr-x 10 activeloguser activeloguser 4096 Aug 23 16:36 src
+drwxrwxr-x  2 activeloguser activeloguser 4096 Aug 23 16:27 tests
+drwxrwxr-x  3 activeloguser activeloguser 4096 Aug 23 11:56 .
+drwxrwxr-x 61 activeloguser activeloguser 4096 Aug 24 15:38 ..
+drwxrwxr-x  5 activeloguser activeloguser 4096 Aug 23 12:04 src
+drwxrwxr-x   4 activeloguser activeloguser   4096 Aug 24 07:56 .
+drwxrwxr-x  61 activeloguser activeloguser   4096 Aug 24 15:38 ..
+drwxrwxr-x 672 activeloguser activeloguser  24576 Aug 24 07:51 node_modules
+drwxrwxr-x   9 activeloguser activeloguser   4096 Aug 24 07:47 src
+drwxrwxr-x  9 activeloguser activeloguser 4096 Aug 24 14:03 .
+drwxrwxr-x 61 activeloguser activeloguser 4096 Aug 24 15:38 ..
+drwxrwxr-x  3 activeloguser activeloguser 4096 Aug 24 13:51 businesslog
+drwxrwxr-x  3 activeloguser activeloguser 4096 Aug 24 14:03 dmlog
+drwxrwxr-x  3 activeloguser activeloguser 4096 Aug 24 13:52 fishinglog
+drwxrwxr-x  3 activeloguser activeloguser 4096 Aug 24 14:02 makerlog
+drwxrwxr-x  3 activeloguser activeloguser 4096 Aug 24 13:51 personallog
+drwxrwxr-x  3 activeloguser activeloguser 4096 Aug 24 14:01 playerlog
+drwxrwxr-x  3 activeloguser activeloguser 4096 Aug 24 13:52 studylog
+drwxrwxr-x  5 activeloguser activeloguser 4096 Aug 23 07:33 .
+drwxrwxr-x 61 activeloguser activeloguser 4096 Aug 24 15:38 ..
+drwxrwxr-x  2 activeloguser activeloguser 4096 Aug 23 07:33 config
+drwxrwxr-x  2 activeloguser activeloguser 4096 Aug 23 07:45 public
+drwxrwxr-x 10 activeloguser activeloguser 4096 Aug 23 07:49 src
+drwxrwxr-x  3 activeloguser activeloguser 4096 Aug 24 08:24 .
+drwxrwxr-x 61 activeloguser activeloguser 4096 Aug 24 15:38 ..
+drwxrwxr-x  7 activeloguser activeloguser 4096 Aug 24 08:37 src
+drwxrwxr-x  5 activeloguser activeloguser 4096 Aug 23 16:40 .
+drwxrwxr-x 61 activeloguser activeloguser 4096 Aug 24 15:38 ..
+drwxrwxr-x  2 activeloguser activeloguser 4096 Aug 23 16:40 docs
+drwxrwxr-x  2 activeloguser activeloguser 4096 Aug 23 17:04 public
+drwxrwxr-x 10 activeloguser activeloguser 4096 Aug 23 17:04 src
+drwxrwxr-x  4 activeloguser activeloguser 4096 Aug 23 11:55 .
+drwxrwxr-x 61 activeloguser activeloguser 4096 Aug 24 15:38 ..
+drwxrwxr-x  2 activeloguser activeloguser 4096 Aug 23 11:55 public
+drwxrwxr-x  8 activeloguser activeloguser 4096 Aug 23 11:55 src
+drwxrwxr-x   4 activeloguser activeloguser   4096 Aug 22 22:39 .
+drwxrwxr-x  61 activeloguser activeloguser   4096 Aug 24 15:38 ..
+drwxrwxr-x 723 activeloguser activeloguser  24576 Aug 22 22:39 node_modules
+drwxrwxr-x   8 activeloguser activeloguser   4096 Aug 23 00:28 src
+drwxrwxr-x  3 activeloguser activeloguser 4096 Aug 21 22:21 .
+drwxrwxr-x 61 activeloguser activeloguser 4096 Aug 24 15:38 ..
+drwxrwxr-x  5 activeloguser activeloguser 4096 Aug 21 19:10 src
+
+CRITICAL FEATURES:
+8
+Services with CC integration: 8
+
+Generating detailed report...
