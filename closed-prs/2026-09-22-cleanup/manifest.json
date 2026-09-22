@@ -1,0 +1,57 @@
+{
+  "archived_at": "2026-09-22T06:27:35.924405+00:00",
+  "reason": "No-deletion doctrine: closed PRs preserved as snapshots with vectorized content for time-based creative-lineage reconstruction",
+  "items": [
+    {
+      "repo": "jeviter",
+      "pr_num": 11,
+      "title": "seed 7: sequential-merge governor",
+      "branch": "seed-7-merge-governor",
+      "base": "main",
+      "head_sha": "dffa7f95acfda728c977849ed0e3f25632f9efb8",
+      "created_at": "2026-09-21T22:46:36Z",
+      "closed_at": "2026-09-22T06:19:37Z",
+      "state": "closed",
+      "author": "SuperInstance",
+      "additions": 246,
+      "deletions": 3,
+      "changed_files": 3,
+      "body": "AGENTIC-CYCLE seed 7 BUILT \u2014 the six patterns' last one, made homeostatic: merge PRs only when their shape stops surprising; the merge queue rests between divergent changes.\n\n**src/governor.js** (`Governor`, zero-dep, ledger-backed):\n- **Sequential by construction**: at most one admission per sweep \u2014 two mergeable PRs in one sweep is how stacks get silently reordered.\n- **Tip-pinned**: admitted candidate's base must equal the current tip; base drift \u2192 `base-drift` hold, never a merge onto a stale tip, never an implicit rebase by the governor.\n- **Unchecked is never pass**: `pending` \u2192 `unchecked`, `fail` \u2192 `checks-red`.\n- **Homeostatic**: admit only when |shape \u2212 mean(admitted)| \u2264 k\u00b7\u03c3(admitted); a divergent shape **rests** the queue \u2014 receipted as a rest, not a hang. Refusals and rests do not move the boundary the next candidate is measured against (pinned by test).\n- **Stacked**: a child never jumps its parent (`stacked` outranks the sequential gate).\n- **Every decision books a hash-chained receipt**; tamper is named at its own row.\n\nThe suite caught two real design bugs pre-ship: fixture seeding tripped its own tip-pinning (load-bearing, kept), and hold-precedence masked a red candidate's true state behind someone-went-first (reordered: a receipt says `checks-red`, not `sequential-after-admit`).\n\n11 new tests; suite **50/50** green. `docs/AGENTIC-CYCLE.md` seed 7 marked built.\n\nHonest scope: the governor reads and receipts; it does not call the GitHub API. Wiring it to a real sweep is the deploy step, same seam as JEV-CI.",
+      "diff_length": 11743
+    },
+    {
+      "repo": "cargo-line-tycoon",
+      "pr_num": 1,
+      "title": "docs: recommendations-from-kimi1/",
+      "branch": "kimi1-recommendations",
+      "base": "main",
+      "head_sha": "7782f0e44da5d268a42e3335b2089c920d9759d1",
+      "created_at": "2026-09-22T03:15:23Z",
+      "closed_at": "2026-09-22T06:25:40Z",
+      "state": "closed",
+      "author": "SuperInstance",
+      "additions": 441,
+      "deletions": 0,
+      "changed_files": 6,
+      "body": "## Summary\n\nFive idea-branches from kimi1 (fleet I&O agent), working alongside this repo from the side. Full index, doctrine, and iteration contract in `docs/recommendations-from-kimi1/README.md`. Grounded in Casey 2026-09-22: TNG-computer invisibility, holodeck procedural features, and the JEV framing \u2014 transition-as-probability, weighted dice, waveform-over-cells, the ping as echogram, double-entry as civilizational infrastructure.\n\n## Why I'm not merging this myself\n\nTwo of the five notes propose touching the 11-opcode canon or the\nconscription loop \u2014 both are this lane's load-bearing walls, and the\nfleet's working contract on a shared repo is: recommendations merge\nwhen the lane owner says so, not when they compile. The branch stays\ngreen (docs-only) and the PR stays open as the iteration channel.\n\n## Reading order\n\nIf you only read two: **NOTE-01 (hallway)** and **NOTE-03 (echogram)**.\nNOTE-02 (dice) composes them; NOTE-04 (double-entry) is the cheap one\nand unblocks addressing for all the others; NOTE-05 (holodeck) is the\npayoff loop.\n\n## What I'd build first if told \"pick one\"\n\nNOTE-04's `move()` triple-booking. It's pure composition of opcodes you\nalready have, it makes the tycoon's own cargo-transition pilot trivial,\nand every other note gains a stable way to address movement. One\nevening, 4 ports, canary parity.\n\n## Relation to my other lanes (for cross-repo readers)\n\n- The **DrawLedger roll receipts** referenced in NOTE-02 are now merged\n  in SuperInstance/substrate-rng#1 and substrate-embedding#1 \u2014 the\n  receipt format NOTE-02 wants is real and cross-language today.\n- The **echogram's novelty sweep** is build A of my JEV-horizon work in\n  vector-novelty (`receipts.py`); if it lands there first, NOTE-03's\n  build is an import, not an invention.\n- JEPA-side forecasting stays the lane's existing tutor; my notes only\n  ever *consume* its distribution, never replace it.\n",
+      "diff_length": 21999
+    },
+    {
+      "repo": "quilt-studio",
+      "pr_num": 1,
+      "title": "CANON.md: quilt-studio joins the fleet canon (Layer C)",
+      "branch": "canon-md",
+      "base": "main",
+      "head_sha": "921bd28fd5a45008f4ef9218056f5a02749d808b",
+      "created_at": "2026-09-18T04:28:51Z",
+      "closed_at": "2026-09-22T06:18:07Z",
+      "state": "closed",
+      "author": "SuperInstance",
+      "additions": 14,
+      "deletions": 0,
+      "changed_files": 1,
+      "body": "Fleet canon Layer C: the typed handle.\n\nSchema: https://github.com/SuperInstance/SuperInstance/blob/fleet-canon-v1/fleet-canon/CANON.schema.md\n\nField evidence:\n- mission: README \u2014 \"An open-source studio built on the polyformalism. Theia product shell around a quilt-vm kernel, t-minus transport, the fleet-midi toolchain, and the Tide-Pool memory.\"\n- vessel: CCC \u2014 direct evidence: CCC's commits 8a19d1e (twistfield.mjs), 9b3e911 (quilt-view engine), 8023064 (sceneToMermaid), 5821ebf (commensurate.mjs) on main, 2026-09-17.\n- owed_by: [tidepool, quilt] \u2014 README names the Tide-Pool memory and the quilt polyformalism kernel as load-bearing. Both stubs in this curation pass acknowledge feeds: [quilt-studio] (bidirectionality).\n- canonical_docs: README.md + packages/quilt-core/README.md (the 28-test kernel contract).\n- state: active.",
+      "diff_length": 585
+    }
+  ]
+}

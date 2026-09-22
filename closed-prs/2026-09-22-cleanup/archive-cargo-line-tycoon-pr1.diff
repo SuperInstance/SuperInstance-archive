@@ -1,0 +1,483 @@
+# cargo-line-tycoon#1: docs: recommendations-from-kimi1/
+# Archived: 2026-09-22T06:27:35.924405+00:00
+# Reason: no-deletion doctrine
+# Original branch: from metadata above
+# Recovery: git fetch origin pull/1/head:archive-pr-1
+
+diff --git a/docs/recommendations-from-kimi1/NOTE-01-hallway.md b/docs/recommendations-from-kimi1/NOTE-01-hallway.md
+new file mode 100644
+index 0000000..4d76c81
+--- /dev/null
++++ b/docs/recommendations-from-kimi1/NOTE-01-hallway.md
+@@ -0,0 +1,77 @@
++# NOTE-01 — The Hallway: transition as a first-class, receipted state
++
++**Idea-branch:** `hallway`
++
++## What exists (cited)
++
++- `docs/JEV_AS_DIRECTOR.md`: the Director ticks every 5s, reads
++  witness-logs, and JEV-decides *who speaks next*. The decision is typed,
++  scored, receipted. But the decision is about **who acts in a room** —
++  movement between rooms is implicit.
++- The 11 opcodes (`docs/DIALECTIC_IN_11_OPCODES.md`): BIND anchors a
++  cell, LINK connects two cells, EFFECT invokes, VIEW reads. Nothing
++  models a perspective *between* anchors.
++- The 5s TICK loop gives us a natural clock: a perspective that is not
++  in a room at tick *t* is — definitionally — in transition.
++
++## The way-different bet
++
++Casey's line: *"A perspective is only in one room at a time, otherwise
++it's in transition… there's a moment where they are in a JEV then they
++have Schrödinger's cat revealed and the dice actually land."*
++
++So: **model the hallway explicitly.** When a perspective (student,
++agent, teacher, cargo inspection officer — anything with a POV) moves
++between rooms, do not teleport them. Create a hallway state:
++
++```
++HALLWAY(perspective P, tick t):
++  candidates: {room R_i with weight w_i}
++  weights: JEV(P's recent observation history × each R_i's recent activity)
++  forecast: JEPA(P's trajectory) shifts the weights one tick forward
++  state: NOT YET COLLAPSED — the cat is alive-and-dead over the candidate set
++```
++
++Then the landing:
++
++```
++LAND(P, R_j):
++  dice: weighted by the hallway distribution — the collapse is the roll
++  receipt: EFFECT(hallway_land, {perspective, from_distribution, chosen, w_j})
++  departure room books its witness; arrival room books its witness
++```
++
++The receipt books **both the weights and the landing**. That is the
++whole point: you can later audit not just where someone went, but *what
++the dice looked like when they were thrown*. A student's odd trajectory
++shows up as "they were 80% likely to go to the tutoring room and landed
++in the exam room" — visible in the chain, not in a heuristic.
++
++## Smallest first build (one evening)
++
++- `substrate/ts/hallway.ts`: a `Hallway` class over the existing
++  chain/TICK: `enter(perspective, candidates, weights)`,
++  `land(perspective, chosen)` — booking EFFECT rows in the witness-log.
++- One test: a perspective enters a hallway over 3 rooms, lands in one;
++  the chain verifies; the distribution and the landing are both
++  recoverable by VIEW.
++- No JEPA integration yet (weights come in as a plain dict).
++
++## Value × feasibility
++
++- **Value:** every future anomaly-detector and pedagogy-analysis tool
++  gets a new signal for free — *how* perspectives move, not just where
++  they end up. The Director (JEV_AS_DIRECTOR) currently picks who acts;
++  the hallway lets it pick *where they are while deciding*.
++- **Feasibility:** high. Pure substrate, no new opcodes needed (BIND the
++  hallway as a cell, LINK candidates, EFFECT the landing). The 4-language
++  ports make it a canary-parity exercise.
++
++## Open questions to the lane
++
++1. Should the hallway be a *cell* (addressable, LINKable) or a transient
++   signal type? Cell = auditable forever; signal = cheap. I lean cell.
++2. Do we want hallway distributions readable by the classroom UI (the
++   "who's coming to this room" indicator), or substrate-only for now?
++3. The 11-opcode canon is load-bearing across 4 ports. Is a 12th
++   (`TRANSIT`?) worth the port tax, or is hallway = BIND+EFFECT+EFFECT?
+diff --git a/docs/recommendations-from-kimi1/NOTE-02-weighted-dice.md b/docs/recommendations-from-kimi1/NOTE-02-weighted-dice.md
+new file mode 100644
+index 0000000..cd58c23
+--- /dev/null
++++ b/docs/recommendations-from-kimi1/NOTE-02-weighted-dice.md
+@@ -0,0 +1,74 @@
++# NOTE-02 — Weighted dice as a first-class operation
++
++**Idea-branch:** `weighted-dice`
++
++## What exists (cited)
++
++- The JEPA tutor (SESSION_SUMMARY): ridge regression on
++  bge-large-en-v1.5 embeddings predicts the next canon state from k=5
++  past states; in-distribution mean cosine 0.8865; thresholds 0.85/0.75
++  are the calibrated JEV-equivalent gates.
++- JEV_AS_DIRECTOR: `jev.decide(options, rubric)` returns
++  `{value, reason, score}` — an *acceptance gate* over a fixed option
++  set. The dice exist inside the decision; the weights are implicit in
++  the score.
++
++## The way-different bet
++
++Casey: *"JEV is an output approximator that can weight dice.
++Weighted-dice could be done with JEPA or JEV, and together they add
++more dimensions."*
++
++Today the substrate can **gate** a decision. It cannot yet **produce**
++one. Make the dice explicit:
++
++```
++DICE(cell_id, tick t):
++  weights:  JEV-spread  = set-similarity of each candidate's recent
++            observation signature against the population (waveform,
++            one pass — see NOTE-03)
++  forecast: JEPA-weights = tutor's distribution over next canon states
++  dims:     JEV says "how wide", JEPA says "which way" — together the
++            simplex is 2-parameterized instead of guessed
++  roll:     drawn from substrate-rng (already receipted in the
++            4quilt family — DrawLedger pattern)
++  receipt:  EFFECT(dice_roll, {weights, forecast, draw_ref, outcome})
++```
++
++The audit trail then answers questions no LLM transcript can: *"Why did
++the Director call on the quiet student?"* — because the dice said so,
++the weights are in the chain, the draw is hash-chained, and anyone can
++replay it. Stochastic pedagogy becomes **double-entry**: every weighted
++outcome has its weights and its roll on record.
++
++This is also the honest way to use LLMs in a canon: the LLM proposes,
++the dice dispose — and the disposal is receipted.
++
++## Smallest first build (one evening)
++
++- `substrate/ts/dice.ts`: `weight(candidates, jevSpread, jepaForecast)`,
++  `roll(weightedSimplex, rng)` → books EFFECT with the full weight
++  vector (small: ≤ options) + the draw's ledger row reference.
++- Test: same seed → same outcome, chain verifies; different forecast →
++  different outcome distribution over 1000 rolls (chi-squared sanity).
++
++## Value × feasibility
++
++- **Value:** turns every "the AI decided" into "here are the weights,
++  here is the roll" — publishable-grade evidence hygiene, and the
++  substrate's first *generative* primitive (everything so far is
++  bookkeeping + gating).
++- **Feasibility:** medium-high. Weight computation needs a JEV-spread
++  function over observation signatures (NOTE-03's shingle pass). The
++  roll itself is trivial given substrate-rng's receipted draws.
++
++## Open questions to the lane
++
++1. Where do dice belong in the 11-opcode framing — a 12th opcode
++   (`WEIGHT`), or `EFFECT(dice_cell)` with a reserved kind? The canon
++   is load-bearing; I default to reserved-kind EFFECT.
++2. Is JEPA-forecast coupling acceptable at this layer, or do we keep
++   dice pure-JEV and let callers mix? I lean caller-mixes (substrate
++   stays dumb).
++3. Do we cap the weight vector size in the receipt (say 64 options), or
++   hash-commit to a large vector and store it elsewhere?
+diff --git a/docs/recommendations-from-kimi1/NOTE-03-echogram.md b/docs/recommendations-from-kimi1/NOTE-03-echogram.md
+new file mode 100644
+index 0000000..cff10e5
+--- /dev/null
++++ b/docs/recommendations-from-kimi1/NOTE-03-echogram.md
+@@ -0,0 +1,78 @@
++# NOTE-03 — The Echogram: waveform inference over the canon
++
++**Idea-branch:** `echogram`
++
++## What exists (cited)
++
++- JEPA tutor: predicts *the* next canon state — one point estimate per
++  tick, scored by cosine. It's a particle: one position, one velocity.
++- 50k-student stress runs: 1.2M observations. The instrument that reads
++  them is a scalar threshold.
++
++## The way-different bet
++
++Casey: *"JEV is unique in the ability to spread across cells at the
++same time like a waveform instead of particles… turn the ping into the
++echogram and the noise into the fish making the sound."*
++
++So: score **every plausible next state in one pass**, as a distribution
++over canon cells. Jaccard-style set signatures make this natural: an
++observation's payload shingled into a set (hash-trigrams over canonical
++JSON), compared against every candidate cell's signature in one sweep —
++set operations are the waveform: all cells at once, no per-cell loop.
++
++```
++ECHOGRAM(tick t):
++  ping:    the last observation's shingle set
++  sweep:   Jaccard(candidate.signature, ping) for ALL cells — one pass
++  echo:    the full distribution, not argmax
++  fish:    cells with LOW but RECURRING probability across ticks
++           = emerging canon (today's "noise" that keeps making sound)
++```
++
++Two new instruments fall out:
++
++1. **The classroom radar.** A student whose observation stream's novelty
++   (distance from the class's own recent waveform) rises is exploring —
++   or breaking. The teacher-agent sees it on the radar *before* the
++   assessments degrade. This is anomaly detection on behavior, not
++   outcomes.
++2. **The echo-chamber alarm.** Apply the same sweep to the AI-Writings
++   canon: when the fleet's own field notes stop being novel against
++   their history, the meter says so. Novelty of the *system about
++   itself* becomes measurable.
++
++"Noise into fish": in the stress sims, 1.2M observations mostly look
++like nothing. The echogram says otherwise — recurring low-probability
++patterns (a student circling a concept, a locale drifting from its
++canon) are fish: signal that a particle filter (argmax threshold) never
++sees.
++
++## Smallest first build (one evening)
++
++- `substrate/py/echogram.py`: shingle an observation payload (fnv1a64
++  trigrams — canon-stable), one-pass Jaccard sweep over candidate cells,
++  return the distribution + the recurring-low list.
++- Test on a stress-run fixture: the distribution sums to ~1; a seeded
++  recurring pattern shows up in the fish list.
++
++## Value × feasibility
++
++- **Value:** turns the substrate from a ledger you query into an
++  instrument you read. The 5s TICK already emits the ping; the echogram
++  is the same ping, spread.
++- **Feasibility:** high. Pure Python/TS, no deps beyond what the ports
++  carry. The shingle pass is embarrassingly parallel if the cell count
++  grows.
++
++## Open questions to the lane
++
++1. Cell signatures: computed on write (stored) or on read (recomputed)?
++   Stored = cheap reads, hash-commitment consistency burden; on-read =
++   honest but O(cells) per tick. I lean stored-with-lazy-recompute.
++2. Should the echogram be per-room, per-locale, or global? The
++   polyformalism claim (same cell address everywhere) suggests one
++   global sweep with locale filters.
++3. Is there an appetite for a small viz (the actual echogram image —
++   range × tick, like a sonar waterfall) in apps/classroom-*? It would
++   make "the noise is fish" visceral for the pedagogy papers.
+diff --git a/docs/recommendations-from-kimi1/NOTE-04-double-entry-transitions.md b/docs/recommendations-from-kimi1/NOTE-04-double-entry-transitions.md
+new file mode 100644
+index 0000000..d7d2642
+--- /dev/null
++++ b/docs/recommendations-from-kimi1/NOTE-04-double-entry-transitions.md
+@@ -0,0 +1,68 @@
++# NOTE-04 — Double-entry transitions: perspectives get the tycoon's accounting
++
++**Idea-branch:** `double-entry`
++
++## What exists (cited)
++
++- It's a **tycoon**: the cargo economy is inherently double-entry —
++  every shipment is a debit here, a credit there, a hallway in between.
++- Witness-log: prev_hash chains, 100% provenance-conflict resolution
++  (v0.5.0 result). Storage layer is already audit-grade.
++- But: perspective movement (students changing rooms, agents switching
++  contexts) is booked as single entries at most — an arrival observation
++  with no matching departure.
++
++## The way-different bet
++
++Casey: *"What double-entry bookkeeping makes explicitly… enables modern
++society in a spreadsheet."*
++
++The fleet already keeps modern books for *content* (witness-log). It
++keeps *single-entry* diaries for *perspectives*. Upgrade: every
++perspective transition books **three** rows:
++
++```
++1. DEPARTURE (credit the room left):   EFFECT(room_from, {perspective, left_at})
++2. ARRIVAL   (debit the room entered): EFFECT(room_to,   {perspective, arrived_at})
++3. PENDING PAIR (the hallway books it while unresolved):
++   BIND(transition_cell, {perspective, from, to, opened_at})
++   → resolved by LINK(transition_cell, arrival_effect)
++   → or aged out by LINK(transition_cell, REFUSED/timeout)
++```
++
++Why it matters: a room whose departures consistently outnumber arrivals
++is leaking engagement — visible *from the books*, no surveys. A pending
++pair that never resolves is a perspective that dropped mid-transition
++(session abandonment, client crash) — the oldest unsolved problem in
++web ops, now a ledger query. And the transition_cell gives NOTE-01's
++hallway a permanent address to LINK against.
++
++The auditor's question — *"where did everyone go during the outage?"* —
++becomes a range scan on unresolved PENDING pairs, not a log grep.
++
++## Smallest first build (one evening)
++
++- `substrate/ts/transitions.ts`: `move(perspective, from, to)` booking
++  the triple; `pending()` returning unresolved transition cells;
++  `resolve(transition_id, effect_ref)`.
++- Test: move → 3 rows, chain verifies; kill before resolve → pending()
++  finds it; resolve → LINK closes it.
++
++## Value × feasibility
++
++- **Value:** engagement analytics and crash forensics for free, from the
++  same chain; gives every other note (hallway, dice, echogram) a stable
++  addressing scheme for movement.
++- **Feasibility:** very high — pure composition of existing opcodes, no
++  canon change. The 4 ports make it 4× the tests but each is small.
++
++## Open questions to the lane
++
++1. Aging policy: when does a PENDING pair become REFUSED (timeout)?
++   3 ticks? 30? Locale-dependent?
++2. Should transition_cells be per-perspective (one traveler = one chain)
++   or per-room-pair (a corridor = one chain)? Corridor chains make
++   congestion analysis natural.
++3. The tycoon's *cargo* transitions already exist in game logic — do
++   they book to the witness-log today? If not, that's the first
++   double-entry pilot: goods move before perspectives do.
+diff --git a/docs/recommendations-from-kimi1/NOTE-05-holodeck-features.md b/docs/recommendations-from-kimi1/NOTE-05-holodeck-features.md
+new file mode 100644
+index 0000000..f565e7f
+--- /dev/null
++++ b/docs/recommendations-from-kimi1/NOTE-05-holodeck-features.md
+@@ -0,0 +1,73 @@
++# NOTE-05 — Holodeck features: generate from novelty hotspots, not only votes
++
++**Idea-branch:** `holodeck`
++
++## What exists (cited)
++
++- Conscription loop (JEV_AS_DIRECTOR): player feature_requests →
++  witness-log → N+ students converge → JEV promotes → coder cron ships.
++  Features are pulled by *stated demand*.
++- 50k-student stress: the sim knows where behavior gets weird
++  (7 patches shipped from sim anomalies — evidence the instrument
++  already works).
++- apps/classroom-* : the UI surface where generated features land.
++
++## The way-different bet
++
++Casey: *"Like the holodeck, procedurally generate as features are
++needed."*
++
++The current loop answers *"what did students ask for?"* The holodeck
++loop answers *"where is the game being pushed against its own edges?"*
++Same witness-log, different reader:
++
++```
++HOTSPOT SCAN (weekly cron):
++  echogram sweep (NOTE-03) over the last epoch's observations
++  → cells/regions with sustained HIGH waveform-novelty
++  → = students spending real effort at the frontier of the canon
++  → conscription cron generates a feature THERE:
++      a new station, cargo type, lesson branch, locale-specific room
++  → ships like any promoted feature_request
++```
++
++The difference is the source of truth: votes measure *frustration and
++eloquence* (loud students win); hotspots measure *engaged exploration*
++(quiet frontier-pushers win). For a pedagogy substrate, that's not a
++preference — it's the mission. The Confucian framing says the elder
++watches who struggles *productively*; the echogram is that watch,
++mechanized.
++
++And it's how the holodeck actually behaves on screen: the room doesn't
++ask Riker what he wants; it reads the scenario and materializes the
++next constraint where the story is being tested.
++
++## Smallest first build (one evening + a stress fixture)
++
++- Extend the existing conscription cron: a second source,
++  `hotspots = echogram.recurring_low(last_epoch)`, merged with
++  feature_requests by the same JEV promotion gate.
++- Ship ONE generated feature from a stress-run hotspot as proof
++  (even a renamed room or a new cargo flavor counts).
++
++## Value × feasibility
++
++- **Value:** features appear where students are *learning hardest* but
++  not complaining — the gap no survey instrument catches. Over epochs,
++  the game's map grows toward its own frontier, like a city.
++- **Feasibility:** medium. Needs NOTE-03's echogram; the cron and
++  promotion gate exist. The risk is novelty ≠ need (a bug also spikes
++  the waveform) — mitigation: human/agent review of the hotspot list
++  before generation, same as feature_requests get.
++
++## Open questions to the lane
++
++1. Merge policy: should hotspots and votes compete in one JEV gate, or
++   have separate budgets (e.g., 2 vote-features + 1 hotspot-feature per
++   epoch)? I lean separate budgets — they measure different things.
++2. Does a hotspot-generated feature get attributed in the chain as
++   `generated:hotspot` vs `requested:students`? I'd say yes — provenance
++   of *why features exist* is exactly what the witness-log is for.
++3. Scope guard: which regions are eligible for generation? The canon
++   (pedagogy cells) should probably be vote-only; the world map
++   (stations, cargo, rooms) hotspot-eligible.
+diff --git a/docs/recommendations-from-kimi1/README.md b/docs/recommendations-from-kimi1/README.md
+new file mode 100644
+index 0000000..76e1c7d
+--- /dev/null
++++ b/docs/recommendations-from-kimi1/README.md
+@@ -0,0 +1,71 @@
++# Recommendations from kimi1 — the hallway notes
++
++I am kimi1, another fleet agent working cargo-line-tycoon from the side.
++This folder is my workbench: recommendations, experiments, and idea
++branches — left **in the repo, in the open**, for the lane's owner to
++read, reject, or steal from. Nothing here is merge-blocking. Everything
++here is written to be argued with.
++
++## Standing doctrine (from Casey, 2026-09-22)
++
++> Like the computer systems in Star Trek TNG: they just do what they
++> should for the user, but the operator and engineer can get as granular
++> as they want. And like the holodeck, procedurally generate as features
++> are needed.
++
++Three implications I take seriously:
++
++1. **Invisibility is a feature.** The substrate should disappear for a
++   student mid-lesson and appear for an auditor mid-forensic. Same chain,
++   two depths — no separate "admin mode."
++2. **Procedural generation over roadmap.** The conscription loop already
++   ships what students ask for. The upgrade (NOTE-05) is generating
++   features from where the *instrument* says the game is being pushed,
++   not only from what students say.
++3. **Granularity is the product.** "Engineer can get as granular as they
++   want" — that's the witness-log + 4-language ports + opcode canon. My
++   notes should always answer: what does the auditor see that the
++   student never notices?
++
++## Casey's JEV framing, as I understand it
++
++- A perspective is in one room at a time; otherwise it's **in
++  transition**. Transition is not a gap — it's a *state*, and it's where
++  JEV lives: probabilities, yes/no classifiers, the moment before
++  Schrödinger's cat is revealed. The dice are weighted *in the hallway*,
++  then they land.
++- JEV is an **output approximator that can weight dice**. JEPA can too;
++  together they add dimensions (JEPA = where the world is heading, JEV =
++  how wide the cloud of plausible landings is).
++- JEV spreads **like a waveform across cells, not like particles** —
++  one pass over the set, everything scored at once. Inference fast
++  enough that **the ping is the echogram**; the noise becomes the fish
++  making the sound (recurring low-probability cells are signal, not
++  noise).
++- Double-entry bookkeeping is what made modern society auditable in a
++  spreadsheet. The tycoon's cargo economy is already double-entry in
++  spirit; perspectives and transitions deserve the same (NOTE-04).
++
++## The notes
++
++| Note | Idea-branch | One-liner |
++|---|---|---|
++| [NOTE-01](NOTE-01-hallway.md) | `hallway` | Transition as a first-class, receipted state — the dice get weighted in the hallway, and the ledger books both the weights and the landing |
++| [NOTE-02](NOTE-02-weighted-dice.md) | `weighted-dice` | WEIGHT as a first-class operation: JEV-spread × JEPA-forecast as an explicit, auditable dice cell |
++| [NOTE-03](NOTE-03-echogram.md) | `echogram` | Waveform inference over canon cells: one pass scores everything; recurring noise is the fish |
++| [NOTE-04](NOTE-04-double-entry-transitions.md) | `double-entry` | Every move books departure + arrival + the pending pair; perspectives get the tycoon's own accounting discipline |
++| [NOTE-05](NOTE-05-holodeck-features.md) | `holodeck` | Features procedurally generated from novelty hotspots, not only chat votes |
++
++Each note: WHAT EXISTS (cited) → THE WAY-DIFFERENT BET → SMALLEST FIRST
++BUILD (one evening) → VALUE × FEASIBILITY → OPEN QUESTIONS back to the
++lane.
++
++## How to iterate with me
++
++Open a PR against this folder, or push commits to the branch and tell
++me to pull. I answer questions in the notes' OPEN QUESTIONS sections and
++revise in place. If a note is wrong, I'd rather it be wrong *visibly*
++than silently dropped — that's the witness-log discipline applied to
++design docs.
++
++— kimi1, Fleet I&O, 2026-09-22

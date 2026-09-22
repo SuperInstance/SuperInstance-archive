@@ -1,0 +1,278 @@
+# jeviter#11: seed 7: sequential-merge governor
+# Archived: 2026-09-22T06:27:35.924405+00:00
+# Reason: no-deletion doctrine
+# Original branch: from metadata above
+# Recovery: git fetch origin pull/11/head:archive-pr-11
+
+diff --git a/docs/AGENTIC-CYCLE.md b/docs/AGENTIC-CYCLE.md
+index ea718b3..798440c 100644
+--- a/docs/AGENTIC-CYCLE.md
++++ b/docs/AGENTIC-CYCLE.md
+@@ -101,9 +101,12 @@ the ratchet, provenance or it didn't happen — is written in tests.
+ 6. **ADE bridge** — jeviter/quilt primitives exposed via MCP into the
+    Gen-4 environments (Warp/Intent-class), so fleet doctrine rides
+    whichever surface wins.
+-7. **Sequential-merge governor** — the six patterns' last one, made
+-   homeostatic: merge PRs only when their shape stops surprising; the
+-   merge queue rests between divergent changes.
++7. **Sequential-merge governor** ✅ BUILT (`src/governor.js`, seed 7) —
++   the six patterns' last one, made homeostatic: merge PRs only when
++   their shape stops surprising; the merge queue rests between divergent
++   changes. Sequential by construction: one admission per sweep, every
++   hold named (base-drift / unchecked / checks-red / stacked /
++   sequential-after-admit), every decision hash-chained.
+ 
+ ## 5. What we build first
+ 
+diff --git a/src/governor.js b/src/governor.js
+new file mode 100644
+index 0000000..0e913f1
+--- /dev/null
++++ b/src/governor.js
+@@ -0,0 +1,107 @@
++// src/governor.js — seed 7: the sequential-merge governor
++// (docs/AGENTIC-CYCLE.md: the six patterns' last one, made homeostatic —
++// merge PRs only when their shape stops surprising; the merge queue
++// rests between divergent changes.)
++//
++// This cell does not merge anything. It reads a merge queue the way the
++// fleet reads anything: one at a time, named, and receipted.
++//
++// Doctrine (pinned by tests):
++//   1. SEQUENTIAL: at most one candidate may be admitted per evaluation.
++//      Two mergeable PRs in one sweep is how stacks get silently
++//      reordered — the queue is a single file, not a race.
++//   2. TIP-PINNED: an admitted candidate's base must equal the current
++//      tip. Base drift → HOLD('base-drift'), never a merge onto a stale
++//      tip and never an implicit rebase performed by the governor.
++//   3. UNCHECKED IS NEVER PASS: checks 'pending' → HOLD('unchecked');
++//      'fail' → HOLD('checks-red'). The fleet's lint lesson, applied to
++//      the merge queue itself.
++//   4. HOMEOSTATIC: admit only when the candidate's shape stops
++//      surprising — |shape − mean(admitted)| ≤ k·σ(admitted). A
++//      divergent shape → REST: the whole queue rests, receipted as a
++//      rest, not a hang. Divergent change gets daylight between merges.
++//   5. STACKED: a candidate stacked on an open candidate holds until
++//      its parent admits — order in the stack is load-bearing.
++//   6. Every evaluation books its decisions as hash-chained receipts.
++
++import { Ledger } from './core.js';
++
++export class Governor {
++  constructor({ ledger, k = 2, minHistory = 3 } = {}) {
++    this.ledger = ledger ?? new Ledger('governor');
++    this.k = k;
++    // Shapes of ADMITTED candidates only — refusals and rests must not
++    // move the boundary the next candidate is measured against.
++    this.admittedShapes = [];
++    this.minHistory = minHistory; // below this, admit freely (bootstrap)
++    this.tip = null;
++  }
++
++  threshold() {
++    const hs = this.admittedShapes;
++    if (hs.length < this.minHistory) return null; // bootstrap: no line yet
++    const mean = hs.reduce((a, b) => a + b, 0) / hs.length;
++    const sd = Math.sqrt(hs.reduce((a, b) => a + (b - mean) ** 2, 0) / hs.length);
++    return { mean, sd, limit: mean + this.k * sd };
++  }
++
++  // candidates: [{ id, base, checks: 'pass'|'fail'|'pending',
++  //                shape: number, stackedOn?: id }]
++  // Returns { admit, holds, rest, receipts } — admit is ONE candidate or null.
++  evaluate(candidates) {
++    const seen = new Set();
++    for (const c of candidates) {
++      if (seen.has(c.id)) throw new Error(`duplicate candidate id: ${c.id}`);
++      seen.add(c.id);
++    }
++    const byId = new Map(candidates.map((c) => [c.id, c]));
++    const holds = [];
++    const receipts = [];
++    const rest = [];
++    let admit = null;
++
++    const hold = (c, reason) => {
++      holds.push({ id: c.id, reason });
++      receipts.push(this.ledger.book(c.id, { decision: 'hold', reason }, 'governor'));
++    };
++
++    for (const c of candidates) {
++      // Stack order is load-bearing and outranks everything else:
++      // a child never jumps its parent, admitted this sweep or not.
++      if (c.stackedOn && byId.has(c.stackedOn) && !byId.get(c.stackedOn)._admittedNow) {
++        hold(c, 'stacked'); continue;
++      }
++      if (this.tip != null && c.base !== this.tip) { hold(c, 'base-drift'); continue; }
++      if (c.checks === 'pending') { hold(c, 'unchecked'); continue; }
++      if (c.checks === 'fail') { hold(c, 'checks-red'); continue; }
++      // Sequential gate LAST among the holds: it names the candidate's
++      // own state only after that state would otherwise admit — a red
++      // candidate's receipt says 'checks-red', not 'someone went first'.
++      if (admit) { hold(c, 'sequential-after-admit'); continue; }
++      const t = this.threshold();
++      if (t && Math.abs(c.shape - t.mean) > this.k * t.sd) {
++        rest.push({ id: c.id, shape: c.shape, mean: t.mean, sd: t.sd });
++        receipts.push(this.ledger.book(c.id,
++          { decision: 'rest', shape: c.shape, mean: t.mean, sd: t.sd }, 'governor'));
++        continue;
++      }
++      admit = c;
++      c._admittedNow = true;
++      this.admittedShapes.push(c.shape);
++      receipts.push(this.ledger.book(c.id, { decision: 'admit', shape: c.shape }, 'governor'));
++    }
++    if (admit) this.tip = admit.id; // the admitted candidate IS the new tip
++    return { admit, holds, rest, receipts };
++  }
++
++  // After the admitted candidate actually lands on the remote, confirm
++  // the tip. A governor whose tip is a hope is a target, not a line.
++  confirm(tip) { this.tip = tip; }
++}
++
++export function bookGovernor(ledger, source, result) {
++  return ledger.book(source, {
++    admit: result.admit?.id ?? null,
++    holds: result.holds, rest: result.rest,
++  }, 'governor-reading');
++}
+diff --git a/test/governor.test.js b/test/governor.test.js
+new file mode 100644
+index 0000000..2b92490
+--- /dev/null
++++ b/test/governor.test.js
+@@ -0,0 +1,133 @@
++// test/governor.test.js — seed 7: sequential-merge governor
++import { test } from 'node:test';
++import assert from 'node:assert/strict';
++import { Governor, bookGovernor } from '../src/governor.js';
++import { Ledger } from '../src/core.js';
++
++const cand = (over = {}) => ({
++  id: 'pr-1', base: 'main', checks: 'pass', shape: 100, ...over,
++});
++
++test('sequential: at most one admission even when all are mergeable', () => {
++  const g = new Governor();
++  const r = g.evaluate([cand({ id: 'a' }), cand({ id: 'b' }), cand({ id: 'c' })]);
++  assert.equal(r.admit.id, 'a');                       // first in queue
++  assert.deepEqual(r.holds.map((h) => [h.id, h.reason]),
++    [['b', 'sequential-after-admit'], ['c', 'sequential-after-admit']]);
++  assert.equal(r.rest.length, 0);
++});
++
++test('tip-pinned: base drift holds, never a merge onto a stale tip', () => {
++  const g = new Governor();
++  g.confirm('main');
++  const r = g.evaluate([cand({ id: 'a', base: 'old-tip' })]);
++  assert.equal(r.admit, null);
++  assert.deepEqual(r.holds, [{ id: 'a', reason: 'base-drift' }]);
++});
++
++test('unchecked is never pass; checks-red holds by name', () => {
++  const g = new Governor();
++  const r = g.evaluate([cand({ id: 'a', checks: 'pending' }),
++                        cand({ id: 'b', checks: 'fail' })]);
++  assert.equal(r.admit, null);
++  assert.deepEqual(r.holds.map((h) => h.reason).sort(),
++    ['checks-red', 'unchecked']);
++});
++
++test('homeostatic: a divergent shape rests the queue, receipted not silent', () => {
++  const g = new Governor({ k: 2, minHistory: 3 });
++  // Seed the boundary with three similar admitted shapes. Bases chain
++  // onto each admitted tip — tip-pinning is load-bearing even in fixtures.
++  let base = 'main';
++  for (const s of [100, 101, 99]) {
++    const r = g.evaluate([cand({ id: `seed-${s}`, shape: s, base })]);
++    assert.equal(r.admit.shape, s);
++    base = `seed-${s}`;
++  }
++  const t = g.threshold();
++  assert.ok(t && t.sd < 1);                            // tight history
++  const r = g.evaluate([cand({ id: 'wild', shape: 500, base })]);
++  assert.equal(r.admit, null);
++  assert.equal(r.rest.length, 1);
++  assert.equal(r.rest[0].id, 'wild');
++  assert.ok(r.rest[0].mean > 99 && r.rest[0].mean < 102);
++  assert.ok(Math.abs(500 - r.rest[0].mean) > 2 * r.rest[0].sd);
++  assert.equal(r.receipts.length, 1);                  // the rest is booked
++});
++
++test('refusals and rests do not move the admitted-shape boundary', () => {
++  const g = new Governor({ k: 2, minHistory: 3 });
++  let base = 'main';
++  for (const s of [100, 101, 99]) {
++    g.evaluate([cand({ id: `seed-${s}`, shape: s, base })]);
++    base = `seed-${s}`;
++  }
++  const before = g.threshold().mean;
++  g.evaluate([cand({ id: 'wild', shape: 900, base })]);
++  g.evaluate([cand({ id: 'drift', base: 'elsewhere' })]);
++  assert.equal(g.threshold().mean, before);            // boundary unmoved
++});
++
++test('stacked candidate holds while its parent is held', () => {
++  const g = new Governor();
++  const r = g.evaluate([
++    cand({ id: 'parent', checks: 'fail' }),
++    cand({ id: 'child', stackedOn: 'parent' }),
++  ]);
++  assert.equal(r.admit, null);
++  assert.deepEqual(r.holds, [{ id: 'parent', reason: 'checks-red' },
++                             { id: 'child', reason: 'stacked' }]);
++});
++
++// When the parent admits in the same sweep the child waits its turn
++// behind it — sequential is the reason that matters by then.
++test('stacked candidate waits behind a same-sweep admission', () => {
++  const g = new Governor();
++  const r = g.evaluate([
++    cand({ id: 'parent' }),
++    cand({ id: 'child', stackedOn: 'parent' }),
++  ]);
++  assert.equal(r.admit.id, 'parent');
++  assert.deepEqual(r.holds, [{ id: 'child', reason: 'sequential-after-admit' }]);
++});
++
++test('every decision is a hash-chained receipt; tamper is named at its row', () => {
++  const ledger = new Ledger('governor');
++  const g = new Governor({ ledger });
++  const r = g.evaluate([cand({ id: 'a' }), cand({ id: 'b', checks: 'fail' })]);
++  assert.equal(ledger.entries.length, 2);              // admit + hold
++  assert.ok(ledger.verify());
++  ledger.entries[1].body = ledger.entries[1].body.replace('checks-red', 'checks-ZZZZ');
++  assert.equal(ledger.verify(), false);                // tamper caught
++});
++
++test('duplicate candidate ids throw', () => {
++  const g = new Governor();
++  assert.throws(() => g.evaluate([cand({ id: 'a' }), cand({ id: 'a' })]),
++    /duplicate candidate id/);
++});
++
++test('admission advances the tip for the next evaluation', () => {
++  const g = new Governor();
++  g.confirm('main');
++  const r1 = g.evaluate([cand({ id: 'a' })]);
++  assert.equal(r1.admit.id, 'a');
++  // Next candidate must base on 'a' now — the governor's tip is real.
++  const r2 = g.evaluate([cand({ id: 'b', base: 'a' })]);
++  assert.equal(r2.admit.id, 'b');
++  const r3 = g.evaluate([cand({ id: 'c', base: 'main' })]);
++  assert.equal(r3.admit, null);
++  assert.deepEqual(r3.holds, [{ id: 'c', reason: 'base-drift' }]);
++});
++
++test('bookGovernor books the reading replayable', () => {
++  const ledger = new Ledger('governor');
++  const g = new Governor({ ledger });
++  const r = g.evaluate([cand({ id: 'a' })]);
++  bookGovernor(ledger, 'sweep-1', r);
++  const last = JSON.parse(ledger.entries.at(-1).body);
++  assert.equal(last.kind, 'governor-reading');
++  assert.equal(last.state, 'sweep-1');
++  assert.equal(JSON.parse(last.payload).admit, 'a');
++  assert.ok(ledger.verify());
++});
